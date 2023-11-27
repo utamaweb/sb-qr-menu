@@ -20,7 +20,7 @@
                         <label class="d-tc mt-2"><strong>{{trans('file.Choose Warehouse')}}</strong> &nbsp;</label>
                         <input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}" />
                         <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" >
-                            <option value="0">{{trans('file.All Warehouse')}}</option>
+                            <option value="0">Semua Cabang</option>
                             @foreach($lims_warehouse_list as $warehouse)
                             <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                             @endforeach
@@ -55,7 +55,7 @@
             </div>
             {!! Form::close() !!}
         </div>
-        <?php 
+        <?php
             $color = '#733686';
             $color_rgba = 'rgba(115, 54, 134, 0.8)';
         ?>

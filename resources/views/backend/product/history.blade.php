@@ -27,9 +27,9 @@
                 </div>
                 <div class="col-md-3 @if(\Auth::user()->role_id > 2){{'d-none'}}@endif">
                     <div class="form-group">
-                        <label><strong>{{trans('file.Warehouse')}}</strong></label>
+                        <label><strong>Cabang</strong></label>
                         <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" >
-                            <option value="0">{{trans('file.All Warehouse')}}</option>
+                            <option value="0">Semua Cabang</option>
                             @foreach($lims_warehouse_list as $warehouse)
                                 <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                             @endforeach
@@ -69,7 +69,7 @@
                             <th class="not-exported-sale"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.customer')}}</th>
                             <th>{{trans('file.qty')}}</th>
                             <th>{{trans('file.Unit Price')}}</th>
@@ -88,7 +88,7 @@
                             <th class="not-exported-purchase"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.Supplier')}}</th>
                             <th>{{trans('file.qty')}}</th>
                             <th>{{trans('file.Unit Price')}}</th>
@@ -118,7 +118,7 @@
                             <th class="not-exported-sale-return"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.customer')}}</th>
                             <th>{{trans('file.qty')}}</th>
                             <th>{{trans('file.Unit Price')}}</th>
@@ -137,7 +137,7 @@
                             <th class="not-exported-purchase-return"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.Supplier')}}</th>
                             <th>{{trans('file.qty')}}</th>
                             <th>{{trans('file.Unit Price')}}</th>
@@ -387,7 +387,7 @@
             datatable_sum_purchase(api, false);
         }
     });
-    
+
     function datatable_sum_purchase(dt_selector, is_calling_first) {
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();

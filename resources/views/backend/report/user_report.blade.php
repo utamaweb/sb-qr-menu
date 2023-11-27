@@ -76,7 +76,7 @@
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
                             <th>{{trans('file.customer')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
                             <th>{{trans('file.grand total')}}</th>
                             <th>{{trans('file.Paid')}}</th>
@@ -112,7 +112,7 @@
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
                             <th>{{trans('file.Supplier')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
                             <th>{{trans('file.grand total')}}</th>
                             <th>{{trans('file.Paid Amount')}}</th>
@@ -148,7 +148,7 @@
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
                             <th>{{trans('file.customer')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
                             <th>{{trans('file.grand total')}}</th>
                             <th>{{trans('file.Status')}}</th>
@@ -237,7 +237,7 @@
                             <th class="not-exported-expense"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.category')}}</th>
                             <th>{{trans('file.Amount')}}</th>
                             <th>{{trans('file.Note')}}</th>

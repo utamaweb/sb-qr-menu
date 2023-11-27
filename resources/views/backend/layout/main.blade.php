@@ -407,7 +407,7 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-sm-12">
-              <p>&copy; {{$general_setting->site_title}} | {{trans('file.Developed')}} {{trans('file.By')}} <span class="external">{{$general_setting->developed_by}}</span> | V {{env('VERSION')}}</p>
+              <p>&copy; {{$general_setting->site_title}} | Utamaweb</p>
             </div>
           </div>
         </div>
@@ -557,8 +557,8 @@
                             </select>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label>{{trans('file.Warehouse')}} *</label>
-                            <select name="warehouse_id" id="expense_modal_warehouse_id" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select Warehouse...">
+                            <label>Cabang *</label>
+                            <select name="warehouse_id" id="expense_modal_warehouse_id" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Pilih cabang...">
 
                             </select>
                         </div>
@@ -736,8 +736,8 @@
                     {!! Form::open(['route' => 'report.warehouse', 'method' => 'post']) !!}
 
                       <div class="form-group">
-                          <label>{{trans('file.Warehouse')}} *</label>
-                          <select name="warehouse_id" id="warehouse_modal_id" class="selectpicker form-control" required data-live-search="true" id="warehouse-id" data-live-search-style="begins" title="Select warehouse...">
+                          <label>Cabang *</label>
+                          <select name="warehouse_id" id="warehouse_modal_id" class="selectpicker form-control" required data-live-search="true" id="warehouse-id" data-live-search-style="begins" title="Pilih cabang...">
 
                           </select>
                       </div>

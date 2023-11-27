@@ -6,7 +6,7 @@
 			<input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}">
             <h4 class="text-center mt-3">{{trans('file.Best Seller')}} {{trans('file.From')}} {{$start_month.' - '.date("F Y")}} &nbsp;&nbsp;
             <select class="selectpicker" id="warehouse_id" name="warehouse_id">
-				<option value="0">{{trans('file.All Warehouse')}}</option>
+				<option value="0">Semua Cabang</option>
 				@foreach($lims_warehouse_list as $warehouse)
 				<option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
 				@endforeach

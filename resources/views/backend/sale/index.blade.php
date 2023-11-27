@@ -15,7 +15,7 @@
                 <h3 class="text-center">{{trans('file.Sale List')}}</h3>
             </div>
             {!! Form::open(['route' => 'sales.index', 'method' => 'get']) !!}
-            <div class="row ml-1 mt-2">
+            <div class="row mx-2 mt-2">
                 <div class="col-md-3">
                     <div class="form-group">
                         <label><strong>{{trans('file.Date')}}</strong></label>
@@ -26,9 +26,9 @@
                 </div>
                 <div class="col-md-3 @if(\Auth::user()->role_id > 2){{'d-none'}}@endif">
                     <div class="form-group">
-                        <label><strong>{{trans('file.Warehouse')}}</strong></label>
+                        <label><strong>Cabang</strong></label>
                         <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" >
-                            <option value="0">{{trans('file.All Warehouse')}}</option>
+                            <option value="0">Semua Cabang</option>
                             @foreach($lims_warehouse_list as $warehouse)
                                 <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                             @endforeach
@@ -486,7 +486,7 @@
         columns.push({"data": field_name[i]});
     }
     columns.push({"data": "options"});
-    
+
     @if($lims_pos_setting_data)
         var public_key = <?php echo json_encode($lims_pos_setting_data->stripe_public_key) ?>;
     @endif

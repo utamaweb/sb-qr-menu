@@ -18,7 +18,7 @@
                     <th class="not-exported"></th>
                     <th>{{trans('file.Date')}}</th>
                     <th>{{trans('file.reference')}}</th>
-                    <th>{{trans('file.Warehouse')}}</th>
+                    <th>Cabang</th>
                     <th>{{trans('file.product')}}s</th>
                     <th>{{trans('file.Note')}}</th>
                     <th class="not-exported">{{trans('file.action')}}</th>

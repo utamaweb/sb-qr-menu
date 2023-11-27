@@ -17,7 +17,7 @@
                     <th class="not-exported"></th>
                     <th>{{trans('file.Date')}}</th>
                     <th>{{trans('file.reference')}}</th>
-                    <th>{{trans('file.Warehouse')}}</th>
+                    <th>Cabang</th>
                     <th>{{trans('file.category')}}</th>
                     <th>{{trans('file.Brand')}}</th>
                     <th>{{trans('file.Type')}}</th>
@@ -125,8 +125,8 @@
           <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
             <div class="row">
                 <div class="col-md-6 form-group">
-                    <label>{{trans('file.Warehouse')}} *</label>
-                    <select required name="warehouse_id" id="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select warehouse...">
+                    <label>Cabang *</label>
+                    <select required name="warehouse_id" id="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Pilih cabang...">
                         @foreach($lims_warehouse_list as $warehouse)
                         <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                         @endforeach

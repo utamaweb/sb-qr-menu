@@ -63,12 +63,12 @@
         <div role="tabpanel" class="tab-pane fade show active" id="customer-group-sale">
             <div class="table-responsive mb-4">
                 <table id="sale-table" class="table table-hover" style="width: 100%">
-                    <thead> 
+                    <thead>
                         <tr>
                             <th class="not-exported-sale"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}} No</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.customer')}}</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
                             <th>{{trans('file.grand total')}}</th>
@@ -132,7 +132,7 @@
                             <th class="not-exported-quotation"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}} No</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.customer')}}</th>
                             <th>{{trans('file.Supplier')}}</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
@@ -165,7 +165,7 @@
                             <th class="not-exported-return"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}} No</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.customer')}}</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
                             <th>{{trans('file.grand total')}}</th>
@@ -589,7 +589,7 @@
             datatable_sum_quotation(api, false);
         }
     });
-    
+
     function datatable_sum_quotation(dt_selector, is_calling_first) {
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
@@ -724,6 +724,6 @@
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
         }
     }
-    
+
 </script>
 @endpush

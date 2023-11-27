@@ -127,8 +127,8 @@
                                         </select>
                                     </div>
                                     <div class="form-group" id="warehouseId">
-                                        <label><strong>{{trans('file.Warehouse')}} *</strong></label>
-                                        <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Warehouse...">
+                                        <label><strong>Cabang *</strong></label>
+                                        <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Pilih cabang...">
                                           @foreach($lims_warehouse_list as $warehouse)
                                               <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                           @endforeach

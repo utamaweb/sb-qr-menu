@@ -71,7 +71,7 @@
                                                 @if($lims_pos_setting_data)
                                                 <input type="hidden" name="warehouse_id_hidden" value="{{$lims_pos_setting_data->warehouse_id}}">
                                                 @endif
-                                                <select required id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select warehouse...">
+                                                <select required id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Pilih cabang...">
                                                     @foreach($lims_warehouse_list as $warehouse)
                                                     <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                                     @endforeach
@@ -93,7 +93,7 @@
                                                 @if($lims_pos_setting_data)
                                                 <input type="hidden" name="warehouse_id_hidden" value="{{$lims_pos_setting_data->warehouse_id}}">
                                                 @endif
-                                                <select required id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select warehouse...">
+                                                <select required id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Pilih cabang...">
                                                     @foreach($lims_warehouse_list as $warehouse)
                                                     <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                                     @endforeach
@@ -312,7 +312,7 @@
                     <div class="payment-amount">
                         <h2>{{trans('file.grand total')}} <span id="grand-total">{{number_format(0, $general_setting->decimal, '.', '')}}</span></h2>
                     </div>
-                    <div class="payment-options">
+                    <div class="payment-options d-flex justify-content-end">
 
                         @if(in_array("card",$options))
                         <div class="column-5">
@@ -342,16 +342,16 @@
                             <button style="background-color: #5f27cd" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="gift-card-btn"><i class="fa fa-credit-card-alt"></i> {{trans('file.Gift Card')}}</button>
                         </div>
                         @endif
-                        @if(in_array("deposit",$options))
+                        {{-- @if(in_array("deposit",$options))
                         <div class="column-5">
                             <button style="background-color: #b33771" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="deposit-btn"><i class="fa fa-university"></i> {{trans('file.Deposit')}}</button>
                         </div>
-                        @endif
-                        @if($lims_reward_point_setting_data && $lims_reward_point_setting_data->is_active)
+                        @endif --}}
+                        {{-- @if($lims_reward_point_setting_data && $lims_reward_point_setting_data->is_active)
                         <div class="column-5">
                             <button style="background-color: #319398" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="point-btn"><i class="dripicons-rocket"></i> {{trans('file.Points')}}</button>
                         </div>
-                        @endif
+                        @endif --}}
                         <div class="column-5">
                             <button style="background-color: #d63031;" type="button" class="btn btn-sm btn-custom" id="cancel-btn" onclick="return confirmCancel()"><i class="fa fa-close"></i> {{trans('file.Cancel')}}</button>
                         </div>
@@ -1071,8 +1071,8 @@
                       <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
                         <div class="row">
                           <div class="col-md-6 form-group warehouse-section">
-                              <label>{{trans('file.Warehouse')}} *</strong> </label>
-                              <select required name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select warehouse...">
+                              <label>Cabang *</strong> </label>
+                              <select required name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Pilih cabang...">
                                   @foreach($lims_warehouse_list as $warehouse)
                                   <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                   @endforeach
@@ -1260,7 +1260,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <select required name="warehouseId" class="form-control">
-                                    <option value="0">{{trans('file.All Warehouse')}}</option>
+                                    <option value="0">Semua Cabang</option>
                                     @foreach($lims_warehouse_list as $warehouse)
                                     <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                     @endforeach

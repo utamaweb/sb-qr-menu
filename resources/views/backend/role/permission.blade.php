@@ -1298,7 +1298,7 @@
 							                    	@else
 							                    	<input type="checkbox" value="1" id="warehouse" name="warehouse">
 							                    	@endif
-								                    <label for="warehouse" class="padding05">{{trans('file.Warehouse')}} &nbsp;&nbsp;</label>
+								                    <label for="warehouse" class="padding05">Cabang &nbsp;&nbsp;</label>
 								                </div>
 								            </div>
 						                </span>

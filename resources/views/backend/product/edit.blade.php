@@ -365,7 +365,7 @@
                                         <table id="diffPrice-table" class="table table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>{{trans('file.Warehouse')}}</th>
+                                                    <th>Cabang</th>
                                                     <th>{{trans('file.Price')}}</th>
                                                 </tr>
                                                 @foreach($lims_warehouse_list as $warehouse)

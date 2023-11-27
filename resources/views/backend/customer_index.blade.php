@@ -61,7 +61,7 @@
                         <th>{{trans('file.date')}}</th>
                         <th>{{trans('file.reference')}}</th>
                         <th>{{trans('file.Biller')}}</th>
-                        <th>{{trans('file.Warehouse')}}</th>
+                        <th>Cabang</th>
                         <th>{{trans('file.Sale Status')}}</th>
                         <th>{{trans('file.Payment Status')}}</th>
                         <th>{{trans('file.grand total')}}</th>
@@ -247,7 +247,7 @@
                                 <th>{{trans('file.reference')}}</th>
                                 <th>{{trans('file.Biller')}}</th>
                                 <th>{{trans('file.customer')}}</th>
-                                <th>{{trans('file.Warehouse')}}</th>
+                                <th>Cabang</th>
                                 <th>{{trans('file.grand total')}}</th>
                                 <th class="not-exported">{{trans('file.action')}}</th>
                             </tr>

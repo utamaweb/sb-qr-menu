@@ -31,7 +31,7 @@
                         <label class="">{{trans('file.From Warehouse')}} &nbsp;</label>
                         <div class="">
                             <select id="from_warehouse_id" name="from_warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" >
-                                <option value="0">{{trans('file.All Warehouse')}}</option>
+                                <option value="0">Semua Cabang</option>
                                 @foreach($lims_warehouse_list as $warehouse)
                                     @if($warehouse->id == $from_warehouse_id)
                                         <option selected value="{{$warehouse->id}}">{{$warehouse->name}}</option>
@@ -48,7 +48,7 @@
                         <label class="">{{trans('file.To Warehouse')}} &nbsp;</label>
                         <div class="">
                             <select id="to_warehouse_id" name="to_warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" >
-                                <option value="0">{{trans('file.All Warehouse')}}</option>
+                                <option value="0">Semua Cabang</option>
                                 @foreach($lims_warehouse_list as $warehouse)
                                     @if($warehouse->id == $to_warehouse_id)
                                         <option selected value="{{$warehouse->id}}">{{$warehouse->name}}</option>
@@ -79,8 +79,8 @@
                     <th class="not-exported"></th>
                     <th>{{trans('file.Date')}}</th>
                     <th>{{trans('file.reference')}} No</th>
-                    <th>{{trans('file.Warehouse')}}({{trans('file.From')}})</th>
-                    <th>{{trans('file.Warehouse')}}({{trans('file.To')}})</th>
+                    <th>Cabang({{trans('file.From')}})</th>
+                    <th>Cabang({{trans('file.To')}})</th>
                     <th>{{trans('file.product')}} {{trans('file.Cost')}}</th>
                     <th>{{trans('file.product')}} {{trans('file.Tax')}}</th>
                     <th>{{trans('file.grand total')}}</th>

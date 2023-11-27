@@ -45,7 +45,7 @@
                                         <span class="validation-msg" id="code-error"></span>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Barcode Symbology')}} *</strong> </label>
                                         <div class="input-group">
@@ -274,7 +274,7 @@
                                         <table class="table table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>{{trans('file.Warehouse')}}</th>
+                                                    <th>Cabang</th>
                                                     <th>{{trans('file.qty')}}</th>
                                                 </tr>
                                                 @foreach($lims_warehouse_list as $warehouse)
@@ -338,14 +338,14 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12 mt-2" id="diffPrice-option">
-                                    <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1">&nbsp; {{trans('file.This product has different price for different warehouse')}}</h5>
+                                    <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1">&nbsp; Barang ini punya harga berbeda untuk cabang berbeda</h5>
                                 </div>
                                 <div class="col-md-6" id="diffPrice-section">
                                     <div class="table-responsive ml-2">
                                         <table id="diffPrice-table" class="table table-hover">
                                             <thead>
                                                 <tr>
-                                                    <th>{{trans('file.Warehouse')}}</th>
+                                                    <th>Cabang</th>
                                                     <th>{{trans('file.Price')}}</th>
                                                 </tr>
                                                 @foreach($lims_warehouse_list as $warehouse)

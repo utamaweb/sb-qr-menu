@@ -28,10 +28,10 @@
                 </div>
                 <div class="col-md-4 mt-3 @if(\Auth::user()->role_id > 2){{'d-none'}}@endif">
                     <div class="d-flex">
-                        <label class="">{{trans('file.Warehouse')}} &nbsp;</label>
+                        <label class="">Cabang &nbsp;</label>
                         <div class="">
                             <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" >
-                                <option value="0">{{trans('file.All Warehouse')}}</option>
+                                <option value="0">Semua Cabang</option>
                                 @foreach($lims_warehouse_list as $warehouse)
                                     @if($warehouse->id == $warehouse_id)
                                         <option selected value="{{$warehouse->id}}">{{$warehouse->name}}</option>
@@ -50,7 +50,7 @@
                 </div>
             </div>
             {!! Form::close() !!}
-        </div> 
+        </div>
         @if(in_array("returns-add", $all_permission))
             <a href="#" data-toggle="modal" data-target="#add-sale-return" class="btn btn-info"><i class="dripicons-plus"></i> {{trans('file.Add Return')}}</a>
         @endif
@@ -63,7 +63,7 @@
                     <th>{{trans('file.Date')}}</th>
                     <th>{{trans('file.reference')}}</th>
                     <th>{{trans('file.Sale Reference')}}</th>
-                    <th>{{trans('file.Warehouse')}}</th>
+                    <th>Cabang</th>
                     <th>{{trans('file.Biller')}}</th>
                     <th>{{trans('file.customer')}}</th>
                     <th>{{trans('file.grand total')}}</th>

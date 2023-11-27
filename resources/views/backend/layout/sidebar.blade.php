@@ -23,16 +23,16 @@
                 <?php
                     $add_permission_active = $role_has_permissions_list->where('name', 'products-add')->first();
                 ?>
-                @if($add_permission_active)
+                {{-- @if($add_permission_active)
                 <li id="product-create-menu"><a href="{{route('products.create')}}">{{__('file.add_product')}}</a></li>
-                @endif
+                @endif --}}
                 @endif
                 @if($print_barcode_active)
                 <li id="printBarcode-menu"><a href="{{route('product.printBarcode')}}">{{__('file.print_barcode')}}</a></li>
                 @endif
                 @if($adjustment_active)
                 <li id="adjustment-list-menu"><a href="{{route('qty_adjustment.index')}}">{{trans('file.Adjustment List')}}</a></li>
-                <li id="adjustment-create-menu"><a href="{{route('qty_adjustment.create')}}">{{trans('file.Add Adjustment')}}</a></li>
+                {{-- <li id="adjustment-create-menu"><a href="{{route('qty_adjustment.create')}}">{{trans('file.Add Adjustment')}}</a></li> --}}
                 @endif
                 @if($stock_count_active)
                 <li id="stock-count-menu"><a href="{{route('stock-count.index')}}">{{trans('file.Stock Count')}}</a></li>
@@ -96,20 +96,20 @@
             $index_permission_active = $role_has_permissions_list->where('name', 'expenses-index')->first();
             ?>
             @if($index_permission_active)
-            <li><a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>{{trans('file.Expense')}}</span></a>
+            <li><a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
             <ul id="expense" class="collapse list-unstyled ">
                 <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">{{trans('file.Expense Category')}}</a></li>
                 <li id="exp-list-menu"><a href="{{route('expenses.index')}}">{{trans('file.Expense List')}}</a></li>
-                <?php
+                {{-- <?php
                 $add_permission_active = $role_has_permissions_list->where('name', 'expenses-add')->first();
                 ?>
                 @if($add_permission_active)
                 <li><a id="add-expense" href=""> {{trans('file.Add Expense')}}</a></li>
-                @endif
+                @endif --}}
             </ul>
             </li>
             @endif
-            <?php
+            {{-- <?php
             $index_permission_active = $role_has_permissions_list->where('name', 'quotes-index')->first();
             ?>
             @if($index_permission_active)
@@ -124,8 +124,8 @@
                 @endif
             </ul>
             </li>
-            @endif
-            <?php
+            @endif --}}
+            {{-- <?php
             $index_permission_active = $role_has_permissions_list->where('name', 'transfers-index')->first();
             ?>
             @if($index_permission_active)
@@ -141,9 +141,9 @@
                 @endif
             </ul>
             </li>
-            @endif
+            @endif --}}
 
-            <?php
+            {{-- <?php
                 $sale_return_index_permission_active = $role_has_permissions_list->where('name', 'returns-index')->first();
 
                 $purchase_return_index_permission_active = $role_has_permissions_list->where('name', 'purchase-return-index')->first();
@@ -159,8 +159,8 @@
                 @endif
             </ul>
             </li>
-            @endif
-            <?php
+            @endif --}}
+            {{-- <?php
             $index_permission_active = $role_has_permissions_list->where('name', 'account-index')->first();
 
             $money_transfer_permission_active = $role_has_permissions_list->where('name', 'money-transfer')->first();
@@ -170,7 +170,7 @@
             $account_statement_permission_active = $role_has_permissions_list->where('name', 'account-statement')->first();
 
             ?>
-            {{-- @if($index_permission_active || $balance_sheet_permission_active || $account_statement_permission_active || $money_transfer_permission_active)
+            @if($index_permission_active || $balance_sheet_permission_active || $account_statement_permission_active || $money_transfer_permission_active)
             <li class=""><a href="#account" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-briefcase"></i><span>{{trans('file.Accounting')}}</span></a>
             <ul id="account" class="collapse list-unstyled ">
                 @if($index_permission_active)
@@ -189,7 +189,7 @@
             </ul>
             </li>
             @endif --}}
-            <?php
+            {{-- <?php
                 $department_active = $role_has_permissions_list->where('name', 'department')->first();
 
                 $index_employee_active = $role_has_permissions_list->where('name', 'employees-index')->first();
@@ -201,7 +201,7 @@
                 $holiday_active = $role_has_permissions_list->where('name', 'holiday')->first();
             ?>
 
-            {{-- @if($department_active || $index_employee_active || $attendance_active || $payroll_active || $holiday_active)
+            @if($department_active || $index_employee_active || $attendance_active || $payroll_active || $holiday_active)
             <li class=""><a href="#hrm" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-user-group"></i><span>HRM</span></a>
             <ul id="hrm" class="collapse list-unstyled ">
                 @if($department_active)

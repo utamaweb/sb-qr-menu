@@ -64,7 +64,7 @@
                             <th class="not-exported-purchase"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
                             <th>{{trans('file.grand total')}}</th>
                             <th>{{trans('file.Paid')}}</th>
@@ -124,7 +124,7 @@
                             <th class="not-exported-return"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
                             <th>{{trans('file.grand total')}}</th>
                         </tr>
@@ -152,7 +152,7 @@
                             <th class="not-exported-quotation"></th>
                             <th>{{trans('file.Date')}}</th>
                             <th>{{trans('file.reference')}}</th>
-                            <th>{{trans('file.Warehouse')}}</th>
+                            <th>Cabang</th>
                             <th>{{trans('file.customer')}}</th>
                             <th>{{trans('file.product')}} ({{trans('file.qty')}})</th>
                             <th>{{trans('file.grand total')}}</th>

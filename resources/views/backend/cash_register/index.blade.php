@@ -14,7 +14,7 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th>{{trans('file.User')}}</th>
-                    <th>{{trans('file.Warehouse')}}</th>
+                    <th>Cabang</th>
                     <th>{{trans('file.Cash in Hand')}}</th>
                     <th>{{trans('file.Opened at')}}</th>
                     <th>{{trans('file.Closed at')}}</th>

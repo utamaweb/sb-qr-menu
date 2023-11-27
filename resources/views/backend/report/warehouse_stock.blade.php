@@ -8,9 +8,9 @@
 					<div class="col-md-6 offset-md-3 mt-3 text-center">
 						{{ Form::open(['route' => 'report.warehouseStock', 'method' => 'get', 'id' => 'report-form']) }}
 						<h3>{{trans('file.Stock Chart')}} </h3>
-						<p>Select warehouse to view chart</p>
+						<p>Pilih Cabang</p>
 						<select class="form-control mb-3" id="warehouse_id" name="warehouse_id">
-							<option value="0">{{trans('file.All Warehouse')}}</option>
+							<option value="0">Semua Cabang</option>
 							@foreach($lims_warehouse_list as $warehouse)
 							<option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
 							@endforeach

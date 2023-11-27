@@ -10,7 +10,7 @@
     <meta name="robots" content="all,follow">
     <link rel="icon" type="image/png" href="{{url('public/logo', $general_setting->site_logo)}}" />
     @if(!config('database.connections.saleprosaas_landlord'))
-    <link rel="icon" type="image/png" href="{{url('logo', $general_setting->site_logo)}}" />
+    <link rel="icon" type="image/png" href="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}" />
     <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="<?php echo asset('vendor/bootstrap/css/bootstrap.min.css') ?>" type="text/css">
     <!-- login stylesheet-->

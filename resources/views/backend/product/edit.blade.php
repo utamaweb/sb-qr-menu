@@ -259,7 +259,7 @@
                                                     @endforeach
                                                 @elseif($field->type == 'radio_button')
                                                     <br>
-                                                    <?php 
+                                                    <?php
                                                     $option_values = explode(",", $field->option_value);
                                                     ?>
                                                     @foreach($option_values as $value)
@@ -336,7 +336,7 @@
                                                 <tr>
                                                     <td><button type="button" class="btn btn-sm"><i class="fa fa-list"></i></button></i></td>
                                                     <td>
-                                                        <img src="{{url('public/images/product', $image)}}" height="60" width="60">
+                                                        <img src="{{ Storage::url('images/product/'. $image) }}" height="60" width="60">
                                                         <input type="hidden" name="prev_img[]" value="{{$image}}">
                                                     </td>
                                                     <td><button type="button" class="btn btn-sm btn-danger remove-img">X</button></td>

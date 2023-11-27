@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     @if(!config('database.connections.saleprosaas_landlord'))
-    <link rel="icon" type="image/png" href="{{url('logo', $general_setting->site_logo)}}" />
+    <link rel="icon" type="image/png" href="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}" />
     <title>{{$general_setting->site_title}}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -129,9 +129,12 @@
       <nav class="side-navbar">
         <span class="brand-big">
             @if($general_setting->site_logo)
-            <a href="{{url('/')}}"><img src="{{url('logo', $general_setting->site_logo)}}" width="115"></a>
+            <a href="{{url('/')}}"><img src="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}"
+                    width="115"></a>
             @else
-            <a href="{{url('/')}}"><h1 class="d-inline">{{$general_setting->site_title}}</h1></a>
+            <a href="{{url('/')}}">
+                <h1 class="d-inline">{{$general_setting->site_title}}</h1>
+            </a>
             @endif
         </span>
         @include('backend.layout.sidebar')
@@ -146,7 +149,7 @@
 
 
             <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
-            <div class="dropdown">
+            {{-- <div class="dropdown">
               <a class="btn-pos btn-sm" type="button" data-toggle="dropdown" aria-expanded="false">
                 <i class="dripicons-plus"></i>
               </a>
@@ -230,7 +233,7 @@
                 <li class="dropdown-item"><a href="{{route('supplier.create')}}">{{trans('file.Add Supplier')}}</a></li>
                 @endif
               </ul>
-            </div>
+            </div> --}}
             <?php
                 $empty_database_permission_active = $role_has_permissions_list->where('name', 'empty_database')->first();
 
@@ -243,7 +246,7 @@
             @if($sale_add_permission_active)
             <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> POS</span></a></li>
             @endif
-            <li class="nav-item"><a id="switch-theme" data-toggle="tooltip" title="{{trans('file.Switch Theme')}}"><i class="dripicons-brightness-max"></i></a></li>
+            {{-- <li class="nav-item"><a id="switch-theme" data-toggle="tooltip" title="{{trans('file.Switch Theme')}}"><i class="dripicons-brightness-max"></i></a></li> --}}
             <li class="nav-item"><a id="btnFullscreen" data-toggle="tooltip" title="{{trans('file.Full Screen')}}"><i class="dripicons-expand"></i></a></li>
             @if(\Auth::user()->role_id <= 2)
                 <li class="nav-item"><a href="{{route('cashRegister.index')}}" data-toggle="tooltip" title="{{trans('file.Cash Register List')}}"><i class="dripicons-archive"></i></a></li>
@@ -290,7 +293,7 @@
                     </ul>
                 </li>
             @endif
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                     <a rel="nofollow" title="{{trans('file.language')}}" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-web"></i></a>
                     <ul class="right-sidebar">
                         <li>
@@ -351,7 +354,7 @@
                           <a href="{{ url('language_switch/swahili') }}" class="btn btn-link"> Swahili</a>
                         </li>
                     </ul>
-            </li>
+            </li> --}}
             <li class="nav-item">
                 <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst(Auth::user()->name)}}</span> <i class="fa fa-angle-down"></i>
                 </a>
@@ -367,16 +370,16 @@
                     <li>
                     <a href="{{url('my-transactions/'.date('Y').'/'.date('m'))}}"><i class="dripicons-swap"></i> {{trans('file.My Transaction')}}</a>
                     </li>
-                    @if(Auth::user()->role_id != 5)
+                    {{-- @if(Auth::user()->role_id != 5)
                     <li>
                     <a href="{{url('holidays/my-holiday/'.date('Y').'/'.date('m'))}}"><i class="dripicons-vibrate"></i> {{trans('file.My Holiday')}}</a>
                     </li>
-                    @endif
-                    @if($empty_database_permission_active)
+                    @endif --}}
+                    {{-- @if($empty_database_permission_active)
                     <li>
                     <a onclick="return confirm('Are you sure want to delete? If you do this all of your data will be lost.')" href="{{route('setting.emptyDatabase')}}"><i class="dripicons-stack"></i> {{trans('file.Empty Database')}}</a>
                     </li>
-                    @endif
+                    @endif --}}
                     <li>
                     <a href="{{ route('logout') }}"
                         onclick="event.preventDefault();
@@ -427,7 +430,7 @@
                                 <input type="hidden" name="sender_id" value="{{\Auth::id()}}">
                               <label>{{trans('file.User')}} *</label>
                               <select id="receiver_id" name="receiver_id" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select user...">
-                                  
+
                               </select>
                           </div>
                           <div class="col-md-4 form-group">
@@ -497,14 +500,14 @@
                       <div class="col-md-6 form-group">
                           <label>{{ __('Icon') }} (SVG format)</label>
                           <input type="file" name="icon" class="form-control">
-                      </div> 
+                      </div>
                       <div class="col-md-6 form-group">
                           <br>
                           <input type="checkbox" name="featured" id="featured" value="1"> <label>{{ __('List on category dropdown') }}</label>
                       </div>
                       @endif
                   </div>
-                  
+
                   @if(in_array('ecommerce',explode(',',$general_setting->modules)))
                   <div class="row">
                       <div class="col-md-12 mt-3">
@@ -1112,7 +1115,7 @@
             $('#notification-modal').modal();
           }
         });
-        
+
       });
 
       $("a#add-account").click(function(e){
@@ -1179,7 +1182,7 @@
             $('#warehouse-modal').modal();
           }
         });
-        
+
       });
 
       $("a#user-report-link").click(function(e){
@@ -1196,7 +1199,7 @@
             $('#user-modal').modal();
           }
         });
-        
+
       });
 
       $("a#customer-report-link").click(function(e){
@@ -1245,7 +1248,7 @@
             $('#supplier-modal').modal();
           }
         });
-        
+
       });
 
       $("a#due-report-link").click(function(e){

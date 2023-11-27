@@ -57,7 +57,7 @@ class SettingController extends Controller
         }
         return redirect()->back()->with('message', 'Database cleared successfully');
     }
-    
+
     public function generalSetting()
     {
         $lims_general_setting_data = GeneralSetting::latest()->first();
@@ -118,11 +118,11 @@ class SettingController extends Controller
         $general_setting->state = $data['state'];
         $logo = $request->site_logo;
         if ($logo) {
-            $this->fileDelete('logo/', $general_setting->site_logo);
+            $this->fileDelete('storage/images/logo', $general_setting->site_logo);
 
             $ext = pathinfo($logo->getClientOriginalName(), PATHINFO_EXTENSION);
             $logoName = date("Ymdhis") . '.' . $ext;
-            $logo->move('public/logo', $logoName);
+            $logo->move('storage/images/logo', $logoName);
             $general_setting->site_logo = $logoName;
         }
         $general_setting->save();

@@ -14,7 +14,7 @@
 <nav class="side-navbar shrink">
     <span class="brand-big">
         @if($general_setting->site_logo)
-        <a href="{{url('/')}}"><img src="{{url('logo', $general_setting->site_logo)}}" width="115"></a>
+        <a href="{{url('/')}}"><img src="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}" width="115"></a>
         @else
         <a href="{{url('/')}}"><h1 class="d-inline">{{$general_setting->site_title}}</h1></a>
         @endif
@@ -154,13 +154,13 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-md-2">
+                                    {{-- <div class="col-md-2">
                                         <select name="currency_id" id="currency" class="form-control selectpicker" data-toggle="tooltip" title="" data-original-title="Sale currency">
                                             @foreach($currency_list as $currency_data)
                                             <option value="{{$currency_data->id}}" data-rate="{{$currency_data->exchange_rate}}">{{$currency_data->code}}</option>
                                             @endforeach
                                         </select>
-                                    </div> 
+                                    </div>
                                     <div class="col-md-2">
                                         <div class="form-group d-flex">
                                             <input class="form-control" type="text" id="exchange_rate" name="exchange_rate" value="{{$currency->exchange_rate}}">
@@ -168,7 +168,7 @@
                                                 <span class="input-group-text" data-toggle="tooltip" title="" data-original-title="currency exchange rate">i</span>
                                             </div>
                                         </div>
-                                    </div>
+                                    </div> --}}
                                     @foreach($custom_fields as $field)
                                         @if(!$field->is_admin || \Auth::user()->role_id == 1)
                                             <div class="{{'col-md-'.$field->grid_value}}">
@@ -557,7 +557,7 @@
 
                         <div class="navbar-header">
                           <ul class="nav-menu list-unstyled d-flex flex-md-row align-items-md-center">
-                            <div class="dropdown">
+                            {{-- <div class="dropdown">
                               <a class="btn-pos btn-sm" type="button" data-toggle="dropdown" aria-expanded="false">
                                 <i class="dripicons-plus"></i>
                               </a>
@@ -641,7 +641,7 @@
                                 <li class="dropdown-item"><a href="{{route('supplier.create')}}">{{trans('file.Add Supplier')}}</a></li>
                                 @endif
                               </ul>
-                            </div>
+                            </div> --}}
                             <li class="nav-item ml-4"><a id="btnFullscreen" data-toggle="tooltip" title="Full Screen"><i class="dripicons-expand"></i></a></li>
                             <?php
                                 $general_setting_permission = $permission_list->where('name', 'general_setting')->first();
@@ -657,9 +657,9 @@
                                     ['role_id', Auth::user()->role_id]
                                 ])->first();
                             ?>
-                            @if($pos_setting_permission_active)
+                            {{-- @if($pos_setting_permission_active)
                             <li class="nav-item"><a class="dropdown-item" data-toggle="tooltip" href="{{route('setting.pos')}}" title="{{trans('file.POS Setting')}}"><i class="dripicons-gear"></i></a> </li>
-                            @endif
+                            @endif --}}
                             <li class="nav-item">
                                 <a href="{{route('sales.printLastReciept')}}" data-toggle="tooltip" title="{{trans('file.Print Last Reciept')}}"><i class="dripicons-print"></i></a>
                             </li>
@@ -723,11 +723,11 @@
                                     <li>
                                         <a href="{{url('my-transactions/'.date('Y').'/'.date('m'))}}"><i class="dripicons-swap"></i> {{trans('file.My Transaction')}}</a>
                                     </li>
-                                    @if(Auth::user()->role_id != 5)
+                                    {{-- @if(Auth::user()->role_id != 5)
                                     <li>
                                         <a href="{{url('holidays/my-holiday/'.date('Y').'/'.date('m'))}}"><i class="dripicons-vibrate"></i> {{trans('file.My Holiday')}}</a>
                                     </li>
-                                    @endif
+                                    @endif --}}
                                     <li>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault();
@@ -1400,7 +1400,7 @@ $('#currency').change(function(){
         currencyChange = true;
         checkDiscount($(this).val(), true);
         couponDiscount();
-    }); 
+    });
 });
 
 var localStorageQty = [];
@@ -2662,7 +2662,7 @@ function checkQuantity(sale_qty, flag) {
                     localStorageQty[rowindex] = sale_qty;
                     localStorage.setItem("localStorageQty", localStorageQty);
                     checkQuantity(sale_qty, true);
-                } 
+                }
                 else {
                     localStorageQty[rowindex] = sale_qty;
                     localStorage.setItem("localStorageQty", localStorageQty);

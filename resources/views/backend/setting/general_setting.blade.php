@@ -35,7 +35,7 @@
                                     </span>
                                     @endif
                                 </div>
-                                <div class="col-md-4 mt-4">
+                                {{-- <div class="col-md-4 mt-4">
                                     <div class="form-group">
                                         @if($lims_general_setting_data->is_rtl)
                                         <input type="checkbox" name="is_rtl" value="1" checked>
@@ -46,7 +46,7 @@
                                         <label>{{trans('file.RTL Layout')}}</label>
 
                                     </div>
-                                </div>
+                                </div> --}}
                                 @if(config('database.connections.saleprosaas_landlord'))
                                     <div class="col-md-4 mt-4">
                                         <div class="form-group">
@@ -67,7 +67,7 @@
                                         <input type="text" name="company_name" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->company_name}}@endif" />
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.VAT Registration Number')}}</label>
                                         <input type="text" name="vat_registration_number" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->vat_registration_number}}@endif" />
@@ -86,7 +86,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Currency')}} *</label>
                                         <select name="currency" class="form-control" required>
@@ -100,7 +100,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Currency Position')}} *</label><br>
                                         @if($lims_general_setting_data->currency_position == 'prefix')
@@ -169,7 +169,7 @@
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Invoice Format')}} *</label>
                                         @if($lims_general_setting_data)

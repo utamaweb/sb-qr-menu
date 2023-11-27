@@ -199,9 +199,17 @@
                     rows: ':visible'
                 },
             },
+            // {
+            //     extend: 'excel',
+            //     text: '<i title="export to excel" class="dripicons-document-new"></i>',
+            //     exportOptions: {
+            //         columns: ':visible:Not(.not-exported)',
+            //         rows: ':visible'
+            //     },
+            // },
             {
                 extend: 'excel',
-                text: '<i title="export to excel" class="dripicons-document-new"></i>',
+                text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
                 exportOptions: {
                     columns: ':visible:Not(.not-exported)',
                     rows: ':visible'

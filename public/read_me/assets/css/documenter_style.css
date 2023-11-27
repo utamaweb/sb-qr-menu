@@ -17,7 +17,7 @@ html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,a,abbr,ac
 	font-family:inherit;
 	vertical-align:baseline;
 }
-html { 
+html {
 	font-size:101%;
 	font-family:Nunito;
 	font-size:14px;
@@ -34,7 +34,7 @@ body{
 footer, header, section {
 	display:block;
 }
-a{ color:#7c5cc4; text-decoration:none; cursor:pointer; }
+a{ color:#2279be; text-decoration:none; cursor:pointer; }
 a:hover { text-decoration:underline }
 p, ul, ol{
 	margin:18px 0;
@@ -50,7 +50,7 @@ li.placeholder{
 	width:100%;
 	font-size:16px;
 }
-hr { 
+hr {
 	display:block;
 	height:0px;
 	line-height:0px;
@@ -120,10 +120,10 @@ strong{
 	z-index:100;
 }
 #documenter_sidebar a:hover{
-	color: #7c5cc4;
+	color: #2279be;
 }
 #documenter_sidebar a.current{
-	color: #7c5cc4;
+	color: #2279be;
 }
 img{
 	border: 20px solid #ddd;
@@ -372,7 +372,7 @@ noscript p{
 	p, h2, h3 { orphans: 3; widows: 3; }
 	h2, h3{ page-break-after: avoid; }
 	hr { border-top:1px solid #000 !important;border-bottom:0 !important; }
-	
+
 	#documenter_sidebar{
 		-moz-box-shadow:none;
 		-webkit-box-shadow:none;
@@ -384,7 +384,7 @@ noscript p{
 		margin-top:500px;
 	}
 	#documenter_sidebar ul:before { content: "Table of Contents"; }
-	
+
 	#documenter_sidebar ul{
 		border:0 !important;
 	}

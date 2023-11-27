@@ -100,8 +100,8 @@
                                     <label class="mt-2"><strong>{{trans('file.Thermal POS receipt')}}</strong></label>
                                 </div>
                             </div>
-                            <hr>
-                            <div class="row">
+                            {{-- <hr> --}}
+                            <div class="row d-none">
                                 <div class="col-md-12">
                                     <h4><strong>Stripe</strong></h4>
                                 </div>
@@ -119,7 +119,7 @@
                                 </div>
                             </div>
                             <hr>
-                            <div class="row">
+                            <div class="row d-none">
                                 <div class="col-md-12">
                                     <h4><strong>Paypal</strong></h4>
                                 </div>
@@ -157,7 +157,7 @@
                                         <label class="mt-2"><strong>Cash</strong></label>
                                     </div>
 
-                                    <div class="form-group d-inline">
+                                    {{-- <div class="form-group d-inline">
                                         @if(in_array("card",$options))
                                         <input class="mt-2" type="checkbox" name="options[]" value="card" checked>
                                         @else
@@ -200,7 +200,7 @@
                                         <input class="mt-2" type="checkbox" name="options[]" value="paypal">
                                         @endif
                                         <label class="mt-2"><strong>Paypal</strong></label>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                             <div class="form-group mt-3">

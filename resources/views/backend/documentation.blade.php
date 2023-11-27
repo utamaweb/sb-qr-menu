@@ -14,7 +14,7 @@
     <meta name="copyright" content="{{$general_setting->developed_by}}">
     <meta name="generator" content="Documenter v2.0 http://rxa.li/documenter">
     <meta name="date" content="2017-04-26T00:00:00+02:00">
-    <link rel="icon" type="image/png" href="{{url('logo', $general_setting->site_logo)}}" />
+    <link rel="icon" type="image/png" href="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}" />
     <!-- Google fonts - Roboto -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Nunito:400,700">
     <link rel="stylesheet" href="read_me/assets/css/documenter_style.css" media="all">

@@ -13,15 +13,15 @@
 
 <section>
     <div class="container-fluid">
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info add-warehouse-btn"><i class="dripicons-plus"></i> {{trans('file.Add Warehouse')}}</a>
-        <a href="#" data-toggle="modal" data-target="#importWarehouse" class="btn btn-primary add-warehouse-btn"><i class="dripicons-copy"></i> {{trans('file.Import Warehouse')}}</a>
+        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info add-warehouse-btn"><i class="dripicons-plus"></i> Tambah Cabang</a>
+        {{-- <a href="#" data-toggle="modal" data-target="#importWarehouse" class="btn btn-primary add-warehouse-btn"><i class="dripicons-copy"></i> {{trans('file.Import Warehouse')}}</a> --}}
     </div>
     <div class="table-responsive">
         <table id="warehouse-table" class="table">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>{{trans('file.Warehouse')}}</th>
+                    <th>Cabang</th>
                     <th>{{trans('file.Phone Number')}}</th>
                     <th>{{trans('file.Email')}}</th>
                     <th>{{trans('file.Address')}}</th>
@@ -85,7 +85,7 @@
     <div class="modal-content">
         {!! Form::open(['route' => 'warehouse.store', 'method' => 'post']) !!}
       <div class="modal-header">
-        <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Warehouse')}}</h5>
+        <h5 id="exampleModalLabel" class="modal-title">Tambah Cabang</h5>
         <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
       </div>
       <div class="modal-body">
@@ -276,69 +276,51 @@
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
         dom: '<"row"lfB>rtip',
         buttons: [
-            {
-                extend: 'pdf',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            {
-                extend: 'excel',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            {
-                extend: 'csv',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            {
-                extend: 'print',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
-                        warehouse_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                warehouse_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(warehouse_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'warehouse/deletebyselection',
-                                data:{
-                                    warehouseIdArray: warehouse_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!warehouse_id.length)
-                            alert('No warehouse is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
-                }
-            },
-            {
-                extend: 'colvis',
-                columns: ':gt(0)'
-            },
+        {
+        extend: 'pdf',
+        text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
+        exportOptions: {
+        columns: ':visible:Not(.not-exported)',
+        rows: ':visible'
+        },
+        },
+        // {
+        // extend: 'excel',
+        // text: '<i title="export to excel" class="dripicons-document-new"></i>',
+        // exportOptions: {
+        // columns: ':visible:Not(.not-exported)',
+        // rows: ':visible'
+        // },
+        // },
+        {
+        extend: 'excel',
+        text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
+        exportOptions: {
+        columns: ':visible:Not(.not-exported)',
+        rows: ':visible'
+        },
+        },
+        {
+        extend: 'csv',
+        text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
+        exportOptions: {
+        columns: ':visible:Not(.not-exported)',
+        rows: ':visible'
+        },
+        },
+        {
+        extend: 'print',
+        text: '<i title="print" class="fa fa-print"></i>',
+        exportOptions: {
+        columns: ':visible:Not(.not-exported)',
+        rows: ':visible'
+        },
+        },
+        {
+        extend: 'colvis',
+        text: '<i title="column visibility" class="fa fa-eye"></i>',
+        columns: ':gt(0)'
+        },
         ],
     } );
 

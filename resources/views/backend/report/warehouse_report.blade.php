@@ -3,7 +3,7 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header mt-2">
-                <h3 class="text-center">{{trans('file.Warehouse Report')}}</h3>
+                <h3 class="text-center">Laporan Cabang</h3>
             </div>
             {!! Form::open(['route' => 'report.warehouse', 'method' => 'post']) !!}
             <div class="row mb-3">
@@ -21,7 +21,7 @@
                 </div>
                 <div class="col-md-4 mt-3">
                     <div class="form-group row">
-                        <label class="d-tc mt-2"><strong>{{trans('file.Choose Warehouse')}}</strong> &nbsp;</label>
+                        <label class="d-tc mt-2"><strong>Pilih Cabang</strong> &nbsp;</label>
                         <div class="d-tc">
                             <input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}" />
                             <select id="warehouse_id" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins">

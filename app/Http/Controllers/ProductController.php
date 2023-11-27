@@ -45,10 +45,10 @@ class ProductController extends Controller
 
         // foreach ($files as $key => $image) {
         //     $imageName = $image->getFilename();
-            
-        //     $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 100);
-        //     $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-        //     $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
+
+        //     $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 100);
+        //     $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
+        //     $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
 
         // }
 
@@ -185,10 +185,10 @@ class ProductController extends Controller
                 $product_image = explode(",", $product->image);
                 $product_image = htmlspecialchars($product_image[0]);
                 if($product_image && $product_image != 'zummXD2dvAtI.png') {
-                    if(file_exists("public/images/product/small/". $product_image))
-                        $nestedData['image'] = '<img src="'.url('images/product/small', $product_image).'" height="80" width="80">';
+                    if(file_exists("storage/images/product/small/". $product_image))
+                        $nestedData['image'] = '<img src="'.url('storage/images/product/small', $product_image).'" height="80" width="80">';
                     else
-                        $nestedData['image'] = '<img src="'.url('images/product', $product_image).'" height="80" width="80">';
+                        $nestedData['image'] = '<img src="'.url('storage/images/product', $product_image).'" height="80" width="80">';
                 }
                 else
                     $nestedData['image'] = '<img src="images/zummXD2dvAtI.png" height="80" width="80">';
@@ -356,34 +356,34 @@ class ProductController extends Controller
         $images = $request->image;
         $image_names = [];
         if($images) {
-            if ( !file_exists("public/images/product/large") && !is_dir("public/images/product/large") ) {
-                mkdir("public/images/product/large");       
+            if ( !file_exists("storage/images/product/large") && !is_dir("storage/images/product/large") ) {
+                mkdir("storage/images/product/large");
             }
-            if ( !file_exists("public/images/product/medium") && !is_dir("public/images/product/medium") ) {
-                mkdir("public/images/product/medium");       
+            if ( !file_exists("storage/images/product/medium") && !is_dir("storage/images/product/medium") ) {
+                mkdir("storage/images/product/medium");
             }
-            if ( !file_exists("public/images/product/small") && !is_dir("public/images/product/small") ) {
-                mkdir("public/images/product/small");       
+            if ( !file_exists("storage/images/product/small") && !is_dir("storage/images/product/small") ) {
+                mkdir("storage/images/product/small");
             }
             foreach ($images as $key => $image) {
                 $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
                 $imageName = date("Ymdhis") . ($key+1);
                 if(!config('database.connections.saleprosaas_landlord')) {
                     $imageName = $imageName . '.' . $ext;
-                    $image->move('public/images/product', $imageName);
+                    $image->move('storage/images/product', $imageName);
 
-                    $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
-                    $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-                    $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
+                    $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 90);
+                    $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
+                    $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
 
                 }
                 else {
                     $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
-                    $image->move('public/images/product', $imageName);
+                    $image->move('storage/images/product', $imageName);
 
-                    $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
-                    $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-                    $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
+                    $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 90);
+                    $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
+                    $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
 
                 }
                 $image_names[] = $imageName;
@@ -398,7 +398,7 @@ class ProductController extends Controller
             $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
             $fileName = strtotime(date('Y-m-d H:i:s'));
             $fileName = $fileName . '.' . $ext;
-            $file->move('public/product/files', $fileName);
+            $file->move('storage/product/files', $fileName);
             $data['file'] = $fileName;
         }
         if(!isset($data['is_sync_disable']) && \Schema::hasColumn('products', 'is_sync_disable'))
@@ -1100,14 +1100,14 @@ class ProductController extends Controller
 
             //dealing with new images
             if($request->image) {
-                if ( !file_exists("public/images/product/large") && !is_dir("public/images/product/large") ) {
-                    mkdir("public/images/product/large");       
+                if ( !file_exists("storage/images/product/large") && !is_dir("storage/images/product/large") ) {
+                    mkdir("storage/images/product/large");
                 }
-                if ( !file_exists("public/images/product/medium") && !is_dir("public/images/product/medium") ) {
-                    mkdir("public/images/product/medium");       
+                if ( !file_exists("storage/images/product/medium") && !is_dir("storage/images/product/medium") ) {
+                    mkdir("storage/images/product/medium");
                 }
-                if ( !file_exists("public/images/product/small") && !is_dir("public/images/product/small") ) {
-                    mkdir("public/images/product/small");       
+                if ( !file_exists("storage/images/product/small") && !is_dir("storage/images/product/small") ) {
+                    mkdir("storage/images/product/small");
                 }
                 $images = $request->image;
                 $image_names = [];
@@ -1116,16 +1116,16 @@ class ProductController extends Controller
                     $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
                     if(!config('database.connections.saleprosaas_landlord')) {
                         $imageName = date("Ymdhis") . ($length + $key+1) . '.' . $ext;
-                        $image->move('public/images/product', $imageName);
-                        $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
-                        $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-                        $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
+                        $image->move('storage/images/product', $imageName);
+                        $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 90);
+                        $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
+                        $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
                     }else{
                         $imageName = $this->getTenantId() . '_' . date("Ymdhis") . ($length + $key+1) . '.' . $ext;
-                        $image->move('public/images/product', $imageName);
-                        $img_lg = Image::make('public/images/product/'. $imageName)->fit(500, 500)->save('public/images/product/large/'. $imageName, 90);
-                        $img_md = Image::make('public/images/product/'. $imageName)->fit(250, 250)->save('public/images/product/medium/'. $imageName, 100);
-                        $img_sm = Image::make('public/images/product/'. $imageName)->fit(100, 100)->save('public/images/product/small/'. $imageName, 100);
+                        $image->move('storage/images/product', $imageName);
+                        $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 90);
+                        $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
+                        $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
                     }
                     $image_names[] = $imageName;
                 }
@@ -1142,7 +1142,7 @@ class ProductController extends Controller
                 $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
                 $fileName = strtotime(date('Y-m-d H:i:s'));
                 $fileName = $fileName . '.' . $ext;
-                $file->move('public/product/files', $fileName);
+                $file->move('storage/product/files', $fileName);
                 $data['file'] = $fileName;
             }
 
@@ -1600,10 +1600,10 @@ class ProductController extends Controller
             if($lims_product_data->image != 'zummXD2dvAtI.png') {
                 $images = explode(",", $lims_product_data->image);
                 foreach ($images as $key => $image) {
-                    $this->fileDelete('images/product/', $image);
-                    $this->fileDelete('images/product/large/', $image);
-                    $this->fileDelete('images/product/medium/', $image);
-                    $this->fileDelete('images/product/small/', $image);
+                    $this->fileDelete('storage/images/product/', $image);
+                    $this->fileDelete('storage/images/product/large/', $image);
+                    $this->fileDelete('storage/images/product/medium/', $image);
+                    $this->fileDelete('storage/images/product/small/', $image);
                 }
             }
             $lims_product_data->save();

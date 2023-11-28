@@ -1,20 +1,25 @@
 @extends('backend.layout.main') @section('content')
 
-@if($errors->has('name'))
-<div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}</div>
-@endif
-@if($errors->has('image'))
-<div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ $errors->first('image') }}</div>
-@endif
-@if(session()->has('message'))
-  <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-@endif
-@if(session()->has('not_permitted'))
-  <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-@endif
-
 <section>
     <div class="container-fluid">
+
+    @if($errors->has('name'))
+    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}</div>
+    @endif
+    @if($errors->has('image'))
+    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ $errors->first('image') }}</div>
+    @endif
+    @if(session()->has('message'))
+    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
+    @endif
+    @if(session()->has('not_permitted'))
+    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
+    @endif
+
         <!-- Trigger the modal with a button -->
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#category-modal"><i class="dripicons-plus"></i> {{trans("file.Add Category")}}</button>&nbsp;
         <button class="btn btn-primary" data-toggle="modal" data-target="#importCategory"><i class="dripicons-copy"></i> {{trans('file.Import Category')}}</button>
@@ -80,7 +85,7 @@
             <div class="col-md-6 form-group">
                 <label>{{ __('Icon') }} (SVG format)</label>
                 <input type="file" name="icon" class="form-control">
-            </div> 
+            </div>
             <div class="col-md-6 form-group">
                 <br>
                 <input type="checkbox" name="featured" id="featured" value="1"> <label>{{ __('List on category dropdown') }}</label>

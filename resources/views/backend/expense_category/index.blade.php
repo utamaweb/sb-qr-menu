@@ -1,19 +1,24 @@
 @extends('backend.layout.main') @section('content')
-@if($errors->has('code'))
-<div class="alert alert-danger alert-dismissible text-center">
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ $errors->first('code') }}</div>
-@endif
-@if(session()->has('message'))
-  <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-@endif
-@if(session()->has('not_permitted'))
-  <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-@endif
 
 <section>
     <div class="container-fluid">
+        @if($errors->has('code'))
+        <div class="alert alert-danger alert-dismissible text-center">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>{{ $errors->first('code') }}
+        </div>
+        @endif
+        @if(session()->has('message'))
+        <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
+        @endif
+        @if(session()->has('not_permitted'))
+        <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
+        @endif
+        
         <button class="btn btn-info" data-toggle="modal" data-target="#createModal"><i class="dripicons-plus"></i> {{trans('file.Add Expense Category')}}</button>&nbsp;
-        <button class="btn btn-primary" data-toggle="modal" data-target="#importExpenseCategory"><i class="dripicons-copy"></i> {{trans('file.Import Expense Category')}}</button>
+        {{-- <button class="btn btn-primary" data-toggle="modal" data-target="#importExpenseCategory"><i class="dripicons-copy"></i> {{trans('file.Import Expense Category')}}</button> --}}
     </div>
     <div class="table-responsive">
         <table id="expense_category-table" class="table">

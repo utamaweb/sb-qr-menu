@@ -334,7 +334,7 @@
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            var url = '{{url("/public/images/product")}}';
+            var url = '{{url("/storage/images/product")}}';
             data.forEach(function(item){
               if(item.product_images)
                 var images = item.product_images.split('|');
@@ -352,7 +352,7 @@
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            var url = '{{url("/public/images/product")}}';
+            var url = '{{url("/storage/images/product")}}';
             data.forEach(function(item){
               if(item.product_images)
                 var images = item.product_images.split('|');
@@ -370,7 +370,7 @@
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            var url = '{{url("/public/images/product")}}';
+            var url = '{{url("/storage/images/product")}}';
             data.forEach(function(item){
               if(item.product_images)
                 var images = item.product_images.split('|');

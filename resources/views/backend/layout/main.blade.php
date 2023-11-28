@@ -293,7 +293,7 @@
                     </ul>
                 </li>
             @endif
-            {{-- <li class="nav-item">
+            <li class="nav-item">
                     <a rel="nofollow" title="{{trans('file.language')}}" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-web"></i></a>
                     <ul class="right-sidebar">
                         <li>
@@ -354,7 +354,7 @@
                           <a href="{{ url('language_switch/swahili') }}" class="btn btn-link"> Swahili</a>
                         </li>
                     </ul>
-            </li> --}}
+            </li>
             <li class="nav-item">
                 <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst(Auth::user()->name)}}</span> <i class="fa fa-angle-down"></i>
                 </a>
@@ -534,58 +534,6 @@
       </div>
       <!-- Category Modal -->
 
-      <!-- expense modal -->
-      <div id="expense-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-        <div role="document" class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Expense')}}</h5>
-                    <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                </div>
-                <div class="modal-body">
-                  <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                    {!! Form::open(['route' => 'expenses.store', 'method' => 'post']) !!}
-                      <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>{{trans('file.Date')}}</label>
-                            <input type="text" name="created_at" class="form-control date" placeholder="Choose date"/>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>{{trans('file.Expense Category')}} *</label>
-                            <select name="expense_category_id" id="expense_category_modal_id" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select Expense Category...">
-
-                            </select>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Cabang *</label>
-                            <select name="warehouse_id" id="expense_modal_warehouse_id" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Pilih cabang...">
-
-                            </select>
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>{{trans('file.Amount')}} *</label>
-                            <input type="number" name="amount" step="any" required class="form-control">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label> {{trans('file.Account')}}</label>
-                            <select class="form-control selectpicker" name="account_id" id="expense_modal_account_id">
-
-                            </select>
-                        </div>
-                      </div>
-                      <div class="form-group">
-                          <label>{{trans('file.Note')}}</label>
-                          <textarea name="note" rows="3" class="form-control"></textarea>
-                      </div>
-                      <div class="form-group">
-                          <button type="submit" class="btn btn-primary">{{trans('file.submit')}}</button>
-                      </div>
-                    {{ Form::close() }}
-                </div>
-            </div>
-        </div>
-      </div>
-      <!-- end expense modal -->
 
       <!-- sale return modal -->
       <div id="add-sale-return" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">

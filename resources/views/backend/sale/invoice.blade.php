@@ -95,17 +95,18 @@
     <div id="receipt-data">
         <div class="centered">
             @if($general_setting->site_logo)
-                <img src="{{url('logo', $general_setting->site_logo)}}" height="42" width="50" style="margin:10px 0;">
+                <img src="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}" height="50%" width="50%">
             @endif
+            <div style="margin-top: -37px;">
+                <h1 style="font-size: 2rem !important;">SB POS</h1>
 
-            <h2>{{$lims_biller_data->company_name}}</h2>
-
-            <p>{{trans('file.Address')}}: {{$lims_warehouse_data->address}}
-                <br>{{trans('file.Phone Number')}}: {{$lims_warehouse_data->phone}}
-                @if($general_setting->vat_registration_number)
-                <br>{{trans('file.VAT Number')}}: {{$general_setting->vat_registration_number}}
-                @endif
-            </p>
+                <p>{{trans('file.Address')}}: {{$lims_warehouse_data->address}}
+                    <br>{{trans('file.Phone Number')}}: {{$lims_warehouse_data->phone}}
+                    @if($general_setting->vat_registration_number)
+                    <br>{{trans('file.VAT Number')}}: {{$general_setting->vat_registration_number}}
+                    @endif
+                </p>
+            </div>
         </div>
         <p>{{trans('file.Date')}}: {{date($general_setting->date_format, strtotime($lims_sale_data->created_at->toDateString()))}}<br>
             {{trans('file.reference')}}: {{$lims_sale_data->reference_no}}<br>

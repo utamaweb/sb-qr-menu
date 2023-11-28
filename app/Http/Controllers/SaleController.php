@@ -1012,7 +1012,7 @@ class SaleController extends Controller
                 ['products.is_active', true],
                 ['product_warehouse.warehouse_id', $id]
             ]);
-        } 
+        }
         $lims_product_warehouse_data = $query->whereNull('product_warehouse.variant_id')
                                         ->whereNull('product_warehouse.product_batch_id')
                                         ->select('product_warehouse.*',  'products.is_embeded')

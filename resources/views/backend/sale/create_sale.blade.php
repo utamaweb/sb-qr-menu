@@ -1053,50 +1053,27 @@
                     <div class="payment-amount">
                         <h2>{{trans('file.grand total')}} <span id="grand-total">{{number_format((float)$lims_sale_data->grand_total, $general_setting->decimal, '.', '')}}</span></h2>
                     </div>
-                    <div class="payment-options">
+                    <div class="payment-options d-flex justify-content-end">
                         @php
                             $options = explode(',', $lims_pos_setting_data->payment_options);
                         @endphp
-                        @if(in_array("card",$options))
-                        <div class="column-5">
-                            <button style="background: #0984e3" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="credit-card-btn"><i class="fa fa-credit-card"></i> {{trans('file.Card')}}</button>
-                        </div>
-                        @endif
                         @if(in_array("cash",$options))
                         <div class="column-5">
-                            <button style="background: #00cec9" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="cash-btn"><i class="fa fa-money"></i> {{trans('file.Cash')}}</button>
-                        </div>
-                        @endif
-                        @if(in_array("paypal",$options) && (strlen($lims_pos_setting_data->paypal_live_api_username)>0) && (strlen($lims_pos_setting_data->paypal_live_api_password)>0) && (strlen($lims_pos_setting_data->paypal_live_api_secret)>0))
-                        <div class="column-5">
-                            <button style="background-color: #213170" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="paypal-btn"><i class="fa fa-paypal"></i> {{trans('file.PayPal')}}</button>
+                            <button style="background: #00cec9" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal"
+                                data-target="#add-payment" id="cash-btn"><i class="fa fa-money"></i> {{trans('file.Cash')}}</button>
                         </div>
                         @endif
                         <div class="column-5">
-                            <button style="background-color: #e28d02" type="button" class="btn btn-sm btn-custom" id="draft-btn"><i class="dripicons-flag"></i> {{trans('file.Draft')}}</button>
+                            <button style="background-color: #e28d02" type="button" class="btn btn-sm btn-custom" id="draft-btn"><i
+                                    class="dripicons-flag"></i> {{trans('file.Draft')}}</button>
                         </div>
-                        @if(in_array("cheque",$options))
                         <div class="column-5">
-                            <button style="background-color: #fd7272" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="cheque-btn"><i class="fa fa-money"></i> {{trans('file.Cheque')}}</button>
+                            <button style="background-color: #d63031;" type="button" class="btn btn-sm btn-custom" id="cancel-btn"
+                                onclick="return confirmCancel()"><i class="fa fa-close"></i> {{trans('file.Cancel')}}</button>
                         </div>
-                        @endif
-                        @if(in_array("gift_card",$options))
                         <div class="column-5">
-                            <button style="background-color: #5f27cd" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="gift-card-btn"><i class="fa fa-credit-card-alt"></i> {{trans('file.Gift Card')}}</button>
-                        </div>
-                        @endif
-                        @if(in_array("deposit",$options))
-                        <div class="column-5">
-                            <button style="background-color: #b33771" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="deposit-btn"><i class="fa fa-university"></i> {{trans('file.Deposit')}}</button>
-                        </div>
-                        @endif
-                        @if($lims_reward_point_setting_data && $lims_reward_point_setting_data->is_active)
-                        <div class="column-5">
-                            <button style="background-color: #319398" type="button" class="btn btn-sm btn-custom payment-btn" data-toggle="modal" data-target="#add-payment" id="point-btn"><i class="dripicons-rocket"></i> {{trans('file.Points')}}</button>
-                        </div>
-                        @endif
-                        <div class="column-5">
-                            <button style="background-color: #d63031;" type="button" class="btn btn-sm btn-custom" id="cancel-btn" onclick="return confirmCancel()"><i class="fa fa-close"></i> {{trans('file.Cancel')}}</button>
+                            <button style="background-color: #ffc107;" type="button" class="btn btn-sm btn-custom" data-toggle="modal"
+                                data-target="#recentTransaction"><i class="dripicons-clock"></i> {{trans('file.Recent Transaction')}}</button>
                         </div>
                     </div>
                 </div>

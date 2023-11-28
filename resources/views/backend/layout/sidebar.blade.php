@@ -337,7 +337,7 @@
    @if($tax_permission_active)
    <li>
       <a href="#pembayaran" aria-expanded="false" data-toggle="collapse"> <i
-         class="dripicons-home"></i><span>Pembayaran</span></a>
+         class="dripicons-wallet"></i><span>Pembayaran</span></a>
       <ul id="pembayaran" class="collapse list-unstyled " style="border-radius: 10px;">
          @if($tax_permission_active)
         <li id="tax-menu"><a href="{{route('tax.index')}}">{{trans('file.Tax')}}</a></li>

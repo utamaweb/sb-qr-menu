@@ -30,17 +30,16 @@
                                             <input type="file" name="document" class="form-control" >
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <label>{{trans('file.Select Product')}}</label>
                                         <div class="search-box input-group">
                                             <button type="button" class="btn btn-secondary btn-lg"><i class="fa fa-barcode"></i></button>
-                                            <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Please type product code and select..." class="form-control" />
+                                            <input type="text" name="product_code_name" id="lims_productcodeSearch"
+                                                placeholder="Please type product code and select..." class="form-control" />
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-5">
+                                <div class="row mt-3">
                                     <div class="col-md-12">
                                         <h5>{{trans('file.Order Table')}} *</h5>
                                         <div class="table-responsive mt-3">

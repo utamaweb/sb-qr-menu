@@ -6,7 +6,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>{{trans('file.Update Adjustment')}}</h4>
+                        <h4>{{trans('file.Update Adjustment')}} - <strong>{{$lims_adjustment_data->reference_no}}</strong></h4>
                     </div>
                     <div class="card-body">
                         <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
@@ -14,12 +14,6 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-4">
-                                        <div class="form-group">
-                                            <label>{{trans('file.reference')}}</label>
-                                            <p><strong>{{$lims_adjustment_data->reference_no}}</strong></p>
-                                        </div>
-                                    </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>Cabang *</label>
@@ -37,9 +31,7 @@
                                             <input type="file" name="document" class="form-control" >
                                         </div>
                                     </div>
-                                </div>
-                                <div class="row mt-3">
-                                    <div class="col-md-12">
+                                    <div class="col-md-4">
                                         <label>{{trans('file.Select Product')}}</label>
                                         <div class="search-box input-group">
                                             <button type="button" class="btn btn-secondary btn-lg"><i class="fa fa-barcode"></i></button>
@@ -47,7 +39,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-5">
+                                <div class="row mt-3">
                                     <div class="col-md-12">
                                         <h5>{{trans('file.Order Table')}} *</h5>
                                         <div class="table-responsive mt-3">

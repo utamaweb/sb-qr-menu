@@ -16,13 +16,13 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="row">
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label>{{trans('file.Date')}}</label>
                                             <input type="text" name="created_at" class="form-control date" placeholder="Choose date"/>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    <div class="col-md-6">
                                         <div class="form-group">
                                             <label>Cabang *</label>
                                             <select required name="warehouse_id" class="selectpicker form-control" data-live-search="true" title="Pilih cabang...">
@@ -32,7 +32,7 @@
                                             </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-4">
+                                    {{-- <div class="col-md-4">
                                         <div class="form-group">
                                             <label>{{trans('file.Supplier')}}</label>
                                             <select name="supplier_id" class="selectpicker form-control" data-live-search="true" title="Select supplier...">
@@ -134,8 +134,8 @@
                                                 </div>
                                             </div>
                                         @endif
-                                    @endforeach
-                                    <div class="col-md-12 mt-3">
+                                    @endforeach --}}
+                                    <div class="col-md-12 mt-3 mb-1">
                                         <label>{{trans('file.Select Product')}}</label>
                                         <div class="search-box input-group">
                                             <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button>
@@ -181,7 +181,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row">
+                                <div class="row d-none">
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <input type="hidden" name="total_qty" />
@@ -216,7 +216,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row mt-3">
+                                <div class="row mt-2">
                                     <div class="col-md-4">
                                         <div class="form-group">
                                             <label>{{trans('file.Order Tax')}}</label>

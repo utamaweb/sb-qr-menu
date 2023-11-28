@@ -126,9 +126,9 @@
 @push('scripts')
 <script type="text/javascript">
 
-    $("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #role-menu").addClass("active");
+    $("ul#outlet").siblings('a').attr('aria-expanded','true');
+    $("ul#outlet").addClass("show");
+    $("ul#outlet #role-menu").addClass("active");
 
 	 function confirmDelete() {
         if (confirm("Are you sure want to delete?")) {

@@ -239,9 +239,9 @@
 @push('scripts')
 <script type="text/javascript">
 
-    $("ul#product").siblings('a').attr('aria-expanded','true');
-    $("ul#product").addClass("show");
-    $("ul#product #stock-count-menu").addClass("active");
+    $("ul#inventaris").siblings('a').attr('aria-expanded','true');
+    $("ul#inventaris").addClass("show");
+    $("ul#inventaris #stock-count-menu").addClass("active");
 
     $("#category, #brand").hide();
 

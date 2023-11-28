@@ -294,14 +294,14 @@ class ProductController extends Controller
         if ($role->hasPermissionTo('products-add')){
             $lims_product_list_without_variant = $this->productWithoutVariant();
             $lims_product_list_with_variant = $this->productWithVariant();
-            $lims_brand_list = Brand::where('is_active', true)->get();
+            // $lims_brand_list = Brand::where('is_active', true)->get();
             $lims_category_list = Category::where('is_active', true)->get();
             $lims_unit_list = Unit::where('is_active', true)->get();
             $lims_tax_list = Tax::where('is_active', true)->get();
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $numberOfProduct = Product::where('is_active', true)->count();
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.create',compact('lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields'));
+            return view('backend.product.create',compact('lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -1001,7 +1001,7 @@ class ProductController extends Controller
         if ($role->hasPermissionTo('products-edit')) {
             $lims_product_list_without_variant = $this->productWithoutVariant();
             $lims_product_list_with_variant = $this->productWithVariant();
-            $lims_brand_list = Brand::where('is_active', true)->get();
+            // $lims_brand_list = Brand::where('is_active', true)->get();
             $lims_category_list = Category::where('is_active', true)->get();
             $lims_unit_list = Unit::where('is_active', true)->get();
             $lims_tax_list = Tax::where('is_active', true)->get();
@@ -1014,7 +1014,7 @@ class ProductController extends Controller
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $noOfVariantValue = 0;
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.edit',compact('lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_brand_list', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields'));
+            return view('backend.product.edit',compact('lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -1485,7 +1485,7 @@ class ProductController extends Controller
            $product->code = $data['code'];
            $product->type = strtolower($data['type']);
            $product->barcode_symbology = 'C128';
-           $product->brand_id = $brand_id;
+        //    $product->brand_id = $brand_id;
            $product->category_id = $lims_category_data->id;
            $product->unit_id = $lims_unit_data->id;
            $product->purchase_unit_id = $lims_unit_data->id;

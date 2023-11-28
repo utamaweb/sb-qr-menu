@@ -126,7 +126,7 @@
   <body class="@if($theme == 'dark')dark-mode dripicons-brightness-low @endif  @if(Route::current()->getName() == 'sale.pos') pos-page @endif" onload="myFunction()">
     <div id="loader"></div>
       <!-- Side Navbar -->
-      <nav class="side-navbar">
+      <nav class="side-navbar pl-0 px-2">
         <span class="brand-big">
             @if($general_setting->site_logo)
             <a href="{{url('/')}}"><img src="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}"

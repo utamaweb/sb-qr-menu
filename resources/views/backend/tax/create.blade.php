@@ -155,9 +155,9 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #tax-menu").addClass("active");
+    $("ul#pembayaran").siblings('a').attr('aria-expanded','true');
+    $("ul#pembayaran").addClass("show");
+    $("ul#pembayaran #tax-menu").addClass("active");
 
     var tax_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

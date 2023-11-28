@@ -208,9 +208,9 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #unit-menu").addClass("active");
+    $("ul#product").siblings('a').attr('aria-expanded','true');
+    $("ul#product").addClass("show");
+    $("ul#product #unit-menu").addClass("active");
 
     var unit_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

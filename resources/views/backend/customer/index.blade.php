@@ -272,9 +272,9 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#people").siblings('a').attr('aria-expanded','true');
-    $("ul#people").addClass("show");
-    $("ul#people #customer-list-menu").addClass("active");
+    $("ul#outlet").siblings('a').attr('aria-expanded','true');
+    $("ul#outlet").addClass("show");
+    $("ul#outlet #customer-list-menu").addClass("active");
 
     function confirmDelete() {
       if (confirm("Are you sure want to delete?")) {

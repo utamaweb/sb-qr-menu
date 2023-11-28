@@ -55,7 +55,7 @@
         </div>
       </div>
       <!-- Counts Section -->
-      <section class="dashboard-counts"> 
+      <section class="dashboard-counts">
         <div class="container-fluid">
           <div class="row">
             @if($revenue_profit_summary)
@@ -464,16 +464,16 @@
         //extract the parts of the date
         const day = date.getDate();
         const month = date.getMonth() + 1;
-        const year = date.getFullYear();    
+        const year = date.getFullYear();
         //replace the month
-        format = format.replace("m", month.toString().padStart(2,"0"));        
+        format = format.replace("m", month.toString().padStart(2,"0"));
         //replace the year
         format = format.replace("Y", year.toString());
         //replace the day
         format = format.replace("d", day.toString().padStart(2,"0"));
         return format;
     }
-    
+
 
     $(document).ready(function(){
       $.ajax({

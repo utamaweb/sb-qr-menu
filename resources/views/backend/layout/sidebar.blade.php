@@ -283,9 +283,9 @@
    @endif
    @if($stock_count_active || $adjustment_active || $coupon_permission_active)
    <li>
-      <a href="#inventaris" aria-expanded="false" data-toggle="collapse"> <i
-         class="dripicons-folder-open"></i><span>Inventaris</span><span></a>
-      <ul id="inventaris" class="collapse list-unstyled " style="border-radius: 10px;">
+      <a href="#stok" aria-expanded="false" data-toggle="collapse"> <i
+         class="dripicons-folder-open"></i><span>Stok</span><span></a>
+      <ul id="stok" class="collapse list-unstyled " style="border-radius: 10px;">
          @if($adjustment_active)
          <li id="adjustment-list-menu"><a
             href="{{route('qty_adjustment.index')}}">{{trans('file.Adjustment List')}}</a></li>
@@ -300,11 +300,15 @@
       </ul>
    </li>
    @endif
-   @if($coupon_permission_active)
-    <li id="coupon"><a href="{{route('coupons.index')}}"> <i class="dripicons-ticket"></i><span>Diskon</span></a></li>
-    @endif
-    <li><a href="#"> <i class="dripicons-toggles"></i><span>Tipe Pesanan</span></a></li>
-    <li><a href="#"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
+    <li><a href="{{route('order_type.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
+    <li>
+        <a href="#bahan-baku" aria-expanded="false" data-toggle="collapse"> <i
+                class="dripicons-list"></i><span>Bahan Baku</span><span></a>
+        <ul id="bahan-baku" class="collapse list-unstyled " style="border-radius: 10px;">
+            <li id="bahan-baku"><a href="{{route('bahan_baku.index')}}">Bahan Baku</a></li>
+            <li id="kategori-bahan-baku"><a href="{{route('category.index')}}">Kategori Bahan Baku</a></li>
+        </ul>
+    </li>
 
    <hr>
 
@@ -335,7 +339,7 @@
 
       ?>
    @if($tax_permission_active)
-   <li>
+   {{-- <li>
       <a href="#pembayaran" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-wallet"></i><span>Pembayaran</span></a>
       <ul id="pembayaran" class="collapse list-unstyled " style="border-radius: 10px;">
@@ -343,7 +347,7 @@
         <li id="tax-menu"><a href="{{route('tax.index')}}">{{trans('file.Tax')}}</a></li>
         @endif
       </ul>
-   </li>
+   </li> --}}
 
    @endif
    @if($role_index_permission_active || $user_index_permission_active || $customer_index_permission_active || $biller_index_permission_active ||
@@ -412,7 +416,7 @@
       ?>
    @if($sale_index_permission_active || $gift_card_permission_active || $coupon_permission_active ||
    $delivery_permission_active)
-   <li>
+   {{-- <li>
       <a href="#sale" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-cart"></i><span>{{trans('file.Sale')}}</span></a>
       <ul id="sale" class="collapse list-unstyled " style="border-radius: 10px;">
@@ -422,7 +426,7 @@
          <li id="sale-create-menu"><a href="{{route('sales.create')}}">{{trans('file.Add Sale')}}</a></li>
          <li id="sale-import-menu"><a
             href="{{url('sales/sale_by_csv')}}">{{trans('file.Import Sale By CSV')}}</a></li>
-         @endif
+         @endif --}}
          {{-- @if($gift_card_permission_active)
          <li id="gift-card-menu"><a href="{{route('gift_cards.index')}}">{{trans('file.Gift Card List')}}</a>
          </li>
@@ -434,8 +438,8 @@
          @if($delivery_permission_active)
          <li id="delivery-menu"><a href="{{route('delivery.index')}}">{{trans('file.Delivery List')}}</a></li>
          @endif --}}
-      </ul>
-   </li>
+      {{-- </ul>
+   </li> --}}
    @endif
 
    <li>

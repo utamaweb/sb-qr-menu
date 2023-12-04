@@ -22,9 +22,7 @@
                                                 <div class="input-group">
                                                     <select name="type" required class="form-control selectpicker" id="type">
                                                         <option value="standard">Standard</option>
-                                                        <option value="combo">Combo</option>
-                                                        <option value="digital">Digital</option>
-                                                        <option value="service">Service</option>
+                                                        <option value="combo">Paket</option>
                                                     </select>
                                                     <input type="hidden" name="type_hidden" value="{{$lims_product_data->type}}">
                                                 </div>
@@ -244,7 +242,7 @@
                                         <input type="number" name="alert_quantity" value="{{$lims_product_data->alert_quantity}}" class="form-control" step="any">
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                {{-- <div class="col-md-4">
                                     <div class="form-group">
                                         <input type="hidden" name="tax" value="{{$lims_product_data->tax_id}}">
                                         <label>{{trans('file.product')}} {{trans('file.Tax')}}</strong> </label>
@@ -324,7 +322,7 @@
                                             </div>
                                         </div>
                                     @endif
-                                @endforeach
+                                @endforeach --}}
                                 <div class="col-md-4">
                                     <div class="form-group mt-3">
                                         @if($lims_product_data->featured)
@@ -335,7 +333,7 @@
                                         <label>{{trans('file.Featured')}}</label>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
+                                {{-- <div class="col-md-4">
                                     <div class="form-group mt-3">
                                         @if($lims_product_data->is_embeded)
                                             <input type="checkbox" name="is_embeded" value="1" checked>
@@ -344,7 +342,7 @@
                                         @endif
                                         <label>{{trans('file.Embedded Barcode')}} <i class="dripicons-question" data-toggle="tooltip" title="{{trans('file.Check this if this product will be used in weight scale machine.')}}"></i></label>
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <div class="col-md-12">
                                     <div class="form-group">

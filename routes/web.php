@@ -59,6 +59,8 @@ use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\OrderTypeController;
+use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -218,7 +220,18 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function() {
         Route::get('warehouse/lims_warehouse_search', 'limsWarehouseSearch')->name('warehouse.search');
         Route::get('warehouse/all', 'warehouseAll')->name('warehouse.all');
     });
-    Route::resource('warehouse', WarehouseController::class);
+    Route::resource('warehouse', WarehouseController::class)->except('show');
+
+
+    // Route::controller(OrderTypeController::class)->group(function () {
+    //     Route::post('importorder_type', 'importOrderType')->name('order_type.import');
+    //     Route::post('order_type/deletebyselection', 'deleteBySelection');
+    //     Route::get('order_type/lims_order_type_search', 'limsOrderTypeSearch')->name('order_type.search');
+    //     Route::get('order_type/all', 'warehouseAll')->name('warehouse.all');
+    // });
+    Route::resource('order_type', OrderTypeController::class);
+    Route::resource('bahan_baku', BahanBakuController::class);
+    Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 
 
     Route::resource('tables', TableController::class);

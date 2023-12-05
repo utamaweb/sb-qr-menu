@@ -16,7 +16,7 @@
         <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
                 aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
         @endif
-        
+
         <button class="btn btn-info" data-toggle="modal" data-target="#createModal"><i class="dripicons-plus"></i> {{trans('file.Add Expense Category')}}</button>&nbsp;
         {{-- <button class="btn btn-primary" data-toggle="modal" data-target="#importExpenseCategory"><i class="dripicons-copy"></i> {{trans('file.Import Expense Category')}}</button> --}}
     </div>
@@ -60,100 +60,89 @@
     </div>
 </section>
 
-<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+    class="modal fade text-left">
     <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => 'expense_categories.store', 'method' => 'post', 'files' => true]) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Expense Category')}}</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-          <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-            <div class="form-group">
-                <label>{{trans('file.Code')}} *</label>
-                <div class="input-group">
-                    {{Form::text('code',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category code...'))}}
-                    <div class="input-group-append">
-                        <button id="genbutton" type="button" class="btn btn-default">{{trans('file.Generate')}}</button>
+        <div class="modal-content">
+            {!! Form::open(['route' => 'expense_categories.store', 'method' => 'post', 'files' => true]) !!}
+            <div class="modal-header">
+                <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Expense Category')}}</h5>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
+                            class="dripicons-cross"></i></span></button>
+            </div>
+            <div class="modal-body">
+                <p class="italic">
+                    <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>{{trans('file.Code')}} *</label>
+                        <div class="input-group">
+                            {{Form::text('code',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category code...'))}}
+                            <div class="input-group-append">
+                                <button id="genbutton" type="button"
+                                    class="btn btn-default">{{trans('file.Generate')}}</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label>{{trans('file.name')}} *</label>
+                        {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category name...'))}}
+                    </div>
+                    <input type="hidden" name="is_active" value="1">
+                    <div class="col-md-12 d-flex justify-content-end">
+                        {{-- <div class="form-group mt-3 mr-2">
+                                                            <a href="{{ url()->previous() }}" class="btn
+                        btn-outline-primary">Kembali</a>
+                    </div> --}}
+                    <div class="form-group mt-3">
+                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                     </div>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>{{trans('file.name')}} *</label>
-                {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category name...'))}}
-            </div>
-            <input type="hidden" name="is_active" value="1">
-            <div class="form-group">
-              <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
             </div>
         </div>
         {{ Form::close() }}
-      </div>
     </div>
 </div>
-
-<div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-  <div role="document" class="modal-dialog">
-    <div class="modal-content">
-        {{ Form::open(['route' => ['expense_categories.update', 1], 'method' => 'PUT', 'files' => true] ) }}
-      <div class="modal-header">
-        <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Update Expense Category')}}</h5>
-        <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-      </div>
-      <div class="modal-body">
-        <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-            <div class="form-group">
-                <label>{{trans('file.Code')}} *</label>
-                {{Form::text('code',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category code...'))}}
-            </div>
-            <div class="form-group">
-                <label>{{trans('file.name')}} *</label>
-                {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category name...'))}}
-            </div>
-        <input type="hidden" name="expense_category_id">
-        <div class="form-group">
-            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-          </div>
-        </div>
-      {{ Form::close() }}
-    </div>
-  </div>
 </div>
 
-<div id="importExpenseCategory" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+<div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+    class="modal fade text-left">
     <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => 'expense_category.import', 'method' => 'post', 'files' => true]) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Import Expense Category')}}</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-            <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-           <p>{{trans('file.The correct column order is')}} (code*, name*) {{trans('file.and you must follow this')}}.</p>
-
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{trans('file.Upload CSV File')}} *</label>
-                        {{Form::file('file', array('class' => 'form-control','required'))}}
+        <div class="modal-content">
+            {{ Form::open(['route' => ['expense_categories.update', 1], 'method' => 'PUT', 'files' => true] ) }}
+            <div class="modal-header">
+                <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Update Expense Category')}}</h5>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
+                            class="dripicons-cross"></i></span></button>
+            </div>
+            <div class="modal-body">
+                <p class="italic">
+                    <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                <div class="row">
+                    <div class="form-group col-md-6">
+                        <label>{{trans('file.Code')}} *</label>
+                        {{Form::text('code',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category code...'))}}
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label> {{trans('file.Sample File')}}</label>
-                        <a href="sample_file/sample_expense_category.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
+                    <div class="form-group col-md-6">
+                        <label>{{trans('file.name')}} *</label>
+                        {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category name...'))}}
+                    </div>
+                    <input type="hidden" name="expense_category_id">
+                    <div class="col-md-12 d-flex justify-content-end">
+                        {{-- <div class="form-group mt-3 mr-2">
+                                                                    <a href="{{ url()->previous() }}" class="btn
+                        btn-outline-primary">Kembali</a>
+                    </div> --}}
+                    <div class="form-group mt-3">
+                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                     </div>
                 </div>
             </div>
-            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
         </div>
         {{ Form::close() }}
-      </div>
     </div>
 </div>
-
+</div>
 
 @endsection
 

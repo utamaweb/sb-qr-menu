@@ -17,12 +17,13 @@ return new class extends Migration
             $table->bigInteger("first_stock");
             $table->bigInteger("stock_in");
             $table->bigInteger("stock_used");
-            $table->bigInteger("adjusment");
+            $table->bigInteger("adjustment");
             $table->bigInteger("last_stock");
             $table->unsignedBigInteger('unit_id');
+            // $table->foreignId('unit_id')->constrained();
             $table->timestamps();
 
-            $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
+            // $table->foreign('unit_id')->references('id')->on('units')->onDelete('cascade');
         });
     }
 

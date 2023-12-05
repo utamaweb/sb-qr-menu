@@ -26,14 +26,14 @@
 
         <!-- Trigger the modal with a button -->
         <button type="button" class="btn btn-info" data-toggle="modal" data-target="#order-type-modal"><i
-                class="dripicons-plus"></i> Tipe Pesanan</button>
+                class="dripicons-plus"></i> Bahan Baku</button>
     </div>
     <div class="table-responsive">
         <table id="category-table" class="table" style="width: 100%">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>Tipe Pesanan</th>
+                    <th>Bahan Baku</th>
                     {{-- <th>{{trans('file.Parent Category')}}</th> --}}
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
@@ -49,7 +49,7 @@
         <div class="modal-content">
             {{ Form::open(['route' => ['category.update', 1], 'method' => 'PUT', 'files' => true] ) }}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Update Tipe Pesanan</h5>
+                <h5 id="exampleModalLabel" class="modal-title">Update Bahan Baku</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
                             class="dripicons-cross"></i></span></button>
             </div>
@@ -84,7 +84,7 @@
         <div class="modal-content">
             {!! Form::open(['route' => 'category.store', 'method' => 'post', 'files' => true]) !!}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Tambah Tipe Pesanan</h5>
+                <h5 id="exampleModalLabel" class="modal-title">Tambah Bahan Baku</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
                             class="dripicons-cross"></i></span></button>
             </div>
@@ -94,7 +94,7 @@
                 <div class="row">
                     <div class="col-md-12 form-group">
                         <label>{{trans('file.name')}} *</label>
-                        {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Masukkan nama tipe pesanan..'))}}
+                        {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Masukkan nama bahan baku..'))}}
                     </div>
                     <div class="col-md-12 d-flex justify-content-end">
                 <div class="form-group">
@@ -113,7 +113,7 @@
 <script type="text/javascript">
     // $("ul#order-type").siblings('a').attr('aria-expanded','true');
     // $("ul#order-type").addClass("show");
-    $("li#order-type").addClass("active");
+    $("li#ingredient").addClass("active");
 
     function confirmDelete() {
       if (confirm("If you delete category all products under this category will also be deleted. Are you sure want to delete?")) {

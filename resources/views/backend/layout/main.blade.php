@@ -293,7 +293,7 @@
                     </ul>
                 </li>
             @endif
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                     <a rel="nofollow" title="{{trans('file.language')}}" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-web"></i></a>
                     <ul class="right-sidebar">
                         <li>
@@ -354,7 +354,7 @@
                           <a href="{{ url('language_switch/swahili') }}" class="btn btn-link"> Swahili</a>
                         </li>
                     </ul>
-            </li>
+            </li> --}}
             <li class="nav-item">
                 <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst(Auth::user()->name)}}</span> <i class="fa fa-angle-down"></i>
                 </a>

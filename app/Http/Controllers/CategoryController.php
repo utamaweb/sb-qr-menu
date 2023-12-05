@@ -34,9 +34,8 @@ class CategoryController extends Controller
     {
         $columns = array(
             0 =>'id',
-            2 =>'name',
-            3=> 'parent_id',
-            4=> 'is_active',
+            1 =>'name',
+            2=> 'is_active',
         );
 
         $totalData = DB::table('categories')->where('is_active', true)->count();
@@ -205,7 +204,7 @@ class CategoryController extends Controller
     {
         if(!env('USER_VERIFIED'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-        
+
         $this->validate($request,[
             'name' => [
                 'max:255',
@@ -235,7 +234,7 @@ class CategoryController extends Controller
                 $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
                 $image->move('public/images/category', $imageName);
             }
-            Image::make('public/images/category/'. $imageName)->fit(100, 100)->save(); 
+            Image::make('public/images/category/'. $imageName)->fit(100, 100)->save();
             $input['image'] = $imageName;
         }
 
@@ -256,7 +255,7 @@ class CategoryController extends Controller
                 $iconName = $this->getTenantId() . '_' . $iconName . '.' . $ext;
                 $icon->move('public/images/category/icons/', $iconName);
             }
-            Image::make('public/images/category/icons/'. $iconName)->fit(100, 100)->save();            
+            Image::make('public/images/category/icons/'. $iconName)->fit(100, 100)->save();
             $input['icon'] = $iconName;
         }
         if(!isset($request->featured) && \Schema::hasColumn('categories', 'featured') ){
@@ -266,7 +265,7 @@ class CategoryController extends Controller
             $input['is_sync_disable'] = null;
 
         DB::table('categories')->where('id', $request->category_id)->update($input);
-        
+
         return redirect('category')->with('message', 'Category updated successfully');
     }
 

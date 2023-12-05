@@ -272,16 +272,16 @@
          <li id="product-list-menu"><a href="{{route('products.index')}}">{{__('file.product_list')}}</a>
          </li>
          @endif
-         @if($print_barcode_active)
+         {{-- @if($print_barcode_active)
          <li id="printBarcode-menu"><a href="{{route('product.printBarcode')}}">{{__('file.print_barcode')}}</a></li>
-         @endif
+         @endif --}}
          @if($unit_permission_active)
          <li id="unit-menu"><a href="{{route('unit.index')}}">{{trans('file.Unit')}}</a></li>
          @endif
       </ul>
    </li>
    @endif
-   @if($stock_count_active || $adjustment_active || $coupon_permission_active)
+   {{-- @if($stock_count_active || $adjustment_active || $coupon_permission_active)
    <li>
       <a href="#stok" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-folder-open"></i><span>Stok</span><span></a>
@@ -289,26 +289,23 @@
          @if($adjustment_active)
          <li id="adjustment-list-menu"><a
             href="{{route('qty_adjustment.index')}}">{{trans('file.Adjustment List')}}</a></li>
-         {{--
-         <li id="adjustment-create-menu"><a href="{{route('qty_adjustment.create')}}">{{trans('file.Add Adjustment')}}</a>
-         </li>
-         --}}
          @endif
          @if($stock_count_active)
          <li id="stock-count-menu"><a href="{{route('stock-count.index')}}">{{trans('file.Stock Count')}}</a></li>
          @endif
       </ul>
    </li>
-   @endif
-    <li><a href="{{route('order_type.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
-    <li>
+   @endif --}}
+    <li id="order-type"><a href="{{route('order_type.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
+    <li id="ingredient"><a  href="{{route('ingredient.index')}}"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
+    {{-- <li>
         <a href="#bahan-baku" aria-expanded="false" data-toggle="collapse"> <i
                 class="dripicons-list"></i><span>Bahan Baku</span><span></a>
         <ul id="bahan-baku" class="collapse list-unstyled " style="border-radius: 10px;">
             <li id="bahan-baku"><a href="{{route('bahan_baku.index')}}">Bahan Baku</a></li>
             <li id="kategori-bahan-baku"><a href="{{route('category.index')}}">Kategori Bahan Baku</a></li>
         </ul>
-    </li>
+    </li> --}}
 
    <hr>
 

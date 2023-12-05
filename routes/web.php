@@ -38,6 +38,7 @@ use App\Http\Controllers\GiftCardController;
 use App\Http\Controllers\CourierController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MoneyTransferController;
 use App\Http\Controllers\NotificationController;
@@ -230,7 +231,7 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function() {
     //     Route::get('order_type/all', 'warehouseAll')->name('warehouse.all');
     // });
     Route::resource('order_type', OrderTypeController::class);
-    Route::resource('bahan_baku', BahanBakuController::class);
+    Route::resource('ingredient', IngredientController::class);
     Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 
 

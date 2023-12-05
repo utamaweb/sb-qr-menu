@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\BahanBaku;
+use App\Models\Ingredient;
 
-class BahanBakuSeeder extends Seeder
+class IngredientSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -20,7 +20,7 @@ class BahanBakuSeeder extends Seeder
         ];
 
         foreach ($bahans as $bahan) {
-            BahanBaku::create([
+            Ingredient::create([
                 'name'  =>  $bahan[0],
                 'first_stock'  =>  $bahan[1],
                 'stock_in'  =>  $bahan[2],

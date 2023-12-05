@@ -30,10 +30,7 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th>{{trans('file.category')}}</th>
-                    <th>{{trans('file.Parent Category')}}</th>
-                    <th>{{trans('file.Number of Product')}}</th>
-                    <th>{{trans('file.Stock Quantity')}}</th>
-                    <th>{{trans('file.Stock Worth (Price/Cost)')}}</th>
+                    {{-- <th>{{trans('file.Parent Category')}}</th> --}}
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
@@ -209,10 +206,6 @@
         "columns": [
             {"data": "key"},
             {"data": "name"},
-            {"data": "parent_id"},
-            {"data": "number_of_product"},
-            {"data": "stock_qty"},
-            {"data": "stock_worth"},
             {"data": "options"},
         ],
         'language': {
@@ -224,12 +217,7 @@
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
-        order:[['2', 'asc']],
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 1, 3, 4, 5, 6]
-            },
             {
                 'render': function(data, type, row, meta){
                     if(type === 'display'){

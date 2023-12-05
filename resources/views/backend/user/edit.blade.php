@@ -43,10 +43,6 @@
                                         </span>
                                         @endif
                                     </div>
-                                    <div class="form-group mt-3">
-                                        <label><strong>{{trans('file.Phone Number')}} *</strong></label>
-                                        <input type="text" name="phone" required class="form-control" value="{{$lims_user_data->phone}}">
-                                    </div>
                                     <div class="form-group">
                                         @if($lims_user_data->is_active)
                                         <input class="mt-2" type="checkbox" name="is_active" value="1" checked>
@@ -55,14 +51,17 @@
                                         @endif
                                         <label class="mt-2"><strong>{{trans('file.Active')}}</strong></label>
                                     </div>
-                                    <div class="form-group">
-                                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label><strong>{{trans('file.Company Name')}}</strong></label>
-                                        <input type="text" name="company_name" class="form-control" value="{{$lims_user_data->company_name}}">
+                                        <label><strong>Cabang *</strong></label>
+                                        <input type="hidden" name="warehouse_id_hidden" value="{{$lims_user_data->warehouse_id}}">
+                                        <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
+                                            title="Pilih cabang...">
+                                            @foreach($lims_warehouse_list as $warehouse)
+                                            <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                     <div class="form-group">
                                         <label><strong>{{trans('file.Role')}} *</strong></label>
@@ -73,23 +72,17 @@
                                           @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group" id="biller-id">
-                                        <label><strong>{{trans('file.Biller')}} *</strong></label>
-                                        <input type="hidden" name="biller_id_hidden" value="{{$lims_user_data->biller_id}}">
-                                        <select name="biller_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Biller...">
-                                          @foreach($lims_biller_list as $biller)
-                                              <option value="{{$biller->id}}">{{$biller->name}}</option>
-                                          @endforeach
-                                        </select>
+                                    <div class="form-group mt-3">
+                                        <label><strong>{{trans('file.Phone Number')}} *</strong></label>
+                                        <input type="text" name="phone" required class="form-control" value="{{$lims_user_data->phone}}">
                                     </div>
-                                    <div class="form-group" id="warehouseId">
-                                        <label><strong>Cabang *</strong></label>
-                                        <input type="hidden" name="warehouse_id_hidden" value="{{$lims_user_data->warehouse_id}}">
-                                        <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Pilih cabang...">
-                                          @foreach($lims_warehouse_list as $warehouse)
-                                              <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
-                                          @endforeach
-                                        </select>
+                                </div>
+                                <div class="col-md-12 d-flex justify-content-end">
+                                    <div class="form-group mt-3 mr-2">
+                                        <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
+                                    </div>
+                                    <div class="form-group mt-3">
+                                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                                     </div>
                                 </div>
                             </div>

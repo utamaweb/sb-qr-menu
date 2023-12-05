@@ -1600,9 +1600,14 @@
 						        </tbody>
 						    </table>
 						</div>
-						<div class="form-group">
-	                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-	                    </div>
+						<div class="col-md-12 d-flex justify-content-end">
+                            <div class="form-group mt-3 mr-2">
+                                <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
+                            </div>
+                            <div class="form-group mt-3">
+                                <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                            </div>
+                        </div>
                     </div>
                     {!! Form::close() !!}
                 </div>
@@ -1616,9 +1621,9 @@
 @push('scripts')
 <script type="text/javascript">
 
-	$("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #role-menu").addClass("active");
+	$("ul#outlet").siblings('a').attr('aria-expanded','true');
+    $("ul#outlet").addClass("show");
+    $("ul#outlet #role-menu").addClass("active");
 
     @if(config('database.connections.saleprosaas_landlord'))
     	$.ajax({

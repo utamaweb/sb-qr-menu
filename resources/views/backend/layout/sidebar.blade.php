@@ -362,23 +362,23 @@
          @if($warehouse_permission_active)
         <li id="warehouse-menu"><a href="{{route('warehouse.index')}}">Cabang</a></li>
         @endif
-        <li id="table-menu"><a href="{{route('tables.index')}}">Meja</a></li>
+        {{-- <li id="table-menu"><a href="{{route('tables.index')}}">Meja</a></li>
          @if($customer_index_permission_active)
          <li id="customer-list-menu"><a href="{{route('customer.index')}}">Customer</a></li>
          @endif
         @if($customer_group_permission_active)
         <li id="customer-group-menu"><a href="{{route('customer_group.index')}}">Group Customer</a></li>
-        @endif
-         @if($supplier_index_permission_active)
+        @endif --}}
+         {{-- @if($supplier_index_permission_active)
          <li id="supplier-list-menu"><a href="{{route('supplier.index')}}">Supplier</a></li>
-         @endif
+         @endif --}}
       </ul>
    </li>
 
    @endif
 
 
-   <?php
+   {{-- <?php
       $index_permission_active = $role_has_permissions_list->where('name', 'purchases-index')->first();
       ?>
    @if($index_permission_active)
@@ -399,7 +399,7 @@
          @endif
       </ul>
    </li>
-   @endif
+   @endif --}}
    <?php
       $sale_index_permission_active = $role_has_permissions_list->where('name', 'sales-index')->first();
 

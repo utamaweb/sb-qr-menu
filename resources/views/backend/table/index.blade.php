@@ -83,10 +83,16 @@
 	                <label>{{trans('file.Description')}} *</label>
 	                <textarea class="form-control" name="description" rows="5"></textarea>
 	            </div>
+           <div class="col-md-12 d-flex justify-content-end">
+            {{-- <div class="form-group mt-3 mr-2">
+                                                        <a href="{{ url()->previous() }}" class="btn
+            btn-outline-primary">Kembali</a>
+        </div> --}}
+        <div class="form-group mt-3">
+            <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+        </div>
+        </div>
           	</div>
-            <div class="form-group">
-              <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-            </div>
           </form>
         </div>
         {{ Form::close() }}
@@ -119,10 +125,16 @@
 	                <label>{{trans('file.Description')}} *</label>
 	                <textarea class="form-control" name="description" rows="5"></textarea>
 	            </div>
+                <div class="col-md-12 d-flex justify-content-end">
+                    {{-- <div class="form-group mt-3 mr-2">
+                                                                <a href="{{ url()->previous() }}" class="btn
+                    btn-outline-primary">Kembali</a>
+                </div> --}}
+                <div class="form-group mt-3">
+                    <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                </div>
+                </div>
 	      	</div>
-	        <div class="form-group">
-	          <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-	        </div>
 	    </form>
       {{ Form::close() }}
     </div>
@@ -134,9 +146,9 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #table-menu").addClass("active");
+    $("ul#outlet").siblings('a').attr('aria-expanded','true');
+    $("ul#outlet").addClass("show");
+    $("ul#outlet #table-menu").addClass("active");
 
     $.ajaxSetup({
         headers: {

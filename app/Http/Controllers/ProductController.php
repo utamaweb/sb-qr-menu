@@ -80,7 +80,7 @@ class ProductController extends Controller
     {
         $columns = array(
             2 => 'name',
-            3 => 'code',
+            // 3 => 'code',
             4 => 'brand_id',
             5 => 'category_id',
             6 => 'qty',

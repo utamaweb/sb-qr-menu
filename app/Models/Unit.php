@@ -15,4 +15,9 @@ class Unit extends Model
     {
     	return $this->hasMany('App\Models\Product');
     }
+
+    public function ingredient()
+    {
+    	return $this->hasMany('App\Models\Ingredient');
+    }
 }

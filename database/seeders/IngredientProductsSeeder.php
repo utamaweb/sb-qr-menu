@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\IngredientProduct;
+use App\Models\IngredientProducts;
 
 class IngredientProductsSeeder extends Seeder
 {
@@ -23,7 +23,7 @@ class IngredientProductsSeeder extends Seeder
         ];
 
         foreach ($ingredientProducts as $ingPro) {
-            Ingredient::create([
+            IngredientProducts::create([
                 'ingredient_id'  =>  $ingPro[0],
                 'product_id'  =>  $ingPro[1],
             ]);

@@ -15,7 +15,7 @@ class RoleController extends Controller
     public function index()
     {
         if(Auth::user()->role_id <= 2) {
-            $lims_role_all = Roles::where('is_active', true)->get();
+            $lims_role_all = Roles::get();
             return view('backend.role.create', compact('lims_role_all'));
         }
         else

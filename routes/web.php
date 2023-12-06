@@ -224,12 +224,12 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function() {
     Route::resource('warehouse', WarehouseController::class)->except('show');
 
 
-    // Route::controller(OrderTypeController::class)->group(function () {
-    //     Route::post('importorder_type', 'importOrderType')->name('order_type.import');
-    //     Route::post('order_type/deletebyselection', 'deleteBySelection');
-    //     Route::get('order_type/lims_order_type_search', 'limsOrderTypeSearch')->name('order_type.search');
-    //     Route::get('order_type/all', 'warehouseAll')->name('warehouse.all');
+    // Route::controller(CategoryController::class)->group(function () {
+    //     Route::post('category/import', 'import')->name('category.import');
+    //     Route::post('category/deletebyselection', 'deleteBySelection');
+    //     Route::post('category/category-data', 'categoryData');
     // });
+
     Route::resource('order_type', OrderTypeController::class);
     Route::resource('ingredient', IngredientController::class);
     Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);

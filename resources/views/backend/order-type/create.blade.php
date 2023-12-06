@@ -29,7 +29,7 @@
                 class="dripicons-plus"></i> Tipe Pesanan</button>
     </div>
     <div class="table-responsive">
-        <table id="category-table" class="table" style="width: 100%">
+        <table id="" class="table" style="width: 100%">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
@@ -37,43 +37,57 @@
                     {{-- <th>{{trans('file.Parent Category')}}</th> --}}
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
+                @foreach ($orderTypes as $orderType)
+                    <tr>
+                        <td>{{$loop->iteration}}</td>
+                        <td>{{$orderType->name}}</td>
+                        <td>
+                            <button type="button" class="btn btn-warning" data-toggle="modal" data-target="#editModal-{{$orderType->id}}" ><i class="dripicons-document-edit"></i>Edit</button>
+                            {{-- <button class="btn btn-warning">Edit</button> --}}
+                            <!-- Edit Modal -->
+                            <div id="editModal-{{$orderType->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
+                            class="modal fade text-left">
+                            <div role="document" class="modal-dialog">
+                                <div class="modal-content">
+                                    {{ Form::open(['route' => ['order_type.update', 1], 'method' => 'PUT', 'files' => true] ) }}
+                                    <div class="modal-header">
+                                        <h5 id="exampleModalLabel" class="modal-title">Update Tipe Pesanan</h5>
+                                        <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
+                                                    class="dripicons-cross"></i></span></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p class="italic">
+                                            <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                                        <div class="row">
+                                            <div class="col-md-12 form-group">
+                                                <label>{{trans('file.name')}} *</label>
+                                                <input type="text" value="{{$orderType->name}}" name="name" class="form-control">
+                                            </div>
+                                            <input type="hidden" name="order_type_id" value="{{$orderType->id}}">
+
+                                            <div class="col-md-12 d-flex justify-content-end">
+                                                <div class="form-group">
+                                                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{ Form::close() }}
+                                </div>
+                            </div>
+                            </div>
+                            <form action="{{route('order_type.destroy', $orderType->id)}}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn btn-danger" onclick="return confirmDelete()"><i class="dripicons-trash"></i>Hapus</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
             </thead>
         </table>
     </div>
 </section>
-
-<!-- Edit Modal -->
-<div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-    class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-        <div class="modal-content">
-            {{ Form::open(['route' => ['category.update', 1], 'method' => 'PUT', 'files' => true] ) }}
-            <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Update Tipe Pesanan</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
-                            class="dripicons-cross"></i></span></button>
-            </div>
-            <div class="modal-body">
-                <p class="italic">
-                    <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                <div class="row">
-                    <div class="col-md-12 form-group">
-                        <label>{{trans('file.name')}} *</label>
-                        {{Form::text('name',null, array('required' => 'required', 'class' => 'form-control'))}}
-                    </div>
-                    <input type="hidden" name="category_id">
-
-                    <div class="col-md-12 d-flex justify-content-end">
-                        <div class="form-group">
-                            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{ Form::close() }}
-        </div>
-    </div>
-</div>
 
 
 
@@ -82,7 +96,9 @@
     class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {!! Form::open(['route' => 'category.store', 'method' => 'post', 'files' => true]) !!}
+            <form method="POST" action="{{route('order_type.store')}}">
+                @csrf
+            {{-- {!! Form::open(['route' => 'order_type.store', 'method' => 'post', 'files' => true]) !!} --}}
             <div class="modal-header">
                 <h5 id="exampleModalLabel" class="modal-title">Tambah Tipe Pesanan</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
@@ -93,8 +109,9 @@
                     <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
                 <div class="row">
                     <div class="col-md-12 form-group">
-                        <label>{{trans('file.name')}} *</label>
-                        {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Masukkan nama tipe pesanan..'))}}
+                        <label>Nama</label>
+                        {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Masukkan nama tipe pesanan..'))}} --}}
+                        <input type="text" name="name" required class="form-control" placeholder="Masukkan tipe pesanan...">
                     </div>
                     <div class="col-md-12 d-flex justify-content-end">
                 <div class="form-group">
@@ -102,7 +119,7 @@
                 </div>
                 </div>
             </div>
-            {{ Form::close() }}
+        </form>
         </div>
     </div>
 </div>
@@ -116,13 +133,13 @@
     $("li#order-type").addClass("active");
 
     function confirmDelete() {
-      if (confirm("If you delete category all products under this category will also be deleted. Are you sure want to delete?")) {
+      if (confirm("If you delete order type all products under this order type will also be deleted. Are you sure want to delete?")) {
           return true;
       }
       return false;
     }
 
-    var category_id = [];
+    var orderType_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
 
     $.ajaxSetup({
@@ -130,16 +147,16 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    $(document).on("click", ".open-EditCategoryDialog", function(){
+    $(document).on("click", ".open-EditOrderTypeDialog", function(){
         $("#editModal input[name='is_sync_disable']").prop("checked", false);
         $("#editModal input[name='featured']").prop("checked", false);
-        var url ="category/";
+        var url ="order_type/";
         var id = $(this).data('id').toString();
         url = url.concat(id).concat("/edit");
         $.get(url, function(data){
             $("#editModal input[name='name']").val(data['name']);
             $("#editModal select[name='parent_id']").val(data['parent_id']);
-            $("#editModal input[name='category_id']").val(data['id']);
+            $("#editModal input[name='orderType_id']").val(data['id']);
             if (data['is_sync_disable']) {
                 $("#editModal input[name='is_sync_disable']").prop("checked", true);
             }
@@ -152,11 +169,11 @@
         });
     });
 
-    $('#category-table').DataTable( {
+    $('#orderType-table').DataTable( {
         "processing": true,
         "serverSide": true,
         "ajax":{
-            url:"category/category-data",
+            url:"order_type/all",
             dataType: "json",
             type:"post"
         },
@@ -239,18 +256,18 @@
                 className: 'buttons-delete',
                 action: function ( e, dt, node, config ) {
                     if(user_verified == '1') {
-                        category_id.length = 0;
+                        orderType_id.length = 0;
                         $(':checkbox:checked').each(function(i){
                             if(i){
-                                category_id[i-1] = $(this).closest('tr').data('id');
+                                orderType_id[i-1] = $(this).closest('tr').data('id');
                             }
                         });
-                        if(category_id.length && confirm("If you delete category all products under this category will also be deleted. Are you sure want to delete?")) {
+                        if(orderType_id.length && confirm("If you delete order type all products under this order type will also be deleted. Are you sure want to delete?")) {
                             $.ajax({
                                 type:'POST',
-                                url:'category/deletebyselection',
+                                url:'order_type/deletebyselection',
                                 data:{
-                                    categoryIdArray: category_id
+                                    orderTypeIdArray: orderType_id
                                 },
                                 success:function(data){
                                     dt.rows({ page: 'current', selected: true }).deselect();
@@ -258,8 +275,8 @@
                                 }
                             });
                         }
-                        else if(!category_id.length)
-                            alert('No category is selected!');
+                        else if(!orderType_id.length)
+                            alert('No order type is selected!');
                     }
                     else
                         alert('This feature is disable for demo!');

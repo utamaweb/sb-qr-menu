@@ -15,23 +15,18 @@ class OrderTypeController extends Controller
     use CacheForget;
     public function index()
     {
+        $orderTypes = OrderType::get();
         // $lims_order_type_all = OrderType::where('is_active', true)->get();
         // $numberOfOrderType = OrderType::where('is_active', true)->count();
-        return view('backend.order-type.create');
+        return view('backend.order-type.create', compact('orderTypes'));
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => [
-                'max:255',
-                    Rule::unique('order_types')->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
+            'name' => 'max:255',
         ]);
         $input = $request->all();
-        $input['is_active'] = true;
         OrderType::create($input);
         $this->cacheForget('order_type_list');
         return redirect('order_type')->with('message', 'Data inserted successfully');
@@ -46,12 +41,7 @@ class OrderTypeController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => [
-                'max:255',
-                    Rule::unique('order_types')->ignore($request->order_type_id)->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
+            'name' => 'max:255',
         ]);
         $input = $request->all();
         $lims_order_type_data = OrderType::find($input['order_type_id']);
@@ -117,8 +107,7 @@ class OrderTypeController extends Controller
     public function destroy($id)
     {
         $lims_order_type_data = OrderType::find($id);
-        $lims_order_type_data->is_active = false;
-        $lims_order_type_data->save();
+        $lims_order_type_data->delete();
         $this->cacheForget('order_type_list');
         return redirect('order_type')->with('not_permitted', 'Data deleted successfully');
     }
@@ -140,4 +129,6 @@ class OrderTypeController extends Controller
 
         return response()->json($html);
     }
+
+
 }

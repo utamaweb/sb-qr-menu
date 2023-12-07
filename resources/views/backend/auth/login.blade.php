@@ -54,8 +54,7 @@
                     <form method="POST" action="{{ route('login') }}" id="login-form">
                         @csrf
                         <div class="form-group-material">
-                            <input id="login-username" type="text" name="name" required class="input-material" value="">
-                            <label for="login-username" class="label-material">{{trans('file.UserName')}}</label>
+                            <input id="login-username" type="text" name="name" required class="input-material" value="" placeholder="Username">
                             @if(session()->has('error'))
                             <p>
                                 <strong>{{ session()->get('error') }}</strong>
@@ -65,15 +64,14 @@
 
                         <div class="form-group-material">
                             <input id="login-password" type="password" name="password" required class="input-material"
-                                value="">
-                            <label for="login-password" class="label-material">{{trans('file.Password')}}</label>
+                                value="" placeholder="Password">
                             @if(session()->has('error'))
                             <p>
                                 <strong>{{ session()->get('error') }}</strong>
                             </p>
                             @endif
                         </div>
-                        <button type="submit" class="btn btn-primary btn-block">{{trans('file.LogIn')}}</button>
+                        <button type="submit" class="btn btn-primary btn-block">Login</button>
                     </form>
                 </div>
             </div>

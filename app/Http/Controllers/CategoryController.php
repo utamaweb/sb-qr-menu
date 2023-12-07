@@ -22,9 +22,10 @@ class CategoryController extends Controller
 
     public function index()
     {
+        $categories = Category::get();
         $role = Role::find(Auth::user()->role_id);
         if($role->hasPermissionTo('category')) {
-            return view('backend.category.create');
+            return view('backend.category.create', compact('categories'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -130,14 +131,7 @@ class CategoryController extends Controller
     {
         $request->name = preg_replace('/\s+/', ' ', $request->name);
         $this->validate($request, [
-            'name' => [
-                'max:255',
-                    Rule::unique('categories')->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
-            'image' => 'image|mimes:jpg,jpeg,png,gif',
-            'icon'  => 'mimetypes:text/plain,image/png,image/jpeg,image/svg',
+            'name' => 'max:255',
         ]);
         $image = $request->image;
         if ($image) {
@@ -155,35 +149,8 @@ class CategoryController extends Controller
             $lims_category_data['image'] = $imageName;
         }
         $icon = $request->icon;
-        if ($icon) {
-            if (!file_exists('public/images/category/icons/')) {
-                mkdir('public/images/category/icons/', 0755, true);
-            }
-            $ext = pathinfo($icon->getClientOriginalName(), PATHINFO_EXTENSION);
-            $iconName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
-                $iconName = $iconName . '.' . $ext;
-                $icon->move('public/images/category/icons/', $iconName);
-            }
-            else {
-                $iconName = $this->getTenantId() . '_' . $iconName . '.' . $ext;
-                $icon->move('public/images/category/icons/', $iconName);
-            }
-            Image::make('public/images/category/'. $iconName)->fit(100, 100)->save();
-            $lims_category_data['icon'] = $iconName;
-        }
         $lims_category_data['name'] = $request->name;
         $lims_category_data['is_active'] = true;
-
-        if(isset($request->is_sync_disable))
-            $lims_category_data['is_sync_disable'] = $request->is_sync_disable;
-
-        if(isset($request->slug)) {
-            $lims_category_data['slug'] = Str::slug($request->name, '-');
-            $lims_category_data['featured'] = $request->featured;
-            $lims_category_data['page_title'] = $request->page_title;
-            $lims_category_data['short_description'] = $request->short_description;
-        }
 
         DB::table('categories')->insert($lims_category_data);
         $this->cacheForget('category_list');
@@ -199,71 +166,16 @@ class CategoryController extends Controller
         return $lims_category_data;
     }
 
-    public function update(Request $request)
+    public function update(Request $request, $id)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
         $this->validate($request,[
-            'name' => [
-                'max:255',
-                Rule::unique('categories')->ignore($request->category_id)->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
-            'image' => 'image|mimes:jpg,jpeg,png,gif',
-            'icon'  => 'mimetypes:text/plain,image/png,image/jpeg,image/svg',
+            'name' => 'max:255',
         ]);
 
-        $lims_category_data = DB::table('categories')->where('id', $request->category_id)->first();
-
-        $input = $request->except('image','icon','_method','_token','category_id');
-
-        $image = $request->image;
-        if ($image) {
-            $this->fileDelete('images/category/', $lims_category_data->image);
-
-            $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
-            $imageName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
-                $imageName = $imageName . '.' . $ext;
-                $image->move('public/images/category', $imageName);
-            }
-            else {
-                $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
-                $image->move('public/images/category', $imageName);
-            }
-            Image::make('public/images/category/'. $imageName)->fit(100, 100)->save();
-            $input['image'] = $imageName;
-        }
-
-        $icon = $request->icon;
-        if ($icon) {
-            if (!file_exists('public/images/category/icons/')) {
-                mkdir('public/images/category/icons/', 0755, true);
-            }
-            $this->fileDelete('images/category/icons/', $lims_category_data->icon);
-
-            $ext = pathinfo($icon->getClientOriginalName(), PATHINFO_EXTENSION);
-            $iconName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
-                $iconName = $iconName . '.' . $ext;
-                $icon->move('public/images/category/icons/', $iconName);
-            }
-            else {
-                $iconName = $this->getTenantId() . '_' . $iconName . '.' . $ext;
-                $icon->move('public/images/category/icons/', $iconName);
-            }
-            Image::make('public/images/category/icons/'. $iconName)->fit(100, 100)->save();
-            $input['icon'] = $iconName;
-        }
-        if(!isset($request->featured) && \Schema::hasColumn('categories', 'featured') ){
-            $input['featured'] = 0;
-        }
-        if(!isset($input['is_sync_disable']) && \Schema::hasColumn('categories', 'is_sync_disable'))
-            $input['is_sync_disable'] = null;
-
-        DB::table('categories')->where('id', $request->category_id)->update($input);
+        $lims_category_data = Category::find($id);
+        $lims_category_data->update([
+            'name' => $request->name,
+        ]);
 
         return redirect('category')->with('message', 'Category updated successfully');
     }
@@ -335,17 +247,16 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $lims_category_data = Category::findOrFail($id);
-        $lims_category_data->is_active = false;
         $lims_product_data = Product::where('category_id', $id)->get();
         foreach ($lims_product_data as $product_data) {
             $product_data->is_active = false;
-            $product_data->save();
+            $product_data->delete();
         }
 
         $this->fileDelete('images/category/', $lims_category_data->image);
         $this->fileDelete('images/category/icons', $lims_category_data->icon);
 
-        $lims_category_data->save();
+        $lims_category_data->delete();
         $this->cacheForget('category_list');
         return redirect('category')->with('not_permitted', 'Category deleted successfully');
     }

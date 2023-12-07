@@ -4,16 +4,13 @@
     <div class="container-fluid">
 
     @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}</div>
-    @endif
-    @if($errors->has('image'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ $errors->first('image') }}</div>
+    <div class="alert alert-danger alert-dismissible text-center">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
+    </div>
     @endif
     @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-]
-    ?;center"><button type="button" class="close" data-dismiss="alert"
+    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
     @endif
     @if(session()->has('not_permitted'))
@@ -21,120 +18,126 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
 
-        <!-- Trigger the modal with a button -->
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#category-modal"><i class="dripicons-plus"></i> {{trans("file.Add Category")}}</button>
+        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Kategori</a>&nbsp;
     </div>
     <div class="table-responsive">
-        <table id="category-table" class="table" style="width: 100%">
+        <table id="ingredient-table" class="table">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>{{trans('file.category')}}</th>
-                    {{-- <th>{{trans('file.Parent Category')}}</th> --}}
+                    <th>Nama Kategori</th>
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
+            <tbody>
+                @foreach($categories as $key=>$category)
+                <tr data-id="{{$category->id}}">
+                    <td>{{$key}}</td>
+                    <td>{{ $category->name }}</td>
+                    <td>
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$category->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                        {{-- Edit Modal --}}
+                        <div id="editModal-{{$category->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                            <div role="document" class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Update Kategori')}}</h5>
+                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                </div>
+                                <div class="modal-body">
+                                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                                    <form action="{{route('category.update', $category->id)}}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="form-group">
+                                        <div class="form-group">
+                                            <label>Nama Kategori *</label>
+                                            <input type="text" value="{{$category->name}}" name="name" required class="form-control">
+                                        </div>
+                                        </div>
+                                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                                    </form>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                        {{ Form::open(['route' => ['category.destroy', $category->id], 'method' => 'DELETE'] ) }}
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                {{ Form::close() }}
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
         </table>
     </div>
 </section>
 
-<!-- Category Modal -->
-<div id="category-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-    class="modal fade text-left">
+
+<!-- Create Modal -->
+<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {!! Form::open(['route' => 'category.store', 'method' => 'post', 'files' => true]) !!}
+            {!! Form::open(['route' => 'category.store', 'method' => 'post']) !!}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Category')}}</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
-                            class="dripicons-cross"></i></span></button>
+                <h5 id="exampleModalLabel" class="modal-title">Tambah Kategori</h5>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic">
-                    <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label>{{trans('file.name')}} *</label>
-                        {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type category name...'))}}
+                <p class="italic"><small>{{trans('file.Inputan yang memiliki tanda (*) wajib diisi')}}.</small></p>
+                <form>
+                    <div class="form-group">
+                        <label>Nama Kategori *</label>
+                        <input type="text" name="name" required class="form-control">
                     </div>
-                    <div class="col-md-6 form-group">
-                        <label>{{trans('file.Image')}}</label>
-                        <input type="file" name="image" class="form-control">
-                    </div>
-                    <div class="col-md-12 d-flex justify-content-end">
-                        {{-- <div class="form-group mt-3 mr-2">
-                                                <a href="{{ url()->previous() }}" class="btn
-                        btn-outline-primary">Kembali</a>
-                    </div> --}}
-                    <div class="form-group mt-3">
-                        <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
-                    </div>
-                </div>
-            </div>
+                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+            </form>
         </div>
         {{ Form::close() }}
     </div>
 </div>
 </div>
-<!-- Category Modal -->
 
-<!-- Edit Modal -->
-<div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-    class="modal fade text-left">
+<div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
-        <div class="modal-content">
-            {{ Form::open(['route' => ['category.update', 1], 'method' => 'PUT', 'files' => true] ) }}
-            <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Update Category')}}</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
-                            class="dripicons-cross"></i></span></button>
-            </div>
-            <div class="modal-body">
-                <p class="italic">
-                    <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                <div class="row">
-                    <div class="col-md-6 form-group">
-                        <label>{{trans('file.name')}} *</label>
-                        {{-- {{Form::text('name',null, array('required' => 'required', 'class' => 'form-control'))}} --}}
-                        <input type="text" name="name" required class="form-control" id="name-input">
+      <div class="modal-content">
+        {!! Form::open(['route' => 'category.import', 'method' => 'post', 'files' => true]) !!}
+        <div class="modal-header">
+          <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
+          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+        </div>
+        <div class="modal-body">
+            <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+            <p>{{trans('file.The correct column order is')}} (name*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>{{trans('file.Upload CSV File')}} *</label>
+                        {{Form::file('file', array('class' => 'form-control','required'))}}
                     </div>
-                    <input type="hidden" name="category_id">
-                    <div class="col-md-6 form-group">
-                        <label>{{trans('file.Image')}}</label>
-                        <input type="file" name="image" class="form-control">
-                    </div>
-
-                    <div class="col-md-12 d-flex justify-content-end">
-                        {{-- <div class="form-group mt-3 mr-2">
-                                                                    <a href="{{ url()->previous() }}" class="btn
-                        btn-outline-primary">Kembali</a>
-                    </div> --}}
-                    <div class="form-group mt-3">
-                        <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
-                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label> {{trans('file.Sample File')}}</label>
+                        <a href="sample_file/category.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
                     </div>
                 </div>
             </div>
-            {{ Form::close() }}
+            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
         </div>
+        {{ Form::close() }}
+      </div>
     </div>
 </div>
 
 @endsection
+
 @push('scripts')
 <script type="text/javascript">
     $("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
-    $("ul#product #category-menu").addClass("active");
+    $("ul#product #unit-menu").addClass("active");
 
-    function confirmDelete() {
-      if (confirm("If you delete category all products under this category will also be deleted. Are you sure want to delete?")) {
-          return true;
-      }
-      return false;
-    }
-
-    var category_id = [];
+    var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
 
     $.ajaxSetup({
@@ -142,43 +145,101 @@
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    $(document).on("click", ".open-EditCategoryDialog", function(){
-        $("#editModal input[name='is_sync_disable']").prop("checked", false);
-        $("#editModal input[name='featured']").prop("checked", false);
-        var url ="category/";
+
+    $(document).ready(function() {
+    $(document).on('click', '.open-EditUnitDialog', function() {
+        var url = "ingredient/"
         var id = $(this).data('id').toString();
         url = url.concat(id).concat("/edit");
-        $.get(url, function(data){
-            $("#input-name").val('arg');
-            $("#editModal input[name='category_id']").val(data['id']);
-            if (data['is_sync_disable']) {
-                $("#editModal input[name='is_sync_disable']").prop("checked", true);
+
+        $.get(url, function(data) {
+            $("input[name='name']").val(data['name']);
+            $("input[name='first_stock']").val(data['first_stock']);
+            $("input[name='unit_id']").val(data['unit_id']);
+            $("input[name='operation_value']").val(data['operation_value']);
+            $("input[name='ingredient_id']").val(data['id']);
+            $("#base_unit_edit").val(data['base_unit']);
+            if(data['base_unit']!=null)
+            {
+                $(".operator").show();
+                $(".operation_value").show();
             }
-            if (data['featured']) {
-                $("#editModal input[name='featured']").prop("checked", true);
+            else
+            {
+                $(".operator").hide();
+                $(".operation_value").hide();
             }
-            $("#editModal input[name='page_title']").val(data['page_title']);
-            $("#editModal input[name='short_description']").val(data['short_description']);
             $('.selectpicker').selectpicker('refresh');
+
         });
     });
 
-    $('#category-table').DataTable( {
-        "processing": true,
-        "serverSide": true,
-        "ajax":{
-            url:"category/category-data",
-            dataType: "json",
-            type:"post"
-        },
-        "createdRow": function( row, data, dataIndex ) {
-            $(row).attr('data-id', data['id']);
-        },
-        "columns": [
-            {"data": "key"},
-            {"data": "name"},
-            {"data": "options"},
-        ],
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $( "#select_all" ).on( "change", function() {
+        if ($(this).is(':checked')) {
+            $("tbody input[type='checkbox']").prop('checked', true);
+        }
+        else {
+            $("tbody input[type='checkbox']").prop('checked', false);
+        }
+    });
+
+    $("#export").on("click", function(e){
+        e.preventDefault();
+        var unit = [];
+        $(':checkbox:checked').each(function(i){
+          unit[i] = $(this).val();
+        });
+        $.ajax({
+           type:'POST',
+           url:'/exportunit',
+           data:{
+
+                unitArray: unit
+            },
+           success:function(data){
+            alert('Exported to CSV file successfully! Click Ok to download file');
+            window.location.href = data;
+           }
+        });
+    });
+
+    $('.open-CreateUnitDialog').on('click', function() {
+        $(".operator").hide();
+        $(".operation_value").hide();
+
+    });
+
+    $('#base_unit_create').on('change', function() {
+        if($(this).val()){
+            $("#createModal .operator").show();
+            $("#createModal .operation_value").show();
+        }
+        else{
+            $("#createModal .operator").hide();
+            $("#createModal .operation_value").hide();
+        }
+    });
+
+    $('#base_unit_edit').on('change', function() {
+        if($(this).val()){
+            $("#editModal .operator").show();
+            $("#editModal .operation_value").show();
+        }
+        else{
+            $("#editModal .operator").hide();
+            $("#editModal .operation_value").hide();
+        }
+    });
+});
+
+    $('#ingredient-table').DataTable( {
+        "order": [],
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
@@ -189,6 +250,10 @@
             }
         },
         'columnDefs': [
+            {
+                "orderable": false,
+                'targets': [0, 2]
+            },
             {
                 'render': function(data, type, row, meta){
                     if(type === 'display'){
@@ -206,7 +271,6 @@
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
-
         dom: '<"row"lfB>rtip',
         buttons: [
             {
@@ -216,7 +280,6 @@
                     columns: ':visible:Not(.not-exported)',
                     rows: ':visible'
                 },
-                footer:true
             },
             {
                 extend: 'excel',
@@ -225,7 +288,6 @@
                     columns: ':visible:Not(.not-exported)',
                     rows: ':visible'
                 },
-                footer:true
             },
             {
                 extend: 'csv',
@@ -234,7 +296,6 @@
                     columns: ':visible:Not(.not-exported)',
                     rows: ':visible'
                 },
-                footer:true
             },
             {
                 extend: 'print',
@@ -243,34 +304,33 @@
                     columns: ':visible:Not(.not-exported)',
                     rows: ':visible'
                 },
-                footer:true
             },
             {
                 text: '<i title="delete" class="dripicons-cross"></i>',
                 className: 'buttons-delete',
                 action: function ( e, dt, node, config ) {
                     if(user_verified == '1') {
-                        category_id.length = 0;
+                        ingredient_id.length = 0;
                         $(':checkbox:checked').each(function(i){
                             if(i){
-                                category_id[i-1] = $(this).closest('tr').data('id');
+                                ingredient_id[i-1] = $(this).closest('tr').data('id');
                             }
                         });
-                        if(category_id.length && confirm("If you delete category all products under this category will also be deleted. Are you sure want to delete?")) {
+                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
                             $.ajax({
                                 type:'POST',
-                                url:'category/deletebyselection',
+                                url:'ingredient/deletebyselection',
                                 data:{
-                                    categoryIdArray: category_id
+                                    unitIdArray: ingredient_id
                                 },
                                 success:function(data){
-                                    dt.rows({ page: 'current', selected: true }).deselect();
-                                    dt.rows({ page: 'current', selected: true }).remove().draw(false);
+                                    alert(data);
                                 }
                             });
+                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
                         }
-                        else if(!category_id.length)
-                            alert('No category is selected!');
+                        else if(!ingredient_id.length)
+                            alert('No unit is selected!');
                     }
                     else
                         alert('This feature is disable for demo!');
@@ -283,6 +343,5 @@
             },
         ],
     } );
-
 </script>
 @endpush

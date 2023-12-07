@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Ingredient;
+use App\Models\Unit;
 use Illuminate\Validation\Rule;
 use Keygen;
 use Auth;
@@ -15,26 +16,26 @@ class IngredientController extends Controller
     use CacheForget;
     public function index()
     {
-        // $lims_order_type_all = Ingredient::where('is_active', true)->get();
+        $lims_ingredient_all = Ingredient::get();
+        $units = Unit::get();
         // $numberOfIngredient = Ingredient::where('is_active', true)->count();
-        return view('backend.ingredient.create');
+        return view('backend.ingredient.create', compact('lims_ingredient_all', 'units'));
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => [
-                'max:255',
-                Rule::unique('order_types')->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
+            'name' => 'max:255',
         ]);
-        $input = $request->all();
-        $input['is_active'] = true;
-        Ingredient::create($input);
-        $this->cacheForget('order_type_list');
-        return redirect('order_type')->with('message', 'Data inserted successfully');
+        // $input = $request->all();
+        Ingredient::create([
+            'name' => $request->name,
+            'first_stock' => $request->first_stock,
+            'stock_in' => $request->first_stock,
+            'unit_id' => $request->unit_id,
+        ]);
+        $this->cacheForget('ingredient_list');
+        return redirect('ingredient')->with('message', 'Data inserted successfully');
     }
 
     public function edit($id)
@@ -45,19 +46,20 @@ class IngredientController extends Controller
 
     public function update(Request $request, $id)
     {
+        // return $request;
         $this->validate($request, [
-            'name' => [
-                'max:255',
-                Rule::unique('order_types')->ignore($request->order_type_id)->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
+            'name' => 'max:255',
         ]);
-        $input = $request->all();
-        $lims_order_type_data = Ingredient::find($input['order_type_id']);
-        $lims_order_type_data->update($input);
-        $this->cacheForget('order_type_list');
-        return redirect('order_type')->with('message', 'Data updated successfully');
+        $ingredient = Ingredient::find($id);
+        // return $ingredient;
+        $ingredient->update([
+            'name' => $request->name,
+            'first_stock' => $request->first_stock,
+            'stock_in' => $request->first_stock,
+            'unit_id' => $request->unit_id,
+        ]);
+        $this->cacheForget('ingredient_list');
+        return redirect('ingredient')->with('message', 'Data updated successfully');
     }
 
     public function importIngredient(Request $request)
@@ -97,8 +99,8 @@ class IngredientController extends Controller
             $order_type->is_active = true;
             $order_type->save();
         }
-        $this->cacheForget('order_type_list');
-        return redirect('order_type')->with('message', 'Ingredient imported successfully');
+        $this->cacheForget('ingredient_list');
+        return redirect('ingredient')->with('message', 'Ingredient imported successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -109,31 +111,29 @@ class IngredientController extends Controller
             $lims_order_type_data->is_active = false;
             $lims_order_type_data->save();
         }
-        $this->cacheForget('order_type_list');
+        $this->cacheForget('ingredient_list');
         return 'Ingredient deleted successfully!';
     }
 
     public function destroy($id)
     {
         $lims_order_type_data = Ingredient::find($id);
-        $lims_order_type_data->is_active = false;
-        $lims_order_type_data->save();
-        $this->cacheForget('order_type_list');
-        return redirect('order_type')->with('not_permitted', 'Data deleted successfully');
+        $lims_order_type_data->delete();
+        $this->cacheForget('ingredient_list');
+        return redirect('ingredient')->with('not_permitted', 'Data deleted successfully');
     }
 
-    public function order_typeAll()
+    public function ingredientData()
     {
         if (Auth::user()->role_id > 2)
-            $lims_order_type_list = DB::table('order_types')->where([
-                ['is_active', true],
+            $lims_ingredient_list = DB::table('ingredients')->where([
                 ['id', Auth::user()->order_type_id]
             ])->get();
         else
-            $lims_order_type_list = DB::table('order_types')->where('is_active', true)->get();
+            $lims_ingredient_list = DB::table('ingredients')->where('is_active', true)->get();
 
         $html = '';
-        foreach ($lims_order_type_list as $order_type) {
+        foreach ($lims_ingredient_list as $order_type) {
             $html .= '<option value="' . $order_type->id . '">' . $order_type->name . '</option>';
         }
 

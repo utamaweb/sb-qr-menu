@@ -25,7 +25,7 @@ class IngredientSeeder extends Seeder
                 'first_stock'  =>  $bahan[1],
                 'stock_in'  =>  $bahan[2],
                 'stock_used'  =>  $bahan[3],
-                'adjustment'  =>  $bahan[4],
+                // 'adjustment'  =>  $bahan[4],
                 'last_stock'  =>  $bahan[5],
                 'unit_id'  =>  $bahan[6],
             ]);

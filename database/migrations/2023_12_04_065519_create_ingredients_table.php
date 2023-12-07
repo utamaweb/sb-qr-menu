@@ -16,9 +16,9 @@ return new class extends Migration
             $table->string("name");
             $table->bigInteger("first_stock");
             $table->bigInteger("stock_in");
-            $table->bigInteger("stock_used");
-            $table->bigInteger("adjustment");
-            $table->bigInteger("last_stock");
+            $table->bigInteger("stock_used")->default(0);
+            // $table->bigInteger("adjustment")->default(0);
+            $table->bigInteger("last_stock")->default(0);
             $table->unsignedBigInteger('unit_id');
             // $table->foreignId('unit_id')->constrained();
             $table->timestamps();

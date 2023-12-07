@@ -231,6 +231,12 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function() {
     // });
 
     Route::resource('order_type', OrderTypeController::class);
+
+    Route::controller(IngredientController::class)->group(function () {
+        Route::post('ingredient/import', 'import')->name('ingredient.import');
+        Route::post('ingredient/deletebyselection', 'deleteBySelection');
+        Route::post('ingredient/ingredient-data', 'ingredientData');
+    });
     Route::resource('ingredient', IngredientController::class);
     Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 

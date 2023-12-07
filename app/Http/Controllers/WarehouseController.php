@@ -23,12 +23,7 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => [
-                'max:255',
-                    Rule::unique('warehouses')->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
+            'name' => 'max:255',
         ]);
         $input = $request->all();
         $input['is_active'] = true;
@@ -46,15 +41,10 @@ class WarehouseController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => [
-                'max:255',
-                    Rule::unique('warehouses')->ignore($request->warehouse_id)->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
+            'name' => 'max:255'
         ]);
         $input = $request->all();
-        $lims_warehouse_data = Warehouse::find($input['warehouse_id']);
+        $lims_warehouse_data = Warehouse::find($id);
         $lims_warehouse_data->update($input);
         $this->cacheForget('warehouse_list');
         return redirect('warehouse')->with('message', 'Data updated successfully');
@@ -117,8 +107,7 @@ class WarehouseController extends Controller
     public function destroy($id)
     {
         $lims_warehouse_data = Warehouse::find($id);
-        $lims_warehouse_data->is_active = false;
-        $lims_warehouse_data->save();
+        $lims_warehouse_data->delete();
         $this->cacheForget('warehouse_list');
         return redirect('warehouse')->with('not_permitted', 'Data deleted successfully');
     }

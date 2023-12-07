@@ -173,7 +173,6 @@ class CategoryController extends Controller
             $lims_category_data['icon'] = $iconName;
         }
         $lims_category_data['name'] = $request->name;
-        $lims_category_data['parent_id'] = $request->parent_id;
         $lims_category_data['is_active'] = true;
 
         if(isset($request->is_sync_disable))

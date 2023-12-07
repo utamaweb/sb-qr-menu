@@ -67,11 +67,12 @@
                         btn-outline-primary">Kembali</a>
                     </div> --}}
                     <div class="form-group mt-3">
-                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                        <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                     </div>
                 </div>
             </div>
         </div>
+        {{ Form::close() }}
     </div>
 </div>
 </div>
@@ -94,7 +95,8 @@
                 <div class="row">
                     <div class="col-md-6 form-group">
                         <label>{{trans('file.name')}} *</label>
-                        {{Form::text('name',null, array('required' => 'required', 'class' => 'form-control'))}}
+                        {{-- {{Form::text('name',null, array('required' => 'required', 'class' => 'form-control'))}} --}}
+                        <input type="text" name="name" required class="form-control" id="name-input">
                     </div>
                     <input type="hidden" name="category_id">
                     <div class="col-md-6 form-group">
@@ -108,11 +110,12 @@
                         btn-outline-primary">Kembali</a>
                     </div> --}}
                     <div class="form-group mt-3">
-                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                        <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                     </div>
                     </div>
                 </div>
             </div>
+            {{ Form::close() }}
         </div>
     </div>
 </div>
@@ -146,8 +149,7 @@
         var id = $(this).data('id').toString();
         url = url.concat(id).concat("/edit");
         $.get(url, function(data){
-            $("#editModal input[name='name']").val(data['name']);
-            $("#editModal select[name='parent_id']").val(data['parent_id']);
+            $("#input-name").val('arg');
             $("#editModal input[name='category_id']").val(data['id']);
             if (data['is_sync_disable']) {
                 $("#editModal input[name='is_sync_disable']").prop("checked", true);

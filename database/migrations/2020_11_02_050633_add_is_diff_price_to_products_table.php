@@ -14,7 +14,7 @@ class AddIsDiffPriceToProductsTable extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->boolean('is_diffPrice')->after('is_variant')->nullable();
+            $table->boolean('is_diffPrice')->nullable();
         });
     }
 

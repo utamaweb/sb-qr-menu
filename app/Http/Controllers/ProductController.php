@@ -39,22 +39,9 @@ class ProductController extends Controller
 
     public function index()
     {
-        // $path = public_path('images/product/');
-
-        // $files = File::allFiles($path);
-
-        // foreach ($files as $key => $image) {
-        //     $imageName = $image->getFilename();
-
-        //     $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 100);
-        //     $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
-        //     $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
-
-        // }
-
-
         $role = Role::find(Auth::user()->role_id);
         if($role->hasPermissionTo('products-index')){
+            $products = Product::get();
             $permissions = Role::findByName($role->name)->permissions;
             foreach ($permissions as $permission)
                 $all_permission[] = $permission->name;
@@ -70,7 +57,7 @@ class ProductController extends Controller
             foreach($custom_fields as $fieldName) {
                 $field_name[] = str_replace(" ", "_", strtolower($fieldName));
             }
-            return view('backend.product.index', compact('all_permission', 'role_id', 'numberOfProduct', 'custom_fields', 'field_name'));
+            return view('backend.product.index', compact('all_permission', 'role_id', 'numberOfProduct', 'custom_fields', 'field_name', 'products'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');

@@ -31,7 +31,7 @@ class UserController extends Controller
             $permissions = Role::findByName($role->name)->permissions;
             foreach ($permissions as $permission)
                 $all_permission[] = $permission->name;
-            $lims_user_list = User::where('is_deleted', false)->get();
+            $lims_user_list = User::get();
             $numberOfUserAccount = User::where('is_active', true)->count();
             return view('backend.user.index', compact('lims_user_list', 'all_permission', 'numberOfUserAccount'));
         }
@@ -43,7 +43,7 @@ class UserController extends Controller
     {
         $role = Role::find(Auth::user()->role_id);
         if($role->hasPermissionTo('users-add')){
-            $lims_role_list = Roles::where('is_active', true)->get();
+            $lims_role_list = Roles::get();
             $lims_biller_list = Biller::where('is_active', true)->get();
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $lims_customer_group_list = CustomerGroup::where('is_active', true)->get();
@@ -242,7 +242,7 @@ class UserController extends Controller
             ['id', '!=', \Auth::user()->id],
             ['role_id', '!=', '5']
         ])->get();
-        
+
         $html = '';
         foreach($notification_users as $user){
             $html .='<option value="'.$user->id.'">'.$user->name . ' (' . $user->email. ')'.'</option>';
@@ -254,7 +254,7 @@ class UserController extends Controller
     public function allUsers()
     {
         $lims_user_list = DB::table('users')->where('is_active', true)->get();
-        
+
         $html = '';
         foreach($lims_user_list as $user){
             $html .='<option value="'.$user->id.'">'.$user->name . ' (' . $user->phone. ')'.'</option>';

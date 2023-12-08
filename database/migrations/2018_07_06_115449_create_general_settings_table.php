@@ -31,7 +31,7 @@ class CreateGeneralSettingsTable extends Migration
             // $table->json("modules")->>nullable();
             $table->timestamps();
             $table->string('currency_position');
-            // $table->date('expiry_date')->nullable();
+            $table->date('expiry_date')->nullable();
             // $table->boolean('is_zatca')->nullable();
             $table->string('company_name')->nullable();
             // $table->string('vat_registration_number')->nullable();

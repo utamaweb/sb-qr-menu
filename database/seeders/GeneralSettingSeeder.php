@@ -22,6 +22,7 @@ class GeneralSettingSeeder extends Seeder
             'without_stock' => 'no',
             'date_format' => 'd-m-Y',
             'developed_by' => 'UTAMAWEB',
+            'expiry_date' => NULL,
             'invoice_format' => 'standard',
             'decimal' => 0,
             'state' => 1,

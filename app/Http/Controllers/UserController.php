@@ -65,16 +65,9 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => [
                 'max:255',
-                    Rule::unique('users')->where(function ($query) {
-                    return $query->where('is_deleted', false);
-                }),
             ],
             'email' => [
-                'email',
-                'max:255',
-                    Rule::unique('users')->where(function ($query) {
-                    return $query->where('is_deleted', false);
-                }),
+                'email', 'max:255'
             ],
         ]);
 
@@ -102,7 +95,6 @@ class UserController extends Controller
         }
         if(!isset($data['is_active']))
             $data['is_active'] = false;
-        $data['is_deleted'] = false;
         $data['password'] = bcrypt($data['password']);
         $data['phone'] = $data['phone_number'];
         User::create($data);
@@ -120,7 +112,7 @@ class UserController extends Controller
         $role = Role::find(Auth::user()->role_id);
         if($role->hasPermissionTo('users-edit')){
             $lims_user_data = User::find($id);
-            $lims_role_list = Roles::where('is_active', true)->get();
+            $lims_role_list = Roles::get();
             $lims_biller_list = Biller::where('is_active', true)->get();
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             return view('backend.user.edit', compact('lims_user_data', 'lims_role_list', 'lims_biller_list', 'lims_warehouse_list'));
@@ -131,22 +123,13 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
         $this->validate($request, [
             'name' => [
                 'max:255',
-                Rule::unique('users')->ignore($id)->where(function ($query) {
-                    return $query->where('is_deleted', false);
-                }),
             ],
             'email' => [
                 'email',
                 'max:255',
-                    Rule::unique('users')->ignore($id)->where(function ($query) {
-                    return $query->where('is_deleted', false);
-                }),
             ],
         ]);
 
@@ -176,9 +159,6 @@ class UserController extends Controller
 
     public function profileUpdate(Request $request, $id)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
         $input = $request->all();
         $lims_user_data = User::find($id);
         $lims_user_data->update($input);
@@ -187,9 +167,6 @@ class UserController extends Controller
 
     public function changePassword(Request $request, $id)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
         $input = $request->all();
         $lims_user_data = User::find($id);
         if($input['new_pass'] != $input['confirm_pass'])
@@ -211,7 +188,6 @@ class UserController extends Controller
         $user_id = $request['userIdArray'];
         foreach ($user_id as $id) {
             $lims_user_data = User::find($id);
-            $lims_user_data->is_deleted = true;
             $lims_user_data->is_active = false;
             $lims_user_data->save();
         }
@@ -220,13 +196,8 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
         $lims_user_data = User::find($id);
-        $lims_user_data->is_deleted = true;
-        $lims_user_data->is_active = false;
-        $lims_user_data->save();
+        $lims_user_data->delete();
         if(Auth::id() == $id){
             auth()->logout();
             return redirect('/login');

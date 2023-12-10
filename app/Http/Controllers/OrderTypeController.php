@@ -43,9 +43,9 @@ class OrderTypeController extends Controller
         $this->validate($request, [
             'name' => 'max:255',
         ]);
-        $input = $request->all();
-        $lims_order_type_data = OrderType::find($input['order_type_id']);
-        $lims_order_type_data->update($input);
+        $orderType = OrderType::findOrFail($id)->update([
+            'name' => $request->name
+        ]);
         $this->cacheForget('order_type_list');
         return redirect('order_type')->with('message', 'Data updated successfully');
     }

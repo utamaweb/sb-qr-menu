@@ -1605,7 +1605,7 @@
                                 <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
                             </div>
                             <div class="form-group mt-3">
-                                <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                                <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                             </div>
                         </div>
                     </div>

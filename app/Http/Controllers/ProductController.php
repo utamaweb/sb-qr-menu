@@ -279,8 +279,7 @@ class ProductController extends Controller
     {
         $role = Role::firstOrCreate(['id' => Auth::user()->role_id]);
         if ($role->hasPermissionTo('products-add')){
-            $lims_product_list_without_variant = $this->productWithoutVariant();
-            $lims_product_list_with_variant = $this->productWithVariant();
+            // $lims_product_list_with_variant = $this->productWithVariant();
             // $lims_brand_list = Brand::where('is_active', true)->get();
             $lims_category_list = Category::where('is_active', true)->get();
             $lims_unit_list = Unit::where('is_active', true)->get();
@@ -288,7 +287,7 @@ class ProductController extends Controller
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $numberOfProduct = Product::where('is_active', true)->count();
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.create',compact('lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields'));
+            return view('backend.product.create',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -296,6 +295,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        return 1;
         $this->validate($request, [
             'code' => [
                 'max:255',
@@ -1009,10 +1009,6 @@ class ProductController extends Controller
 
     public function updateProduct(Request $request)
     {
-        if(!env('USER_VERIFIED')) {
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-        }
-        else {
             $this->validate($request, [
                 'name' => [
                     'max:255',
@@ -1226,7 +1222,6 @@ class ProductController extends Controller
             $this->cacheForget('product_list');
             $this->cacheForget('product_list_with_variant');
             \Session::flash('edit_message', 'Product updated successfully');
-        }
     }
 
     public function generateCode()
@@ -1578,25 +1573,19 @@ class ProductController extends Controller
 
     public function destroy($id)
     {
-        if(!env('USER_VERIFIED')) {
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-        }
-        else {
-            $lims_product_data = Product::findOrFail($id);
-            $lims_product_data->is_active = false;
-            if($lims_product_data->image != 'zummXD2dvAtI.png') {
-                $images = explode(",", $lims_product_data->image);
-                foreach ($images as $key => $image) {
-                    $this->fileDelete('storage/images/product/', $image);
-                    $this->fileDelete('storage/images/product/large/', $image);
-                    $this->fileDelete('storage/images/product/medium/', $image);
-                    $this->fileDelete('storage/images/product/small/', $image);
-                }
+        $lims_product_data = Product::findOrFail($id);
+        if($lims_product_data->image != 'zummXD2dvAtI.png') {
+            $images = explode(",", $lims_product_data->image);
+            foreach ($images as $key => $image) {
+                $this->fileDelete('storage/images/product/', $image);
+                $this->fileDelete('storage/images/product/large/', $image);
+                $this->fileDelete('storage/images/product/medium/', $image);
+                $this->fileDelete('storage/images/product/small/', $image);
             }
-            $lims_product_data->save();
-            $this->cacheForget('product_list');
-            $this->cacheForget('product_list_with_variant');
-            return redirect('products')->with('message', 'Product deleted successfully');
         }
+        $lims_product_data->delete();
+        $this->cacheForget('product_list');
+        $this->cacheForget('product_list_with_variant');
+        return redirect('products')->with('message', 'Product deleted successfully');
     }
 }

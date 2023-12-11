@@ -33,14 +33,13 @@ class RoleController extends Controller
         $this->validate($request, [
             'name' => [
                 'max:255',
-                    Rule::unique('roles')->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
             ],
         ]);
-
-        $data = $request->all();
-        Roles::create($data);
+        Roles::create([
+            'name'  => $request->name,
+            'description'  => $request->description,
+            'guard_name'  => $request->guard_name,
+        ]);
         return redirect('role')->with('message', 'Data inserted successfully');
     }
 
@@ -59,9 +58,6 @@ class RoleController extends Controller
         $this->validate($request, [
             'name' => [
                 'max:255',
-                Rule::unique('roles')->ignore($request->role_id)->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
             ],
         ]);
 
@@ -88,9 +84,6 @@ class RoleController extends Controller
 
     public function setPermission(Request $request)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
         $role = Role::firstOrCreate(['id' => $request['role_id']]);
 
         if($request->has('revenue_profit_summary')){
@@ -1209,11 +1202,8 @@ class RoleController extends Controller
 
     public function destroy($id)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
         $lims_role_data = Roles::find($id);
-        $lims_role_data->is_active = false;
-        $lims_role_data->save();
+        $lims_role_data->delete();
         return redirect('role')->with('not_permitted', 'Data deleted successfully');
     }
 }

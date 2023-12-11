@@ -18,35 +18,48 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
 
-    @if(in_array("products-add", $all_permission))
-        <a href="{{route('products.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('file.add_product')}}</a>
-        <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a>
-    @endif
+    <div class="container-fluid">
+        @if(in_array("products-add", $all_permission))
+            <a href="{{route('products.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('file.add_product')}}</a>
+            {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
+        @endif
+    </div>
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>Image</th>
-                    <th>Nama Produk</th>
+                    <th>Gambar</th>
+                    <th>Nama</th>
+                    <th>Kode</th>
+                    <th>Brand</th>
                     <th>Kategori</th>
-                    <th>Jumlah</th>
+                    <th>Kuantitas</th>
                     <th>Unit</th>
                     <th>Harga</th>
                     <th>Modal</th>
-                    <th>Harga / Modal</th>
+                    {{-- <th>{{trans('file.Stock Worth (Price/Cost)')}}</th> --}}
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($products as $key => $product)
-                <tr data-id="{{$product->id}}">
+                @foreach($products as $key=>$ingredient)
+                <tr data-id="{{$ingredient->id}}">
                     <td>{{$key}}</td>
-                    <td>{{ $product->name }}</td>
+                    <td>{{ $ingredient->image }}</td>
+                    <td>{{ $ingredient->name }}</td>
+                    <td>{{ $ingredient->code }}</td>
+                    <td>{{ $ingredient->brand }}</td>
+                    <td>{{ $ingredient->category->name }}</td>
+                    <td>{{ $ingredient->qty }}</td>
+                    <td>{{ $ingredient->unit->unit_name }}</td>
+                    <td>{{ $ingredient->price }}</td>
+                    <td>{{ $ingredient->cost }}</td>
                     <td>
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$product->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
-                        {{ Form::open(['route' => ['ingredient.destroy', $product->id], 'method' => 'DELETE'] ) }}
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+
+                        {{ Form::open(['route' => ['products.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                 {{ Form::close() }}
                     </td>
@@ -56,38 +69,6 @@
         </table>
     </div>
 </section>
-
-<div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => 'ingredient.import', 'method' => 'post', 'files' => true]) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-            <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-            <p>{{trans('file.The correct column order is')}} (name*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{trans('file.Upload CSV File')}} *</label>
-                        {{Form::file('file', array('class' => 'form-control','required'))}}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label> {{trans('file.Sample File')}}</label>
-                        <a href="sample_file/ingredient.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
-                    </div>
-                </div>
-            </div>
-            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-        </div>
-        {{ Form::close() }}
-      </div>
-    </div>
-</div>
 
 @endsection
 

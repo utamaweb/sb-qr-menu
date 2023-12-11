@@ -83,7 +83,6 @@
                         <label>{{trans('file.Description')}}</label>
                         {{Form::textarea('description',null,array('rows'=> 5, 'class' => 'form-control'))}}
                     </div>
-                    <input type="hidden" name="is_active" value="1">
                     <input type="hidden" name="guard_name" value="web">
                     <div class="col-md-12 d-flex justify-content-end">
                         {{-- <div class="form-group mt-3 mr-2">
@@ -91,7 +90,7 @@
                         btn-outline-primary">Kembali</a>
                     </div> --}}
                     <div class="form-group mt-3">
-                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                        <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                     </div>
                 </div>
             	</form>
@@ -127,7 +126,7 @@
                         btn-outline-primary">Kembali</a>
                     </div> --}}
                     <div class="form-group mt-3">
-                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                        <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                     </div>
                 </div>
 		        </form>

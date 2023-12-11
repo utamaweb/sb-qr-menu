@@ -295,7 +295,6 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        return 1;
         $this->validate($request, [
             'code' => [
                 'max:255',
@@ -311,14 +310,6 @@ class ProductController extends Controller
             ]
         ]);
         $data = $request->except('image', 'file');
-
-        if(isset($data['is_variant'])) {
-            $data['variant_option'] = json_encode($data['variant_option']);
-            $data['variant_value'] = json_encode($data['variant_value']);
-        }
-        else {
-            $data['variant_option'] = $data['variant_value'] = null;
-        }
         $data['name'] = preg_replace('/[\n\r]/', "<br>", htmlspecialchars(trim($data['name'])));
         $data['slug'] = Str::slug($data['name'], '-');
         $data['slug'] = preg_replace('/[^A-Za-z0-9\-]/', '', $data['slug']);
@@ -334,11 +325,6 @@ class ProductController extends Controller
             $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
 
         $data['product_details'] = str_replace('"', '@', $data['product_details']);
-
-        if($data['starting_date'])
-            $data['starting_date'] = date('Y-m-d', strtotime($data['starting_date']));
-        if($data['last_date'])
-            $data['last_date'] = date('Y-m-d', strtotime($data['last_date']));
         $data['is_active'] = true;
         $images = $request->image;
         $image_names = [];
@@ -390,8 +376,22 @@ class ProductController extends Controller
         }
         if(!isset($data['is_sync_disable']) && \Schema::hasColumn('products', 'is_sync_disable'))
                 $data['is_sync_disable'] = null;
-        //return $data;
-        $lims_product_data = Product::create($data);
+        // return $data;
+        // $lims_product_data = Product::create($data);
+        $lims_product_data = Product::create([
+            'type' => $request->type,
+            'name' => $request->name,
+            'code' => $request->code,
+            'category_id' => $request->category_id,
+            'barcode_symbology' => $request->barcode_symbology,
+            'unit_id' => $request->unit_id,
+            'qty' => $request->qty,
+            'product_details' => $request->product_details,
+            'price' => $request->price,
+            'slug' => $request->slug,
+            'image' => $request->image,
+            'cost' => $request->price,
+        ]);
         //inserting custom field data
         $custom_field_data = [];
         $custom_fields = CustomField::where('belongs_to', 'product')->select('name', 'type')->get();
@@ -421,27 +421,7 @@ class ProductController extends Controller
             $lims_product_data->qty += $initial_stock;
             $lims_product_data->save();
         }
-        //dealing with product variant
-        if(!isset($data['is_batch']))
-            $data['is_batch'] = null;
-        $variant_ids = [];
-        if(isset($data['is_variant'])) {
-            foreach ($data['variant_name'] as $key => $variant_name) {
-                $lims_variant_data = Variant::firstOrCreate(['name' => $data['variant_name'][$key]]);
-                $lims_variant_data->name = $data['variant_name'][$key];
-                $lims_variant_data->save();
-                $variant_ids[] = $lims_variant_data->id;
-                $lims_product_variant_data = new ProductVariant;
-                $lims_product_variant_data->product_id = $lims_product_data->id;
-                $lims_product_variant_data->variant_id = $lims_variant_data->id;
-                $lims_product_variant_data->position = $key + 1;
-                $lims_product_variant_data->item_code = $data['item_code'][$key];
-                $lims_product_variant_data->additional_cost = $data['additional_cost'][$key];
-                $lims_product_variant_data->additional_price = $data['additional_price'][$key];
-                $lims_product_variant_data->qty = 0;
-                $lims_product_variant_data->save();
-            }
-        }
+
         if(isset($data['is_diffPrice'])) {
             foreach ($data['diff_price'] as $key => $diff_price) {
                 if($diff_price) {
@@ -478,7 +458,7 @@ class ProductController extends Controller
         }
         $this->cacheForget('product_list');
         $this->cacheForget('product_list_with_variant');
-        \Session::flash('create_message', 'Product created successfully');
+        return redirect('products')->with('message', 'Data inserted successfully');
     }
 
     public function autoPurchase($product_data, $warehouse_id, $stock)

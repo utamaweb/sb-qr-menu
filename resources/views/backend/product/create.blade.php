@@ -13,7 +13,8 @@
                         <p class="italic">
                             <small>{{trans('file.The field labels marked with * are required input fields')}}.</small>
                         </p>
-                        <form id="product-form">
+                        <form id="product-form" action="{{route('products.store')}}" method="POST">
+                            @csrf
                             <div class="row">
                                 <div class="col-8">
                                     <div class="row">
@@ -186,7 +187,7 @@
                                         <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                     <div class="form-group mt-3">
-                                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn"
+                                        <input type="submit" value="{{trans('file.submit')}}" id=""
                                             class="btn btn-primary">
                                     </div>
                                 </div>
@@ -252,11 +253,6 @@
         });
     });
 
-    $('.add-more-variant').on("click", function() {
-        var htmlText = '<div class="col-md-4 form-group mt-2"><label>Option *</label><input type="text" name="variant_option[]" class="form-control variant-field" placeholder="Size, Color etc..."></div><div class="col-md-6 form-group mt-2"><label>Value *</label><input type="text" name="variant_value[]" class="type-variant form-control variant-field"></div>';
-        $("#variant-input-section").append(htmlText);
-        $('.type-variant').tagsInput();
-    });
 
     //start variant related js
     $(function() {
@@ -317,22 +313,7 @@
                             variantIds.splice(index, 1, $(this).attr('id'));
                         });
 
-                        //start custom code
-                        first_variant_values = $('#'+variantIds[0]).val().split(_getDelimiter(delimiter[variantIds[0] ]));
-                        combinations = first_variant_values;
-                        step = 1;
-                        while(step < variantIds.length) {
-                            var newCombinations = [];
-                            for (var i = 0; i < combinations.length; i++) {
-                                new_variant_values = $('#'+variantIds[step]).val().split(_getDelimiter(delimiter[variantIds[step] ]));
-                                for (var j = 0; j < new_variant_values.length; j++) {
-                                    newCombinations.push(combinations[i]+'/'+new_variant_values[j]);
-                                }
-                            }
-                            combinations = newCombinations;
-                            step++;
-                        }
-                        var rownumber = $('table.variant-list tbody tr:last').index();
+                       rownumber = $('table.variant-list tbody tr:last').index();
                         if(rownumber > -1) {
                             oldCombinations = [];
                             oldAdditionalCost = [];

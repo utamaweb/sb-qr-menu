@@ -1,5 +1,7 @@
 @extends('backend.layout.main')
-
+@push('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endpush
 @section('content')
 <section class="forms">
     <div class="container-fluid">
@@ -160,27 +162,36 @@
                                         </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-12">
                                         <label>Bahan Baku</label>
                                         <div class="search-box input-group mb-4">
                                             <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button>
-                                            <input type="text" name="product_code_name" id="lims_productcodeSearch"
-                                                placeholder="Pilih bahan baku..." class="form-control" />
+                                            <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" />
                                         </div>
-                                        <label>Daftar Bahan Baku</label>
-                                        <div class="table-responsive">
-                                            <table id="myTable" class="table table-hover order-list">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Nama Bahan Baku</th>
-                                                        <th>Quantity</th>
-                                                        <th>Aksi</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                        <select class="form-select form-control" id="multiple-select-field" data-placeholder="Choose anything" multiple>
+                                            <option>Christmas Island</option>
+                                            <option>South Sudan</option>
+                                            <option>Jamaica</option>
+                                            <option>Kenya</option>
+                                            <option>French Guiana</option>
+                                            <option>Mayotta</option>
+                                            <option>Liechtenstein</option>
+                                            <option>Denmark</option>
+                                            <option>Eritrea</option>
+                                            <option>Gibraltar</option>
+                                            <option>Saint Helena, Ascension and Tristan da Cunha</option>
+                                            <option>Haiti</option>
+                                            <option>Namibia</option>
+                                            <option>South Georgia and the South Sandwich Islands</option>
+                                            <option>Vietnam</option>
+                                            <option>Yemen</option>
+                                            <option>Philippines</option>
+                                            <option>Benin</option>
+                                            <option>Czech Republic</option>
+                                            <option>Russia</option>
+                                        </select>
+
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">
@@ -202,7 +213,15 @@
 
 @endsection
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
 <script type="text/javascript">
+$( '#multiple-select-field' ).select2( {
+    theme: "bootstrap-5",
+    width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
+    placeholder: $( this ).data( 'placeholder' ),
+    closeOnSelect: false,
+} );
     $("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
     $("ul#product #product-create-menu").addClass("active");
@@ -672,17 +691,7 @@
                             })(jQuery);
                             //end of variant related js
 
-                            tinymce.init({
-                                selector: 'textarea',
-                                height: 130,
-                                plugins: [
-                                'advlist autolink lists link image charmap print preview anchor textcolor',
-                                'searchreplace visualblocks code fullscreen',
-                                'insertdatetime media table contextmenu paste code wordcount'
-                                ],
-                                toolbar: 'insert | undo redo |  formatselect | bold italic backcolor  | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat',
-                                branding:false
-                            });
+
 
                             $('select[name="type"]').on('change', function() {
                                 if($(this).val() == 'combo'){
@@ -1039,7 +1048,6 @@
                                         $('#submit-btn').on("click", function (e) {
                                             e.preventDefault();
                                             if ( $("#product-form").valid() && validate() ) {
-                                                tinyMCE.triggerSave();
                                                 if(myDropzone.getAcceptedFiles().length) {
                                                     myDropzone.processQueue();
                                                 }

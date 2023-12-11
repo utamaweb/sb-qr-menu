@@ -966,8 +966,8 @@ class ProductController extends Controller
     {
         $role = Role::firstOrCreate(['id' => Auth::user()->role_id]);
         if ($role->hasPermissionTo('products-edit')) {
-            $lims_product_list_without_variant = $this->productWithoutVariant();
-            $lims_product_list_with_variant = $this->productWithVariant();
+            // $lims_product_list_without_variant = $this->productWithoutVariant();
+            // $lims_product_list_with_variant = $this->productWithVariant();
             // $lims_brand_list = Brand::where('is_active', true)->get();
             $lims_category_list = Category::where('is_active', true)->get();
             $lims_unit_list = Unit::where('is_active', true)->get();
@@ -981,28 +981,18 @@ class ProductController extends Controller
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $noOfVariantValue = 0;
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.edit',compact('lims_product_list_without_variant', 'lims_product_list_with_variant', 'lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields'));
+            return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
-    public function updateProduct(Request $request)
+    public function update(Request $request, $id)
     {
             $this->validate($request, [
                 'name' => [
                     'max:255',
-                    Rule::unique('products')->ignore($request->input('id'))->where(function ($query) {
-                        return $query->where('is_active', 1);
-                    }),
                 ],
-
-                'code' => [
-                    'max:255',
-                    Rule::unique('products')->ignore($request->input('id'))->where(function ($query) {
-                        return $query->where('is_active', 1);
-                    }),
-                ]
             ]);
 
             $lims_product_data = Product::findOrFail($request->input('id'));
@@ -1041,11 +1031,6 @@ class ProductController extends Controller
 
             $data['product_details'] = str_replace('"', '@', $data['product_details']);
             // $data['product_details'] = $data['product_details'];
-            if($data['starting_date'])
-                $data['starting_date'] = date('Y-m-d', strtotime($data['starting_date']));
-            if($data['last_date'])
-                $data['last_date'] = date('Y-m-d', strtotime($data['last_date']));
-
             $previous_images = [];
             //dealing with previous images
             if($request->prev_img) {
@@ -1176,15 +1161,15 @@ class ProductController extends Controller
             }
             else {
                 $data['is_diffPrice'] = false;
-                foreach ($data['warehouse_id'] as $key => $warehouse_id) {
-                    $lims_product_warehouse_data = Product_Warehouse::FindProductWithoutVariant($lims_product_data->id, $warehouse_id)->first();
-                    if($lims_product_warehouse_data) {
-                        $lims_product_warehouse_data->price = null;
-                        $lims_product_warehouse_data->save();
-                    }
-                }
+                // foreach ($data['warehouse_id'] as $key => $warehouse_id) {
+                //     $lims_product_warehouse_data = Product_Warehouse::FindProductWithoutVariant($lims_product_data->id, $warehouse_id)->first();
+                //     if($lims_product_warehouse_data) {
+                //         $lims_product_warehouse_data->price = null;
+                //         $lims_product_warehouse_data->save();
+                //     }
+                // }
             }
-            $lims_product_data->update($data);
+            // $lims_product_data->update($data);
             //inserting data for custom fields
             $custom_field_data = [];
             $custom_fields = CustomField::where('belongs_to', 'product')->select('name', 'type')->get();
@@ -1197,11 +1182,22 @@ class ProductController extends Controller
                         $custom_field_data[$field_name] = $data[$field_name];
                 }
             }
-            if(count($custom_field_data))
-                DB::table('products')->where('id', $lims_product_data->id)->update($custom_field_data);
+            // if(count($custom_field_data))
+                // DB::table('products')->where('id', $lims_product_data->id)->update($custom_field_data);
+            $editProduct = Product::findOrFail($id)->update([
+                'type' => $request->type,
+                'name' => $request->name,
+                'code' => $request->code,
+                'category_id' => $request->category_id,
+                'unit_id' => $request->unit_id,
+                'price' => $request->price,
+                'qty' => $request->qty,
+                'product_details' => $request->product_details,
+            ]);
             $this->cacheForget('product_list');
             $this->cacheForget('product_list_with_variant');
-            \Session::flash('edit_message', 'Product updated successfully');
+            // \Session::flash('edit_message', 'Product updated successfully');
+            return redirect('products')->with('message', 'Data updated successfully');
     }
 
     public function generateCode()

@@ -44,22 +44,22 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($products as $key=>$ingredient)
-                <tr data-id="{{$ingredient->id}}">
+                @foreach($products as $key=>$product)
+                <tr data-id="{{$product->id}}">
                     <td>{{$key}}</td>
-                    <td>{{ $ingredient->image }}</td>
-                    <td>{{ $ingredient->name }}</td>
-                    <td>{{ $ingredient->code }}</td>
-                    <td>{{ $ingredient->brand }}</td>
-                    <td>{{ $ingredient->category->name }}</td>
-                    <td>{{ $ingredient->qty }}</td>
-                    <td>{{ $ingredient->unit->unit_name }}</td>
-                    <td>{{ $ingredient->price }}</td>
-                    <td>{{ $ingredient->cost }}</td>
+                    <td>{{ $product->image }}</td>
+                    <td>{{ $product->name }}</td>
+                    <td>{{ $product->code }}</td>
+                    <td>{{ $product->brand }}</td>
+                    <td>{{ $product->category->name }}</td>
+                    <td>{{ $product->qty }}</td>
+                    <td>{{ $product->unit->unit_name }}</td>
+                    <td>{{ $product->price }}</td>
+                    <td>{{ $product->cost }}</td>
                     <td>
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                        <a href={{route('products.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</a>
 
-                        {{ Form::open(['route' => ['products.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
+                        {{ Form::open(['route' => ['products.destroy', $product->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                 {{ Form::close() }}
                     </td>

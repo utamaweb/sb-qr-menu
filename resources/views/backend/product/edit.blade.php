@@ -13,7 +13,9 @@
                         <p class="italic">
                             <small>{{trans('file.The field labels marked with * are required input fields')}}.</small>
                         </p>
-                        <form id="product-form">
+                        <form id="product-form" action="{{route('products.update', $lims_product_data->id)}}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
                             <input type="hidden" name="id" value="{{$lims_product_data->id}}" />
                             <div class="row">
                                 <div class="col-8">
@@ -330,8 +332,7 @@
                                         <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                     <div class="form-group mt-3">
-                                        <button class="btn btn-primary" type="submit"
-                                            id="submit-btn">{{trans('file.submit')}}</button>
+                                        <button class="btn btn-primary" type="submit" id="">{{trans('file.submit')}}</button>
                                     </div>
                                 </div>
                             </div>
@@ -973,16 +974,7 @@
 
     <?php $productArray = []; ?>
     var lims_product_code = [
-        @foreach($lims_product_list_without_variant as $product)
-        <?php
-            $productArray[] = htmlspecialchars($product->code . ' (' . $product->name . ')');
-        ?>
-        @endforeach
-        @foreach($lims_product_list_with_variant as $product)
-            <?php
-                $productArray[] = htmlspecialchars($product->item_code . ' (' . $product->name . ')');
-            ?>
-        @endforeach
+
             <?php
                 echo  '"'.implode('","', $productArray).'"';
             ?> ];

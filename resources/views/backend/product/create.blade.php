@@ -15,14 +15,14 @@
                         <p class="italic">
                             <small>{{trans('file.The field labels marked with * are required input fields')}}.</small>
                         </p>
-                        <form id="product-form" action="{{route('products.store')}}" method="POST">
+                        <form action="{{route('products.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
-                                <div class="col-8">
+                                <div class="col-12">
                                     <div class="row">
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <label>{{trans('file.Product Type')}} *</strong> </label>
+                                                <label>Tipe Produk *</strong> </label>
                                                 <div class="input-group">
                                                     <select name="type" required class="form-control selectpicker"
                                                         id="type">
@@ -32,17 +32,17 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <label>{{trans('file.Product Name')}} *</strong> </label>
+                                                <label>Nama Produk *</strong> </label>
                                                 <input type="text" name="name" class="form-control" id="name"
                                                     aria-describedby="name" required>
                                                 <span class="validation-msg" id="name-error"></span>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <label>{{trans('file.Product Code')}} *</strong> </label>
+                                                <label>Kode Produk *</strong> </label>
                                                 <div class="input-group">
                                                     <input type="text" name="code" class="form-control" id="code"
                                                         aria-describedby="code" required>
@@ -56,9 +56,9 @@
                                                 <span class="validation-msg" id="code-error"></span>
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <label>{{trans('file.category')}} *</strong> </label>
+                                                <label>Kategori *</strong> </label>
                                                 <div class="input-group">
                                                     <select name="category_id" required
                                                         class="selectpicker form-control" data-live-search="true"
@@ -71,33 +71,33 @@
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>
-                                        <div class="col-md-6 d-none">
+                                        <div class="col-md-4 form-group">
+                                            <label>Satuan Produk *</strong> </label>
+                                            <div class="input-group">
+                                                <select required class="form-control selectpicker" name="unit_id">
+                                                    <option value="" disabled selected>Select Product Unit...</option>
+                                                    @foreach($lims_unit_list as $unit)
+                                                    @if($unit->base_unit==null)
+                                                    <option value="{{$unit->id}}">{{$unit->unit_name}}</option>
+                                                    @endif
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <span class="validation-msg"></span>
+                                        </div>
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <label>{{trans('file.Barcode Symbology')}} *</strong> </label>
-                                                <div class="input-group">
-                                                    <select name="barcode_symbology" required
-                                                        class="form-control selectpicker">
-                                                        <option value="C128">Code 128</option>
-                                                        <option value="C39">Code 39</option>
-                                                        <option value="UPCA">UPC-A</option>
-                                                        <option value="UPCE">UPC-E</option>
-                                                        <option value="EAN8">EAN-8</option>
-                                                        <option value="EAN13">EAN-13</option>
-                                                    </select>
-                                                </div>
+                                                <label>Gambar Produk</strong> </label> <i
+                                                    class="dripicons-question" data-toggle="tooltip"
+                                                    title="{{trans('file.You can upload multiple image. Only .jpeg, .jpg, .png, .gif file can be uploaded. First image will be base image.')}}"></i>
+                                                {{-- <div id="imageUpload" class="dropzone"></div> --}}
+                                                <input type="file" class="form-control" name="image">
+                                                <span class="validation-msg" id="image-error"></span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-4">
-                                    <div class="form-group">
-                                        <label>{{trans('file.Product Image')}}</strong> </label> <i
-                                            class="dripicons-question" data-toggle="tooltip"
-                                            title="{{trans('file.You can upload multiple image. Only .jpeg, .jpg, .png, .gif file can be uploaded. First image will be base image.')}}"></i>
-                                        <div id="imageUpload" class="dropzone"></div>
-                                        <span class="validation-msg" id="image-error"></span>
-                                    </div>
-                                </div>
+
                             </div>
                             <div class="row">
                                 <div id="combo" class="col-md-12 mb-1">
@@ -127,20 +127,7 @@
                             <div class="row">
                                 <div id="unit" class="col-md-12">
                                     <div class="row ">
-                                        <div class="col-md-4 form-group">
-                                            <label>Satuan Produk *</strong> </label>
-                                            <div class="input-group">
-                                                <select required class="form-control selectpicker" name="unit_id">
-                                                    <option value="" disabled selected>Select Product Unit...</option>
-                                                    @foreach($lims_unit_list as $unit)
-                                                    @if($unit->base_unit==null)
-                                                    <option value="{{$unit->id}}">{{$unit->unit_name}}</option>
-                                                    @endif
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <span class="validation-msg"></span>
-                                        </div>
+
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Harga Produk *</strong> </label>
@@ -148,12 +135,24 @@
                                                     step="any">
                                                 <span class="validation-msg"></span>
                                             </div>
+                                        </div>
+                                        <div class="col-md-4">
                                             <div class="form-group">
-                                                <input type="hidden" name="qty"
-                                                    value="{{number_format(0, $general_setting->decimal, '.', '')}}">
+                                                <label>Kuantitas *</strong> </label>
+                                                <input type="number" name="qty" required class="form-control"
+                                                    step="any">
+                                                <span class="validation-msg"></span>
                                             </div>
                                         </div>
                                         <div class="col-md-4">
+                                            <div class="form-group">
+                                                <label>Modal *</strong> </label>
+                                                <input type="number" name="cost" required class="form-control"
+                                                    step="any">
+                                                <span class="validation-msg"></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Detail Produk</label>
                                                 <input name="product_details" class="form-control"
@@ -166,32 +165,17 @@
                                 <div class="col-md-12">
                                         <label>Bahan Baku</label>
                                         <div class="search-box input-group mb-4">
-                                            <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button>
-                                            <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" />
+                                            {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
+                                            {{-- <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" /> --}}
+                                            <select required class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
+                                                {{-- <option value="" disabled>Select Product Unit...</option> --}}
+                                                @foreach($ingredients as $ingredient)
+                                                @if($ingredient->base_unit==null)
+                                                <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
+                                                @endif
+                                                @endforeach
+                                            </select>
                                         </div>
-                                        <select class="form-select form-control" id="multiple-select-field" data-placeholder="Choose anything" multiple>
-                                            <option>Christmas Island</option>
-                                            <option>South Sudan</option>
-                                            <option>Jamaica</option>
-                                            <option>Kenya</option>
-                                            <option>French Guiana</option>
-                                            <option>Mayotta</option>
-                                            <option>Liechtenstein</option>
-                                            <option>Denmark</option>
-                                            <option>Eritrea</option>
-                                            <option>Gibraltar</option>
-                                            <option>Saint Helena, Ascension and Tristan da Cunha</option>
-                                            <option>Haiti</option>
-                                            <option>Namibia</option>
-                                            <option>South Georgia and the South Sandwich Islands</option>
-                                            <option>Vietnam</option>
-                                            <option>Yemen</option>
-                                            <option>Philippines</option>
-                                            <option>Benin</option>
-                                            <option>Czech Republic</option>
-                                            <option>Russia</option>
-                                        </select>
-
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">

@@ -33,9 +33,8 @@
                     <th>Gambar</th>
                     <th>Nama</th>
                     <th>Kode</th>
-                    <th>Brand</th>
                     <th>Kategori</th>
-                    <th>Kuantitas</th>
+                    {{-- <th>Kuantitas</th> --}}
                     <th>Unit</th>
                     <th>Harga</th>
                     <th>Modal</th>
@@ -47,13 +46,12 @@
                 @foreach($products as $key=>$product)
                 <tr data-id="{{$product->id}}">
                     <td>{{$key}}</td>
-                    <td>{{ $product->image }}</td>
+                    <td><img src="{{Storage::url('product_images/'.$product->image)}}" alt=""></td>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->code }}</td>
-                    <td>{{ $product->brand }}</td>
-                    <td>{{ $product->category->name }}</td>
-                    <td>{{ $product->qty }}</td>
-                    <td>{{ $product->unit->unit_name }}</td>
+                    <td>{{ $product->category_name }}</td>
+                    {{-- <td>{{ $product->qty }}</td> --}}
+                    <td>{{ $product->unit_name }}</td>
                     <td>{{ $product->price }}</td>
                     <td>{{ $product->cost }}</td>
                     <td>

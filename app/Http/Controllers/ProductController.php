@@ -16,6 +16,7 @@ use App\Models\ProductBatch;
 use App\Models\Product_Warehouse;
 use App\Models\Product_Supplier;
 use App\Models\CustomField;
+use App\Models\Ingredient;
 use Auth;
 use DNS1D;
 use Spatie\Permission\Models\Role;
@@ -23,6 +24,7 @@ use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
 use DB;
 use App\Models\Variant;
+use App\Models\IngredientProducts;
 use App\Models\ProductVariant;
 use App\Models\Purchase;
 use App\Models\ProductPurchase;
@@ -282,12 +284,13 @@ class ProductController extends Controller
             // $lims_product_list_with_variant = $this->productWithVariant();
             // $lims_brand_list = Brand::where('is_active', true)->get();
             $lims_category_list = Category::where('is_active', true)->get();
+            $ingredients = Ingredient::get();
             $lims_unit_list = Unit::where('is_active', true)->get();
             $lims_tax_list = Tax::where('is_active', true)->get();
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $numberOfProduct = Product::where('is_active', true)->count();
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.create',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields'));
+            return view('backend.product.create',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields', 'ingredients'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -295,6 +298,7 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        // return $request;
         $this->validate($request, [
             'code' => [
                 'max:255',
@@ -311,9 +315,6 @@ class ProductController extends Controller
         ]);
         $data = $request->except('image', 'file');
         $data['name'] = preg_replace('/[\n\r]/', "<br>", htmlspecialchars(trim($data['name'])));
-        $data['slug'] = Str::slug($data['name'], '-');
-        $data['slug'] = preg_replace('/[^A-Za-z0-9\-]/', '', $data['slug']);
-        $data['slug'] = str_replace( '\/', '/', $data['slug'] );
         if($data['type'] == 'combo') {
             $data['product_list'] = implode(",", $data['product_id']);
             $data['variant_list'] = implode(",", $data['variant_id']);
@@ -324,89 +325,31 @@ class ProductController extends Controller
         elseif($data['type'] == 'digital' || $data['type'] == 'service')
             $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
 
-        $data['product_details'] = str_replace('"', '@', $data['product_details']);
+        // $data['product_details'] = str_replace('"', '@', $data['product_details']);
         $data['is_active'] = true;
-        $images = $request->image;
-        $image_names = [];
-        if($images) {
-            if ( !file_exists("storage/images/product/large") && !is_dir("storage/images/product/large") ) {
-                mkdir("storage/images/product/large");
-            }
-            if ( !file_exists("storage/images/product/medium") && !is_dir("storage/images/product/medium") ) {
-                mkdir("storage/images/product/medium");
-            }
-            if ( !file_exists("storage/images/product/small") && !is_dir("storage/images/product/small") ) {
-                mkdir("storage/images/product/small");
-            }
-            foreach ($images as $key => $image) {
-                $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
-                $imageName = date("Ymdhis") . ($key+1);
-                if(!config('database.connections.saleprosaas_landlord')) {
-                    $imageName = $imageName . '.' . $ext;
-                    $image->move('storage/images/product', $imageName);
 
-                    $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 90);
-                    $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
-                    $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
+        $image = $request->image;
+        $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+        $uploadImage = $image->storeAs('public/product_images', $imageName);
 
-                }
-                else {
-                    $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
-                    $image->move('storage/images/product', $imageName);
-
-                    $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 90);
-                    $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
-                    $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
-
-                }
-                $image_names[] = $imageName;
-            }
-            $data['image'] = implode(",", $image_names);
-        }
-        else {
-            $data['image'] = 'zummXD2dvAtI.png';
-        }
-        $file = $request->file;
-        if ($file) {
-            $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
-            $fileName = strtotime(date('Y-m-d H:i:s'));
-            $fileName = $fileName . '.' . $ext;
-            $file->move('storage/product/files', $fileName);
-            $data['file'] = $fileName;
-        }
-        if(!isset($data['is_sync_disable']) && \Schema::hasColumn('products', 'is_sync_disable'))
-                $data['is_sync_disable'] = null;
-        // return $data;
         // $lims_product_data = Product::create($data);
-        $lims_product_data = Product::create([
+        $productInsert = Product::create([
             'type' => $request->type,
             'name' => $request->name,
+            'slug' => Str::slug($request->name),
             'code' => $request->code,
             'category_id' => $request->category_id,
-            'barcode_symbology' => $request->barcode_symbology,
             'unit_id' => $request->unit_id,
             'qty' => $request->qty,
             'product_details' => $request->product_details,
             'price' => $request->price,
-            'slug' => $request->slug,
-            'image' => $request->image,
-            'cost' => $request->price,
+            'image' => $imageName,
+            'cost' => $request->cost,
         ]);
-        //inserting custom field data
-        $custom_field_data = [];
-        $custom_fields = CustomField::where('belongs_to', 'product')->select('name', 'type')->get();
-        foreach ($custom_fields as $type => $custom_field) {
-            $field_name = str_replace(' ', '_', strtolower($custom_field->name));
-            if(isset($data[$field_name])) {
-                if($custom_field->type == 'checkbox' || $custom_field->type == 'multi_select')
-                    $custom_field_data[$field_name] = implode(",", $data[$field_name]);
-                else
-                    $custom_field_data[$field_name] = $data[$field_name];
-            }
+        if (isset($request->ingredients)) {
+            $productInsert->ingredient()->sync($request->ingredients);
         }
-        if(count($custom_field_data))
-            DB::table('products')->where('id', $lims_product_data->id)->update($custom_field_data);
-        //dealing with initial stock and auto purchase
+
         $initial_stock = 0;
         if(isset($data['is_initial_stock']) && !isset($data['is_variant']) && !isset($data['is_batch'])) {
             foreach ($data['stock_warehouse_id'] as $key => $warehouse_id) {
@@ -970,6 +913,8 @@ class ProductController extends Controller
             // $lims_product_list_with_variant = $this->productWithVariant();
             // $lims_brand_list = Brand::where('is_active', true)->get();
             $lims_category_list = Category::where('is_active', true)->get();
+            $ingredients = Ingredient::get();
+            $ingredientProducts = IngredientProducts::get()->pluck('id')->toArray();
             $lims_unit_list = Unit::where('is_active', true)->get();
             $lims_tax_list = Tax::where('is_active', true)->get();
             $lims_product_data = Product::where('id', $id)->first();
@@ -981,7 +926,7 @@ class ProductController extends Controller
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $noOfVariantValue = 0;
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields'));
+            return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields','ingredients','ingredientProducts'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -1011,21 +956,6 @@ class ProductController extends Controller
             elseif($data['type'] == 'digital' || $data['type'] == 'service')
                 $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
 
-            if(!isset($data['featured']))
-                $data['featured'] = 0;
-
-            if(!isset($data['is_embeded']))
-                $data['is_embeded'] = 0;
-
-            if(!isset($data['promotion']))
-                $data['promotion'] = null;
-
-            if(!isset($data['is_batch']))
-                $data['is_batch'] = null;
-
-            if(!isset($data['is_imei']))
-                $data['is_imei'] = null;
-
             if(!isset($data['is_sync_disable']) && \Schema::hasColumn('products', 'is_sync_disable'))
                 $data['is_sync_disable'] = null;
 
@@ -1046,53 +976,6 @@ class ProductController extends Controller
                 $lims_product_data->save();
             }
 
-            //dealing with new images
-            if($request->image) {
-                if ( !file_exists("storage/images/product/large") && !is_dir("storage/images/product/large") ) {
-                    mkdir("storage/images/product/large");
-                }
-                if ( !file_exists("storage/images/product/medium") && !is_dir("storage/images/product/medium") ) {
-                    mkdir("storage/images/product/medium");
-                }
-                if ( !file_exists("storage/images/product/small") && !is_dir("storage/images/product/small") ) {
-                    mkdir("storage/images/product/small");
-                }
-                $images = $request->image;
-                $image_names = [];
-                $length = count(explode(",", $lims_product_data->image));
-                foreach ($images as $key => $image) {
-                    $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
-                    if(!config('database.connections.saleprosaas_landlord')) {
-                        $imageName = date("Ymdhis") . ($length + $key+1) . '.' . $ext;
-                        $image->move('storage/images/product', $imageName);
-                        $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 90);
-                        $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
-                        $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
-                    }else{
-                        $imageName = $this->getTenantId() . '_' . date("Ymdhis") . ($length + $key+1) . '.' . $ext;
-                        $image->move('storage/images/product', $imageName);
-                        $img_lg = Image::make('storage/images/product/'. $imageName)->fit(500, 500)->save('storage/images/product/large/'. $imageName, 90);
-                        $img_md = Image::make('storage/images/product/'. $imageName)->fit(250, 250)->save('storage/images/product/medium/'. $imageName, 100);
-                        $img_sm = Image::make('storage/images/product/'. $imageName)->fit(100, 100)->save('storage/images/product/small/'. $imageName, 100);
-                    }
-                    $image_names[] = $imageName;
-                }
-                if($lims_product_data->image)
-                    $data['image'] = $lims_product_data->image. ',' . implode(",", $image_names);
-                else
-                    $data['image'] = implode(",", $image_names);
-            }
-            else
-                $data['image'] = $lims_product_data->image;
-
-            $file = $request->file;
-            if ($file) {
-                $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
-                $fileName = strtotime(date('Y-m-d H:i:s'));
-                $fileName = $fileName . '.' . $ext;
-                $file->move('storage/product/files', $fileName);
-                $data['file'] = $fileName;
-            }
 
             $old_product_variant_ids = ProductVariant::where('product_id', $request->input('id'))->pluck('id')->toArray();
             $new_product_variant_ids = [];
@@ -1170,29 +1053,29 @@ class ProductController extends Controller
                 // }
             }
             // $lims_product_data->update($data);
-            //inserting data for custom fields
-            $custom_field_data = [];
-            $custom_fields = CustomField::where('belongs_to', 'product')->select('name', 'type')->get();
-            foreach ($custom_fields as $type => $custom_field) {
-                $field_name = str_replace(' ', '_', strtolower($custom_field->name));
-                if(isset($data[$field_name])) {
-                    if($custom_field->type == 'checkbox' || $custom_field->type == 'multi_select')
-                        $custom_field_data[$field_name] = implode(",", $data[$field_name]);
-                    else
-                        $custom_field_data[$field_name] = $data[$field_name];
-                }
-            }
             // if(count($custom_field_data))
                 // DB::table('products')->where('id', $lims_product_data->id)->update($custom_field_data);
+            $image = $request->image;
+            $productFind = Product::findOrFail($id);
+            if($image){
+                $this->fileDelete('storage/product_images/', $productFind->image);
+                $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+                $uploadImage = $image->storeAs('public/product_images', $imageName);
+            } else {
+                $imageName = $productFind->image;
+            }
             $editProduct = Product::findOrFail($id)->update([
                 'type' => $request->type,
                 'name' => $request->name,
+                'slug' => Str::slug($request->name),
                 'code' => $request->code,
                 'category_id' => $request->category_id,
                 'unit_id' => $request->unit_id,
-                'price' => $request->price,
                 'qty' => $request->qty,
                 'product_details' => $request->product_details,
+                'price' => $request->price,
+                'image' => $imageName,
+                'cost' => $request->cost,
             ]);
             $this->cacheForget('product_list');
             $this->cacheForget('product_list_with_variant');
@@ -1551,14 +1434,9 @@ class ProductController extends Controller
     {
         $lims_product_data = Product::findOrFail($id);
         if($lims_product_data->image != 'zummXD2dvAtI.png') {
-            $images = explode(",", $lims_product_data->image);
-            foreach ($images as $key => $image) {
-                $this->fileDelete('storage/images/product/', $image);
-                $this->fileDelete('storage/images/product/large/', $image);
-                $this->fileDelete('storage/images/product/medium/', $image);
-                $this->fileDelete('storage/images/product/small/', $image);
-            }
+            $this->fileDelete('storage/product_images/', $lims_product_data->image);
         }
+        IngredientProducts::where('product_id', $lims_product_data->id)->delete();
         $lims_product_data->delete();
         $this->cacheForget('product_list');
         $this->cacheForget('product_list_with_variant');

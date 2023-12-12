@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Product;
+use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
 {
@@ -21,10 +22,10 @@ class ProductSeeder extends Seeder
         foreach ($products as $product) {
             Product::create([
                 'name'  =>  $product[0],
+                'slug' => Str::slug($product[0]),
                 'code'  =>  $product[1],
                 'type'  =>  $product[2],
                 'barcode_symbology'  =>  $product[3],
-                'brand_id'  =>  $product[4],
                 'category_id'  =>  $product[5],
                 'unit_id'  =>  $product[6],
                 'purchase_unit_id'  =>  $product[7],

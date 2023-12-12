@@ -11,14 +11,14 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('slug');
             $table->string('code');
             $table->string('type');
-            $table->string('barcode_symbology');
-            $table->integer('brand_id')->nullable();
+            $table->string('barcode_symbology')->nullable();
             $table->integer('category_id');
             $table->integer('unit_id');
-            $table->integer('purchase_unit_id');
-            $table->integer('sale_unit_id');
+            $table->integer('purchase_unit_id')->nullable();
+            $table->integer('sale_unit_id')->nullable();
             $table->double('cost');
             $table->double('price');
             $table->double('qty')->nullable();

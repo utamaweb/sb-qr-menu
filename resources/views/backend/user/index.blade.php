@@ -25,7 +25,6 @@
                     <th class="not-exported"></th>
                     <th>{{trans('file.UserName')}}</th>
                     <th>{{trans('file.Email')}}</th>
-                    <th>{{trans('file.Company Name')}}</th>
                     <th>{{trans('file.Phone Number')}}</th>
                     <th>{{trans('file.Role')}}</th>
                     <th>{{trans('file.Status')}}</th>
@@ -38,7 +37,6 @@
                     <td>{{$key}}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email}}</td>
-                    <td>{{ $user->company_name}}</td>
                     <td>{{ $user->phone}}</td>
                     <?php $role = DB::table('roles')->find($user->role_id);?>
                     <td>{{ $role->name }}</td>

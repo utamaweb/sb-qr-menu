@@ -63,6 +63,7 @@ use Salla\ZATCA\Tags\InvoiceTaxAmount;
 use Salla\ZATCA\Tags\InvoiceTotalAmount;
 use Salla\ZATCA\Tags\Seller;
 use Salla\ZATCA\Tags\TaxNumber;
+use Carbon\Carbon;
 
 class SaleController extends Controller
 {
@@ -1187,7 +1188,7 @@ class SaleController extends Controller
                 return Tax::where('is_active', true)->get();
             });
             $lims_product_list = Cache::remember('product_list', 60*60*24, function () {
-                return Product::ActiveFeatured()->whereNull('is_variant')->get();
+                return Product::ActiveFeatured()->get();
             });
             foreach ($lims_product_list as $key => $product) {
                 $images = explode(",", $product->image);
@@ -1197,7 +1198,7 @@ class SaleController extends Controller
                     $product->base_image = 'zummXD2dvAtI.png';
             }
             $lims_product_list_with_variant = Cache::remember('product_list_with_variant', 60*60*24, function () {
-                return Product::ActiveFeatured()->whereNotNull('is_variant')->get();
+                return Product::ActiveFeatured()->get();
             });
 
             foreach ($lims_product_list_with_variant as $product) {
@@ -1255,8 +1256,9 @@ class SaleController extends Controller
 
             $currency_list = Currency::where('is_active', true)->get();
             $numberOfInvoice = Sale::count();
+            $dateNow = Carbon::now()->format('d-m-Y');
             $custom_fields = CustomField::where('belongs_to', 'sale')->get();
-            return view('backend.sale.pos', compact('currency_list','role','all_permission', 'lims_customer_list', 'lims_customer_group_all', 'lims_warehouse_list', 'lims_reward_point_setting_data', 'lims_product_list', 'product_number', 'lims_tax_list', 'lims_biller_list', 'lims_pos_setting_data', 'options', 'lims_brand_list', 'lims_category_list', 'lims_table_list', 'recent_sale', 'recent_draft', 'lims_coupon_list', 'flag', 'numberOfInvoice', 'custom_fields'));
+            return view('backend.sale.pos', compact('currency_list','role','all_permission', 'lims_customer_list', 'lims_customer_group_all', 'lims_warehouse_list', 'lims_reward_point_setting_data', 'lims_product_list', 'product_number', 'lims_tax_list', 'lims_biller_list', 'lims_pos_setting_data', 'options', 'lims_brand_list', 'lims_category_list', 'lims_table_list', 'recent_sale', 'recent_draft', 'lims_coupon_list', 'flag', 'numberOfInvoice', 'custom_fields', 'dateNow'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');

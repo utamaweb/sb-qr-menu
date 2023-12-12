@@ -349,7 +349,7 @@
 						            </td>
 						        </tr>
 
-						        <tr class="quotation-row">
+						        {{-- <tr class="quotation-row">
 						            <td>{{trans('file.Quotation')}}</td>
 						            <td class="text-center">
 						                <div class="icheckbox_square-blue checked" aria-checked="false" aria-disabled="false">
@@ -399,9 +399,9 @@
 								            </div>
 						            	</div>
 						            </td>
-						        </tr>
+						        </tr> --}}
 
-						        <tr class="transfer-row">
+						        {{-- <tr class="transfer-row">
 						            <td>{{trans('file.Transfer')}}</td>
 						            <td class="text-center">
 						                <div class="icheckbox_square-blue" aria-checked="false" aria-disabled="false">
@@ -451,7 +451,7 @@
 								            </div>
 						            	</div>
 						            </td>
-						        </tr>
+						        </tr> --}}
 
 						        <tr class="sale-return-row">
 						            <td>{{trans('file.Sale Return')}}</td>
@@ -864,7 +864,7 @@
 						                </span>
 						            </td>
 						        </tr>
-						      	<tr class="accounting-row">
+						      	{{-- <tr class="accounting-row">
 						            <td>{{trans('file.Accounting')}}</td>
 						            <td class="report-permissions" colspan="5">
 						            	<span>
@@ -916,60 +916,7 @@
 								            </div>
 						                </span>
 						            </td>
-						        </tr>
-						        <tr class="hrm-row">
-						            <td>HRM</td>
-						            <td class="report-permissions" colspan="5">
-						            	<span>
-						                    <div aria-checked="false" aria-disabled="false">
-								                <div class="checkbox">
-							                    	@if(in_array("department", $all_permission))
-							                    	<input type="checkbox" value="1" id="department" name="department" checked>
-							                    	@else
-							                    	<input type="checkbox" value="1" id="department" name="department">
-							                    	@endif
-								                    <label for="department" class="padding05">{{trans('file.Department')}} &nbsp;&nbsp;</label>
-								                </div>
-								            </div>
-						                </span>
-						                <span>
-						                    <div aria-checked="false" aria-disabled="false">
-								                <div class="checkbox">
-							                    	@if(in_array("attendance", $all_permission))
-							                    	<input type="checkbox" value="1" id="attendance" name="attendance" checked>
-							                    	@else
-							                    	<input type="checkbox" value="1" id="attendance" name="attendance">
-							                    	@endif
-								                    <label for="attendance" class="padding05">{{trans('file.Attendance')}} &nbsp;&nbsp;</label>
-								                </div>
-								            </div>
-						                </span>
-						                <span>
-						                    <div aria-checked="false" aria-disabled="false">
-								                <div class="checkbox">
-							                    	@if(in_array("payroll", $all_permission))
-							                    	<input type="checkbox" value="1" id="payroll" name="payroll" checked>
-							                    	@else
-							                    	<input type="checkbox" value="1" id="payroll" name="payroll">
-							                    	@endif
-								                    <label for="payroll" class="padding05">{{trans('file.Payroll')}} &nbsp;&nbsp;</label>
-								                </div>
-								            </div>
-						                </span>
-						                <span>
-						                    <div aria-checked="false" aria-disabled="false">
-								                <div class="checkbox">
-							                    	@if(in_array("holiday", $all_permission))
-							                    	<input type="checkbox" value="1" id="holiday" name="holiday" checked>
-							                    	@else
-							                    	<input type="checkbox" value="1" id="holiday" name="holiday">
-							                    	@endif
-								                    <label for="holiday" class="padding05">{{trans('file.Holiday Approve')}} &nbsp;&nbsp;</label>
-								                </div>
-								            </div>
-						                </span>
-						            </td>
-						        </tr>
+						        </tr> --}}
 						        <tr class="report-row">
 						            <td>{{trans('file.Reports')}}</td>
 						            <td class="report-permissions" colspan="5">

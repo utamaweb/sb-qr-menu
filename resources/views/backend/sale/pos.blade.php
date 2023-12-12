@@ -58,7 +58,7 @@
                                 <div class="row">
                                     <div class="col-md-3">
                                       <div class="form-group">
-                                          <input type="text" name="created_at" class="form-control date" placeholder="Choose date" onkeyup='saveValue(this);'/>
+                                          <input type="text" name="created_at" class="form-control" value="{{$dateNow}}" placeholder="Choose date" readonly />
                                       </div>
                                     </div>
                                     <div class="col-md-3">

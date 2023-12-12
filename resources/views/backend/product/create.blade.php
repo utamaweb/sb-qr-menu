@@ -136,7 +136,7 @@
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        {{-- <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Kuantitas *</strong> </label>
                                                 <input type="number" name="qty" required class="form-control"
@@ -151,7 +151,7 @@
                                                     step="any">
                                                 <span class="validation-msg"></span>
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         <div class="col-md-12">
                                             <div class="form-group">
                                                 <label>Detail Produk</label>

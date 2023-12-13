@@ -340,11 +340,9 @@ class ProductController extends Controller
             'code' => $request->code,
             'category_id' => $request->category_id,
             'unit_id' => $request->unit_id,
-            'qty' => $request->qty,
             'product_details' => $request->product_details,
             'price' => $request->price,
             'image' => $imageName,
-            'cost' => $request->cost,
         ]);
         if (isset($request->ingredients)) {
             $productInsert->ingredient()->sync($request->ingredients);
@@ -914,7 +912,7 @@ class ProductController extends Controller
             // $lims_brand_list = Brand::where('is_active', true)->get();
             $lims_category_list = Category::where('is_active', true)->get();
             $ingredients = Ingredient::get();
-            $ingredientProducts = IngredientProducts::get()->pluck('id')->toArray();
+            $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
             $lims_unit_list = Unit::where('is_active', true)->get();
             $lims_tax_list = Tax::where('is_active', true)->get();
             $lims_product_data = Product::where('id', $id)->first();
@@ -963,18 +961,18 @@ class ProductController extends Controller
             // $data['product_details'] = $data['product_details'];
             $previous_images = [];
             //dealing with previous images
-            if($request->prev_img) {
-                foreach ($request->prev_img as $key => $prev_img) {
-                    if(!in_array($prev_img, $previous_images))
-                        $previous_images[] = $prev_img;
-                }
-                $lims_product_data->image = implode(",", $previous_images);
-                $lims_product_data->save();
-            }
-            else {
-                $lims_product_data->image = null;
-                $lims_product_data->save();
-            }
+            // if($request->prev_img) {
+            //     foreach ($request->prev_img as $key => $prev_img) {
+            //         if(!in_array($prev_img, $previous_images))
+            //             $previous_images[] = $prev_img;
+            //     }
+            //     $lims_product_data->image = implode(",", $previous_images);
+            //     $lims_product_data->save();
+            // }
+            // else {
+            //     $lims_product_data->image = null;
+            //     $lims_product_data->save();
+            // }
 
 
             $old_product_variant_ids = ProductVariant::where('product_id', $request->input('id'))->pluck('id')->toArray();
@@ -1064,19 +1062,21 @@ class ProductController extends Controller
             } else {
                 $imageName = $productFind->image;
             }
-            $editProduct = Product::findOrFail($id)->update([
+            $editProduct = Product::findOrFail($id);
+            $editProduct->update([
                 'type' => $request->type,
                 'name' => $request->name,
                 'slug' => Str::slug($request->name),
                 'code' => $request->code,
                 'category_id' => $request->category_id,
                 'unit_id' => $request->unit_id,
-                'qty' => $request->qty,
                 'product_details' => $request->product_details,
                 'price' => $request->price,
                 'image' => $imageName,
-                'cost' => $request->cost,
             ]);
+            if (isset($request->ingredients)) {
+                $editProduct->ingredient()->sync($request->ingredients);
+            }
             $this->cacheForget('product_list');
             $this->cacheForget('product_list_with_variant');
             // \Session::flash('edit_message', 'Product updated successfully');

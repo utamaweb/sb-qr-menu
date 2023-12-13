@@ -37,7 +37,7 @@
                     {{-- <th>Kuantitas</th> --}}
                     <th>Unit</th>
                     <th>Harga</th>
-                    <th>Modal</th>
+                    <th>Bahan Baku</th>
                     {{-- <th>{{trans('file.Stock Worth (Price/Cost)')}}</th> --}}
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
@@ -53,7 +53,13 @@
                     {{-- <td>{{ $product->qty }}</td> --}}
                     <td>{{ $product->unit_name }}</td>
                     <td>{{ $product->price }}</td>
-                    <td>{{ $product->cost }}</td>
+                    <td>@foreach($product->ingredient as $ingredient)
+                        {{$ingredient->name}}
+                        @if( !$loop->last)
+                        ,
+                        @endif
+                        @endforeach
+                    </td>
                     <td>
                         <a href={{route('products.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</a>
 

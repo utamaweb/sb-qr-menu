@@ -152,30 +152,29 @@
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div> --}}
-                                        <div class="col-md-12">
+                                        <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Detail Produk</label>
                                                 <input name="product_details" class="form-control"
                                                     rows="3">
                                             </div>
                                         </div>
+                                        <div class="col-md-4">
+                                            <label>Bahan Baku</label>
+                                            <div class="search-box input-group mb-4">
+                                                {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
+                                                {{-- <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" /> --}}
+                                                <select required class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
+                                                    {{-- <option value="" disabled>Select Product Unit...</option> --}}
+                                                    @foreach($ingredients as $ingredient)
+                                                    @if($ingredient->base_unit==null)
+                                                    <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
+                                                    @endif
+                                                    @endforeach
+                                                </select>
+                                            </div>
                                     </div>
-                                </div>
-
-                                <div class="col-md-12">
-                                        <label>Bahan Baku</label>
-                                        <div class="search-box input-group mb-4">
-                                            {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
-                                            {{-- <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" /> --}}
-                                            <select required class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
-                                                {{-- <option value="" disabled>Select Product Unit...</option> --}}
-                                                @foreach($ingredients as $ingredient)
-                                                @if($ingredient->base_unit==null)
-                                                <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
-                                                @endif
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">

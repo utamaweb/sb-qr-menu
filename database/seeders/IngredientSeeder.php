@@ -14,20 +14,17 @@ class IngredientSeeder extends Seeder
     public function run(): void
     {
         $bahans = [
-            // name, first_stock, stock_in, stock_used, adjustment, last_stock, unit_id
-            ['Gula', 0, 16, 12, 0, 4, 5],
-            ['Bumbu Kuning', 0, 16, 12, 0, 4, 5],
+            // name, first_stock, unit_id
+            ['Ayam Reguler', 100, 1],
+            ['Ayam Jumbo', 100, 1],
+            ['Bebek', 100, 1],
         ];
 
         foreach ($bahans as $bahan) {
             Ingredient::create([
                 'name'  =>  $bahan[0],
                 'first_stock'  =>  $bahan[1],
-                'stock_in'  =>  $bahan[2],
-                'stock_used'  =>  $bahan[3],
-                // 'adjustment'  =>  $bahan[4],
-                'last_stock'  =>  $bahan[5],
-                'unit_id'  =>  $bahan[6],
+                'unit_id'  =>  $bahan[2],
             ]);
         }
     }

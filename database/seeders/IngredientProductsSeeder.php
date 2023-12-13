@@ -15,11 +15,17 @@ class IngredientProductsSeeder extends Seeder
     {
         $ingredientProducts = [
             // ingredient_id, product_id
+            // AYAM REGULER
             [1, 1],
-            [1, 2],
-            [1, 3],
-            [2, 1],
-            [2, 2],
+            [3, 1],
+
+            // AYAM JUMBO
+            [2,2],
+            [4,2],
+
+            // BEBEK PAKET
+            [5, 3],
+            [6, 3],
         ];
 
         foreach ($ingredientProducts as $ingPro) {

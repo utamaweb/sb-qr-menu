@@ -12,7 +12,7 @@ class ExpenseCategoryController extends Controller
 {
     public function index()
     {
-        $lims_expense_category_all = ExpenseCategory::where('is_active', true)->get();
+        $lims_expense_category_all = ExpenseCategory::get();
         return view('backend.expense_category.index', compact('lims_expense_category_all'));
     }
 
@@ -30,12 +30,7 @@ class ExpenseCategoryController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'code' => [
-                'max:255',
-                    Rule::unique('expense_categories')->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ]
+            'name' => 'max:255',
         ]);
 
         $data = $request->all();
@@ -57,16 +52,13 @@ class ExpenseCategoryController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'code' => [
+            'name' => [
                 'max:255',
-                    Rule::unique('expense_categories')->ignore($request->expense_category_id)->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
             ]
         ]);
 
         $data = $request->all();
-        $lims_expense_category_data = ExpenseCategory::find($data['expense_category_id']);
+        $lims_expense_category_data = ExpenseCategory::find($id);
         $lims_expense_category_data->update($data);
         return redirect('expense_categories')->with('message', 'Data updated successfully');
     }
@@ -122,8 +114,7 @@ class ExpenseCategoryController extends Controller
     public function destroy($id)
     {
         $lims_expense_category_data = ExpenseCategory::find($id);
-        $lims_expense_category_data->is_active = false;
-        $lims_expense_category_data->save();
+        $lims_expense_category_data->delete();
         return redirect('expense_categories')->with('not_permitted', 'Data deleted successfully');
     }
 

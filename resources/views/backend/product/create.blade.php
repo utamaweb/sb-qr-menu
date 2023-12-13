@@ -164,7 +164,7 @@
                                             <div class="search-box input-group mb-4">
                                                 {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
                                                 {{-- <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" /> --}}
-                                                <select required class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
+                                                <select class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
                                                     {{-- <option value="" disabled>Select Product Unit...</option> --}}
                                                     @foreach($ingredients as $ingredient)
                                                     @if($ingredient->base_unit==null)

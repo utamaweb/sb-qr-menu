@@ -10,11 +10,13 @@ class CreateExpensesTable extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('reference_no');
-            $table->integer('expense_category_id');
-            $table->integer('warehouse_id');
+            $table->string('reference_no')->nullable();
+            $table->string('name')->nullable();
+            $table->string('qty')->nullable();
             $table->double('amount');
             $table->text('note')->nullable();
+            $table->foreignId('expense_category_id');
+            $table->foreignId('warehouse_id');
             $table->timestamps();
         });
     }

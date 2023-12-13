@@ -2,31 +2,30 @@
 
 <section>
     <div class="container-fluid">
-        @if($errors->has('code'))
-        <div class="alert alert-danger alert-dismissible text-center">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                    aria-hidden="true">&times;</span></button>{{ $errors->first('code') }}
-        </div>
-        @endif
-        @if(session()->has('message'))
-        <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-        @endif
-        @if(session()->has('not_permitted'))
-        <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-        @endif
 
-        <button class="btn btn-info" data-toggle="modal" data-target="#createModal"><i class="dripicons-plus"></i> {{trans('file.Add Expense Category')}}</button>&nbsp;
-        {{-- <button class="btn btn-primary" data-toggle="modal" data-target="#importExpenseCategory"><i class="dripicons-copy"></i> {{trans('file.Import Expense Category')}}</button> --}}
+    @if($errors->has('name'))
+    <div class="alert alert-danger alert-dismissible text-center">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
+    </div>
+    @endif
+    @if(session()->has('message'))
+    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
+    @endif
+    @if(session()->has('not_permitted'))
+    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
+    @endif
+
+        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Kategori Pengeluaran</a>&nbsp;
     </div>
     <div class="table-responsive">
-        <table id="expense_category-table" class="table">
+        <table id="ingredient-table" class="table">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>{{trans('file.Code')}}</th>
-                    <th>{{trans('file.name')}}</th>
+                    <th>Nama Kategori Pengeluaran</th>
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
@@ -34,24 +33,38 @@
                 @foreach($lims_expense_category_all as $key=>$expense_category)
                 <tr data-id="{{$expense_category->id}}">
                     <td>{{$key}}</td>
-                    <td>{{ $expense_category->code }}</td>
                     <td>{{ $expense_category->name }}</td>
                     <td>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{trans('file.action')}}
-                                <span class="caret"></span>
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
-                                <li><button type="button" data-id="{{$expense_category->id}}" class="open-Editexpense_categoryDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button></li>
-                                <li class="divider"></li>
-                                {{ Form::open(['route' => ['expense_categories.destroy', $expense_category->id], 'method' => 'DELETE'] ) }}
-                                <li>
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
-                                </li>
-                                {{ Form::close() }}
-                            </ul>
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense_category->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                        {{-- Edit Modal --}}
+                        <div id="editModal-{{$expense_category->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                            <div role="document" class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 id="exampleModalLabel" class="modal-title"> Update Kategori Pengeluaran</h5>
+                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                </div>
+                                <div class="modal-body">
+                                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                                    <form action="{{route('expense_categories.update', $expense_category->id)}}" method="POST">
+                                        @csrf
+                                        @method('PUT')
+                                        <div class="form-group">
+                                        <div class="form-group">
+                                            <label>Nama Kategori Pengeluaran *</label>
+                                            <input type="text" value="{{$expense_category->name}}" name="name" required class="form-control">
+                                        </div>
+                                        {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
+                                        </div>
+                                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                                    </form>
+                                </div>
+                            </div>
+                            </div>
                         </div>
+                        {{ Form::open(['route' => ['expense_categories.destroy', $expense_category->id], 'method' => 'DELETE'] ) }}
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                {{ Form::close() }}
                     </td>
                 </tr>
                 @endforeach
@@ -60,84 +73,25 @@
     </div>
 </section>
 
-<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-    class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-        <div class="modal-content">
-            {!! Form::open(['route' => 'expense_categories.store', 'method' => 'post', 'files' => true]) !!}
-            <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Expense Category')}}</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
-                            class="dripicons-cross"></i></span></button>
-            </div>
-            <div class="modal-body">
-                <p class="italic">
-                    <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>{{trans('file.Code')}} *</label>
-                        <div class="input-group">
-                            {{Form::text('code',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category code...'))}}
-                            <div class="input-group-append">
-                                <button id="genbutton" type="button"
-                                    class="btn btn-default">{{trans('file.Generate')}}</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label>{{trans('file.name')}} *</label>
-                        {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category name...'))}}
-                    </div>
-                    <input type="hidden" name="is_active" value="1">
-                    <div class="col-md-12 d-flex justify-content-end">
-                        {{-- <div class="form-group mt-3 mr-2">
-                                                            <a href="{{ url()->previous() }}" class="btn
-                        btn-outline-primary">Kembali</a>
-                    </div> --}}
-                    <div class="form-group mt-3">
-                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
-                    </div>
-                </div>
-            </div>
-        </div>
-        {{ Form::close() }}
-    </div>
-</div>
-</div>
 
-<div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true"
-    class="modal fade text-left">
+<!-- Create Modal -->
+<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {{ Form::open(['route' => ['expense_categories.update', 1], 'method' => 'PUT', 'files' => true] ) }}
+            {!! Form::open(['route' => 'expense_categories.store', 'method' => 'post']) !!}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Update Expense Category')}}</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i
-                            class="dripicons-cross"></i></span></button>
+                <h5 id="exampleModalLabel" class="modal-title">Tambah Kategori Pengeluaran</h5>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic">
-                    <small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                <div class="row">
-                    <div class="form-group col-md-6">
-                        <label>{{trans('file.Code')}} *</label>
-                        {{Form::text('code',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category code...'))}}
+                <p class="italic"><small>{{trans('file.Inputan yang memiliki tanda (*) wajib diisi')}}.</small></p>
+                <form>
+                    <div class="form-group">
+                        <label>Nama Kategori Pengeluaran *</label>
+                        <input type="text" name="name" required class="form-control">
                     </div>
-                    <div class="form-group col-md-6">
-                        <label>{{trans('file.name')}} *</label>
-                        {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control', 'placeholder' => 'Type expense category name...'))}}
-                    </div>
-                    <input type="hidden" name="expense_category_id">
-                    <div class="col-md-12 d-flex justify-content-end">
-                        {{-- <div class="form-group mt-3 mr-2">
-                                                                    <a href="{{ url()->previous() }}" class="btn
-                        btn-outline-primary">Kembali</a>
-                    </div> --}}
-                    <div class="form-group mt-3">
-                        <input type="button" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
-                    </div>
-                </div>
-            </div>
+                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+            </form>
         </div>
         {{ Form::close() }}
     </div>
@@ -148,12 +102,11 @@
 
 @push('scripts')
 <script type="text/javascript">
+    $("ul#product").siblings('a').attr('aria-expanded','true');
+    $("ul#product").addClass("show");
+    $("ul#product #unit-menu").addClass("active");
 
-    $("ul#expense").siblings('a').attr('aria-expanded','true');
-    $("ul#expense").addClass("show");
-    $("ul#expense #exp-cat-menu").addClass("active");
-
-    var expense_category_id = [];
+    var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
 
     $.ajaxSetup({
@@ -162,33 +115,73 @@
         }
     });
 
-    $('#genbutton').on("click", function(){
-      $.get('expense_categories/gencode', function(data){
-        $("input[name='code']").val(data);
-      });
+    $(document).ready(function() {
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
     });
 
-    $(document).ready(function() {
-        $(document).on('click', '.open-Editexpense_categoryDialog', function() {
-            var url = "expense_categories/"
-            var id = $(this).data('id').toString();
-            url = url.concat(id).concat("/edit");
-            $.get(url, function(data) {
-                $("input[name='code']").val(data['code']);
-                $("input[name='name']").val(data['name']);
-                $("input[name='expense_category_id']").val(data['id']);
-            });
+    $( "#select_all" ).on( "change", function() {
+        if ($(this).is(':checked')) {
+            $("tbody input[type='checkbox']").prop('checked', true);
+        }
+        else {
+            $("tbody input[type='checkbox']").prop('checked', false);
+        }
+    });
+
+    $("#export").on("click", function(e){
+        e.preventDefault();
+        var unit = [];
+        $(':checkbox:checked').each(function(i){
+          unit[i] = $(this).val();
         });
-    })
+        $.ajax({
+           type:'POST',
+           url:'/exportunit',
+           data:{
 
-function confirmDelete() {
-    if (confirm("Are you sure want to delete?")) {
-        return true;
-    }
-    return false;
-}
+                unitArray: unit
+            },
+           success:function(data){
+            alert('Exported to CSV file successfully! Click Ok to download file');
+            window.location.href = data;
+           }
+        });
+    });
 
-    $('#expense_category-table').DataTable( {
+    $('.open-CreateUnitDialog').on('click', function() {
+        $(".operator").hide();
+        $(".operation_value").hide();
+
+    });
+
+    $('#base_unit_create').on('change', function() {
+        if($(this).val()){
+            $("#createModal .operator").show();
+            $("#createModal .operation_value").show();
+        }
+        else{
+            $("#createModal .operator").hide();
+            $("#createModal .operation_value").hide();
+        }
+    });
+
+    $('#base_unit_edit').on('change', function() {
+        if($(this).val()){
+            $("#editModal .operator").show();
+            $("#editModal .operation_value").show();
+        }
+        else{
+            $("#editModal .operator").hide();
+            $("#editModal .operation_value").hide();
+        }
+    });
+});
+
+    $('#ingredient-table').DataTable( {
         "order": [],
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
@@ -202,7 +195,7 @@ function confirmDelete() {
         'columnDefs': [
             {
                 "orderable": false,
-                'targets': [0, 3]
+                'targets': [0, 2]
             },
             {
                 'render': function(data, type, row, meta){
@@ -228,28 +221,7 @@ function confirmDelete() {
                 text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
                 exportOptions: {
                     columns: ':visible:Not(.not-exported)',
-                    rows: ':visible',
-                    stripHtml: false
-                },
-                customize: function(doc) {
-                    for (var i = 1; i < doc.content[1].table.body.length; i++) {
-                        if (doc.content[1].table.body[i][0].text.indexOf('<img src=') !== -1) {
-                            var imagehtml = doc.content[1].table.body[i][0].text;
-                            var regex = /<img.*?src=['"](.*?)['"]/;
-                            var src = regex.exec(imagehtml)[1];
-                            var tempImage = new Image();
-                            tempImage.src = src;
-                            var canvas = document.createElement("canvas");
-                            canvas.width = tempImage.width;
-                            canvas.height = tempImage.height;
-                            var ctx = canvas.getContext("2d");
-                            ctx.drawImage(tempImage, 0, 0);
-                            var imagedata = canvas.toDataURL("image/png");
-                            delete doc.content[1].table.body[i][0].text;
-                            doc.content[1].table.body[i][0].image = imagedata;
-                            doc.content[1].table.body[i][0].fit = [30, 30];
-                        }
-                    }
+                    rows: ':visible'
                 },
             },
             {
@@ -257,16 +229,7 @@ function confirmDelete() {
                 text: '<i title="export to excel" class="dripicons-document-new"></i>',
                 exportOptions: {
                     columns: ':visible:Not(.not-exported)',
-                    rows: ':visible',
-                    format: {
-                        body: function ( data, row, column, node ) {
-                            if (column === 0 && (data.indexOf('<img src=') !== -1)) {
-                                var regex = /<img.*?src=['"](.*?)['"]/;
-                                data = regex.exec(data)[1];
-                            }
-                            return data;
-                        }
-                    }
+                    rows: ':visible'
                 },
             },
             {
@@ -274,16 +237,7 @@ function confirmDelete() {
                 text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
                 exportOptions: {
                     columns: ':visible:Not(.not-exported)',
-                    rows: ':visible',
-                    format: {
-                        body: function ( data, row, column, node ) {
-                            if (column === 0 && (data.indexOf('<img src=') !== -1)) {
-                                var regex = /<img.*?src=['"](.*?)['"]/;
-                                data = regex.exec(data)[1];
-                            }
-                            return data;
-                        }
-                    }
+                    rows: ':visible'
                 },
             },
             {
@@ -291,8 +245,7 @@ function confirmDelete() {
                 text: '<i title="print" class="fa fa-print"></i>',
                 exportOptions: {
                     columns: ':visible:Not(.not-exported)',
-                    rows: ':visible',
-                    stripHtml: false
+                    rows: ':visible'
                 },
             },
             {
@@ -300,18 +253,18 @@ function confirmDelete() {
                 className: 'buttons-delete',
                 action: function ( e, dt, node, config ) {
                     if(user_verified == '1') {
-                        expense_category_id.length = 0;
+                        ingredient_id.length = 0;
                         $(':checkbox:checked').each(function(i){
                             if(i){
-                                expense_category_id[i-1] = $(this).closest('tr').data('id');
+                                ingredient_id[i-1] = $(this).closest('tr').data('id');
                             }
                         });
-                        if(expense_category_id.length && confirm("Are you sure want to delete?")) {
+                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
                             $.ajax({
                                 type:'POST',
-                                url:'expense_categories/deletebyselection',
+                                url:'ingredient/deletebyselection',
                                 data:{
-                                    expense_categoryIdArray: expense_category_id
+                                    unitIdArray: ingredient_id
                                 },
                                 success:function(data){
                                     alert(data);
@@ -319,8 +272,8 @@ function confirmDelete() {
                             });
                             dt.rows({ page: 'current', selected: true }).remove().draw(false);
                         }
-                        else if(!expense_category_id.length)
-                            alert('No expense category is selected!');
+                        else if(!ingredient_id.length)
+                            alert('No unit is selected!');
                     }
                     else
                         alert('This feature is disable for demo!');
@@ -333,6 +286,5 @@ function confirmDelete() {
             },
         ],
     } );
-
 </script>
 @endpush

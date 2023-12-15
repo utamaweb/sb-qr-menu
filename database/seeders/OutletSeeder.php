@@ -25,8 +25,9 @@ class OutletSeeder extends Seeder
         foreach ($outlets as $outlet) {
             Outlet::create([
                 'name'  =>  $outlet[0],
-                'logo'  =>  $outlet[1],
-                'description'  =>  $outlet[2],
+                // 'logo'  =>  $outlet[1],
+                // 'description'  =>  $outlet[2],
+                'alamat'  =>  $outlet[1],
                 'is_active'  =>  $outlet[2],
             ]);
         }

@@ -12,9 +12,9 @@
       <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya
       Pengeluaran</span></a>
       <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
-         <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">{{trans('file.Expense Category')}}</a>
+         <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">Kategori Pengeluaran</a>
          </li>
-         <li id="exp-list-menu"><a href="{{route('expenses.index')}}">{{trans('file.Expense List')}}</a></li>
+         <li id="exp-list-menu"><a href="{{route('expenses.index')}}">Daftar Pengeluaran</a></li>
          {{-- <?php
             $add_permission_active = $role_has_permissions_list->where('name', 'expenses-add')->first();
             ?>

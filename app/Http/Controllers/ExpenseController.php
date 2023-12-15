@@ -7,6 +7,7 @@ use App\Models\Expense;
 use App\Models\Account;
 use App\Models\Warehouse;
 use App\Models\CashRegister;
+use App\Models\ExpenseCategory;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Auth;
@@ -37,10 +38,11 @@ class ExpenseController extends Controller
                 $warehouse_id = $request->input('warehouse_id');
             else
                 $warehouse_id = 0;
-
+            $lims_expense_category_list = ExpenseCategory::get();
+            $expenses = Expense::get();
             $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
             $lims_account_list = Account::where('is_active', true)->get();
-            return view('backend.expense.index', compact('lims_account_list', 'lims_warehouse_list', 'all_permission', 'starting_date', 'ending_date', 'warehouse_id'));
+            return view('backend.expense.index', compact('expenses','lims_expense_category_list','lims_account_list', 'lims_warehouse_list', 'all_permission', 'starting_date', 'ending_date', 'warehouse_id'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -161,21 +163,22 @@ class ExpenseController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->all();
-        if(isset($data['created_at']))
-            $data['created_at'] = date("Y-m-d H:i:s", strtotime($data['created_at']));
-        else
-            $data['created_at'] = date("Y-m-d H:i:s");
-        $data['reference_no'] = 'er-' . date("Ymd") . '-'. date("his");
-        $data['user_id'] = Auth::id();
-        $cash_register_data = CashRegister::where([
-            ['user_id', $data['user_id']],
-            ['warehouse_id', $data['warehouse_id']],
-            ['status', true]
-        ])->first();
-        if($cash_register_data)
-            $data['cash_register_id'] = $cash_register_data->id;
-        Expense::create($data);
+        // $cash_register_data = CashRegister::where([
+        //     ['user_id', $data['user_id']],
+        //     ['warehouse_id', $data['warehouse_id']],
+        //     ['status', true]
+        // ])->first();
+        // if($cash_register_data)
+        //     $data['cash_register_id'] = $cash_register_data->id;
+        Expense::create([
+            'name' => $request->name,
+            'qty' => $request->qty,
+            'expense_category_id' => $request->expense_category_id,
+            'warehouse_id' => $request->warehouse_id,
+            'amount' => $request->amount,
+            'note' => $request->note,
+            'user_id' => Auth::id()
+        ]);
         return redirect('expenses')->with('message', 'Data inserted successfully');
     }
 
@@ -198,10 +201,15 @@ class ExpenseController extends Controller
 
     public function update(Request $request, $id)
     {
-        $data = $request->all();
-        $lims_expense_data = Expense::find($data['expense_id']);
-        $data['created_at'] = date("Y-m-d H:i:s", strtotime($data['created_at']));
-        $lims_expense_data->update($data);
+        $lims_expense_data = Expense::find($id);
+        $lims_expense_data->update([
+            'name' => $request->name,
+            'qty' => $request->qty,
+            'expense_category_id' => $request->expense_category_id,
+            'warehouse_id' => $request->warehouse_id,
+            'amount' => $request->amount,
+            'note' => $request->note,
+        ]);
         return redirect('expenses')->with('message', 'Data updated successfully');
     }
 

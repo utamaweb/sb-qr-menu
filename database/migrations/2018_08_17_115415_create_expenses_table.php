@@ -17,6 +17,7 @@ class CreateExpensesTable extends Migration
             $table->text('note')->nullable();
             $table->foreignId('expense_category_id');
             $table->foreignId('warehouse_id');
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }

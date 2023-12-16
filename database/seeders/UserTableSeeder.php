@@ -20,7 +20,17 @@ class UserTableSeeder extends Seeder
             'role_id' => '1',
             'is_active' => '1',
         ]);
-
         $superadmin->assignRole('superadmin');
+
+        $kasir = User::create([
+            'name' => 'kasir',
+            'email' => 'kasir@kasir.com',
+            'password' => bcrypt('kasir'),
+            'phone' => '0888',
+            'company_name' => '',
+            'role_id' => '2',
+            'is_active' => '1',
+        ]);
+        $superadmin->assignRole('kasir');
     }
 }

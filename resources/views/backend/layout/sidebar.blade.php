@@ -12,8 +12,10 @@
       <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya
       Pengeluaran</span></a>
       <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
+        @if(auth()->user()->hasRole('Superadmin'))
          <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">Kategori Pengeluaran</a>
          </li>
+         @endif
          <li id="exp-list-menu"><a href="{{route('expenses.index')}}">Daftar Pengeluaran</a></li>
          {{-- <?php
             $add_permission_active = $role_has_permissions_list->where('name', 'expenses-add')->first();

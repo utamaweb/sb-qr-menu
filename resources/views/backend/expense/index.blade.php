@@ -18,7 +18,9 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
 
+    @if(auth()->user()->hasRole('Kasir'))
         <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Pengeluaran</a>&nbsp;
+    @endif
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
@@ -30,7 +32,9 @@
                     <th>Total</th>
                     <th>Cabang</th>
                     <th>Dibuat</th>
+                    @if(auth()->user()->hasRole('Kasir'))
                     <th class="not-exported">{{trans('file.action')}}</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -42,6 +46,7 @@
                     <td>{{ $expense->amount }}</td>
                     <td>{{ $expense->warehouse->name }}</td>
                     <td>{{ $expense->user->name }}</td>
+                    @if(auth()->user()->hasRole('Kasir'))
                     <td>
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
                         {{-- Edit Modal --}}
@@ -107,6 +112,7 @@
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                 {{ Form::close() }}
                     </td>
+                    @endif
                 </tr>
                 @endforeach
             </tbody>

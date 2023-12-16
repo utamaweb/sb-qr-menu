@@ -97,7 +97,8 @@ class UserController extends Controller
             $data['is_active'] = false;
         $data['password'] = bcrypt($data['password']);
         $data['phone'] = $data['phone_number'];
-        User::create($data);
+        $roleName = Role::find($request->role_id)->pluck('name');
+        User::create($data)->assignRole($roleName);;
         if($data['role_id'] == 5) {
             $data['name'] = $data['customer_name'];
             $data['phone_number'] = $data['phone'];

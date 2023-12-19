@@ -215,7 +215,7 @@
                   <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
                     {!! Form::open(['route' => 'expenses.store', 'method' => 'post']) !!}
                     <?php
-                      $lims_expense_category_list = DB::table('expense_categories')->where('is_active', true)->get();
+                      $lims_expense_category_list = DB::table('expense_categories')->get();
                       if(Auth::user()->role_id > 2)
                         $lims_warehouse_list = DB::table('warehouses')->where([
                           ['is_active', true],
@@ -231,7 +231,7 @@
                             <label>{{trans('file.Expense Category')}} *</label>
                             <select name="expense_category_id" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select Expense Category...">
                                 @foreach($lims_expense_category_list as $expense_category)
-                                <option value="{{$expense_category->id}}">{{$expense_category->name . ' (' . $expense_category->code. ')'}}</option>
+                                <option value="{{$expense_category->id}}">{{$expense_category->name}}</option>
                                 @endforeach
                             </select>
                         </div>

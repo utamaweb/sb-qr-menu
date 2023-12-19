@@ -1171,9 +1171,10 @@ class SaleController extends Controller
             if(empty($all_permission))
                 $all_permission[] = 'dummy text';
 
-            $lims_customer_list = Cache::remember('customer_list', 60*60*24, function () {
-                return Customer::where('is_active', true)->get();
-            });
+            // $lims_customer_list = Cache::remember('customer_list', 60*60*24, function () {
+            //     return Customer::get();
+            // });
+            $lims_customer_list = Customer::get();
             $lims_customer_group_all = Cache::remember('customer_group_list', 60*60*24, function () {
                 return CustomerGroup::where('is_active', true)->get();
             });
@@ -1187,9 +1188,11 @@ class SaleController extends Controller
             $lims_tax_list = Cache::remember('tax_list', 60*60*24*30, function () {
                 return Tax::where('is_active', true)->get();
             });
-            $lims_product_list = Cache::remember('product_list', 60*60*24, function () {
-                return Product::ActiveFeatured()->get();
-            });
+            // $lims_product_list = Cache::remember('product_list', 60*60*24, function () {
+            //     return Product::get();
+            // });
+            $lims_product_list = Product::get();
+            // return $lims_product_list;
             foreach ($lims_product_list as $key => $product) {
                 $images = explode(",", $product->image);
                 if($images[0])
@@ -1218,6 +1221,7 @@ class SaleController extends Controller
             }
 
             $product_number = count($lims_product_list);
+            // return $product_number;
             $lims_pos_setting_data = Cache::remember('pos_setting', 60*60*24*30, function () {
                 return PosSetting::latest()->first();
             });

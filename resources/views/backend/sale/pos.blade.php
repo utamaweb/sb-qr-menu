@@ -561,11 +561,11 @@
           <div class="row">
                     {{-- <div class="col-md-6">
                         <button class="btn btn-block btn-primary" id="category-filter">{{trans('file.category')}}</button>
-                    </div> --}}
-                    {{-- <div class="col-md-4">
+                    </div>
+                    <div class="col-md-4">
                         <button class="btn btn-block btn-info" id="brand-filter">{{trans('file.Brand')}}</button>
-                    </div> --}}
-                    {{-- <div class="col-md-6">
+                    </div>
+                    <div class="col-md-6">
                         <button class="btn btn-block btn-danger" id="featured-filter">{{trans('file.Featured')}}</button>
                     </div> --}}
                     <div class="col-md-12 table-container">
@@ -582,12 +582,12 @@
                             <tbody>
                             @for ($i=0; $i < ceil($product_number/5); $i++)
                                 <tr>
-                                    <td class="product-img sound-btn" title="{{$lims_product_list[0+$i*5]->name}}" data-product ="{{$lims_product_list[0+$i*5]->code . ' (' . $lims_product_list[0+$i*5]->name . ')'}}"><img  src="{{ Storage::url('images/product/'.$lims_product_list[0+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$lims_product_list[0+$i*5]->name}}" data-product ="{{$lims_product_list[0+$i*5]->code . ' (' . $lims_product_list[0+$i*5]->name . ')'}}"><img  src="{{ Storage::url('product_images/'.$lims_product_list[0+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$lims_product_list[0+$i*5]->name}}</p>
                                         <span>{{$lims_product_list[0+$i*5]->code}}</span>
                                     </td>
                                     @if(!empty($lims_product_list[1+$i*5]))
-                                    <td class="product-img sound-btn" title="{{$lims_product_list[1+$i*5]->name}}" data-product ="{{$lims_product_list[1+$i*5]->code . ' (' . $lims_product_list[1+$i*5]->name . ')'}}"><img  src="{{ Storage::url('images/product/'.$lims_product_list[1+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$lims_product_list[1+$i*5]->name}}" data-product ="{{$lims_product_list[1+$i*5]->code . ' (' . $lims_product_list[1+$i*5]->name . ')'}}"><img  src="{{ Storage::url('product_images/'.$lims_product_list[1+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$lims_product_list[1+$i*5]->name}}</p>
                                         <span>{{$lims_product_list[1+$i*5]->code}}</span>
                                     </td>
@@ -595,7 +595,7 @@
                                     <td style="border:none;"></td>
                                     @endif
                                     @if(!empty($lims_product_list[2+$i*5]))
-                                    <td class="product-img sound-btn" title="{{$lims_product_list[2+$i*5]->name}}" data-product ="{{$lims_product_list[2+$i*5]->code . ' (' . $lims_product_list[2+$i*5]->name . ')'}}"><img  src="{{ Storage::url('images/product/'.$lims_product_list[2+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$lims_product_list[2+$i*5]->name}}" data-product ="{{$lims_product_list[2+$i*5]->code . ' (' . $lims_product_list[2+$i*5]->name . ')'}}"><img  src="{{ Storage::url('product_images/'.$lims_product_list[2+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$lims_product_list[2+$i*5]->name}}</p>
                                         <span>{{$lims_product_list[2+$i*5]->code}}</span>
                                     </td>
@@ -603,7 +603,7 @@
                                     <td style="border:none;"></td>
                                     @endif
                                     @if(!empty($lims_product_list[3+$i*5]))
-                                    <td class="product-img sound-btn" title="{{$lims_product_list[3+$i*5]->name}}" data-product ="{{$lims_product_list[3+$i*5]->code . ' (' . $lims_product_list[3+$i*5]->name . ')'}}"><img  src="{{ Storage::url('images/product/'.$lims_product_list[3+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$lims_product_list[3+$i*5]->name}}" data-product ="{{$lims_product_list[3+$i*5]->code . ' (' . $lims_product_list[3+$i*5]->name . ')'}}"><img  src="{{ Storage::url('product_images/'.$lims_product_list[3+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$lims_product_list[3+$i*5]->name}}</p>
                                         <span>{{$lims_product_list[3+$i*5]->code}}</span>
                                     </td>
@@ -611,7 +611,7 @@
                                     <td style="border:none;"></td>
                                     @endif
                                     @if(!empty($lims_product_list[4+$i*5]))
-                                    <td class="product-img sound-btn" title="{{$lims_product_list[4+$i*5]->name}}" data-product ="{{$lims_product_list[4+$i*5]->code . ' (' . $lims_product_list[4+$i*5]->name . ')'}}"><img  src="{{ Storage::url('images/product/'.$lims_product_list[4+$i*5]->base_image)}}" width="100%" />
+                                    <td class="product-img sound-btn" title="{{$lims_product_list[4+$i*5]->name}}" data-product ="{{$lims_product_list[4+$i*5]->code . ' (' . $lims_product_list[4+$i*5]->name . ')'}}"><img  src="{{ Storage::url('product_images/'.$lims_product_list[4+$i*5]->base_image)}}" width="100%" />
                                         <p>{{$lims_product_list[4+$i*5]->name}}</p>
                                         <span>{{$lims_product_list[4+$i*5]->code}}</span>
                                     </td>
@@ -1151,6 +1151,7 @@ var biller_id = <?php echo json_encode(\Auth::user()->biller_id) ?>;
 var coupon_list = <?php echo json_encode($lims_coupon_list) ?>;
 var currency = <?php echo json_encode($currency) ?>;
 var currencyChange = false;
+console.log(currency);
 $('#currency').val(currency['id']);
 
 $('#currency').change(function(){
@@ -1631,9 +1632,9 @@ function populateProduct(data) {
         $.each(data['name'], function(index) {
             var product_info = data['code'][index]+' (' + data['name'][index] + ')';
             if(index % 5 == 0 && index != 0)
-                tableData += '</tr><tr><td class="product-img sound-btn" title="'+data['name'][index]+'" data-product = "'+product_info+'"><img  src="storage/images/product/'+data['image'][index]+'" width="100%" /><p>'+data['name'][index]+'</p><span>'+data['code'][index]+'</span></td>';
+                tableData += '</tr><tr><td class="product-img sound-btn" title="'+data['name'][index]+'" data-product = "'+product_info+'"><img  src="public/storage/product_images/'+data['image'][index]+'" width="100%" /><p>'+data['name'][index]+'</p><span>'+data['code'][index]+'</span></td>';
             else
-                tableData += '<td class="product-img sound-btn" title="'+data['name'][index]+'" data-product = "'+product_info+'"><img  src="storage/images/product/'+data['image'][index]+'" width="100%" /><p>'+data['name'][index]+'</p><span>'+data['code'][index]+'</span></td>';
+                tableData += '<td class="product-img sound-btn" title="'+data['name'][index]+'" data-product = "'+product_info+'"><img  src="public/storage/product_images/'+data['image'][index]+'" width="100%" /><p>'+data['name'][index]+'</p><span>'+data['code'][index]+'</span></td>';
         });
 
         if(data['name'].length % 5){
@@ -1802,11 +1803,13 @@ $("#myTable").on('click', '.qty', function() {
 });
 
 $(document).on('click', '.sound-btn', function() {
+    alert('sound');
     var audio = $("#mysoundclip1")[0];
     audio.play();
 });
 
 $(document).on('click', '.product-img', function() {
+    alert('yes');
     var customer_id = $('#customer_id').val();
     var warehouse_id = $('select[name="warehouse_id"]').val();
     if(!customer_id)

@@ -54,12 +54,12 @@ class Common
         // config(['staff_access' => $general_setting->staff_access, 'date_format' => $general_setting->date_format, 'currency' => $currency->code, 'currency_position' => $general_setting->currency_position, 'decimal' => $general_setting->decimal, 'is_zatca' => $general_setting->is_zatca, 'company_name' => $general_setting->company_name, 'vat_registration_number' => $general_setting->vat_registration_number, 'without_stock' => $general_setting->without_stock]);
 
         $alert_product = DB::table('products')->where('is_active', true)->whereColumn('alert_quantity', '>', 'qty')->count();
-        $dso_alert_product = DB::table('dso_alerts')->select('number_of_products')->whereDate('created_at', date("Y-m-d"))->first();
-        if($dso_alert_product)
-            $dso_alert_product_no = $dso_alert_product->number_of_products;
-        else
-            $dso_alert_product_no = 0;
-        View::share(['alert_product' => $alert_product, 'dso_alert_product_no' => $dso_alert_product_no]);
+        // $dso_alert_product = DB::table('dso_alerts')->select('number_of_products')->whereDate('created_at', date("Y-m-d"))->first();
+        // if($dso_alert_product)
+        //     $dso_alert_product_no = $dso_alert_product->number_of_products;
+        // else
+        //     $dso_alert_product_no = 0;
+        View::share(['alert_product' => $alert_product]);
         $role = Cache::remember('user_role', 60*60*24*365, function () {
             return DB::table('roles')->find(Auth::user()->role_id);
         });

@@ -33,6 +33,7 @@ class CreateProductsTable extends Migration
             $table->tinyInteger('featured')->nullable();
             $table->text('product_details')->nullable();
             $table->boolean('is_active')->nullable();
+            $table->boolean('is_diffPrice')->nullable();
             $table->timestamps();
         });
     }

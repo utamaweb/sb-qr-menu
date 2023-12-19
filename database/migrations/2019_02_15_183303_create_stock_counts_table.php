@@ -24,6 +24,7 @@ class CreateStockCountsTable extends Migration
             $table->string('initial_file')->nullable();
             $table->string('final_file')->nullable();
             $table->text('note')->nullable();
+            $table->boolean('is_adjusted');
             $table->timestamps();
         });
     }

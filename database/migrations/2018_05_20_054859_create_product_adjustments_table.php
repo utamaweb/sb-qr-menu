@@ -17,6 +17,7 @@ class CreateProductAdjustmentsTable extends Migration
             $table->increments('id');
             $table->integer('adjustment_id');
             $table->integer('product_id');
+            $table->integer('variant_id')->nullable();
             $table->double('qty');
             $table->string('action');
             $table->timestamps();

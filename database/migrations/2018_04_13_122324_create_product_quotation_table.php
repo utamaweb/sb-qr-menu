@@ -17,6 +17,8 @@ class CreateProductQuotationTable extends Migration
             $table->increments('id');
             $table->integer('quotation_id');
             $table->integer('product_id');
+            $table->integer('product_batch_id')->nullable();
+            $table->integer('variant_id')->nullable();
             $table->double('qty');
             $table->integer('sale_unit_id');
             $table->double('net_unit_price');

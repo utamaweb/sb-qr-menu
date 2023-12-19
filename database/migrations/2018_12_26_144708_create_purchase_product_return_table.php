@@ -17,6 +17,9 @@ class CreatePurchaseProductReturnTable extends Migration
             $table->increments('id');
             $table->integer('return_id');
             $table->integer('product_id');
+            $table->integer('product_batch_id')->nullable();
+            $table->integer('variant_id')->nullable();
+            $table->text('imei_number')->nullable();
             $table->double('qty');
             $table->integer('purchase_unit_id');
             $table->double('net_unit_cost');

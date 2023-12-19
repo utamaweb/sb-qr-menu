@@ -25,9 +25,15 @@ class CreateSalesTable extends Migration
             $table->double('total_tax');
             $table->double('total_price');
             $table->double('grand_total');
+            $table->integer('currency_id')->nullable()->default(null);
+            $table->double('exchange_rate')->nullable()->default(null);
             $table->double('order_tax_rate')->nullable();
             $table->double('order_tax')->nullable();
+            $table->string('order_discount_type')->nullable();
+            $table->double('order_discount_value')->nullable();
             $table->double('order_discount')->nullable();
+            $table->integer('coupon_id')->nullable();
+            $table->double('coupon_discount')->nullable();
             $table->double('shipping_cost')->nullable();
             $table->integer('sale_status');
             $table->integer('payment_status');
@@ -35,6 +41,10 @@ class CreateSalesTable extends Migration
             $table->double('paid_amount')->nullable();
             $table->text('sale_note')->nullable();
             $table->text('staff_note')->nullable();
+            $table->integer('user_id');
+            $table->integer('cash_register_id')->nullable();
+            $table->integer('table_id')->nullable();
+            $table->integer('queue')->nullable();
             $table->timestamps();
         });
     }

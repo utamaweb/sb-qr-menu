@@ -16,9 +16,15 @@ class CreateReturnsTable extends Migration
         Schema::create('returns', function (Blueprint $table) {
             $table->increments('id');
             $table->string('reference_no');
+            $table->integer('user_id');
+            $table->integer('sale_id')->nullable();
+            $table->integer('cash_register_id')->nullable();
             $table->integer('customer_id');
             $table->integer('warehouse_id');
             $table->integer('biller_id');
+            $table->integer('account_id');
+            $table->integer('currency_id')->nullable();
+            $table->double('exchange_rate')->nullable();
             $table->integer('item');
             $table->double('total_qty');
             $table->double('total_discount');

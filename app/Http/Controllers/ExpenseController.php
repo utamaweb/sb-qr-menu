@@ -41,8 +41,8 @@ class ExpenseController extends Controller
             $lims_expense_category_list = ExpenseCategory::get();
             $expenses = Expense::get();
             $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
-            $lims_account_list = Account::where('is_active', true)->get();
-            return view('backend.expense.index', compact('expenses','lims_expense_category_list','lims_account_list', 'lims_warehouse_list', 'all_permission', 'starting_date', 'ending_date', 'warehouse_id'));
+            // $lims_account_list = Account::where('is_active', true)->get();
+            return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list', 'all_permission', 'starting_date', 'ending_date', 'warehouse_id'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');

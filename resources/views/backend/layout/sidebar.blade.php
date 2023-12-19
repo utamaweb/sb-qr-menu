@@ -494,16 +494,16 @@
          @if($discount_permission_active)
          <li id="discount-list-menu"><a href="{{route('discounts.index')}}">{{trans('file.Discount')}}</a></li>
          @endif --}}
-         @if($all_notification_permission_active)
+         {{-- @if($all_notification_permission_active)
          <li id="notification-list-menu">
             <a href="{{route('notifications.index')}}">{{trans('file.All Notification')}}</a>
          </li>
-         @endif
-         @if($send_notification_permission_active)
+         @endif --}}
+         {{-- @if($send_notification_permission_active)
          <li id="notification-menu">
             <a href="" id="send-notification">{{trans('file.Send Notification')}}</a>
          </li>
-         @endif
+         @endif --}}
          {{-- @if($customer_group_permission_active)
          <li id="customer-group-menu"><a href="{{route('customer_group.index')}}">{{trans('file.Customer Group')}}</a></li>
          @endif --}}

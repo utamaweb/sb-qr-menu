@@ -61,7 +61,7 @@ class SettingController extends Controller
     public function generalSetting()
     {
         $lims_general_setting_data = GeneralSetting::latest()->first();
-        $lims_account_list = Account::where('is_active', true)->get();
+        // $lims_account_list = Account::where('is_active', true)->get();
         $lims_currency_list = Currency::get();
         $zones_array = array();
         $timestamp = time();
@@ -70,7 +70,7 @@ class SettingController extends Controller
             $zones_array[$key]['zone'] = $zone;
             $zones_array[$key]['diff_from_GMT'] = 'UTC/GMT ' . date('P', $timestamp);
         }
-        return view('backend.setting.general_setting', compact('lims_general_setting_data', 'lims_account_list', 'zones_array', 'lims_currency_list'));
+        return view('backend.setting.general_setting', compact('lims_general_setting_data', 'zones_array', 'lims_currency_list'));
     }
 
     public function generalSettingStore(Request $request)
@@ -477,7 +477,7 @@ class SettingController extends Controller
     {
         $lims_customer_list = Customer::where('is_active', true)->get();
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $lims_biller_list = Biller::where('is_active', true)->get();
+        // $lims_biller_list = Biller::where('is_active', true)->get();
         $lims_pos_setting_data = PosSetting::latest()->first();
 
         if($lims_pos_setting_data)
@@ -485,7 +485,7 @@ class SettingController extends Controller
         else
             $options = [];
 
-        return view('backend.setting.pos_setting', compact('lims_customer_list', 'lims_warehouse_list', 'lims_biller_list', 'lims_pos_setting_data','options'));
+        return view('backend.setting.pos_setting', compact('lims_customer_list', 'lims_warehouse_list', 'lims_pos_setting_data','options'));
     }
 
     public function posSettingStore(Request $request)

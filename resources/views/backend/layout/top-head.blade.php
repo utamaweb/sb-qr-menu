@@ -223,7 +223,7 @@
                         ])->get();
                       else
                         $lims_warehouse_list = DB::table('warehouses')->where('is_active', true)->get();
-                      $lims_account_list = \App\Models\Account::where('is_active', true)->get();
+                    //   $lims_account_list = \App\Models\Account::where('is_active', true)->get();
 
                     ?>
                       <div class="row">
@@ -250,13 +250,13 @@
                         <div class="col-md-6 form-group">
                             <label> {{trans('file.Account')}}</label>
                             <select class="form-control selectpicker" name="account_id">
-                            @foreach($lims_account_list as $account)
+                            {{-- @foreach($lims_account_list as $account)
                                 @if($account->is_default)
                                 <option selected value="{{$account->id}}">{{$account->name}} [{{$account->account_no}}]</option>
                                 @else
                                 <option value="{{$account->id}}">{{$account->name}} [{{$account->account_no}}]</option>
                                 @endif
-                            @endforeach
+                            @endforeach --}}
                             </select>
                         </div>
                       </div>

@@ -1184,7 +1184,7 @@ class SaleController extends Controller
             $lims_biller_list = Cache::remember('biller_list', 60*60*24*30, function () {
                 return Biller::where('is_active', true)->get();
             });
-            $lims_reward_point_setting_data = RewardPointSetting::latest()->first();
+            // $lims_reward_point_setting_data = RewardPointSetting::latest()->first();
             $lims_tax_list = Cache::remember('tax_list', 60*60*24*30, function () {
                 return Tax::where('is_active', true)->get();
             });
@@ -1262,7 +1262,7 @@ class SaleController extends Controller
             $numberOfInvoice = Sale::count();
             $dateNow = Carbon::now()->format('d-m-Y');
             $custom_fields = CustomField::where('belongs_to', 'sale')->get();
-            return view('backend.sale.pos', compact('currency_list','role','all_permission', 'lims_customer_list', 'lims_customer_group_all', 'lims_warehouse_list', 'lims_reward_point_setting_data', 'lims_product_list', 'product_number', 'lims_tax_list', 'lims_biller_list', 'lims_pos_setting_data', 'options', 'lims_brand_list', 'lims_category_list', 'lims_table_list', 'recent_sale', 'recent_draft', 'lims_coupon_list', 'flag', 'numberOfInvoice', 'custom_fields', 'dateNow'));
+            return view('backend.sale.pos', compact('currency_list','role','all_permission', 'lims_customer_list', 'lims_customer_group_all', 'lims_warehouse_list', 'lims_product_list', 'product_number', 'lims_tax_list', 'lims_biller_list', 'lims_pos_setting_data', 'options', 'lims_brand_list', 'lims_category_list', 'lims_table_list', 'recent_sale', 'recent_draft', 'lims_coupon_list', 'flag', 'numberOfInvoice', 'custom_fields', 'dateNow'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');

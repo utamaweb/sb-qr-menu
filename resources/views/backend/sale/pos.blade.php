@@ -413,9 +413,10 @@
                                                 @if(in_array("deposit",$options))
                                                 <option value="6">Deposit</option>
                                                 @endif
-                                                @if($lims_reward_point_setting_data && $lims_reward_point_setting_data->is_active)
+                                                {{-- @if($lims_reward_point_setting_data && $lims_reward_point_setting_data->is_active) --}}
+                                                {{-- @if($lims_reward_point_setting_data->is_active) --}}
                                                 <option value="7">Points</option>
-                                                @endif
+                                                {{-- @endif --}}
                                             </select>
                                         </div>
                                         <div class="form-group col-md-12 mt-3">
@@ -1135,7 +1136,6 @@ var temp_unit_operation_value = [];
 
 var deposit = <?php echo json_encode($deposit) ?>;
 var points = <?php echo json_encode($points) ?>;
-var reward_point_setting = <?php echo json_encode($lims_reward_point_setting_data) ?>;
 
 @if($lims_pos_setting_data)
 var product_row_number = <?php echo json_encode($lims_pos_setting_data->product_number) ?>;

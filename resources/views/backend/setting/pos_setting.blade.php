@@ -31,7 +31,7 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label>{{trans('file.Default Biller')}} *</label>
                                         @if($lims_pos_setting_data)
                                         <input type="hidden" name="biller_id_hidden" value="{{$lims_pos_setting_data->biller_id}}">
@@ -41,7 +41,7 @@
                                             <option value="{{$biller->id}}">{{$biller->name . ' (' . $biller->company_name . ')'}}</option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <div class="form-group">
                                         @if($lims_pos_setting_data && $lims_pos_setting_data->keybord_active)
                                         <input class="mt-2" type="checkbox" name="keybord_active" value="1" checked>

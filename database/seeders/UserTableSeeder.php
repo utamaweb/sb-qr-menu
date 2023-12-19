@@ -31,6 +31,6 @@ class UserTableSeeder extends Seeder
             'role_id' => '2',
             'is_active' => '1',
         ]);
-        $superadmin->assignRole('kasir');
+        $kasir->assignRole('kasir');
     }
 }

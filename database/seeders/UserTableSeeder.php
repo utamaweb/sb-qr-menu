@@ -28,7 +28,7 @@ class UserTableSeeder extends Seeder
             'password' => bcrypt('kasir'),
             'phone' => '0888',
             'company_name' => '',
-            'role_id' => '2',
+            'role_id' => '3',
             'is_active' => '1',
         ]);
         $kasir->assignRole('kasir');

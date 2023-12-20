@@ -171,10 +171,10 @@ class ExpenseController extends Controller
         // if($cash_register_data)
         //     $data['cash_register_id'] = $cash_register_data->id;
         Expense::create([
-            'name' => $request->name,
+            // 'name' => $request->name,
             'qty' => $request->qty,
             'expense_category_id' => $request->expense_category_id,
-            'warehouse_id' => $request->warehouse_id,
+            'warehouse_id' => Auth::user()->warehouse_id,
             'amount' => $request->amount,
             'note' => $request->note,
             'user_id' => Auth::id()

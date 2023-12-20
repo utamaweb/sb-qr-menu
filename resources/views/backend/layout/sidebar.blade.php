@@ -13,7 +13,7 @@
       Pengeluaran</span></a>
       <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
         @if(auth()->user()->hasRole('Superadmin'))
-         <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">Kategori Pengeluaran</a>
+         <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">Nama Pengeluaran</a>
          </li>
          @endif
          <li id="exp-list-menu"><a href="{{route('expenses.index')}}">Daftar Pengeluaran</a></li>

@@ -27,11 +27,11 @@
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>Nama Pengeluaran</th>
+                    <th>Pengeluaran</th>
                     <th>Kuantitas</th>
                     <th>Total</th>
                     <th>Cabang</th>
-                    <th>Dibuat</th>
+                    <th>Dibuat | Waktu</th>
                     @if(auth()->user()->hasRole('Kasir'))
                     <th class="not-exported">{{trans('file.action')}}</th>
                     @endif
@@ -41,11 +41,11 @@
                 @foreach($expenses as $key=>$expense)
                 <tr data-id="{{$expense->id}}">
                     <td>{{$key}}</td>
-                    <td>{{ $expense->name }}</td>
+                    <td>{{ $expense->expenseCategory->name }}</td>
                     <td>{{ $expense->qty }}</td>
                     <td>{{ $expense->amount }}</td>
                     <td>{{ $expense->warehouse->name }}</td>
-                    <td>{{ $expense->user->name }}</td>
+                    <td>{{ $expense->user->name }} | {{$expense->created_at}}</td>
                     @if(auth()->user()->hasRole('Kasir'))
                     <td>
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
@@ -65,20 +65,8 @@
                                         <div class="row">
                                             <div class="col-md-6 form-group">
                                                 <label>Nama Pengeluaran *</label>
-                                                <input type="text" name="name" required class="form-control" value="{{$expense->name}}">
-                                            </div>
-                                            <div class="col-md-6 form-group">
-                                                <label>Kuantitas *</label>
-                                                <input type="text" name="qty" required class="form-control" value="{{$expense->qty}}">
-                                            </div>
-                                            <div class="col-md-6 form-group">
-                                                <label>Total *</label>
-                                                <input type="text" name="amount" required class="form-control" value="{{$expense->amount}}">
-                                            </div>
-                                            <div class="col-md-6 form-group">
-                                                <label>Kategori Pengeluaran *</label>
                                                 <select name="expense_category_id" class="selectpicker form-control" required
-                                                    data-live-search="true" data-live-search-style="begins" title="Pilih Kategori Pengeluaran...">
+                                                    data-live-search="true" data-live-search-style="begins" title="Pilih Pengeluaran...">
                                                     @foreach($lims_expense_category_list as $expense_category)
                                                     <option value="{{$expense_category->id}}" {{$expense->expense_category_id == $expense_category->id ? 'selected' : ''}}>
                                                         {{$expense_category->name}}
@@ -87,6 +75,15 @@
                                                 </select>
                                             </div>
                                             <div class="col-md-6 form-group">
+                                                <label>Kuantitas *</label>
+                                                <input type="number" name="qty" required class="form-control" value="{{$expense->qty}}">
+                                            </div>
+                                            <div class="col-md-6 form-group">
+                                                <label>Total *</label>
+                                                <input type="text" name="amount" required class="form-control" value="{{$expense->amount}}">
+                                            </div>
+
+                                            {{-- <div class="col-md-6 form-group">
                                                 <label>Cabang *</label>
                                                 <select name="warehouse_id" class="selectpicker form-control" required data-live-search="true"
                                                     data-live-search-style="begins" title="Pilih cabang...">
@@ -94,7 +91,7 @@
                                                     <option value="{{$warehouse->id}}" {{$expense->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{$warehouse->name}}</option>
                                                     @endforeach
                                                 </select>
-                                            </div>
+                                            </div> --}}
                                             <div class="col-md-6 form-group">
                                                 <label>Keterangan</label>
                                                 <input type="text" name="note" required class="form-control" value="{{$expense->note}}">
@@ -135,20 +132,8 @@
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Nama Pengeluaran *</label>
-                            <input type="text" name="name" required class="form-control">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Kuantitas *</label>
-                            <input type="text" name="qty" required class="form-control">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Total *</label>
-                            <input type="text" name="amount" required class="form-control">
-                        </div>
-                        <div class="col-md-6 form-group">
-                            <label>Kategori Pengeluaran *</label>
                             <select name="expense_category_id" class="selectpicker form-control" required
-                                data-live-search="true" data-live-search-style="begins" title="Pilih Kategori Pengeluaran...">
+                                data-live-search="true" data-live-search-style="begins" title="Pilih Pengeluaran...">
                                 @foreach($lims_expense_category_list as $expense_category)
                                 <option value="{{$expense_category->id}}">
                                     {{$expense_category->name}}
@@ -157,6 +142,14 @@
                             </select>
                         </div>
                         <div class="col-md-6 form-group">
+                            <label>Kuantitas *</label>
+                            <input type="number" name="qty" required class="form-control">
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <label>Total *</label>
+                            <input type="text" name="amount" required class="form-control">
+                        </div>
+                        {{-- <div class="col-md-6 form-group">
                             <label>Cabang *</label>
                             <select name="warehouse_id" class="selectpicker form-control" required data-live-search="true"
                                 data-live-search-style="begins" title="Pilih cabang...">
@@ -164,10 +157,14 @@
                                 <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                 @endforeach
                             </select>
-                        </div>
+                        </div> --}}
                         <div class="col-md-6 form-group">
                             <label>Keterangan</label>
                             <input type="text" name="note" required class="form-control">
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label>Tanggal</label>
+                            <input type="text" name="created_at" readonly class="form-control" value="{{\Carbon\Carbon::now()->format('d-m-Y')}}">
                         </div>
                     </div>
                         <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">

@@ -18,14 +18,14 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
 
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Kategori Pengeluaran</a>&nbsp;
+        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Nama Pengeluaran</a>&nbsp;
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>Nama Kategori Pengeluaran</th>
+                    <th>Nama Pengeluaran</th>
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
@@ -41,7 +41,7 @@
                             <div role="document" class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> Update Kategori Pengeluaran</h5>
+                                <h5 id="exampleModalLabel" class="modal-title"> Update Nama Pengeluaran</h5>
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
@@ -51,7 +51,7 @@
                                         @method('PUT')
                                         <div class="form-group">
                                         <div class="form-group">
-                                            <label>Nama Kategori Pengeluaran *</label>
+                                            <label>Nama Nama Pengeluaran *</label>
                                             <input type="text" value="{{$expense_category->name}}" name="name" required class="form-control">
                                         </div>
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
@@ -80,14 +80,14 @@
         <div class="modal-content">
             {!! Form::open(['route' => 'expense_categories.store', 'method' => 'post']) !!}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Tambah Kategori Pengeluaran</h5>
+                <h5 id="exampleModalLabel" class="modal-title">Tambah Nama Pengeluaran</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
                 <p class="italic"><small>{{trans('file.Inputan yang memiliki tanda (*) wajib diisi')}}.</small></p>
                 <form>
                     <div class="form-group">
-                        <label>Nama Kategori Pengeluaran *</label>
+                        <label>Nama Pengeluaran *</label>
                         <input type="text" name="name" required class="form-control">
                     </div>
                     <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">

@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Outlet;
+use App\Models\Warehouse;
 
 class OutletSeeder extends Seeder
 {
@@ -23,11 +23,11 @@ class OutletSeeder extends Seeder
         ];
 
         foreach ($outlets as $outlet) {
-            Outlet::create([
+            Warehouse::create([
                 'name'  =>  $outlet[0],
                 // 'logo'  =>  $outlet[1],
                 // 'description'  =>  $outlet[2],
-                'alamat'  =>  $outlet[1],
+                'address'  =>  $outlet[1],
                 'is_active'  =>  $outlet[2],
             ]);
         }

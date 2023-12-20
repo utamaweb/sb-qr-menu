@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Warehouse;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 use Keygen;
 use Auth;
 use DB;
@@ -27,7 +28,14 @@ class WarehouseController extends Controller
         ]);
         $input = $request->all();
         $input['is_active'] = true;
-        Warehouse::create($input);
+        $image = $request->image;
+        $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+        $uploadImage = $image->storeAs('public/outlet_logo', $imageName);
+        $warehouse = Warehouse::create([
+            'name' => $request->name,
+            'logo' => $imageName,
+            'address' => $request->address,
+        ]);
         $this->cacheForget('warehouse_list');
         return redirect('warehouse')->with('message', 'Data inserted successfully');
     }
@@ -45,7 +53,19 @@ class WarehouseController extends Controller
         ]);
         $input = $request->all();
         $lims_warehouse_data = Warehouse::find($id);
-        $lims_warehouse_data->update($input);
+        $image = $request->image;
+        if($image){
+            $this->fileDelete('storage/outlet_logo/', $lims_warehouse_data->logo);
+            $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+            $uploadImage = $image->storeAs('public/outlet_logo', $imageName);
+        } else {
+            $imageName = $lims_warehouse_data->logo;
+        }
+        $lims_warehouse_data->update([
+            'name' => $request->name,
+            'address' => $request->address,
+            'logo' => $imageName,
+        ]);
         $this->cacheForget('warehouse_list');
         return redirect('warehouse')->with('message', 'Data updated successfully');
     }

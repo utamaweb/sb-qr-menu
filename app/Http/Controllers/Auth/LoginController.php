@@ -71,7 +71,7 @@ class LoginController extends Controller
 
     public function login(Request $request)
     {
-
+        // return 1;
         $input = $request->all();
 
         $this->validate($request, [

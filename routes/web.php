@@ -122,13 +122,13 @@ Route::controller(ClientAutoUpdateController::class)->group(function () {
 Auth::routes();
 Route::get('/documentation', [HomeController::class, 'documentation']);
 
-Route::group(['middleware' => 'auth'], function() {
+Route::group(['middleware' => 'auth:web'], function() {
     Route::controller(HomeController::class)->group(function () {
         Route::get('home', 'home');
     });
 });
 
-Route::group(['middleware' => ['common', 'auth', 'active']], function() {
+Route::group(['middleware' => ['common', 'auth:web', 'active']], function() {
 
     Route::controller(HomeController::class)->group(function () {
         Route::get('/', 'index');

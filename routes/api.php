@@ -3,6 +3,7 @@
 use App\Http\Controllers\DemoAutoUpdateController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,6 +20,7 @@ Route::post('login', [AuthController::class, 'login']);
 
 Route::group(['middleware' => ['jwt.verify', 'auth:api']], function ($router) {
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::get('products', [ProductController::class, 'index']);
 
     Route::get('users', [UserController::class, 'show']);
     Route::get('users/{username}', [UserController::class, 'getUserByUsername']);
@@ -33,7 +35,6 @@ Route::group(['middleware' => ['jwt.verify', 'auth:api']], function ($router) {
 
     Route::post('transfers', [TransferController::class, 'store']);
 
-    Route::post('data_plans', [DataPlanController::class, 'store']);
 
     Route::get('transactions', [TransactionController::class, 'index']);
 

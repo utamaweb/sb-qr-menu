@@ -18,7 +18,7 @@ use App\Http\Controllers\Api\ProductController;
 
 Route::post('login', [AuthController::class, 'login']);
 
-Route::group(['middleware' => ['jwt.verify', 'auth:api']], function ($router) {
+Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::post('logout', [AuthController::class, 'logout']);
     Route::get('products', [ProductController::class, 'index']);
 

@@ -51,7 +51,7 @@
                             data-dismiss="alert" aria-label="Close"><span
                                 aria-hidden="true">&times;</span></button>{{ session()->get('delete_message') }}</div>
                     @endif
-                    <form method="POST" action="{{ route('login') }}" id="login-form">
+                    <form method="POST" action="{{ route('admin.auth.login') }}" id="login-form">
                         @csrf
                         <div class="form-group-material">
                             <input id="login-username" type="text" name="name" required class="input-material" value="" placeholder="Username">

@@ -15,11 +15,7 @@ class Authenticate extends Middleware
     protected function redirectTo($request)
     {
         if (! $request->expectsJson()) {
-            if (!$this->auth->guard('api')->check()) {
-                return response()->json(['error' => 'Unauthenticated.'], 401);
-            } else {
-                return route('login');
-            }
+            return route('admin.auth.index');
         }
     }
 }

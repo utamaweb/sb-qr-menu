@@ -21,7 +21,7 @@ class LoginController extends Controller
 
 
 
-    protected $redirectTo = '/dashboard';
+    protected $redirectTo = '/admin/dashboard';
 
     /**
 
@@ -84,7 +84,7 @@ class LoginController extends Controller
         if(auth()->attempt(array($fieldType => $input['name'], 'password' => $input['password'])))
         {
             setcookie('login_now', 1, time() + (86400 * 1), "/");
-            return redirect('/dashboard');
+            return redirect('/admin/dashboard');
         }
         else {
             return redirect()->route('login')->with('error','Username And Password Are Wrong.');

@@ -605,24 +605,6 @@
             $('body').removeClass('dark-mode');
             $('#switch-theme i').addClass('dripicons-brightness-max');
         }
-        $('#switch-theme').click(function() {
-            if(theme == 'light') {
-                theme = 'dark';
-                var url = <?php echo json_encode(route('switchTheme', 'dark')); ?>;
-                $('body').addClass('dark-mode');
-                $('#switch-theme i').addClass('dripicons-brightness-low');
-            }
-            else {
-                theme = 'light';
-                var url = <?php echo json_encode(route('switchTheme', 'light')); ?>;
-                $('body').removeClass('dark-mode');
-                $('#switch-theme i').addClass('dripicons-brightness-max');
-            }
-
-            $.get(url, function(data) {
-                console.log('theme changed to '+theme);
-            });
-        });
 
         $("li#notification-icon").on("click", function (argument) {
               $.get('notifications/mark-as-read', function(data) {

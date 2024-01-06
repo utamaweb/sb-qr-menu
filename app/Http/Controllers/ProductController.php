@@ -920,11 +920,10 @@ class ProductController extends Controller
                 $lims_product_data->variant_option = json_decode($lims_product_data->variant_option);
                 $lims_product_data->variant_value = json_decode($lims_product_data->variant_value);
             }
-            $lims_product_variant_data = $lims_product_data->variant()->orderBy('position')->get();
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $noOfVariantValue = 0;
             $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_product_variant_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields','ingredients','ingredientProducts'));
+            return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields','ingredients','ingredientProducts'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -975,52 +974,8 @@ class ProductController extends Controller
             // }
 
 
-            $old_product_variant_ids = ProductVariant::where('product_id', $request->input('id'))->pluck('id')->toArray();
             $new_product_variant_ids = [];
-            //dealing with product variant
-            if(isset($data['is_variant'])) {
-                if(isset($data['variant_option']) && isset($data['variant_value'])) {
-                    $data['variant_option'] = json_encode($data['variant_option']);
-                    $data['variant_value'] = json_encode($data['variant_value']);
-                }
-                foreach ($data['variant_name'] as $key => $variant_name) {
-                    $lims_variant_data = Variant::firstOrCreate(['name' => $data['variant_name'][$key]]);
-                    $lims_product_variant_data = ProductVariant::where([
-                                                    ['product_id', $lims_product_data->id],
-                                                    ['variant_id', $lims_variant_data->id]
-                                                ])->first();
-                    if($lims_product_variant_data) {
-                        $lims_product_variant_data->update([
-                            'position' => $key+1,
-                            'item_code' => $data['item_code'][$key],
-                            'additional_cost' => $data['additional_cost'][$key],
-                            'additional_price' => $data['additional_price'][$key]
-                        ]);
-                    }
-                    else {
-                        $lims_product_variant_data = new ProductVariant();
-                        $lims_product_variant_data->product_id = $lims_product_data->id;
-                        $lims_product_variant_data->variant_id = $lims_variant_data->id;
-                        $lims_product_variant_data->position = $key + 1;
-                        $lims_product_variant_data->item_code = $data['item_code'][$key];
-                        $lims_product_variant_data->additional_cost = $data['additional_cost'][$key];
-                        $lims_product_variant_data->additional_price = $data['additional_price'][$key];
-                        $lims_product_variant_data->qty = 0;
-                        $lims_product_variant_data->save();
-                    }
-                    $new_product_variant_ids[] = $lims_product_variant_data->id;
-                }
-            }
-            else {
-                $data['is_variant'] = null;
-                $data['variant_option'] = null;
-                $data['variant_value'] = null;
-            }
             //deleting old product variant if not exist
-            foreach ($old_product_variant_ids as $key => $product_variant_id) {
-                if (!in_array($product_variant_id, $new_product_variant_ids))
-                    ProductVariant::find($product_variant_id)->delete();
-            }
             if(isset($data['is_diffPrice'])) {
                 foreach ($data['diff_price'] as $key => $diff_price) {
                     if($diff_price) {
@@ -1080,7 +1035,7 @@ class ProductController extends Controller
             $this->cacheForget('product_list');
             $this->cacheForget('product_list_with_variant');
             // \Session::flash('edit_message', 'Product updated successfully');
-            return redirect('products')->with('message', 'Data updated successfully');
+            return redirect('admin/products')->with('message', 'Data updated successfully');
     }
 
     public function generateCode()

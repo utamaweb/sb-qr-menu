@@ -271,7 +271,7 @@
          <li id="category-menu"><a href="{{route('category.index')}}">Kategori</a></li>
          @endif
          @if($index_permission_active)
-         <li id="product-list-menu"><a href="{{route('products.index')}}">{{__('file.product_list')}}</a>
+         <li id="product-list-menu"><a href="{{route('products.index')}}">Daftar Produk</a>
          </li>
          @endif
          {{-- @if($print_barcode_active)

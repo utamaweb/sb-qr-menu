@@ -1182,7 +1182,8 @@ class SaleController extends Controller
                 return Warehouse::where('is_active', true)->get();
             });
             $lims_biller_list = Cache::remember('biller_list', 60*60*24*30, function () {
-                return Biller::where('is_active', true)->get();
+                // return Biller::where('is_active', true)->get();
+                return User::where('role_id', 3)->get();
             });
             // $lims_reward_point_setting_data = RewardPointSetting::latest()->first();
             $lims_tax_list = Cache::remember('tax_list', 60*60*24*30, function () {

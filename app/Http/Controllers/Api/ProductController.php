@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Str;
 
 class ProductController extends Controller
 {
@@ -22,11 +25,14 @@ class ProductController extends Controller
         // return $data;
 
         $validator = Validator::make($data, [
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'tag' => 'required',
-            'ingredient' => 'required',
-            'thumbnail' => 'file|image|mimes:jpeg,png,jpg|max:8012',
+            'type' => 'required|string',
+            'name' => 'required|string',
+            'code' => 'required',
+            'category_id' => 'required',
+            'unit_id' => 'required',
+            'image' => 'file|image|mimes:jpeg,png,jpg|max:8012',
+            'price' => 'required',
+            'product_details' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -36,29 +42,30 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            $post = Post::create([
-                'title' => $request->title,
-                'slug' => Str::slug($request->title),
-                'content' => $request->content,
-                // 'thumbnail' => $thumbnail,
-                'user_id' => auth()->user()->id,
+            $product = Product::create([
+                'type' => $request->type,
+                'name' => $request->name,
+                'slug' => Str::slug($request->name),
+                'code' => $request->code,
+                'category_id' => $request->category_id,
+                'unit_id' => $request->unit_id,
+                'image' => $request->image,
+                'price' => $request->price,
+                'product_details' => $request->product_details,
             ]);
-            if (isset($request->tag)) {
-                $this->handleTags($request, $post);
+            if (isset($request->ingredients)) {
+                $product->ingredient()->sync($request->ingredients);
             }
-            if (isset($request->ingredient)) {
-                $this->handleIngredients($request, $post);
-            }
-            $thumbnail = "https://storage.googleapis.com/ecocrafters_bucket/post_thumbnail/default-image.png";
-            if ($request->thumbnail){
-                $thumbnail = $request->hasFile('thumbnail') ? $this->uploadFile($request->file('thumbnail'), 'post_thumbnail', $post->id . "-" . Str::slug($request->title)) : null;
-                // $data['thumbnail'] = $link;
-            }
-            $post->update([
-                'thumbnail' => $thumbnail,
-            ]);
+            // $thumbnail = "https://storage.googleapis.com/ecocrafters_bucket/post_thumbnail/default-image.png";
+            // if ($request->thumbnail){
+            //     $thumbnail = $request->hasFile('thumbnail') ? $this->uploadFile($request->file('thumbnail'), 'post_thumbnail', $post->id . "-" . Str::slug($request->title)) : null;
+            //     // $data['thumbnail'] = $link;
+            // }
+            // $product->update([
+            //     'thumbnail' => $thumbnail,
+            // ]);
             DB::commit();
-            return response()->json($post, 200);
+            return response()->json($product, 200);
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json(['message' => $th->getMessage()], 500);
@@ -168,19 +175,13 @@ class ProductController extends Controller
         return response()->json(['message' => 'Post Succesfully Deleted.'], 200);
     }
 
-    public function savePost(Request $request, $id)
-    {
-        $post = Post::find($id);
-        $user = auth()->user()->id;
-        $check = UserSavePost::wherePostId($id)->whereUserId($user)->exists();
-        if ($check == False){
-            UserSavePost::create([
-                'user_id' => $user,
-                'post_id' => $id,
-            ]);
-        } else {
-            return response()->json(['message' => 'Post Already Saved Before.'], 500);
+    public function handleIngredients(Request $request, Product $product){
+        // $tagsNames = $request->get('tags');
+        $ingredientsNames = explode(',', $request->get('ingredient'));
+        foreach($ingredientsNames as $ingredientName){
+            Ingredient::firstOrCreate(['name' => $ingredientName])->save();
         }
-        return response()->json(['message' => 'Post Succesfully Saved.'], 200);
+        $ingredients = Ingredient::whereIn('name', $ingredientsNames)->get();
+        $post->ingredient()->sync($ingredients);
     }
 }

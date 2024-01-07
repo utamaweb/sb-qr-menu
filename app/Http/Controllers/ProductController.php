@@ -331,7 +331,6 @@ class ProductController extends Controller
         $image = $request->image;
         $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
         $uploadImage = $image->storeAs('public/product_images', $imageName);
-
         // $lims_product_data = Product::create($data);
         $productInsert = Product::create([
             'type' => $request->type,

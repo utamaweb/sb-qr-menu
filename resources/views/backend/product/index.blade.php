@@ -254,7 +254,6 @@
                 text: '<i title="delete" class="dripicons-cross"></i>',
                 className: 'buttons-delete',
                 action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
                         ingredient_id.length = 0;
                         $(':checkbox:checked').each(function(i){
                             if(i){
@@ -276,9 +275,6 @@
                         }
                         else if(!ingredient_id.length)
                             alert('No unit is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
                 }
             },
             {

@@ -23,8 +23,6 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-        // return $data;
-
         $validator = Validator::make($data, [
             'type' => 'required|string',
             'name' => 'required|string',
@@ -43,8 +41,9 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
+            $image = $request->image;
             $imageName = 'default-img.png';
-            if($image){
+            if($request->image){
                 $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
                 $uploadImage = $image->storeAs('public/product_images', $imageName);
             }
@@ -55,7 +54,7 @@ class ProductController extends Controller
                 'code' => $request->code,
                 'category_id' => $request->category_id,
                 'unit_id' => $request->unit_id,
-                'image' => $request->image,
+                'image' => $imageName,
                 'price' => $request->price,
                 'product_details' => $request->product_details,
             ]);
@@ -94,12 +93,15 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $data = $request->all();
-        // return $data;
-
         $validator = Validator::make($data, [
-            'title' => 'required|string',
-            'content' => 'required|string',
-            'thumbnail' => 'file|image|mimes:jpeg,png,jpg|max:8012',
+            'type' => 'required|string',
+            'name' => 'required|string',
+            'code' => 'required',
+            'category_id' => 'required',
+            'unit_id' => 'required',
+            'image' => 'file|image|mimes:jpeg,png,jpg|max:8012',
+            'price' => 'required',
+            'product_details' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -109,28 +111,30 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
-            $post = Post::find($id);
-            if ($request->thumbnail && $post->thumbnail != "https://storage.googleapis.com/ecocrafters_bucket/post_thumbnail/default-image.png"){
-                $this->deleteFile($post->thumbnail);
-                $thumbnail = $request->hasFile('thumbnail') ? $this->uploadFile($request->file('thumbnail'), 'post_thumbnail', $post->id . "-" . Str::slug($request->title)) : null;
-                $post->thumbnail = $thumbnail;
-            } else {
-                $thumbnail = $request->hasFile('thumbnail') ? $this->uploadFile($request->file('thumbnail'), 'post_thumbnail', $post->id . "-" . Str::slug($request->title)) : null;
-                $post->thumbnail = $thumbnail;
+            $image = $request->image;
+            $productFind = Product::findOrFail($id);
+            $imageName = 'default-img.png';
+            if($image){
+                $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+                $uploadImage = $image->storeAs('public/product_images', $imageName);
             }
-            $post->title = $request->title;
-            $post->content = $request->content;
-            $post->slug = Str::slug($request->title);
-            // $data = $request->only('title', 'content', 'thumbnail');
-            $post->update();
-            if (isset($request->tag)) {
-                $this->handleTags($request, $post);
-            }
-            if (isset($request->ingredient)) {
-                $this->handleIngredients($request, $post);
+            $product = Product::findOrFail($id);
+            $product->update([
+                'type' => $request->type,
+                'name' => $request->name,
+                'slug' => Str::slug($request->name),
+                'code' => $request->code,
+                'category_id' => $request->category_id,
+                'unit_id' => $request->unit_id,
+                'image' => $imageName,
+                'price' => $request->price,
+                'product_details' => $request->product_details,
+            ]);
+            if (isset($request->ingredients)) {
+                $product->ingredient()->sync($request->ingredients);
             }
             DB::commit();
-            return response()->json($post, 200);
+            return response()->json($product, 200);
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json(['message' => $th->getMessage()], 500);

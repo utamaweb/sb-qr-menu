@@ -17,11 +17,11 @@ use App\Http\Controllers\Api\ProductController;
 */
 
 Route::post('login', [AuthController::class, 'login']);
+Route::get('products', [ProductController::class, 'index']);
 
 Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::post('logout', [AuthController::class, 'logout']);
     // Products CRUD API
-    Route::get('products', [ProductController::class, 'index']);
     Route::post('products', [ProductController::class, 'store']);
     Route::get('products/{id}', [ProductController::class, 'detail']);
     Route::put('products/{id}', [ProductController::class, 'update']);

@@ -8,6 +8,7 @@ use App\Models\Product;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Str;
+use Storage;
 
 class ProductController extends Controller
 {
@@ -42,6 +43,11 @@ class ProductController extends Controller
         DB::beginTransaction();
 
         try {
+            $imageName = 'default-img.png';
+            if($image){
+                $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+                $uploadImage = $image->storeAs('public/product_images', $imageName);
+            }
             $product = Product::create([
                 'type' => $request->type,
                 'name' => $request->name,
@@ -56,14 +62,6 @@ class ProductController extends Controller
             if (isset($request->ingredients)) {
                 $product->ingredient()->sync($request->ingredients);
             }
-            // $thumbnail = "https://storage.googleapis.com/ecocrafters_bucket/post_thumbnail/default-image.png";
-            // if ($request->thumbnail){
-            //     $thumbnail = $request->hasFile('thumbnail') ? $this->uploadFile($request->file('thumbnail'), 'post_thumbnail', $post->id . "-" . Str::slug($request->title)) : null;
-            //     // $data['thumbnail'] = $link;
-            // }
-            // $product->update([
-            //     'thumbnail' => $thumbnail,
-            // ]);
             DB::commit();
             return response()->json($product, 200);
         } catch (\Throwable $th) {
@@ -91,27 +89,6 @@ class ProductController extends Controller
             return $item;
         });
         return response()->json($posts, 200);
-    }
-
-    public function getAllPosts(Request $request)
-    {
-        $posts = Post::with('user')->get();
-        $posts->map(function ($item) {
-            $item['user']['avatar_url'] = $item['user']['avatar'] ? "https://storage.googleapis.com/ecocrafters_bucket/".$item['user']['avatar'] : "https://storage.googleapis.com/ecocrafters-api.appspot.com/avatar.png";
-
-            return $item;
-        });
-        return response()->json($posts, 200);
-    }
-
-    public function searchPostOrUser(Request $request, $search)
-    {
-        $result['posts'] = Post::where('title', 'LIKE', '%'.$search.'%')->get();
-        $result['users'] = User::where('full_name', 'LIKE', '%'.$search.'%')->get();
-        if ($result['posts']->count() < 1 && $result['users']->count() < 1) {
-            return response()->json(['message' => 'Posts & Users Are Not Available..'], 404);
-        }
-        return response()->json($result, 200);
     }
 
     public function update(Request $request, $id)
@@ -165,14 +142,14 @@ class ProductController extends Controller
         Storage::disk('gcs')->delete($path);
     }
 
-    public function delete(Request $request, $id)
+    public function destroy(Request $request, $id)
     {
-        $post = Post::find($id);
-        if ($post->thumbnail != "https://storage.googleapis.com/ecocrafters_bucket/post_thumbnail/default-image.png") {
-            Storage::disk('gcs')->delete($post->thumbnail);
+        $product = Product::find($id);
+        if ($product->image != "default-image.png") {
+            Storage::delete('public/product_images/' . $product->image);
         }
-        $post->delete();
-        return response()->json(['message' => 'Post Succesfully Deleted.'], 200);
+        $product->delete();
+        return response()->json(['message' => 'Product Succesfully Deleted.'], 200);
     }
 
     public function handleIngredients(Request $request, Product $product){

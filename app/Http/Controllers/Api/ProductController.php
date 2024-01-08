@@ -113,8 +113,9 @@ class ProductController extends Controller
         try {
             $image = $request->image;
             $productFind = Product::findOrFail($id);
-            $imageName = 'default-img.png';
+            $imageName = $productFind->image;
             if($image){
+                Storage::delete('public/product_images/' . $productFind->image);
                 $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
                 $uploadImage = $image->storeAs('public/product_images', $imageName);
             }

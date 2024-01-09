@@ -18,82 +18,33 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
 
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>&nbsp;
+        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Stock Opname</a>&nbsp;
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>Nama Bahan Baku</th>
-                    <th>Stok Akhir</th>
-                    <th>Unit</th>
-                    <th>Stok Indikator</th>
+                    <th>Nama Stock Opname</th>
+                    <th>Dibuat</th>
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($lims_ingredient_all as $key=>$ingredient)
-                <tr data-id="{{$ingredient->id}}">
+                @foreach($stockOpnames as $key=>$stockOpname)
+                <tr data-id="{{$stockOpname->id}}">
                     <td>{{$key}}</td>
-                    <td>{{ $ingredient->name }}</td>
-                    <td>{{ $ingredient->last_stock }}</td>
-                    <td>{{ $ingredient->unit->unit_name }}</td>
-                    <td>-</td>
+                    <td>{{ $stockOpname->name }}</td>
+                    <td>{{ $stockOpname->created_at}}</td>
                     <td>
                         <div class="row">
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
-                        {{-- Edit Modal --}}
-                        <div id="editModal-{{$ingredient->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                            <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Update Bahan Baku')}}</h5>
-                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                </div>
-                                <div class="modal-body">
-                                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                                    <form action="{{route('ingredient.update', $ingredient->id)}}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="form-group">
-                                        <div class="form-group">
-                                            <label>Nama Bahan Baku *</label>
-                                            <input type="text" value="{{$ingredient->name}}" name="name" required class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Unit *</label>
-                                            <select name="unit_id" id="" class="form-control">
-                                                <option value="---Pilih Unit---"></option>
-                                                @foreach($units as $unit)
-                                                <option value="{{$unit->id}}" {{$ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="row">
-                                            <div class="form-group col-md-6">
-                                                <label>Stok Awal *</label>
-                                                <input type="number" value="{{$ingredient->first_stock}}" name="first_stock" required class="form-control">
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label>Batas Stok Maksimum *</label>
-                                                <input type="number" value="{{$ingredient->max_stock}}" name="max_stock" required class="form-control">
-                                            </div>
-                                        </div>
-                                        {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
-                                        </div>
-                                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-                                    </form>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-
-                        {{ Form::open(['route' => ['ingredient.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
+                        <a href="{{route('stock-opname.show', $stockOpname->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
+                        {{-- <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$stockOpname->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button> --}}
+                        {{ Form::open(['route' => ['stock-opname.destroy', $stockOpname->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                 {{ Form::close() }}
+                            </div>
                     </td>
-                </div>
                 </tr>
                 @endforeach
             </tbody>
@@ -102,79 +53,44 @@
 </section>
 
 
-<!-- Create Modal -->
+<!-- Stock Opname Modal -->
 <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {!! Form::open(['route' => 'ingredient.store', 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'stock-opname.store', 'method' => 'post']) !!}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Tambah Bahan Baku</h5>
+                <h5 id="exampleModalLabel" class="modal-title">Stock Opname</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>Inputan yang memiliki tanda (*) wajib diisi</small></p>
                 <form>
                     <div class="form-group">
-                        <label>Nama Bahan Baku *</label>
-                        <input type="text" name="name" required class="form-control">
+                        <label for="name">Nama Stock Opname</label>
+                        <input type="text" name="name" class="form-control">
                     </div>
-                    <div class="form-group">
-                        <label>Unit *</label>
-                        <select name="unit_id" id="" class="form-control">
-                            <option value="---Pilih Unit---"></option>
-                            @foreach($units as $unit)
-                            <option value="{{$unit->id}}">{{$unit->unit_name}} ({{$unit->unit_code}})</option>
-                            @endforeach
-                        </select>
+                        <div class="row">
+                        <div class="form-group col-md-6">Bahan Baku</div>
+                        <div class="form-group col-md-6">Kuantitas</div>
                     </div>
+                    <hr>
+                    @foreach($ingredients as $ingredient)
                     <div class="row">
                         <div class="form-group col-md-6">
-                            <label>Stok Awal *</label>
-                            <input type="number" name="first_stock" required class="form-control">
+                            {{$ingredient->name}}
+                            <input type="hidden" name="ingredient_id[]" value="{{$ingredient->id}}">
                         </div>
                         <div class="form-group col-md-6">
-                            <label>Batas Stok Maksimum *</label>
-                            <input type="number" name="max_stock" required class="form-control">
+                            <input type="number" class="form-control" name="qty[]" value="{{$ingredient->last_stock}}">
                         </div>
                     </div>
+                    @endforeach
+
                     <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
             </form>
         </div>
         {{ Form::close() }}
     </div>
 </div>
-</div>
-
-<div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => 'ingredient.import', 'method' => 'post', 'files' => true]) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-            <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-            <p>{{trans('file.The correct column order is')}} (name*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{trans('file.Upload CSV File')}} *</label>
-                        {{Form::file('file', array('class' => 'form-control','required'))}}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label> {{trans('file.Sample File')}}</label>
-                        <a href="sample_file/ingredient.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
-                    </div>
-                </div>
-            </div>
-            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-        </div>
-        {{ Form::close() }}
-      </div>
-    </div>
 </div>
 
 @endsection

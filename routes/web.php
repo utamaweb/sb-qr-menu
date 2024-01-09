@@ -40,6 +40,7 @@ use App\Http\Controllers\CourierController;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MoneyTransferController;
 use App\Http\Controllers\NotificationController;
@@ -233,6 +234,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('ingredient/ingredient-data', 'ingredientData');
         });
         Route::resource('ingredient', IngredientController::class);
+        Route::resource('stock-opname', StockOpnameController::class);
+        Route::put('stock-opname-detail/{id}', [StockOpnameController::class,'updateDetail'])->name('updateDetailStockOpname');
         Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 
 

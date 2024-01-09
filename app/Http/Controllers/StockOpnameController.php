@@ -37,7 +37,11 @@ class StockOpnameController extends Controller
                 'ingredient_id' => $request->ingredient_id[$item],
                 'qty' => $request->qty[$item],
             );
+            $data2 = array(
+                'last_stock' => $request->qty[$item]
+            );
             StockOpnameDetail::create($data);
+            Ingredient::find($request->ingredient_id[$item])->update($data2);
         }
         return redirect()->route('stock-opname.index')->with('message', 'Data berhasil ditambahkan');
     }
@@ -46,23 +50,6 @@ class StockOpnameController extends Controller
         $stockOpname = StockOpname::find($id);
         $stockOpnameDetails = StockOpnameDetail::whereStockOpnameId($id)->get();
         return view('backend.stock_opname.show', compact('stockOpname','stockOpnameDetails'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $this->validate($request, [
-            'shift_name' => 'required|max:255',
-            'shift_hour' => 'required',
-        ]);
-        $shift = Shift::find($id);
-        $shift->update([
-            'shift_name' => $request->shift_name,
-            'shift_hour' => $request->shift_hour,
-            'warehouse_id' => $request->warehouse_id,
-            'initial_shift_money' => $request->initial_shift_money,
-        ]);
-        // $this->cacheForget('ingredient_list');
-        return redirect()->route('shift.index')->with('message', 'Data berhasil diubah');
     }
 
     public function updateDetail(Request $request, $id)

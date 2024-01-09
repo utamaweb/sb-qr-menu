@@ -295,10 +295,10 @@ class PermissionSeeder extends Seeder
             $name = strtolower($permission['name']);
 
             Permission::insert([
-                ["name" => $name, "guard_name" => "web"],
-                ["name" => $name, "guard_name" => "web"],
-                ["name" => $name, "guard_name" => "web"],
-                ["name" => $name, "guard_name" => "web"],
+                ["name" => $name, "guard_name" => "api"],
+                ["name" => $name, "guard_name" => "api"],
+                ["name" => $name, "guard_name" => "api"],
+                ["name" => $name, "guard_name" => "api"],
             ]);
         }
 

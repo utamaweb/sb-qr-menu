@@ -364,6 +364,7 @@
          @if($warehouse_permission_active)
         <li id="warehouse-menu"><a href="{{route('warehouse.index')}}">Cabang</a></li>
         @endif
+        <li id="shift-menu"><a href="{{route('shift.index')}}">Shift</a></li>
         {{-- <li id="table-menu"><a href="{{route('tables.index')}}">Meja</a></li>
          @if($customer_index_permission_active)
          <li id="customer-list-menu"><a href="{{route('customer.index')}}">Customer</a></li>

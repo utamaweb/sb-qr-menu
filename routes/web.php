@@ -58,6 +58,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TableController;
 use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TransferController;
+use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
@@ -233,6 +234,14 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::resource('ingredient', IngredientController::class);
         Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
+
+
+        Route::controller(ShiftController::class)->group(function () {
+            Route::post('shift/import', 'import')->name('shift.import');
+            Route::post('shift/deletebyselection', 'deleteBySelection');
+            Route::post('shift/shift-data', 'shiftData');
+        });
+        Route::resource('shift', ShiftController::class);
 
 
         Route::resource('tables', TableController::class);

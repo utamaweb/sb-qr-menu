@@ -18,7 +18,6 @@ class IngredientController extends Controller
     {
         $lims_ingredient_all = Ingredient::get();
         $units = Unit::get();
-        // $numberOfIngredient = Ingredient::where('is_active', true)->count();
         return view('backend.ingredient.create', compact('lims_ingredient_all', 'units'));
     }
 
@@ -27,15 +26,15 @@ class IngredientController extends Controller
         $this->validate($request, [
             'name' => 'max:255',
         ]);
-        // $input = $request->all();
         Ingredient::create([
             'name' => $request->name,
+            'max_stock' => $request->max_stock,
             'first_stock' => $request->first_stock,
             'stock_in' => $request->first_stock,
             'unit_id' => $request->unit_id,
         ]);
         $this->cacheForget('ingredient_list');
-        return redirect('ingredient')->with('message', 'Data inserted successfully');
+        return redirect()->route('ingredient.index')->with('message', 'Data berhasil ditambahkan');
     }
 
     public function edit($id)

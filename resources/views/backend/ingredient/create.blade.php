@@ -97,15 +97,11 @@
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>{{trans('file.Inputan yang memiliki tanda (*) wajib diisi')}}.</small></p>
+                <p class="italic"><small>Inputan yang memiliki tanda (*) wajib diisi</small></p>
                 <form>
                     <div class="form-group">
                         <label>Nama Bahan Baku *</label>
                         <input type="text" name="name" required class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Stok Awal *</label>
-                        <input type="number" name="first_stock" required class="form-control">
                     </div>
                     <div class="form-group">
                         <label>Unit *</label>
@@ -115,6 +111,16 @@
                             <option value="{{$unit->id}}">{{$unit->unit_name}} ({{$unit->unit_code}})</option>
                             @endforeach
                         </select>
+                    </div>
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Stok Awal *</label>
+                            <input type="number" name="first_stock" required class="form-control">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Batas Stok Maksimum *</label>
+                            <input type="number" name="max_stock" required class="form-control">
+                        </div>
                     </div>
                     <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
             </form>

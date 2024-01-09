@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ingredient extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'first_stock', 'stock_in', 'stock_used', 'adjustment', 'last_stock', 'unit_id'];
+    protected $fillable = ['name', 'first_stock', 'stock_in', 'stock_used', 'adjustment', 'last_stock', 'unit_id','max_stock'];
 
     public function unit()
     {

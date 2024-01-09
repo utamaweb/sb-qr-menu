@@ -26,6 +26,9 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th>Nama Bahan Baku</th>
+                    <th>Stok Akhir</th>
+                    <th>Unit</th>
+                    <th>Stok Indikator</th>
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
@@ -34,6 +37,9 @@
                 <tr data-id="{{$ingredient->id}}">
                     <td>{{$key}}</td>
                     <td>{{ $ingredient->name }}</td>
+                    <td>{{ $ingredient->last_stock }}</td>
+                    <td>{{ $ingredient->unit->unit_name }}</td>
+                    <td>-</td>
                     <td>
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
                         {{-- Edit Modal --}}

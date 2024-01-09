@@ -55,10 +55,6 @@
                                             <input type="text" value="{{$ingredient->name}}" name="name" required class="form-control">
                                         </div>
                                         <div class="form-group">
-                                            <label>Stok Awal *</label>
-                                            <input type="number" value="{{$ingredient->first_stock}}" name="first_stock" required class="form-control">
-                                        </div>
-                                        <div class="form-group">
                                             <label>Unit *</label>
                                             <select name="unit_id" id="" class="form-control">
                                                 <option value="---Pilih Unit---"></option>
@@ -66,6 +62,16 @@
                                                 <option value="{{$unit->id}}" {{$ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
                                                 @endforeach
                                             </select>
+                                        </div>
+                                        <div class="row">
+                                            <div class="form-group col-md-6">
+                                                <label>Stok Awal *</label>
+                                                <input type="number" value="{{$ingredient->first_stock}}" name="first_stock" required class="form-control">
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label>Batas Stok Maksimum *</label>
+                                                <input type="number" value="{{$ingredient->max_stock}}" name="max_stock" required class="form-control">
+                                            </div>
                                         </div>
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
                                         </div>

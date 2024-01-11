@@ -17,13 +17,13 @@ class ExpenseController extends Controller
 {
     public function index(Request $request)
     {
-        $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('expenses-index')){
-            $permissions = Role::findByName($role->name)->permissions;
-            foreach ($permissions as $permission)
-                $all_permission[] = $permission->name;
-            if(empty($all_permission))
-                $all_permission[] = 'dummy text';
+        // $role = Role::find(Auth::user()->role_id);
+        // if($role->hasPermissionTo('expenses-index')){
+            // $permissions = Role::findByName($role->name)->permissions;
+            // foreach ($permissions as $permission)
+            //     $all_permission[] = $permission->name;
+            // if(empty($all_permission))
+            //     $all_permission[] = 'dummy text';
 
             if($request->starting_date) {
                 $starting_date = $request->starting_date;
@@ -42,10 +42,10 @@ class ExpenseController extends Controller
             $expenses = Expense::get();
             $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
             // $lims_account_list = Account::where('is_active', true)->get();
-            return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list', 'all_permission', 'starting_date', 'ending_date', 'warehouse_id'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+            return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list', 'starting_date', 'ending_date', 'warehouse_id'));
+        // }
+        // else
+        //     return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
     public function expenseData(Request $request)

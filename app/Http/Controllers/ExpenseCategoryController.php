@@ -35,7 +35,7 @@ class ExpenseCategoryController extends Controller
 
         $data = $request->all();
         ExpenseCategory::create($data);
-        return redirect('expense_categories')->with('message', 'Data inserted successfully');
+        return redirect()->back()->with('message', 'Data inserted successfully');
     }
 
     public function show($id)

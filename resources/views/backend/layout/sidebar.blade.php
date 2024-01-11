@@ -9,8 +9,7 @@
       ?>
    @if($index_permission_active)
    <li>
-      <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya
-      Pengeluaran</span></a>
+      <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
       <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
         @if(auth()->user()->hasRole('Superadmin'))
          <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">Nama Pengeluaran</a>
@@ -300,7 +299,8 @@
    @endif --}}
     <li id="order-type"><a href="{{route('order_type.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
     <li id="ingredient"><a  href="{{route('ingredient.index')}}"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
-    <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stock Opname</span></a></li>
+    <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stok Opname</span></a></li>
+    <li id="stock-opname"><a  href="{{route('stock-purchase.index')}}"> <i class="dripicons-view-thumb"></i><span>Pembelian Stok</span></a></li>
     {{-- <li>
         <a href="#bahan-baku" aria-expanded="false" data-toggle="collapse"> <i
                 class="dripicons-list"></i><span>Bahan Baku</span><span></a>

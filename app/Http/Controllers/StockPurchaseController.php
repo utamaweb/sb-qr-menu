@@ -52,9 +52,10 @@ class StockPurchaseController extends Controller
                 'qty' => $request->qty[$item],
                 'notes' => $request->notes[$item],
             );
+            $qtyToInt = (int)$request->qty[$item];
             $ingredient = Ingredient::find($request->ingredient_id[$item]);
             $data2 = array(
-                'last_stock' => $ingredient->qty + $request->qty[$item],
+                'last_stock' => $ingredient->last_stock + $qtyToInt,
             );
             StockPurchaseIngredient::create($data);
             Ingredient::find($request->ingredient_id[$item])->update($data2);

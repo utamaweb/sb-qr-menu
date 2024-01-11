@@ -23,15 +23,8 @@
                                     <div class="form-group">
                                         <label>Cabang *</strong> </label>
                                         <div class="input-group">
-                                            <select name="warehouse_id" required class="form-control selectpicker" id="warehouse_id">
-                                                <option value="">Pilih Cabang</option>
-                                                @foreach($warehouses as $warehouse)
-                                                @if($roleName == 'Superadmin')
-                                                <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
-                                                @else
-                                                <option value="{{$warehouse->id}}" {{auth()->user()->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{$warehouse->name}}</option>
-                                                @endif
-                                                @endforeach
+                                            <select name="warehouse_id" required class="form-control selectpicker" disabled id="warehouse_id">
+                                                <option value="">{{$stockPurchase->warehouse->name}}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -53,7 +46,7 @@
                                     <label for="example-text-input" class="col-md-2 col-form-label">Bahan Baku</label>
 
                                     <div class="col-md-4">
-                                        <select name="ingredient_id[]" required class="form-control">
+                                        <select name="ingredient_id[]" required class="form-control" disabled>
                                             <option value="">Pilih Bahan Baku</option>
                                             @foreach($ingredients as $ingredient)
                                             <option value="{{$ingredient->id}}" {{$stockPurchaseDetail->ingredient_id == $ingredient->id ? 'selected' :''}}>{{$ingredient->name}}</option>
@@ -65,10 +58,6 @@
                                     </div>
                                     <div class="col-md-2">
                                         <input type="text" placeholder="Catatan" disabled value="{{$stockPurchaseDetail->notes}}" name="notes[]" class="form-control">
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <a href="javascript:void(0);" class="addCF btn btn-warning" id="add_more"><i class="fa fa-plus"></i></a>
                                     </div>
                                 </div>
                             </div>

@@ -9,54 +9,66 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>Detail Stok Opname</h4>
+                        <h4>Detail Stok Purchase</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
                             {{-- <small>Label yang bertanda (*) wajib diisi.</small> --}}
                         </p>
-                        <form action="{{route('stock-opname.store')}}" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('stock-purchase.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
-                                <div class="col-12">
-                                    <div class="form-group">
-                                        <label>Nama Stok Opname</strong> </label>
-                                        <input type="text" name="name" class="form-control" id="name"
-                                        aria-describedby="name" value="{{$stockOpname->name}}" required>
-                                    </div>
-                                </div>
 
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label>Cabang *</strong> </label>
                                         <div class="input-group">
-                                            <select name="warehouse_id" required disbaled class="form-control selectpicker" id="warehouse_id">
-                                                <option>{{$stockOpname->warehouse->name}}</option>
+                                            <select name="warehouse_id" required class="form-control selectpicker" id="warehouse_id">
+                                                <option value="">Pilih Cabang</option>
+                                                @foreach($warehouses as $warehouse)
+                                                @if($roleName == 'Superadmin')
+                                                <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                                @else
+                                                <option value="{{$warehouse->id}}" {{auth()->user()->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                                @endif
+                                                @endforeach
                                             </select>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="col-md-12">
+                                <div class="col-12">
                                     <div class="form-group">
-                                        <label for="notes">Catatan</strong> </label>
-                                        <input type="text" name="notes" disabled value="{{$stockOpname->notes}}" class="form-control" id="notes" aria-describedby="notes" required>
+                                        <label>Tanggal *</strong> </label>
+                                        <div class="input-group">
+                                            <input type="text" readonly value="{{$dateNow}}" name="date" class="form-control">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            @foreach($stockOpnameDetails as $stockOpnameDetail)
+                            @foreach($stockPurchaseDetails as $stockPurchaseDetail)
                             <div id="add_new" class="margin">
                                 <div class="form-group row">
                                     <label for="example-text-input" class="col-md-2 col-form-label">Bahan Baku</label>
 
-                                    <div class="col-md-6">
-                                        <select name="ingredient_id[]" required class="form-control" disabled>
-                                            <option value="">{{$stockOpnameDetail->ingredient->name}}</option>
+                                    <div class="col-md-4">
+                                        <select name="ingredient_id[]" required class="form-control">
+                                            <option value="">Pilih Bahan Baku</option>
+                                            @foreach($ingredients as $ingredient)
+                                            <option value="{{$ingredient->id}}" {{$stockPurchaseDetail->ingredient_id == $ingredient->id ? 'selected' :''}}>{{$ingredient->name}}</option>
+                                            @endforeach
                                         </select>
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" name="qty[]" class="form-control" placeholder="Stok Aktual" disabled value="{{$stockOpnameDetail->qty}}">
+                                        <input type="number" placeholder="Jumlah" name="qty[]" class="form-control" value="{{$stockPurchaseDetail->qty}}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" placeholder="Catatan" disabled value="{{$stockPurchaseDetail->notes}}" name="notes[]" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <a href="javascript:void(0);" class="addCF btn btn-warning" id="add_more"><i class="fa fa-plus"></i></a>
                                     </div>
                                 </div>
                             </div>

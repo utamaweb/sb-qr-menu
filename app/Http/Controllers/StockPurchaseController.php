@@ -64,9 +64,13 @@ class StockPurchaseController extends Controller
     }
 
     public function show($id) {
-        $stockOpname = StockOpname::find($id);
-        $stockOpnameDetails = StockOpnameDetail::whereStockOpnameId($id)->get();
-        return view('backend.stock_opname.show', compact('stockOpname','stockOpnameDetails'));
+        $warehouses = Warehouse::get();
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $roleName = auth()->user()->getRoleNames()[0];
+        $ingredients = Ingredient::get();
+        $stockPurchase = StockPurchase::find($id);
+        $stockPurchaseDetails = StockPurchaseIngredient::whereStockPurchaseId($id)->get();
+        return view('backend.stock_purchase.show', compact('ingredients','dateNow','roleName','warehouses','stockPurchase','stockPurchaseDetails'));
     }
 
     public function updateDetail(Request $request, $id)

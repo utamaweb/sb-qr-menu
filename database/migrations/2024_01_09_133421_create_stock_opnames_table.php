@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('stock_opnames', function (Blueprint $table) {
             $table->id();
             $table->string("name");
+            $table->string("notes");
+            $table->unsignedBigInteger("warehouse_id");
             $table->timestamps();
         });
     }

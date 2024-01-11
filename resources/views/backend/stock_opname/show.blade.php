@@ -1,287 +1,82 @@
-@extends('backend.layout.main') @section('content')
-
-<section>
+@extends('backend.layout.main')
+@push('css')
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+@endpush
+@section('content')
+<section class="forms">
     <div class="container-fluid">
-
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-
-        <a href="{{route('stock-opname.index')}}" class="btn btn-info"><i class="dripicons-arrow-thin-left"></i> Kembali </a>&nbsp;
-        <p>{{$stockOpname->name}}</p>
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th class="not-exported"></th>
-                    <th>Bahan Baku</th>
-                    <th>Kuantitas</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($stockOpnameDetails as $key=>$stockOpnameDetail)
-                <tr data-id="{{$stockOpnameDetail->id}}">
-                    <td>{{$key}}</td>
-                    <td>{{ $stockOpnameDetail->ingredient->name }}</td>
-                    <td>{{ $stockOpnameDetail->qty }}</td>
-                    <td>
-                        <div class="row">
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$stockOpnameDetail->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
-                        <!-- Stock Opname Edit Modal -->
-                            <div id="editModal-{{$stockOpnameDetail->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                                <div role="document" class="modal-dialog">
-                                    <div class="modal-content">
-                                        <form method="POST" action="{{route('updateDetailStockOpname', $stockOpnameDetail->id)}}">
-                                            @csrf
-                                            @method('PUT')
-                                        <div class="modal-header">
-                                            <h5 id="exampleModalLabel" class="modal-title">Stock Opname</h5>
-                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <form>
-                                                <div class="form-group">
-                                                    <label for="qty">Kuantitas</label>
-                                                    <input type="text" name="qty" value="{{$stockOpnameDetail->qty}}" class="form-control">
-                                                </div>
-
-                                                <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-                                        </form>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <h4>Detail Stok Opname</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="italic">
+                            {{-- <small>Label yang bertanda (*) wajib diisi.</small> --}}
+                        </p>
+                        <form action="{{route('stock-opname.store')}}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label>Nama Stok Opname</strong> </label>
+                                        <input type="text" name="name" class="form-control" id="name"
+                                        aria-describedby="name" value="{{$stockOpname->name}}" required>
                                     </div>
-                                        </form>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group">
+                                        <label>Cabang *</strong> </label>
+                                        <div class="input-group">
+                                            <select name="warehouse_id" required disbaled class="form-control selectpicker" id="warehouse_id">
+                                                <option>{{$stockOpname->warehouse->name}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="notes">Catatan</strong> </label>
+                                        <input type="text" name="notes" disabled value="{{$stockOpname->notes}}" class="form-control" id="notes" aria-describedby="notes" required>
+                                    </div>
                                 </div>
                             </div>
+
+                            @foreach($stockOpnameDetails as $stockOpnameDetail)
+                            <div id="add_new" class="margin">
+                                <div class="form-group row">
+                                    <label for="example-text-input" class="col-md-2 col-form-label">Bahan Baku</label>
+
+                                    <div class="col-md-6">
+                                        <select name="ingredient_id[]" required class="form-control" disabled>
+                                            <option value="">{{$stockOpnameDetail->ingredient->name}}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" name="qty[]" class="form-control" placeholder="Stok Aktual" disabled value="{{$stockOpnameDetail->qty}}">
+                                    </div>
+                                </div>
                             </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                            @endforeach
+
+                                <div class="col-md-12 d-flex justify-content-end">
+                                    <div class="form-group mt-3 mr-2">
+                                        <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
+                                    </div>
+                                </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 
 @endsection
-
 @push('scripts')
-<script type="text/javascript">
-    $("ul#product").siblings('a').attr('aria-expanded','true');
-    $("ul#product").addClass("show");
-    $("ul#product #unit-menu").addClass("active");
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    var ingredient_id = [];
-    var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $(document).ready(function() {
-    $(document).on('click', '.open-EditUnitDialog', function() {
-        var url = "ingredient/"
-        var id = $(this).data('id').toString();
-        url = url.concat(id).concat("/edit");
-
-        $.get(url, function(data) {
-            $("input[name='name']").val(data['name']);
-            $("input[name='first_stock']").val(data['first_stock']);
-            $("input[name='unit_id']").val(data['unit_id']);
-            $("input[name='operation_value']").val(data['operation_value']);
-            $("input[name='ingredient_id']").val(data['id']);
-            $("#base_unit_edit").val(data['base_unit']);
-            if(data['base_unit']!=null)
-            {
-                $(".operator").show();
-                $(".operation_value").show();
-            }
-            else
-            {
-                $(".operator").hide();
-                $(".operation_value").hide();
-            }
-            $('.selectpicker').selectpicker('refresh');
-
-        });
-    });
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $( "#select_all" ).on( "change", function() {
-        if ($(this).is(':checked')) {
-            $("tbody input[type='checkbox']").prop('checked', true);
-        }
-        else {
-            $("tbody input[type='checkbox']").prop('checked', false);
-        }
-    });
-
-    $("#export").on("click", function(e){
-        e.preventDefault();
-        var unit = [];
-        $(':checkbox:checked').each(function(i){
-          unit[i] = $(this).val();
-        });
-        $.ajax({
-           type:'POST',
-           url:'/exportunit',
-           data:{
-
-                unitArray: unit
-            },
-           success:function(data){
-            alert('Exported to CSV file successfully! Click Ok to download file');
-            window.location.href = data;
-           }
-        });
-    });
-
-    $('.open-CreateUnitDialog').on('click', function() {
-        $(".operator").hide();
-        $(".operation_value").hide();
-
-    });
-
-    $('#base_unit_create').on('change', function() {
-        if($(this).val()){
-            $("#createModal .operator").show();
-            $("#createModal .operation_value").show();
-        }
-        else{
-            $("#createModal .operator").hide();
-            $("#createModal .operation_value").hide();
-        }
-    });
-
-    $('#base_unit_edit').on('change', function() {
-        if($(this).val()){
-            $("#editModal .operator").show();
-            $("#editModal .operation_value").show();
-        }
-        else{
-            $("#editModal .operator").hide();
-            $("#editModal .operation_value").hide();
-        }
-    });
-});
-
-    $('#ingredient-table').DataTable( {
-        "order": [],
-        'language': {
-            'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
-             "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
-            'paginate': {
-                    'previous': '<i class="dripicons-chevron-left"></i>',
-                    'next': '<i class="dripicons-chevron-right"></i>'
-            }
-        },
-        'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
-
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
-        ],
-        'select': { style: 'multi',  selector: 'td:first-child'},
-        'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        dom: '<"row"lfB>rtip',
-        buttons: [
-            {
-                extend: 'pdf',
-                text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            {
-                extend: 'excel',
-                text: '<i title="export to excel" class="dripicons-document-new"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            {
-                extend: 'csv',
-                text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            {
-                extend: 'print',
-                text: '<i title="print" class="fa fa-print"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                        ingredient_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                ingredient_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'ingredient/deletebyselection',
-                                data:{
-                                    unitIdArray: ingredient_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!ingredient_id.length)
-                            alert('No unit is selected!');
-                }
-            },
-            {
-                extend: 'colvis',
-                text: '<i title="column visibility" class="fa fa-eye"></i>',
-                columns: ':gt(0)'
-            },
-        ],
-    } );
-</script>
 @endpush

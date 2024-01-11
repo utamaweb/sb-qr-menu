@@ -8,5 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class StockOpname extends Model
 {
     use HasFactory;
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'notes','warehouse_id'];
+
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse');
+    }
 }

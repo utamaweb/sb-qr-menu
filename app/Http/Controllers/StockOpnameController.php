@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\StockOpname;
 use App\Models\StockOpnameDetail;
 use App\Models\Ingredient;
+use App\Models\Warehouse;
 use Illuminate\Validation\Rule;
 use Keygen;
 use Auth;
@@ -20,7 +21,14 @@ class StockOpnameController extends Controller
         $stockOpnames = StockOpname::get();
         $stockOpnameDetails = StockOpnameDetail::get();
         $ingredients = Ingredient::get();
-        return view('backend.stock_opname.create', compact('stockOpnames', 'ingredients','stockOpnameDetails'));
+        return view('backend.stock_opname.index', compact('stockOpnames', 'ingredients','stockOpnameDetails'));
+    }
+
+    public function create() {
+        $ingredients = Ingredient::get();
+        $roleName = auth()->user()->getRoleNames()[0];
+        $warehouses = Warehouse::get();
+        return view('backend.stock_opname.create', compact('ingredients', 'roleName', 'warehouses'));
     }
 
     public function store(Request $request)
@@ -30,6 +38,8 @@ class StockOpnameController extends Controller
         ]);
         $stockOpname = StockOpname::create([
             'name' => $request->name,
+            'notes' => $request->notes,
+            'warehouse_id' => $request->warehouse_id,
         ]);
         foreach ($request->qty as $item => $v) {
             $data = array(
@@ -38,7 +48,7 @@ class StockOpnameController extends Controller
                 'qty' => $request->qty[$item],
             );
             $data2 = array(
-                'last_stock' => $request->qty[$item]
+                'last_stock' => $request->qty[$item],
             );
             StockOpnameDetail::create($data);
             Ingredient::find($request->ingredient_id[$item])->update($data2);

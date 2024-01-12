@@ -1,0 +1,38 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('transactions', function (Blueprint $table) {
+            $table->id();
+            $table->string('transaction_code');
+            $table->unsignedBigInteger('warehouse_id');
+            $table->string('sequence_number');
+            $table->unsignedBigInteger('order_type_id');
+            $table->unsignedBigInteger('user_id');
+            $table->string('payment_method');
+            $table->string('notes');
+            $table->bigInteger('total_amount');
+            $table->bigInteger('total_qty');
+            $table->bigInteger('paid_amount');
+            $table->bigInteger('change_money');
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('transactions');
+    }
+};

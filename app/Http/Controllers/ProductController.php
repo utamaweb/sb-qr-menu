@@ -42,14 +42,14 @@ class ProductController extends Controller
     public function index()
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('products-index')){
+        // if($role->hasPermissionTo('products-index')){
             $products = Product::get();
-            $permissions = Role::findByName($role->name)->permissions;
-            foreach ($permissions as $permission)
-                $all_permission[] = $permission->name;
-            if(empty($all_permission))
-                $all_permission[] = 'dummy text';
-            $role_id = $role->id;
+            // $permissions = Role::findByName($role->name)->permissions;
+            // foreach ($permissions as $permission)
+            //     $all_permission[] = $permission->name;
+            // if(empty($all_permission))
+            //     $all_permission[] = 'dummy text';
+            // $role_id = $role->id;
             $numberOfProduct = DB::table('products')->where('is_active', true)->count();
             $custom_fields = CustomField::where([
                                 ['belongs_to', 'product'],
@@ -59,10 +59,10 @@ class ProductController extends Controller
             foreach($custom_fields as $fieldName) {
                 $field_name[] = str_replace(" ", "_", strtolower($fieldName));
             }
-            return view('backend.product.index', compact('all_permission', 'role_id', 'numberOfProduct', 'custom_fields', 'field_name', 'products'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+            return view('backend.product.index', compact('numberOfProduct', 'custom_fields', 'field_name', 'products'));
+        // }
+        // else
+            // return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
     public function create()

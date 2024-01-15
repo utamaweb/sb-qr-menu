@@ -19,10 +19,8 @@
     @endif
 
     <div class="container-fluid">
-        @if(in_array("products-add", $all_permission))
             <a href="{{route('products.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('file.add_product')}}</a>
             {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
-        @endif
     </div>
     </div>
     <div class="table-responsive">

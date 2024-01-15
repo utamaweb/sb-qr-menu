@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Models\Product;
+use App\Models\IngredientProducts;
+use App\Models\Ingredient;
 use App\Models\Warehouse;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\Validator;
@@ -63,6 +66,9 @@ class TransactionController extends Controller
             $dateNow = Carbon::now()->format('Y-m-d');
             $dateTimeNow = Carbon::now();
             $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
+            if($sequence_number == NULL){
+                $sequence_number = 0;
+            }
             $transaction = Transaction::create([
                 'warehouse_id' => auth()->user()->warehouse_id,
                 'sequence_number' => $sequence_number + 1,
@@ -89,6 +95,36 @@ class TransactionController extends Controller
             $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
             $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
             $transaction['product_count'] = count($request->transaction_details);
+
+
+            $product_ids = [];
+            foreach ($request->transaction_details as $detail) {
+                array_push($product_ids, $detail['product_id']);
+            }
+            $products = Product::whereIn('id', $product_ids)->get();
+            $ingredient_product_ids = IngredientProducts::whereIn('product_id', $product_ids)->get()->pluck('ingredient_id');
+            $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
+            $ingredients = Ingredient::whereIn('id', $ingredient_product_ids)->get();
+            foreach ($request->transaction_details as $detail) {
+                $product_id = $detail['product_id'];
+                $qty = $detail['qty'];
+
+                // Ambil produk terkait
+                $product = $products->where('id', $product_id)->first();
+
+                // Ambil bahan baku terkait melalui model Ingredient
+                $ingredients = $product->ingredient;
+
+                // Update stok bahan baku sesuai dengan kuantitas terjual
+                foreach ($ingredients as $ingredient) {
+                    // $pivotData = ['quantity' => $qty];
+                    // $product->ingredients()->updateExistingPivot($ingredient->id, $pivotData);
+
+                    // Alternatif: Jika menggunakan Eloquent events, bisa juga langsung memperbarui stok di model Ingredient
+                    $ingredient->last_stock -= $qty;
+                    $ingredient->save();
+                }
+            }
 
             DB::commit();
             return response()->json($transaction, 200);

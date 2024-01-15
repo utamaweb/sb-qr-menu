@@ -4,6 +4,7 @@ use App\Http\Controllers\DemoAutoUpdateController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\TransactionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -31,6 +32,9 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('users/{username}', [UserController::class, 'getUserByUsername']);
     Route::put('users', [UserController::class, 'update']);
 
+    Route::post('transaction', [TransactionController::class, 'store']);
+
+
     Route::put('wallets', [WalletController::class, 'update']);
     Route::get('wallets', [WalletController::class, 'show']);
 
@@ -41,13 +45,6 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::post('transfers', [TransferController::class, 'store']);
 
 
-    Route::get('transactions', [TransactionController::class, 'index']);
-
-    Route::get('payment_methods', [PaymentMethodController::class, 'index']);
-
-    Route::get('tips', [TipController::class, 'index']);
-
-    Route::get('operator_cards', [OperatorCardController::class, 'index']);
 });
 
 Route::controller(DemoAutoUpdateController::class)->group(function () {

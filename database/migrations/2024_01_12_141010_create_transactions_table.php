@@ -13,17 +13,18 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('transaction_code');
+            $table->string('transaction_code')->nullable();
             $table->unsignedBigInteger('warehouse_id');
             $table->string('sequence_number');
             $table->unsignedBigInteger('order_type_id');
             $table->unsignedBigInteger('user_id');
             $table->string('payment_method');
-            $table->string('notes');
+            $table->date('date');
+            $table->string('notes')->nullable();
             $table->bigInteger('total_amount');
             $table->bigInteger('total_qty');
             $table->bigInteger('paid_amount');
-            $table->bigInteger('change_money');
+            $table->bigInteger('change_money')->default(0);
             $table->timestamps();
         });
     }

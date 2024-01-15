@@ -12,11 +12,11 @@ class TransactionDetail extends Model
 
     public function transaction()
     {
-    	return $this->hasMany('App\Models\Transaction');
+    	return $this->belongsTo('App\Models\Transaction');
     }
 
     public function product()
     {
-    	return $this->hasMany('App\Models\Product');
+    	return $this->belongsTo('App\Models\Product');
     }
 }

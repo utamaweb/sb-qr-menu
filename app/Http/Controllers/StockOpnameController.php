@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\StockOpname;
 use App\Models\StockOpnameDetail;
 use App\Models\Ingredient;
+use App\Models\Stock;
 use App\Models\Warehouse;
 use Illuminate\Validation\Rule;
 use Keygen;
@@ -53,7 +54,23 @@ class StockOpnameController extends Controller
                 'last_stock' => $request->qty[$item],
             );
             StockOpnameDetail::create($data);
-            Ingredient::find($request->ingredient_id[$item])->update($data2);
+            $checkStock = Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->count();
+            if($checkStock < 1){
+                Stock::create([
+                    'warehouse_id' => $request->warehouse_id,
+                    'ingredient_id' => $request->ingredient_id[$item],
+                    'first_stock' => $request->qty[$item],
+                    'stock_in' => $request->qty[$item],
+                    'last_stock' => $request->qty[$item],
+                ]);
+            } else {
+                $stock = Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->first();
+                Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->update([
+                    // 'stock_in' => $stock->stock_in + $request->qty[$item],
+                    'last_stock' => $request->qty[$item],
+                ]);
+            }
+            // Ingredient::find($request->ingredient_id[$item])->update($data2);
         }
         return redirect()->route('stock-opname.index')->with('message', 'Data berhasil ditambahkan');
     }

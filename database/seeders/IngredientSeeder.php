@@ -23,8 +23,8 @@ class IngredientSeeder extends Seeder
         foreach ($bahans as $bahan) {
             Ingredient::create([
                 'name'  =>  $bahan[0],
-                'first_stock'  =>  $bahan[1],
-                'last_stock'  =>  $bahan[1],
+                // 'first_stock'  =>  $bahan[1],
+                // 'last_stock'  =>  $bahan[1],
                 'unit_id'  =>  $bahan[2],
             ]);
         }

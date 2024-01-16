@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Transaction;
+use App\Models\Stock;
 use App\Models\Product;
 use App\Models\IngredientProducts;
 use App\Models\Ingredient;
@@ -106,22 +107,34 @@ class TransactionController extends Controller
             $products = Product::whereIn('id', $product_ids)->get();
             $ingredient_product_ids = IngredientProducts::whereIn('product_id', $product_ids)->get()->pluck('ingredient_id');
             $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
-            $ingredients = Ingredient::whereIn('id', $ingredient_product_ids)->get();
+            // $ingredients = Ingredient::whereIn('id', $ingredient_product_ids)->get();
+            $ingredients = Stock::whereIn('id', $ingredient_product_ids)->get();
             foreach ($request->transaction_details as $detail) {
                 $product_id = $detail['product_id'];
                 $qty = $detail['qty'];
-
                 // Ambil produk terkait
                 $product = $products->where('id', $product_id)->first();
 
                 // Ambil bahan baku terkait melalui model Ingredient
                 $ingredients = $product->ingredient;
 
-                // Update stok bahan baku sesuai dengan kuantitas terjual
+                // foreach ($ingredients as $ingredient) {
+                //     $ingredient->last_stock -= $qty;
+                //     $ingredient->stock_used += $qty;
+                //     $ingredient->save();
+                // }
                 foreach ($ingredients as $ingredient) {
-                    $ingredient->last_stock -= $qty;
-                    $ingredient->stock_used += $qty;
-                    $ingredient->save();
+                    // $ingredient->last_stock -= $qty;
+                    // $ingredient->stock_used += $qty;
+                    // $ingredient->save();
+                    $stock = Stock::where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                    if (!$stock) {
+                        // Handle jika stok belum ada
+                        continue;
+                    }
+                    $stock->last_stock -= $qty;
+                    $stock->stock_used += $qty;
+                    $stock->save();
                 }
             }
 

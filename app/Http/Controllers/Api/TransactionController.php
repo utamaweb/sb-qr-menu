@@ -124,6 +124,7 @@ class TransactionController extends Controller
 
                     // Alternatif: Jika menggunakan Eloquent events, bisa juga langsung memperbarui stok di model Ingredient
                     $ingredient->last_stock -= $qty;
+                    $ingredient->stock_used += $qty;
                     $ingredient->save();
                 }
             }

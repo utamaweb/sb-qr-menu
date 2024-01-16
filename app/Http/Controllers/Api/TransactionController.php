@@ -119,10 +119,6 @@ class TransactionController extends Controller
 
                 // Update stok bahan baku sesuai dengan kuantitas terjual
                 foreach ($ingredients as $ingredient) {
-                    // $pivotData = ['quantity' => $qty];
-                    // $product->ingredients()->updateExistingPivot($ingredient->id, $pivotData);
-
-                    // Alternatif: Jika menggunakan Eloquent events, bisa juga langsung memperbarui stok di model Ingredient
                     $ingredient->last_stock -= $qty;
                     $ingredient->stock_used += $qty;
                     $ingredient->save();

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\StockPurchase;
 use App\Models\StockPurchaseIngredient;
 use App\Models\Warehouse;
+use App\Models\TransactionInOut;
+use App\Models\Stock;
 use App\Models\Ingredient;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -52,13 +54,36 @@ class StockPurchaseController extends Controller
                 'qty' => $request->qty[$item],
                 'notes' => $request->notes[$item],
             );
-            $qtyToInt = (int)$request->qty[$item];
-            $ingredient = Ingredient::find($request->ingredient_id[$item]);
-            $data2 = array(
-                'last_stock' => $ingredient->last_stock + $qtyToInt,
-            );
             StockPurchaseIngredient::create($data);
-            Ingredient::find($request->ingredient_id[$item])->update($data2);
+            $qtyToInt = (int)$request->qty[$item];
+            $checkStock = Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->count();
+            if($checkStock < 1){
+                Stock::create([
+                    'warehouse_id' => $request->warehouse_id,
+                    'ingredient_id' => $request->ingredient_id[$item],
+                    'first_stock' => $request->qty[$item],
+                    'stock_in' => $request->qty[$item],
+                    'last_stock' => $request->qty[$item],
+                ]);
+            } else {
+                $stock = Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->first();
+                Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->update([
+                    'stock_in' => $stock->stock_in + $request->qty[$item],
+                    'last_stock' => $stock->last_stock + $request->qty[$item],
+                ]);
+            }
+            TransactionInOut::create([
+                'warehouse_id' => $request->warehouse_id,
+                'ingredient_id' => $request->ingredient_id[$item],
+                'qty' => $request->qty[$item],
+                'transaction_type' => 'in',
+                'user_id' => auth()->user()->id,
+            ]);
+            // $ingredient = Ingredient::find($request->ingredient_id[$item]);
+            // $data2 = array(
+            //     'last_stock' => $ingredient->last_stock + $qtyToInt,
+            // );
+            // Ingredient::find($request->ingredient_id[$item])->update($data2);
         }
         return redirect()->route('stock-purchase.index')->with('message', 'Data berhasil ditambahkan');
     }

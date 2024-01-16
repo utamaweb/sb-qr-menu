@@ -36,11 +36,13 @@ class StockOpnameController extends Controller
         $this->validate($request, [
             'name' => 'required|max:255',
         ]);
+        // Store Table StockOpname
         $stockOpname = StockOpname::create([
             'name' => $request->name,
             'notes' => $request->notes,
             'warehouse_id' => $request->warehouse_id,
         ]);
+        // Store Table Stock Opname Detail
         foreach ($request->qty as $item => $v) {
             $data = array(
                 'stock_opname_id' => $stockOpname->id,

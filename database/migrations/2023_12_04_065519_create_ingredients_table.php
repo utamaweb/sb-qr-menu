@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('ingredients', function (Blueprint $table) {
             $table->id();
             $table->string("name");
-            $table->bigInteger("first_stock");
-            $table->bigInteger("stock_in")->default(0);
-            $table->bigInteger("stock_used")->default(0);
+            // $table->bigInteger("first_stock")->nullable();
+            // $table->bigInteger("stock_in")->default(0);
+            // $table->bigInteger("stock_used")->default(0);
             // $table->bigInteger("adjustment")->default(0);
-            $table->bigInteger("last_stock")->default(0);
-            $table->bigInteger("max_stock")->default(0);
+            // $table->bigInteger("last_stock")->default(0);
+            // $table->bigInteger("max_stock")->default(0);
             $table->unsignedBigInteger('unit_id');
             // $table->foreignId('unit_id')->constrained();
             $table->timestamps();

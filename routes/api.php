@@ -4,6 +4,7 @@ use App\Http\Controllers\DemoAutoUpdateController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\PrinterController;
 use App\Http\Controllers\Api\TransactionController;
 
 /*
@@ -27,6 +28,13 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('products/{id}', [ProductController::class, 'detail']);
     Route::put('products/{id}', [ProductController::class, 'update']);
     Route::delete('products/{id}', [ProductController::class, 'destroy']);
+
+    // Printer CRUD API
+    Route::post('printer', [PrinterController::class, 'store']);
+    Route::get('printer', [PrinterController::class, 'index']);
+    Route::get('printer/{id}', [PrinterController::class, 'detail']);
+    Route::put('printer/{id}', [PrinterController::class, 'update']);
+    Route::delete('printer/{id}', [PrinterController::class, 'destroy']);
 
     Route::get('users', [UserController::class, 'show']);
     Route::get('users/{username}', [UserController::class, 'getUserByUsername']);

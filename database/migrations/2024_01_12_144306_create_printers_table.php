@@ -18,6 +18,8 @@ return new class extends Migration
             $table->string('paper_type');
             $table->string('connection');
             $table->string('driver_type');
+            $table->string('mac_address')->nullable();
+            $table->boolean('is_used')->default(0);
             $table->unsignedBigInteger('warehouse_id');
             $table->timestamps();
         });

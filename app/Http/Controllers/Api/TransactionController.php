@@ -11,6 +11,7 @@ use App\Models\IngredientProducts;
 use App\Models\Ingredient;
 use App\Models\Warehouse;
 use App\Models\TransactionDetail;
+use App\Models\TransactionInOut;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -135,6 +136,15 @@ class TransactionController extends Controller
                     $stock->last_stock -= $qty;
                     $stock->stock_used += $qty;
                     $stock->save();
+
+                    TransactionInOut::create([
+                        'warehouse_id' => auth()->user()->warehouse_id,
+                        'ingredient_id' => $ingredient->id,
+                        'transaction_id' => $transaction->id,
+                        'qty' => $qty,
+                        'transaction_type' => 'out',
+                        'user_id' => auth()->user()->id,
+                    ]);
                 }
             }
 

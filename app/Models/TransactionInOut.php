@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class TransactionInOut extends Model
 {
     use HasFactory;
-    protected $fillable = ['warehouse_id', 'ingredient_id', 'qty', 'transaction_type', 'user_id'];
+    protected $fillable = ['warehouse_id', 'ingredient_id', 'qty', 'transaction_type', 'user_id','transaction_id'];
 
     public function warehouse()
     {

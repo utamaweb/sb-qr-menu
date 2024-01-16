@@ -65,15 +65,17 @@ class TransactionController extends Controller
             $change_money = $request->paid_amount - $total_amount;
             $dateNow = Carbon::now()->format('Y-m-d');
             $dateTimeNow = Carbon::now();
-            $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
-            if($sequence_number == NULL){
+            $transactionCheck = Transaction::count();
+            if ($transactionCheck < 1) {
                 $sequence_number = 0;
+            } else {
+                $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
             }
             $transaction = Transaction::create([
                 'warehouse_id' => auth()->user()->warehouse_id,
                 'sequence_number' => $sequence_number + 1,
                 'order_type_id' => $request->order_type_id,
-                'user_id' => $request->user_id,
+                'user_id' => auth()->user()->id,
                 'payment_method' => $request->payment_method,
                 'date' => $dateNow,
                 'notes' => $request->notes,

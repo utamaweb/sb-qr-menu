@@ -89,10 +89,22 @@ class TransactionController extends Controller
 
             // Simpan detail transaksi
             $transaction_details = $request->input('transaction_details');
+            $transactionDetailsWithProducts = [];
             foreach ($transaction_details as $detail) {
+                $productDetail = [
+                    'transaction_id' => $detail['transaction_id'],
+                    'product_id' => $detail['product_id'],
+                    'qty' => $detail['qty'],
+                    'subtotal' => $detail['subtotal'],
+                    'product_name' => \App\Models\Product::find($detail['product_id'])->name,
+                ];
+
+                // Menambahkan data detail produk ke array
+                $transactionDetailsWithProducts[] = $productDetail;
+
                 $transaction->transaction_details()->create($detail);
             }
-            $transaction['details'] = $transaction_details;
+            $transaction['details'] = $transactionDetailsWithProducts;
             $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
             // $transaction['warehouse']['name'] = $transaction['warehouse']->name;
             // $transaction['warehouse']['address'] = $transaction['warehouse']->address;
@@ -147,6 +159,9 @@ class TransactionController extends Controller
                     ]);
                 }
             }
+            $transaction['order_type'] = $transaction->orderType;
+            $transaction['order_type_name'] = $transaction['order_type']['name'];
+
 
             DB::commit();
             return response()->json($transaction, 200);

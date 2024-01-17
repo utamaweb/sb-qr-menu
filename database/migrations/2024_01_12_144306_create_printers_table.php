@@ -16,10 +16,10 @@ return new class extends Migration
             $table->string('device_type');
             $table->string('name');
             $table->string('paper_type');
-            $table->string('connection');
+            $table->string('connection')->default("Bluetooth");
             $table->string('driver_type');
             $table->string('mac_address')->nullable();
-            $table->boolean('is_used')->default(0);
+            $table->boolean('is_used')->default(1);
             $table->unsignedBigInteger('warehouse_id');
             $table->timestamps();
         });

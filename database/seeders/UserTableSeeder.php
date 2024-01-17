@@ -29,9 +29,21 @@ class UserTableSeeder extends Seeder
             'phone' => '0888',
             'company_name' => '',
             'warehouse_id' => 1,
-            'role_id' => '3',
+            'role_id' => '2',
             'is_active' => '1',
         ]);
         $kasir->assignRole('kasir');
+
+        $customer = User::create([
+            'name' => 'customer',
+            'email' => 'customer@customer.com',
+            'password' => bcrypt('customer'),
+            'phone' => '0888',
+            'company_name' => '',
+            'warehouse_id' => 1,
+            'role_id' => '3',
+            'is_active' => '1',
+        ]);
+        $kasir->assignRole('customer');
     }
 }

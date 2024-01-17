@@ -308,6 +308,8 @@ class PermissionSeeder extends Seeder
         $owner->givePermissionTo(Permission::all());
         $kasir1 = Role::create(['name' => 'Kasir']);
         $kasir1->givePermissionTo(Permission::all());
+        $customer = Role::create(['name' => 'Customer']);
+        // $kasir1->givePermissionTo(Permission::all());
 
         // $allPermissionExUser = Permission::where("name", "!=", "lihat user")->where("name", "!=", "tambah user")->where("name", "!=", "ubah user")->where("name", "!=", "hapus user")->get();
         // $leader = Role::create(['name' => 'Staff']);

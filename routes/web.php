@@ -65,6 +65,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderTypeController;
+use App\Http\Controllers\CloseCashierController;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -236,6 +237,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::resource('ingredient', IngredientController::class);
         Route::resource('stock-opname', StockOpnameController::class);
+        Route::resource('laporan/penjualan/tutup-kasir', CloseCashierController::class);
         Route::put('stock-opname-detail/{id}', [StockOpnameController::class,'updateDetail'])->name('updateDetailStockOpname');
         Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 

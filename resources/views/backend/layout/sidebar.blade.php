@@ -26,6 +26,7 @@
       </ul>
    </li>
    @endif
+   <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Laporan Tutup Kasir</span></a></li>
 
    {{-- LAPORAN --}}
    <?php

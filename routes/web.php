@@ -237,7 +237,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::resource('ingredient', IngredientController::class);
         Route::resource('stock-opname', StockOpnameController::class);
-        Route::resource('laporan/penjualan/tutup-kasir', CloseCashierController::class);
+        Route::resource('close-cashier', CloseCashierController::class);
         Route::put('stock-opname-detail/{id}', [StockOpnameController::class,'updateDetail'])->name('updateDetailStockOpname');
         Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 

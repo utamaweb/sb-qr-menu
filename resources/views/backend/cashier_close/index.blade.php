@@ -10,7 +10,6 @@
                     <th>Kasir</th>
                     <th>Outlet</th>
                     <th>Modal Awal</th>
-                    <th>Saldo Akhir</th>
                     <th>Total Tunai</th>
                     <th>Total Non Tunai</th>
                     <th class="not-exported">Aksi</th>
@@ -20,12 +19,17 @@
                 @foreach($closeCashiers as $key => $closeCashier)
                 <tr data-id="{{$closeCashier->id}}">
                     <td>{{$key}}</td>
-                    <td><b>Buka:</b> {{ $closeCashier->open_time }} <br></td>
-                    <td>{{ $closeCashier->created_at}}</td>
-                    <td>{{ $closeCashier->created_at}}</td>
+                    <td><b>Buka:</b> {{ $closeCashier->open_time }} <br>
+                        <b>Tutup:</b> {{$closeCashier->close_time}}
+                    </td>
+                    <td>{{ $closeCashier->user->name}}</td>
+                    <td>{{ $closeCashier->warehouse->name}}</td>
+                    <td>{{ $closeCashier->initial_money}}</td>
+                    <td>{{ $closeCashier->total_cash}}</td>
+                    <td>{{ $closeCashier->total_non_cash}}</td>
                     <td>
                         <div class="row">
-                        <a href="{{route('stock-opname.show', $closeCashier->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
+                        <a href="{{route('close-cashier.show', $closeCashier->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
                         {{-- <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$closeCashier->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button> --}}
                         {{-- {{ Form::open(['route' => ['stock-opname.destroy', $closeCashier->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>

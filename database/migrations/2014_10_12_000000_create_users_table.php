@@ -20,11 +20,8 @@ class CreateUsersTable extends Migration
             // $table->dropUnique('users_email_unique');
             $table->string('password');
             $table->string('phone');
-            $table->string('company_name')->nullable();
             $table->integer('role_id');
-            $table->integer('biller_id')->nullable();
             $table->integer('warehouse_id')->nullable();
-            $table->boolean('is_active');
             $table->rememberToken();
             $table->timestamps();
         });

@@ -16,9 +16,7 @@ class UserTableSeeder extends Seeder
             'email' => 'superadmin@admin.com',
             'password' => bcrypt('secret'),
             'phone' => '0888',
-            'company_name' => '',
             'role_id' => '1',
-            'is_active' => '1',
         ]);
         $superadmin->assignRole('superadmin');
 
@@ -27,10 +25,8 @@ class UserTableSeeder extends Seeder
             'email' => 'kasir@kasir.com',
             'password' => bcrypt('kasir'),
             'phone' => '0888',
-            'company_name' => '',
             'warehouse_id' => 1,
             'role_id' => '2',
-            'is_active' => '1',
         ]);
         $kasir->assignRole('kasir');
 
@@ -39,10 +35,8 @@ class UserTableSeeder extends Seeder
             'email' => 'customer@customer.com',
             'password' => bcrypt('customer'),
             'phone' => '0888',
-            'company_name' => '',
             'warehouse_id' => 1,
             'role_id' => '3',
-            'is_active' => '1',
         ]);
         $kasir->assignRole('customer');
     }

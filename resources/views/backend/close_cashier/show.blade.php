@@ -33,6 +33,46 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Rincian Pembayaran Pelanggan</h4>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        Total Penerimaan Kasir <br><br>
+                                        Total Penerimaan QRIS<br><br>
+                                        Total Penerimaan <br>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        {{$closeCashier->total_cash}} <br><br>
+                                        {{$closeCashier->total_non_cash}} <br><br>
+                                        {{$closeCashier->total_money}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Produk Terjual</h4>
+                                <hr>
+                                <div class="row">
+                                    @foreach($closeCashierProductSolds as $product)
+                                    <div class="col-md-6">
+                                        {{$product->product_name}} <br><br>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        {{$product->qty}} <br><br>
+                                    </div>
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

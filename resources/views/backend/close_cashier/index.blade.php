@@ -24,7 +24,7 @@
                     </td>
                     <td>{{ $closeCashier->user->name}}</td>
                     <td>{{ $closeCashier->warehouse->name}}</td>
-                    <td>{{ $closeCashier->initial_money}}</td>
+                    <td>{{ $closeCashier->initial_balance}}</td>
                     <td>{{ $closeCashier->total_cash}}</td>
                     <td>{{ $closeCashier->total_non_cash}}</td>
                     <td>
@@ -44,46 +44,6 @@
 </section>
 
 
-<!-- Stock Opname Modal -->
-<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-        <div class="modal-content">
-            {!! Form::open(['route' => 'stock-opname.store', 'method' => 'post']) !!}
-            <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Stock Opname</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="name">Nama Stock Opname</label>
-                        <input type="text" name="name" class="form-control">
-                    </div>
-                        <div class="row">
-                        <div class="form-group col-md-6">Bahan Baku</div>
-                        <div class="form-group col-md-6">Kuantitas</div>
-                    </div>
-                    <hr>
-                    @foreach($ingredients as $ingredient)
-                    <div class="row">
-                        <div class="form-group col-md-6">
-                            {{$ingredient->name}}
-                            <input type="hidden" name="ingredient_id[]" value="{{$ingredient->id}}">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <input type="number" class="form-control" name="qty[]" value="{{$ingredient->last_stock}}">
-                        </div>
-                    </div>
-                    @endforeach
-
-                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-            </form>
-        </div>
-        {{ Form::close() }}
-    </div>
-</div>
-</div>
-
 @endsection
 
 @push('scripts')
@@ -102,32 +62,7 @@
     });
 
     $(document).ready(function() {
-    $(document).on('click', '.open-EditUnitDialog', function() {
-        var url = "ingredient/"
-        var id = $(this).data('id').toString();
-        url = url.concat(id).concat("/edit");
 
-        $.get(url, function(data) {
-            $("input[name='name']").val(data['name']);
-            $("input[name='first_stock']").val(data['first_stock']);
-            $("input[name='unit_id']").val(data['unit_id']);
-            $("input[name='operation_value']").val(data['operation_value']);
-            $("input[name='ingredient_id']").val(data['id']);
-            $("#base_unit_edit").val(data['base_unit']);
-            if(data['base_unit']!=null)
-            {
-                $(".operator").show();
-                $(".operation_value").show();
-            }
-            else
-            {
-                $(".operator").hide();
-                $(".operation_value").hide();
-            }
-            $('.selectpicker').selectpicker('refresh');
-
-        });
-    });
 
     $.ajaxSetup({
         headers: {

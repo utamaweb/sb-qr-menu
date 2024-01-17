@@ -23,6 +23,7 @@ return new class extends Migration
             $table->bigInteger("total_non_cash")->nullable();
             $table->bigInteger("total_money")->nullable();
             $table->bigInteger("total_product_sales")->nullable();
+            $table->boolean("is_closed")->default(0);
             $table->timestamps();
         });
     }

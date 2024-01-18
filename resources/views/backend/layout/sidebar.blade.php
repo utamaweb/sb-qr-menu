@@ -26,7 +26,6 @@
       </ul>
    </li>
    @endif
-   <li id="stock-opname"><a  href="{{route('close-cashier.index')}}"> <i class="dripicons-view-thumb"></i><span>Laporan Tutup Kasir</span></a></li>
 
    {{-- LAPORAN --}}
    <?php
@@ -83,6 +82,7 @@
       <a href="#report" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-document-remove"></i><span>{{trans('file.Reports')}}</span></a>
       <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
+        <li id="stock-opname"><a  href="{{route('close-cashier.index')}}">Laporan Tutup Kasir</a></li>
          @if($profit_loss_active)
          <li id="profit-loss-report-menu">
             {!! Form::open(['route' => 'report.profitLoss', 'method' => 'post', 'id' =>
@@ -93,6 +93,7 @@
             {!! Form::close() !!}
          </li>
          @endif
+
          @if($best_seller_active)
          <li id="best-seller-report-menu">
             <a href="{{url('report/best_seller')}}">{{trans('file.Best Seller')}}</a>

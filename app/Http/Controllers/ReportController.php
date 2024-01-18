@@ -9,6 +9,7 @@ use App\Models\Product_Sale;
 use App\Models\ProductQuotation;
 use App\Models\Sale;
 use App\Models\Purchase;
+use App\Models\TransactionDetail;
 use App\Models\Quotation;
 use App\Models\Transfer;
 use App\Models\Returns;
@@ -844,8 +845,45 @@ class ReportController extends Controller
         $start_date = $data['start_date'];
         $end_date = $data['end_date'];
         $warehouse_id = $data['warehouse_id'];
+
+        if ($warehouse_id == 0) {
+            $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+                ->whereBetween('transactions.date', [$start_date, $end_date])
+                ->get(['transaction_details.*']);
+        } else {
+            $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+                ->whereBetween('transactions.date', [$start_date, $end_date])
+                ->where('transactions.warehouse_id', $warehouse_id)
+                ->get(['transaction_details.*']);
+        }
+
+        $totalQtyPerProduct = [];
+        $totalSubtotalPerProduct = [];
+        $products = Product::get();
+
+        $productId = []; // Inisialisasi variabel di luar loop
+
+        foreach ($transaction_details as $item) {
+            $productId = $item['product_id'];
+
+            // Menambahkan qty ke total qty per produk
+            if (isset($totalQtyPerProduct[$productId])) {
+                $totalQtyPerProduct[$productId] += $item['qty'];
+            } else {
+                $totalQtyPerProduct[$productId] = $item['qty'];
+            }
+
+            // Menambahkan subtotal ke total subtotal per produk
+            if (isset($totalSubtotalPerProduct[$productId])) {
+                $totalSubtotalPerProduct[$productId] += $item['subtotal'];
+            } else {
+                $totalSubtotalPerProduct[$productId] = $item['subtotal'];
+            }
+        }
+
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        return view('backend.report.product_report',compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list'));
+        return view('backend.report.product_report', compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list', 'productId', 'totalSubtotalPerProduct', 'totalQtyPerProduct', 'products'));
+
     }
 
     public function productReportData(Request $request)

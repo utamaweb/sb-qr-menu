@@ -72,13 +72,6 @@
                 <p>No users</p>
                 @endforelse
             </tbody>
-            <tfoot class="tfoot active">
-                <th></th>
-                <th>{{trans('file.Total')}}</th>
-                <th></th>
-                <th></th>
-                <th></th>
-            </tfoot>
         </table>
     </div>
 </section>

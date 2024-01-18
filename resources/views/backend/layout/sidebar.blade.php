@@ -80,9 +80,19 @@
    $supplier_due_report_active)
    <li>
       <a href="#report" aria-expanded="false" data-toggle="collapse"> <i
-         class="dripicons-document-remove"></i><span>{{trans('file.Reports')}}</span></a>
+         class="dripicons-document-remove"></i><span>Laporan</span></a>
       <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
         <li id="stock-opname"><a  href="{{route('close-cashier.index')}}">Laporan Tutup Kasir</a></li>
+        @if($product_report_active)
+         <li id="product-report-menu">
+            {!! Form::open(['route' => 'report.product', 'method' => 'get', 'id' => 'product-report-form']) !!}
+            <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
+            <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
+            <input type="hidden" name="warehouse_id" value="0" />
+            <a id="report-link" href="">Laporan Transaksi Produk</a>
+            {!! Form::close() !!}
+         </li>
+         @endif
          @if($profit_loss_active)
          <li id="profit-loss-report-menu">
             {!! Form::open(['route' => 'report.profitLoss', 'method' => 'post', 'id' =>
@@ -97,16 +107,6 @@
          @if($best_seller_active)
          <li id="best-seller-report-menu">
             <a href="{{url('report/best_seller')}}">{{trans('file.Best Seller')}}</a>
-         </li>
-         @endif
-         @if($product_report_active)
-         <li id="product-report-menu">
-            {!! Form::open(['route' => 'report.product', 'method' => 'get', 'id' => 'product-report-form']) !!}
-            <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
-            <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <input type="hidden" name="warehouse_id" value="0" />
-            <a id="report-link" href="">{{trans('file.Product Report')}}</a>
-            {!! Form::close() !!}
          </li>
          @endif
          @if($daily_sale_active)

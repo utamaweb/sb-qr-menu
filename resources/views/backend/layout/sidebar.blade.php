@@ -106,28 +106,28 @@
 
          @if($best_seller_active)
          <li id="best-seller-report-menu">
-            <a href="{{url('report/best_seller')}}">{{trans('file.Best Seller')}}</a>
+            <a href="{{url('admin/report/best_seller')}}">{{trans('file.Best Seller')}}</a>
          </li>
          @endif
          @if($daily_sale_active)
          <li id="daily-sale-report-menu">
-            <a href="{{url('report/daily_sale/'.date('Y').'/'.date('m'))}}">{{trans('file.Daily Sale')}}</a>
+            <a href="{{url('admin/report/daily_sale/'.date('Y').'/'.date('m'))}}">{{trans('file.Daily Sale')}}</a>
          </li>
          @endif
          @if($monthly_sale_active)
          <li id="monthly-sale-report-menu">
-            <a href="{{url('report/monthly_sale/'.date('Y'))}}">{{trans('file.Monthly Sale')}}</a>
+            <a href="{{url('admin/report/monthly_sale/'.date('Y'))}}">{{trans('file.Monthly Sale')}}</a>
          </li>
          @endif
          @if($daily_purchase_active)
          <li id="daily-purchase-report-menu">
             <a
-               href="{{url('report/daily_purchase/'.date('Y').'/'.date('m'))}}">{{trans('file.Daily Purchase')}}</a>
+               href="{{url('admin/report/daily_purchase/'.date('Y').'/'.date('m'))}}">{{trans('file.Daily Purchase')}}</a>
          </li>
          @endif
          @if($monthly_purchase_active)
          <li id="monthly-purchase-report-menu">
-            <a href="{{url('report/monthly_purchase/'.date('Y'))}}">{{trans('file.Monthly Purchase')}}</a>
+            <a href="{{url('admin/report/monthly_purchase/'.date('Y'))}}">{{trans('file.Monthly Purchase')}}</a>
          </li>
          @endif
          @if($sale_report_active)

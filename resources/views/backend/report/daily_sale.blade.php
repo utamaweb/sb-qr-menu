@@ -6,7 +6,7 @@
 			<div class="card-body">
 				{{ Form::open(['route' => ['report.dailySaleByWarehouse', $year, $month], 'method' => 'post', 'id' => 'report-form']) }}
 				<input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}">
-				<h4 class="text-center">{{trans('file.Daily Sale Report')}} &nbsp;&nbsp;
+				<h4 class="text-center">Laporan Penjualan Harian &nbsp;&nbsp;
 				<select class="selectpicker" id="warehouse_id" name="warehouse_id">
 					<option value="0">Semua Cabang</option>
 					@foreach($lims_warehouse_list as $warehouse)
@@ -49,23 +49,14 @@
 						    				else
 						    					echo '<td><p><strong>'.$i.'</strong></p>';
 
-						    				if($total_discount[$i]){
-						    					echo '<strong>'.trans("file.Product Discount").'</strong><br><span>'.$total_discount[$i].'</span><br><br>';
+						    				if($total_qty[$i]){
+						    					echo '<strong>'."Total Kuantitas".'</strong><br><span>'.$total_qty[$i].'</span><br><br>';
 						    				}
-						    				if($order_discount[$i]){
-						    					echo '<strong>'.trans("file.Order Discount").'</strong><br><span>'.$order_discount[$i].'</span><br><br>';
+						    				if($total_paid_amount[$i]){
+						    					echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>'.$total_paid_amount[$i].'</span><br><br>';
 						    				}
-						    				if($total_tax[$i]){
-						    					echo '<strong>'.trans("file.Product Tax").'</strong><br><span>'.$total_tax[$i].'</span><br><br>';
-						    				}
-						    				if($order_tax[$i]){
-						    					echo '<strong>'.trans("file.Order Tax").'</strong><br><span>'.$order_tax[$i].'</span><br><br>';
-						    				}
-						    				if($shipping_cost[$i]){
-						    					echo '<strong>'.trans("file.Shipping Cost").'</strong><br><span>'.$shipping_cost[$i].'</span><br><br>';
-						    				}
-						    				if($grand_total[$i]){
-						    					echo '<strong>'.trans("file.grand total").'</strong><br><span>'.$grand_total[$i].'</span><br><br>';
+						    				if($total_amount[$i]){
+						    					echo '<strong>'."Total Pendapatan".'</strong><br><span>'.$total_amount[$i].'</span><br><br>';
 						    				}
 						    				echo '</td>';
 						    				$i++;
@@ -76,23 +67,14 @@
 						    				else
 						    					echo '<td><p><strong>'.$i.'</strong></p>';
 
-						    				if($total_discount[$i]){
-						    					echo '<strong>'.trans("file.Product Discount").'</strong><br><span>'.$total_discount[$i].'</span><br><br>';
+                                                    if($total_qty[$i]){
+						    					echo '<strong>'."Total Kuantitas".'</strong><br><span>'.$total_qty[$i].'</span><br><br>';
 						    				}
-						    				if($order_discount[$i]){
-						    					echo '<strong>'.trans("file.Order Discount").'</strong><br><span>'.$order_discount[$i].'</span><br><br>';
+						    				if($total_paid_amount[$i]){
+						    					echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>'.$total_paid_amount[$i].'</span><br><br>';
 						    				}
-						    				if($total_tax[$i]){
-						    					echo '<strong>'.trans("file.Product Tax").'</strong><br><span>'.$total_tax[$i].'</span><br><br>';
-						    				}
-						    				if($order_tax[$i]){
-						    					echo '<strong>'.trans("file.Order Tax").'</strong><br><span>'.$order_tax[$i].'</span><br><br>';
-						    				}
-						    				if($shipping_cost[$i]){
-						    					echo '<strong>'.trans("file.Shipping Cost").'</strong><br><span>'.$shipping_cost[$i].'</span><br><br>';
-						    				}
-						    				if($grand_total[$i]){
-						    					echo '<strong>'.trans("file.grand total").'</strong><br><span>'.$grand_total[$i].'</span><br><br>';
+						    				if($total_amount[$i]){
+						    					echo '<strong>'."Total Pendapatan".'</strong><br><span>'.$total_amount[$i].'</span><br><br>';
 						    				}
 						    				echo '</td>';
 						    				$flag = 1;

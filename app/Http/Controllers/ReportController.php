@@ -9,6 +9,7 @@ use App\Models\Product_Sale;
 use App\Models\ProductQuotation;
 use App\Models\Sale;
 use App\Models\Purchase;
+use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use App\Models\Quotation;
 use App\Models\Transfer;
@@ -214,20 +215,15 @@ class ReportController extends Controller
                 else
                     $date = $year.'-'.$month.'-'.$start;
                 $query1 = array(
-                    'SUM(total_discount) AS total_discount',
-                    'SUM(order_discount) AS order_discount',
-                    'SUM(total_tax) AS total_tax',
-                    'SUM(order_tax) AS order_tax',
-                    'SUM(shipping_cost) AS shipping_cost',
-                    'SUM(grand_total) AS grand_total'
+                    'SUM(total_qty) AS total_qty',
+                    'SUM(paid_amount) AS total_paid_amount',
+                    'SUM(total_amount) AS total_amount'
                 );
-                $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-                $total_discount[$start] = $sale_data[0]->total_discount;
-                $order_discount[$start] = $sale_data[0]->order_discount;
-                $total_tax[$start] = $sale_data[0]->total_tax;
-                $order_tax[$start] = $sale_data[0]->order_tax;
-                $shipping_cost[$start] = $sale_data[0]->shipping_cost;
-                $grand_total[$start] = $sale_data[0]->grand_total;
+                // $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
+                $sale_data = Transaction::where('date', $date)->selectRaw(implode(',', $query1))->get();
+                $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
+                $total_qty[$start] = $sale_data[0]->total_qty;
+                $total_amount[$start] = $sale_data[0]->total_amount;
                 $start++;
             }
             $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
@@ -237,7 +233,7 @@ class ReportController extends Controller
             $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $warehouse_id = 0;
-            return view('backend.report.daily_sale', compact('total_discount','order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'grand_total', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+            return view('backend.report.daily_sale', compact('total_paid_amount','total_qty', 'total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -257,20 +253,15 @@ class ReportController extends Controller
             else
                 $date = $year.'-'.$month.'-'.$start;
             $query1 = array(
-                'SUM(total_discount) AS total_discount',
-                'SUM(order_discount) AS order_discount',
-                'SUM(total_tax) AS total_tax',
-                'SUM(order_tax) AS order_tax',
-                'SUM(shipping_cost) AS shipping_cost',
-                'SUM(grand_total) AS grand_total'
+                'SUM(total_qty) AS total_qty',
+                'SUM(paid_amount) AS total_paid_amount',
+                'SUM(total_amount) AS total_amount'
             );
-            $sale_data = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $total_discount[$start] = $sale_data[0]->total_discount;
-            $order_discount[$start] = $sale_data[0]->order_discount;
-            $total_tax[$start] = $sale_data[0]->total_tax;
-            $order_tax[$start] = $sale_data[0]->order_tax;
-            $shipping_cost[$start] = $sale_data[0]->shipping_cost;
-            $grand_total[$start] = $sale_data[0]->grand_total;
+            // $sale_data = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
+            $sale_data = Transaction::where('warehouse_id', $data['warehouse_id'])->where('date', $date)->selectRaw(implode(',', $query1))->get();
+            $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
+            $total_qty[$start] = $sale_data[0]->total_qty;
+            $total_amount[$start] = $sale_data[0]->total_amount;
             $start++;
         }
         $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
@@ -280,7 +271,7 @@ class ReportController extends Controller
         $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         $warehouse_id = $data['warehouse_id'];
-        return view('backend.report.daily_sale', compact('total_discount','order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'grand_total', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+        return view('backend.report.daily_sale', compact('total_paid_amount','total_qty', 'total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
 
     }
 

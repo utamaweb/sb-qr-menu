@@ -1796,7 +1796,8 @@ class ReportController extends Controller
             $end_date = date("Y-m-d");
         }
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        return view('backend.report.warehouse_report',compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list'));
+        $transactions = Transaction::where('warehouse_id', $warehouse_id)->whereBetween('date', [$start_date, $end_date])->get();
+        return view('backend.report.warehouse_report',compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list', 'transactions'));
     }
 
     public function warehouseSaleData(Request $request)
@@ -1807,11 +1808,16 @@ class ReportController extends Controller
         );
 
         $warehouse_id = $request->input('warehouse_id');
-        $q = DB::table('sales')
-            ->join('customers', 'sales.customer_id', '=', 'customers.id')
-            ->where('sales.warehouse_id', $warehouse_id)
-            ->whereDate('sales.created_at', '>=' ,$request->input('start_date'))
-            ->whereDate('sales.created_at', '<=' ,$request->input('end_date'));
+        $q = DB::table('transactions')
+            // ->join('customers', 'sales.customer_id', '=', 'customers.id')
+            ->where('warehouse_id', $warehouse_id)
+            ->whereDate('created_at', '>=' ,$request->input('start_date'))
+            ->whereDate('created_at', '<=' ,$request->input('end_date'));
+        // $q = DB::table('sales')
+        //     ->join('customers', 'sales.customer_id', '=', 'customers.id')
+        //     ->where('sales.warehouse_id', $warehouse_id)
+        //     ->whereDate('sales.created_at', '>=' ,$request->input('start_date'))
+        //     ->whereDate('sales.created_at', '<=' ,$request->input('end_date'));
 
         $totalData = $q->count();
         $totalFiltered = $totalData;
@@ -1821,7 +1827,7 @@ class ReportController extends Controller
         else
             $limit = $totalData;
         $start = $request->input('start');
-        $order = 'sales.'.$columns[$request->input('order.0.column')];
+        $order = 'transactions.'.$columns[$request->input('order.0.column')];
         $dir = $request->input('order.0.dir');
         $q = $q->select('sales.id', 'sales.reference_no', 'sales.grand_total', 'sales.paid_amount', 'sales.sale_status', 'sales.created_at', 'customers.name as customer')
             ->offset($start)

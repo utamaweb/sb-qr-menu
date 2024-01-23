@@ -22,6 +22,7 @@ class CreateUsersTable extends Migration
             $table->string('phone');
             $table->integer('role_id');
             $table->integer('warehouse_id')->nullable();
+            $table->boolean('is_active')->default(1);
             $table->rememberToken();
             $table->timestamps();
         });

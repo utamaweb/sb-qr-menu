@@ -17,8 +17,12 @@ class CloseCashier extends Model
         'initial_balance',
         'total_cash',
         'total_non_cash',
-        'total_money',
+        'total_income',
+        'total_expense',
         'total_product_sales',
+        'auto_balance',
+        'calculated_balance',
+        'difference',
         'is_closed'
     ];
 

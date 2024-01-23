@@ -49,9 +49,9 @@
 
                             <div id="add_new" class="margin">
                                 <div class="form-group row">
-                                    <label for="example-text-input" class="col-md-2 col-form-label">Bahan Baku</label>
+                                    <label for="example-text-input" class="col-md-1 col-form-label">Bahan Baku</label>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <select name="ingredient_id[]" required class="form-control">
                                             <option value="">Pilih Bahan Baku</option>
                                             @foreach($ingredients as $ingredient)
@@ -59,8 +59,14 @@
                                             @endforeach
                                         </select>
                                     </div>
+                                    <div class="col-md-1">
+                                        <input type="number" placeholder="Qty" name="qty[]"" min="1" class="form-control quantity">
+                                    </div>
                                     <div class="col-md-2">
-                                        <input type="number" placeholder="Jumlah" name="qty[]" class="form-control">
+                                        <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" placeholder="Subtotal" name="subtotal[]" class="form-control subtotal">
                                     </div>
                                     <div class="col-md-2">
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control">
@@ -101,8 +107,8 @@
                 alert("Maksimal 10 Bahan Baku!");
             } else {
                 var add_new = $('<div class="form-group row">\n\
-                    <label for="example-text-input" class="col-md-2 col-form-label"></label>\n\
-                    <div class="col-md-4">\n\
+                    <label for="example-text-input" class="col-md-1 col-form-label"></label>\n\
+                    <div class="col-md-2">\n\
                                         <select name="ingredient_id[]" required class="form-control">\n\
                                             <option value="">Pilih Bahan Baku</option>\n\
                                             @foreach($ingredients as $ingredient)\n\
@@ -110,8 +116,14 @@
                                             @endforeach\n\
                                         </select>\n\
                                     </div>\n\
+                                    <div class="col-md-1">\n\
+                                        <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity">\n\
+                                    </div>\n\
                                     <div class="col-md-2">\n\
-                                        <input type="number" placeholder="Jumlah" name="qty[]" class="form-control">\n\
+                                        <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan">\n\
+                                    </div>\n\
+                                    <div class="col-md-2">\n\
+                                        <input type="number" placeholder="Subtotal" name="subtotal[]" class="form-control subtotal">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control">\n\
@@ -127,6 +139,19 @@
         $("#add_new").on('click', '.remCF', function() {
             $(this).parent().parent().parent().remove();
         });
+
+        function calculateSubtotal(row) {
+        var hargaSatuan = $(row).find('.harga-satuan').val();
+        var qty = $(row).find('.quantity').val();
+        var subtotal = hargaSatuan * qty;
+        $(row).find('.subtotal').val(subtotal); // Assuming 2 decimal places
+    }
+
+    // Event listener for changes in harga satuan or qty
+    $('#add_new').on('input', '.harga-satuan, .quantity', function() {
+        var row = $(this).closest('.form-group');
+        calculateSubtotal(row);
+    });
     });
 </script>
 @endpush

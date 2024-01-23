@@ -16,7 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('stock_purchase_id');
             $table->unsignedBigInteger('ingredient_id');
             $table->string('qty');
-            $table->string('notes');
+            $table->bigInteger('subtotal');
+            $table->string('notes')->nullable();
 
             $table->timestamps();
         });

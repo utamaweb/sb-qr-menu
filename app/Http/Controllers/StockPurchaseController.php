@@ -8,6 +8,7 @@ use App\Models\Warehouse;
 use App\Models\TransactionInOut;
 use App\Models\Stock;
 use App\Models\Ingredient;
+use App\Models\CloseCashier;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -33,8 +34,12 @@ class StockPurchaseController extends Controller
 
     public function store(Request $request)
     {
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $openCashier = CloseCashier::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
         $qtyInt = array_map('intval', $request->qty);
         $totalQty = array_sum($qtyInt);
+        $subtotalInt = array_map('intval', $request->subtotal);
+        $totalSubtotal = array_sum($subtotalInt);
         // return $totalQty;
         $this->validate($request, [
             'warehouse_id' => 'required',
@@ -45,13 +50,16 @@ class StockPurchaseController extends Controller
             'warehouse_id' => $request->warehouse_id,
             'user_id' => auth()->user()->id,
             'date' => $request->date,
-            'total_qty' => $totalQty
+            'total_qty' => $totalQty,
+            'total_price' => $totalSubtotal,
+            'close_cashier_id' => $openCashier->id,
         ]);
         foreach ($request->qty as $item => $v) {
             $data = array(
                 'stock_purchase_id' => $stockPurchase->id,
                 'ingredient_id' => $request->ingredient_id[$item],
                 'qty' => $request->qty[$item],
+                'subtotal' => $request->subtotal[$item],
                 'notes' => $request->notes[$item],
             );
             StockPurchaseIngredient::create($data);

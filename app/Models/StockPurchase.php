@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class StockPurchase extends Model
 {
     use HasFactory;
-    protected $fillable = ['date', 'total_qty', 'total_price','warehouse_id', 'user_id'];
+    protected $fillable = ['date', 'total_qty', 'total_price','warehouse_id', 'user_id','close_cashier_id'];
 
     public function warehouse()
     {

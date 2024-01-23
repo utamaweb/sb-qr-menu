@@ -27,6 +27,7 @@
                     <th class="not-exported"></th>
                     <th>Tanggal</th>
                     <th>Total Kuantitas</th>
+                    <th>Total Pembayaran</th>
                     <th>Dibuat Oleh</th>
                     <th>Outlet</th>
                     <th class="not-exported">{{trans('file.action')}}</th>
@@ -38,6 +39,7 @@
                     <td>{{$key}}</td>
                     <td>{{ $stockPurchase->date }}</td>
                     <td>{{ $stockPurchase->total_qty}}</td>
+                    <td>@currency($stockPurchase->total_price)</td>
                     <td>{{ $stockPurchase->user->name}}</td>
                     <td>{{ $stockPurchase->warehouse->name}}</td>
                     <td>

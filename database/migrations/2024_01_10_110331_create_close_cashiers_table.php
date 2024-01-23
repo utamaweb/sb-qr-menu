@@ -21,8 +21,12 @@ return new class extends Migration
             $table->bigInteger("initial_balance")->nullable();
             $table->bigInteger("total_cash")->nullable();
             $table->bigInteger("total_non_cash")->nullable();
-            $table->bigInteger("total_money")->nullable();
+            $table->bigInteger("total_income")->nullable();
+            $table->bigInteger("total_expense")->nullable();
             $table->bigInteger("total_product_sales")->nullable();
+            $table->bigInteger("auto_balance")->nullable();
+            $table->bigInteger("calculated_balance")->nullable();
+            $table->bigInteger("difference")->nullable();
             $table->boolean("is_closed")->default(0);
             $table->timestamps();
         });

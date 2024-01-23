@@ -14,7 +14,7 @@ use DB;
 
 class CloseCashierController extends Controller
 {
-    public function open() {
+    public function open(Request $request) {
         DB::beginTransaction();
 
         try {
@@ -23,7 +23,7 @@ class CloseCashierController extends Controller
                 'open_time' => Carbon::now()->format('Y-m-d H:i:s'),
                 'user_id' => auth()->user()->id,
                 'warehouse_id' => auth()->user()->warehouse_id,
-                'initial_balance' => 0,
+                'initial_balance' => $request->initial_balance,
             ]);
             session(['current_close_cashier_id' => $openCashier->id]);
             $openCashier['session_close'] = session('current_close_cashier_id');
@@ -60,18 +60,13 @@ class CloseCashierController extends Controller
                 if ($transaction['payment_method'] === 'Tunai') {
                     $totalCash += $transaction['paid_amount'];
                 }
-
                 if ($transaction['payment_method'] === 'QRIS') {
                     $totalNonCash += $transaction['paid_amount'];
                 }
-
                 $totalProductSales += $transaction['total_qty'];
-
                 $transactionDetails = TransactionDetail::where('transaction_id', $transaction->id)->get();
-
                 foreach ($transactionDetails as $item) {
                     $productId = $item['product_id'];
-
                     // Menambahkan qty ke total qty per produk
                     if (isset($totalQtyPerProduct[$productId])) {
                         $totalQtyPerProduct[$productId] += $item['qty'];
@@ -80,10 +75,8 @@ class CloseCashierController extends Controller
                     }
                 }
             }
-
             // Menyiapkan struktur data yang diinginkan
             $structuredData = [];
-
             foreach ($totalQtyPerProduct as $productId => $totalQty) {
                 $productName = Product::find($productId)->name;
 
@@ -111,7 +104,6 @@ class CloseCashierController extends Controller
                 'total_product_sales' => $totalProductSales,
             ]);
             $closeCashier['product_sold'] = $structuredData;
-
 
             DB::commit();
             return response()->json($closeCashier, 200);

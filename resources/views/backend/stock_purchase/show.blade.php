@@ -9,7 +9,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>Detail Stok Purchase</h4>
+                        <h4>Detail Pembelian Stok</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
@@ -40,12 +40,12 @@
                                 </div>
                             </div>
 
-                            @foreach($stockPurchaseDetails as $stockPurchaseDetail)
+                            {{-- @foreach($stockPurchaseDetails as $stockPurchaseDetail)
                             <div id="add_new" class="margin">
                                 <div class="form-group row">
-                                    <label for="example-text-input" class="col-md-2 col-form-label">Bahan Baku</label>
+                                    <label for="example-text-input" class="col-md-1 col-form-label">Bahan Baku</label>
 
-                                    <div class="col-md-4">
+                                    <div class="col-md-2">
                                         <select name="ingredient_id[]" required class="form-control" disabled>
                                             <option value="">Pilih Bahan Baku</option>
                                             @foreach($ingredients as $ingredient)
@@ -57,11 +57,44 @@
                                         <input type="number" placeholder="Jumlah" name="qty[]" class="form-control" value="{{$stockPurchaseDetail->qty}}" disabled>
                                     </div>
                                     <div class="col-md-2">
+                                        <input type="number" placeholder="Harga Satuan" name="qty[]" class="form-control" value="{{$stockPurchaseDetail->subtotal / $stockPurchaseDetail->qty}}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="number" placeholder="Subtotal" name="qty[]" class="form-control" value="{{$stockPurchaseDetail->subtotal}}" disabled>
+                                    </div>
+                                    <div class="col-md-2">
                                         <input type="text" placeholder="Catatan" disabled value="{{$stockPurchaseDetail->notes}}" name="notes[]" class="form-control">
                                     </div>
                                 </div>
                             </div>
-                            @endforeach
+
+                            @endforeach --}}
+                            <div class="table-responsive">
+                                <table id="ingredient-table" class="table">
+                                    <thead>
+                                        <tr>
+                                            <th class="not-exported">No</th>
+                                            <th>Bahan Baku</th>
+                                            <th>Jumlah</th>
+                                            <th>Harga Satuan</th>
+                                            <th>Subtotal</th>
+                                            <th>Catatan</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($stockPurchaseDetails as $key=>$stockPurchase)
+                                        <tr data-id="{{$stockPurchase->id}}">
+                                            <td>{{$loop->iteration}}</td>
+                                            <td>{{ $stockPurchase->ingredient->name }}</td>
+                                            <td>{{ $stockPurchase->qty}}</td>
+                                            <td>{{$stockPurchase->subtotal / $stockPurchase->qty}}</td>
+                                            <td>{{ $stockPurchase->subtotal}}</td>
+                                            <td>{{ $stockPurchase->notes ?: '-'}}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
 
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">

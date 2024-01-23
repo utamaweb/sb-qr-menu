@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('close_cashier_id');
             $table->string('product_name');
             $table->bigInteger('qty');
-            $table->bigInteger('subtotal');
             $table->timestamps();
         });
     }

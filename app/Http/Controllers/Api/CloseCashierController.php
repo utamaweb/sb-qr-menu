@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\CloseCashier;
 use App\Models\CloseCashierProductSold;
 use App\Models\Transaction;
+use App\Models\StockPurchase;
 use App\Models\Product;
 use App\Models\TransactionDetail;
 use Carbon\Carbon;
@@ -35,7 +36,7 @@ class CloseCashierController extends Controller
         }
     }
 
-    public function close() {
+    public function close(Request $request) {
         DB::beginTransaction();
 
         try {
@@ -50,7 +51,9 @@ class CloseCashierController extends Controller
                 ->first();
 
             $transactions = Transaction::where('close_cashier_id', $openCashier->id)->get();
+            $expenses = StockPurchase::where('close_cashier_id', $openCashier->id)->get();
 
+            $totalExpense = 0;
             $totalCash = 0;
             $totalNonCash = 0;
             $totalProductSales = 0;
@@ -74,6 +77,9 @@ class CloseCashierController extends Controller
                         $totalQtyPerProduct[$productId] = $item['qty'];
                     }
                 }
+            }
+            foreach ($expenses as $expense) {
+                $totalExpense += $expense['total_price'];
             }
             // Menyiapkan struktur data yang diinginkan
             $structuredData = [];
@@ -100,8 +106,12 @@ class CloseCashierController extends Controller
                 'is_closed' => 1,
                 'total_cash' => $totalCash,
                 'total_non_cash' => $totalNonCash,
-                'total_money' => $totalMoney,
+                'total_income' => $totalMoney,
                 'total_product_sales' => $totalProductSales,
+                'total_expense' => $totalExpense,
+                'auto_balance' => $closeCashier->initial_balance + $totalMoney - $totalExpense,
+                'calculated_balance' => $request->calculated_balance,
+                'difference' => ($closeCashier->initial_balance + $totalMoney - $totalExpense) - $request->calculated_balance,
             ]);
             $closeCashier['product_sold'] = $structuredData;
 

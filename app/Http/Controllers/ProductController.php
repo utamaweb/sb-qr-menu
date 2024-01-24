@@ -437,6 +437,6 @@ class ProductController extends Controller
         $lims_product_data->delete();
         $this->cacheForget('product_list');
         $this->cacheForget('product_list_with_variant');
-        return redirect('products')->with('message', 'Product deleted successfully');
+        return redirect('admin/products')->with('message', 'Product deleted successfully');
     }
 }

@@ -29,7 +29,7 @@ class OrderTypeController extends Controller
         $input = $request->all();
         OrderType::create($input);
         $this->cacheForget('order_type_list');
-        return redirect('order_type')->with('message', 'Data inserted successfully');
+        return redirect('admin/order_type')->with('message', 'Data inserted successfully');
     }
 
     public function edit($id)
@@ -47,7 +47,7 @@ class OrderTypeController extends Controller
             'name' => $request->name
         ]);
         $this->cacheForget('order_type_list');
-        return redirect('order_type')->with('message', 'Data updated successfully');
+        return redirect('admin/order_type')->with('message', 'Data updated successfully');
     }
 
     public function importOrderType(Request $request)
@@ -89,7 +89,7 @@ class OrderTypeController extends Controller
            $order_type->save();
         }
         $this->cacheForget('order_type_list');
-        return redirect('order_type')->with('message', 'OrderType imported successfully');
+        return redirect('admin/order_type')->with('message', 'OrderType imported successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -109,7 +109,7 @@ class OrderTypeController extends Controller
         $lims_order_type_data = OrderType::find($id);
         $lims_order_type_data->delete();
         $this->cacheForget('order_type_list');
-        return redirect('order_type')->with('not_permitted', 'Data deleted successfully');
+        return redirect('admin/order_type')->with('not_permitted', 'Data deleted successfully');
     }
 
     public function order_typeAll()

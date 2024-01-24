@@ -166,7 +166,7 @@ class PurchaseController extends Controller
                             ['purchases.user_id', Auth::id()],
                             ['purchases.' . $field_name, 'LIKE', "%{$search}%"]
                         ]);
-                }      
+                }
                 $purchases = $q->select('purchases.*')->get();
                 $totalFiltered = $q->count();
             }
@@ -579,7 +579,7 @@ class PurchaseController extends Controller
             ProductPurchase::create($product_purchase);
         }
 
-        return redirect('purchases')->with('message', 'Purchase created successfully');
+        return redirect('admin/purchases')->with('message', 'Purchase created successfully');
     }
 
     public function productPurchaseData($id)
@@ -767,7 +767,7 @@ class PurchaseController extends Controller
         $lims_purchase_data->order_tax = ($lims_purchase_data->total_cost - $lims_purchase_data->order_discount) * ($data['order_tax_rate'] / 100);
         $lims_purchase_data->grand_total = ($lims_purchase_data->total_cost + $lims_purchase_data->order_tax + $lims_purchase_data->shipping_cost) - $lims_purchase_data->order_discount;
         $lims_purchase_data->save();
-        return redirect('purchases');
+        return redirect('admin/purchases');
     }
 
     public function edit($id)
@@ -970,7 +970,7 @@ class PurchaseController extends Controller
                                                     ->first();
                         if($lims_product_warehouse_data)
                             $price = $lims_product_warehouse_data->price;
-                            
+
                         $lims_product_warehouse_data = Product_Warehouse::where([
                             ['product_id', $pro_id],
                             ['product_batch_id', $product_purchase['product_batch_id'] ],
@@ -1048,7 +1048,7 @@ class PurchaseController extends Controller
         }
         if(count($custom_field_data))
             DB::table('purchases')->where('id', $lims_purchase_data->id)->update($custom_field_data);
-        return redirect('purchases')->with('message', 'Purchase updated successfully');
+        return redirect('admin/purchases')->with('message', 'Purchase updated successfully');
     }
 
     public function addPayment(Request $request)
@@ -1104,7 +1104,7 @@ class PurchaseController extends Controller
         elseif ($paying_method == 'Cheque') {
             PaymentWithCheque::create($data);
         }
-        return redirect('purchases')->with('message', 'Payment created successfully');
+        return redirect('admin/purchases')->with('message', 'Payment created successfully');
     }
 
     public function getPayment($id)
@@ -1234,7 +1234,7 @@ class PurchaseController extends Controller
             }
         }
         $lims_payment_data->save();
-        return redirect('purchases')->with('message', 'Payment updated successfully');
+        return redirect('admin/purchases')->with('message', 'Payment updated successfully');
     }
 
     public function deletePayment(Request $request)
@@ -1264,7 +1264,7 @@ class PurchaseController extends Controller
             $lims_payment_cheque_data->delete();
         }
         $lims_payment_data->delete();
-        return redirect('purchases')->with('not_permitted', 'Payment deleted successfully');
+        return redirect('admin/purchases')->with('not_permitted', 'Payment deleted successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -1412,7 +1412,7 @@ class PurchaseController extends Controller
             $lims_purchase_data->delete();
             $this->fileDelete('documents/purchase/', $lims_purchase_data->document);
 
-            return redirect('purchases')->with('not_permitted', 'Purchase deleted successfully');;
+            return redirect('admin/purchases')->with('not_permitted', 'Purchase deleted successfully');;
         }
 
     }
@@ -1661,6 +1661,6 @@ class PurchaseController extends Controller
             return response()->json(['error' => $e->getMessage()]);
         }
         $lims_purchase_data->update($data);
-        return redirect('purchases')->with('message', 'Purchase updated successfully');
+        return redirect('admin/purchases')->with('message', 'Purchase updated successfully');
     }
 }

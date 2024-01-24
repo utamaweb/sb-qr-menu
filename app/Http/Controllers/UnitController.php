@@ -47,7 +47,7 @@ class UnitController extends Controller
             $input['operation_value'] = 1;
         }
         Unit::create($input);
-        return redirect('unit');
+        return redirect('admin/unit');
     }
 
     public function limsUnitSearch()
@@ -88,7 +88,7 @@ class UnitController extends Controller
         }
         $lims_unit_data = Unit::where('id',$input['unit_id'])->first();
         $lims_unit_data->update($input);
-        return redirect('unit');
+        return redirect('admin/unit');
     }
 
     public function importUnit(Request $request)
@@ -137,7 +137,7 @@ class UnitController extends Controller
                 $unit->operation_value = $data['operationvalue'];
             $unit->save();
         }
-        return redirect('unit')->with('message', 'Unit imported successfully');
+        return redirect('admin/unit')->with('message', 'Unit imported successfully');
 
     }
 
@@ -157,6 +157,6 @@ class UnitController extends Controller
         $lims_unit_data = Unit::findOrFail($id);
         $lims_unit_data->is_active = false;
         $lims_unit_data->save();
-        return redirect('unit');
+        return redirect('admin/unit');
     }
 }

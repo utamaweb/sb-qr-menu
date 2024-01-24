@@ -40,7 +40,7 @@ class RoleController extends Controller
             'description'  => $request->description,
             'guard_name'  => $request->guard_name,
         ]);
-        return redirect('role')->with('message', 'Data inserted successfully');
+        return redirect('admin/role')->with('message', 'Data inserted successfully');
     }
 
     public function edit($id)
@@ -64,7 +64,7 @@ class RoleController extends Controller
         $input = $request->all();
         $lims_role_data = Roles::where('id', $input['role_id'])->first();
         $lims_role_data->update($input);
-        return redirect('role')->with('message', 'Data updated successfully');
+        return redirect('admin/role')->with('message', 'Data updated successfully');
     }
 
     public function permission($id)
@@ -1197,13 +1197,13 @@ class RoleController extends Controller
 
         cache()->forget('permissions');
 
-        return redirect('role')->with('message', 'Permission updated successfully');
+        return redirect('admin/role')->with('message', 'Permission updated successfully');
     }
 
     public function destroy($id)
     {
         $lims_role_data = Roles::find($id);
         $lims_role_data->delete();
-        return redirect('role')->with('not_permitted', 'Data deleted successfully');
+        return redirect('admin/role')->with('not_permitted', 'Data deleted successfully');
     }
 }

@@ -179,7 +179,7 @@ class ExpenseController extends Controller
             'note' => $request->note,
             'user_id' => Auth::id()
         ]);
-        return redirect('expenses')->with('message', 'Data inserted successfully');
+        return redirect('admin/expenses')->with('message', 'Data inserted successfully');
     }
 
     public function show($id)
@@ -210,7 +210,7 @@ class ExpenseController extends Controller
             'amount' => $request->amount,
             'note' => $request->note,
         ]);
-        return redirect('expenses')->with('message', 'Data updated successfully');
+        return redirect('admin/expenses')->with('message', 'Data updated successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -227,6 +227,6 @@ class ExpenseController extends Controller
     {
         $lims_expense_data = Expense::find($id);
         $lims_expense_data->delete();
-        return redirect('expenses')->with('not_permitted', 'Data deleted successfully');
+        return redirect('admin/expenses')->with('not_permitted', 'Data deleted successfully');
     }
 }

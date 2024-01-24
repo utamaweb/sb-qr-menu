@@ -111,7 +111,7 @@ class EmployeeController extends Controller
         $data['is_active'] = true;
         Employee::create($data);
 
-        return redirect('employees')->with('message', $message);
+        return redirect('admin/employees')->with('message', $message);
     }
 
     public function update(Request $request, $id)
@@ -163,7 +163,7 @@ class EmployeeController extends Controller
             $data['image'] = $imageName;
         }
         $lims_employee_data->update($data);
-        return redirect('employees')->with('message', 'Employee updated successfully');
+        return redirect('admin/employees')->with('message', 'Employee updated successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -206,6 +206,6 @@ class EmployeeController extends Controller
 
         $lims_employee_data->is_active = false;
         $lims_employee_data->save();
-        return redirect('employees')->with('not_permitted', 'Employee deleted successfully');
+        return redirect('admin/employees')->with('not_permitted', 'Employee deleted successfully');
     }
 }

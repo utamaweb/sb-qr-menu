@@ -154,7 +154,7 @@ class CategoryController extends Controller
 
         DB::table('categories')->insert($lims_category_data);
         $this->cacheForget('category_list');
-        return redirect('category')->with('message', 'Category inserted successfully');
+        return redirect('admin/category')->with('message', 'Category inserted successfully');
     }
 
     public function edit($id)
@@ -177,7 +177,7 @@ class CategoryController extends Controller
             'name' => $request->name,
         ]);
 
-        return redirect('category')->with('message', 'Category updated successfully');
+        return redirect('admin/category')->with('message', 'Category updated successfully');
     }
 
     public function import(Request $request)
@@ -221,7 +221,7 @@ class CategoryController extends Controller
             $category->save();
         }
         $this->cacheForget('category_list');
-        return redirect('category')->with('message', 'Category imported successfully');
+        return redirect('admin/category')->with('message', 'Category imported successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -258,6 +258,6 @@ class CategoryController extends Controller
 
         $lims_category_data->delete();
         $this->cacheForget('category_list');
-        return redirect('category')->with('not_permitted', 'Category deleted successfully');
+        return redirect('admin/category')->with('not_permitted', 'Category deleted successfully');
     }
 }

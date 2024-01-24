@@ -60,7 +60,7 @@ class ExpenseCategoryController extends Controller
         $data = $request->all();
         $lims_expense_category_data = ExpenseCategory::find($id);
         $lims_expense_category_data->update($data);
-        return redirect('expense_categories')->with('message', 'Data updated successfully');
+        return redirect('admin/expense_categories')->with('message', 'Data updated successfully');
     }
 
     public function import(Request $request)
@@ -97,7 +97,7 @@ class ExpenseCategoryController extends Controller
            $expense_category->is_active = true;
            $expense_category->save();
         }
-        return redirect('expense_categories')->with('message', 'ExpenseCategory imported successfully');
+        return redirect('admin/expense_categories')->with('message', 'ExpenseCategory imported successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -115,7 +115,7 @@ class ExpenseCategoryController extends Controller
     {
         $lims_expense_category_data = ExpenseCategory::find($id);
         $lims_expense_category_data->delete();
-        return redirect('expense_categories')->with('not_permitted', 'Data deleted successfully');
+        return redirect('admin/expense_categories')->with('not_permitted', 'Data deleted successfully');
     }
 
     public function expenseCategoriesAll()

@@ -26,9 +26,11 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th>Nama Bahan Baku</th>
+                    <th>Stok Awal</th>
+                    <th>Stok Masuk</th>
+                    <th>Stok Terjual</th>
                     <th>Stok Akhir</th>
                     <th>Unit</th>
-                    <th>Stok Terjual</th>
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
@@ -37,9 +39,11 @@
                 <tr data-id="{{$ingredient->id}}">
                     <td>{{$key}}</td>
                     <td>{{ $ingredient->ingredient->name }}</td>
+                    <td>{{ $ingredient->first_stock }}</td>
+                    <td>{{ $ingredient->stock_in }}</td>
+                    <td>{{ $ingredient->stock_used }}</td>
                     <td>{{ $ingredient->last_stock }}</td>
                     <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
-                    <td>{{ $ingredient->stock_used }}</td>
                     <td>
                         <div class="row">
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>

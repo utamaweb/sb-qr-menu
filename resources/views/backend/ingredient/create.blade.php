@@ -28,7 +28,7 @@
                     <th>Nama Bahan Baku</th>
                     <th>Stok Akhir</th>
                     <th>Unit</th>
-                    <th>Stok Indikator</th>
+                    <th>Stok Terjual</th>
                     <th class="not-exported">{{trans('file.action')}}</th>
                 </tr>
             </thead>
@@ -36,10 +36,10 @@
                 @foreach($lims_ingredient_all as $key=>$ingredient)
                 <tr data-id="{{$ingredient->id}}">
                     <td>{{$key}}</td>
-                    <td>{{ $ingredient->name }}</td>
+                    <td>{{ $ingredient->ingredient->name }}</td>
                     <td>{{ $ingredient->last_stock }}</td>
-                    <td>{{ $ingredient->unit->unit_name }}</td>
-                    <td>-</td>
+                    <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
+                    <td>{{ $ingredient->stock_used }}</td>
                     <td>
                         <div class="row">
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
@@ -48,7 +48,7 @@
                             <div role="document" class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Update Bahan Baku')}}</h5>
+                                <h5 id="exampleModalLabel" class="modal-title">Update Bahan Baku</h5>
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
@@ -59,18 +59,18 @@
                                         <div class="form-group">
                                         <div class="form-group">
                                             <label>Nama Bahan Baku *</label>
-                                            <input type="text" value="{{$ingredient->name}}" name="name" required class="form-control">
+                                            <input type="text" value="{{$ingredient->ingredient->name}}" name="name" required class="form-control">
                                         </div>
                                         <div class="form-group">
                                             <label>Unit *</label>
                                             <select name="unit_id" id="" class="form-control">
                                                 <option value="---Pilih Unit---"></option>
                                                 @foreach($units as $unit)
-                                                <option value="{{$unit->id}}" {{$ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
+                                                <option value="{{$unit->id}}" {{$ingredient->ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
                                                 @endforeach
                                             </select>
                                         </div>
-                                        <div class="row">
+                                        {{-- <div class="row">
                                             <div class="form-group col-md-6">
                                                 <label>Stok Awal *</label>
                                                 <input type="number" value="{{$ingredient->first_stock}}" name="first_stock" required class="form-control">
@@ -79,7 +79,7 @@
                                                 <label>Batas Stok Maksimum *</label>
                                                 <input type="number" value="{{$ingredient->max_stock}}" name="max_stock" required class="form-control">
                                             </div>
-                                        </div>
+                                        </div> --}}
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
                                         </div>
                                         <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
@@ -127,7 +127,7 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="row">
+                    {{-- <div class="row">
                         <div class="form-group col-md-6">
                             <label>Stok Awal *</label>
                             <input type="number" name="first_stock" required class="form-control">
@@ -136,7 +136,7 @@
                             <label>Batas Stok Maksimum *</label>
                             <input type="number" name="max_stock" required class="form-control">
                         </div>
-                    </div>
+                    </div> --}}
                     <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
             </form>
         </div>

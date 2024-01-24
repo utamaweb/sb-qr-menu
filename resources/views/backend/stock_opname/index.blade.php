@@ -37,7 +37,7 @@
                     <td>{{$key}}</td>
                     <td>{{ $stockOpname->name }}</td>
                     <td>{{ $stockOpname->created_at}}</td>
-                    <td>{{ $stockOpname->created_at}}</td>
+                    <td>{{ $stockOpname->warehouse->name}}</td>
                     <td>
                         <div class="row">
                         <a href="{{route('stock-opname.show', $stockOpname->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>

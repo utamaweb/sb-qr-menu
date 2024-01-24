@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Ingredient;
 use App\Models\Unit;
+use App\Models\Stock;
 use Illuminate\Validation\Rule;
 use Keygen;
 use Auth;
@@ -16,7 +17,8 @@ class IngredientController extends Controller
     use CacheForget;
     public function index()
     {
-        $lims_ingredient_all = Ingredient::get();
+        // $lims_ingredient_all = Ingredient::get();
+        $lims_ingredient_all = Stock::get();
         $units = Unit::get();
         return view('backend.ingredient.create', compact('lims_ingredient_all', 'units'));
     }
@@ -28,9 +30,9 @@ class IngredientController extends Controller
         ]);
         Ingredient::create([
             'name' => $request->name,
-            'max_stock' => $request->max_stock,
-            'first_stock' => $request->first_stock,
-            'stock_in' => $request->first_stock,
+            // 'max_stock' => $request->max_stock,
+            // 'first_stock' => $request->first_stock,
+            // 'stock_in' => $request->first_stock,
             'unit_id' => $request->unit_id,
         ]);
         $this->cacheForget('ingredient_list');
@@ -51,9 +53,9 @@ class IngredientController extends Controller
         $ingredient = Ingredient::find($id);
         $ingredient->update([
             'name' => $request->name,
-            'first_stock' => $request->first_stock,
-            'stock_in' => $request->first_stock,
-            'max_stock' => $request->max_stock,
+            // 'first_stock' => $request->first_stock,
+            // 'stock_in' => $request->first_stock,
+            // 'max_stock' => $request->max_stock,
             'unit_id' => $request->unit_id,
         ]);
         $this->cacheForget('ingredient_list');

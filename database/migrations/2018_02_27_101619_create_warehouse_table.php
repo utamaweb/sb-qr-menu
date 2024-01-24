@@ -9,7 +9,7 @@ class CreateWarehouseTable extends Migration
     public function up()
     {
         Schema::create('warehouses', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->string('name');
             $table->string('logo')->nullable();
             $table->text('address');

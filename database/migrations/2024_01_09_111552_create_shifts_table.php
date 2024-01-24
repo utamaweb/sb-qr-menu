@@ -14,9 +14,16 @@ return new class extends Migration
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
             $table->string("shift_name");
-            $table->string("shift_hour");
+            $table->date("date");
+            $table->datetime("start_time");
+            $table->datetime("end_time")->nullable();
+            $table->bigInteger("opening_balance");
+            $table->bigInteger("closing_balance")->nullable();
+            $table->bigInteger("total_transaction")->nullable();
             $table->unsignedBigInteger('warehouse_id');
-            $table->string("initial_shift_money");
+            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -94,7 +94,7 @@
                                             </div> --}}
                                             <div class="col-md-6 form-group">
                                                 <label>Keterangan</label>
-                                                <input type="text" name="note" required class="form-control" value="{{$expense->note}}">
+                                                <input type="text" name="note" class="form-control" value="{{$expense->note}}">
                                             </div>
                                         </div>
 
@@ -160,7 +160,7 @@
                         </div> --}}
                         <div class="col-md-6 form-group">
                             <label>Keterangan</label>
-                            <input type="text" name="note" required class="form-control">
+                            <input type="text" name="note" class="form-control">
                         </div>
                         <div class="col-md-12 form-group">
                             <label>Tanggal</label>

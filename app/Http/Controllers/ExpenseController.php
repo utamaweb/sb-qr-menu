@@ -167,6 +167,9 @@ class ExpenseController extends Controller
     {
         $dateNow = Carbon::now()->format('Y-m-d');
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+        if($shift == NULL){
+            return redirect('admin/expenses')->with('not_permitted', 'Belum ada kasir yang dibuka');
+        }
         Expense::create([
             // 'name' => $request->name,
             'qty' => $request->qty,
@@ -177,7 +180,7 @@ class ExpenseController extends Controller
             'note' => $request->note,
             'user_id' => Auth::id()
         ]);
-        return redirect('admin/expenses')->with('message', 'Data inserted successfully');
+        return redirect('admin/expenses')->with('message', 'Data Berhasil Ditambahkan');
     }
 
     public function show($id)

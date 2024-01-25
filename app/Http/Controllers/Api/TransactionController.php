@@ -74,7 +74,12 @@ class TransactionController extends Controller
             } else {
                 $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
             }
-            $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+            $shift = Shift::where('warehouse_id', auth()
+            ->user()->warehouse_id)
+            // ->where('date', $dateNow)
+            ->where('user_id', auth()->user()->id)
+            ->where('is_closed', 0)
+            ->first();
             if($shift == NULL){
                 return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
             }

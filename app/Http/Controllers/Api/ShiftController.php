@@ -22,7 +22,11 @@ class ShiftController extends Controller
 
         try {
             $dateNow = Carbon::now()->format('Y-m-d');
-            $checkShift = Shift::where('date', $dateNow)->where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
+            $checkShift = Shift::where('date', $dateNow)
+            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->orderBy('id', 'DESC')
+            ->first();
+
             $shiftNumber = 1;
             if($checkShift){
                 $shiftNumber = $checkShift->shift_number + 1;
@@ -59,7 +63,7 @@ class ShiftController extends Controller
 
             $dateNow = Carbon::now()->format('Y-m-d');
             $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                ->where('date', $dateNow)
+                // ->where('date', $dateNow)
                 ->where('user_id', auth()->user()->id)
                 ->where('is_closed', 0)
                 ->with('user')

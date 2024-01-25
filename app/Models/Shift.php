@@ -8,10 +8,15 @@ use Illuminate\Database\Eloquent\Model;
 class Shift extends Model
 {
     use HasFactory;
-    protected $fillable = ['shift_name', 'shift_hour', 'warehouse_id', 'initial_shift_money'];
+    protected $fillable = ['shift_number', 'date', 'warehouse_id', 'date', 'start_time', 'end_time', 'opening_balance','closing_balance', 'total_transaction', 'user_id', 'is_closed'];
 
     public function warehouse()
     {
         return $this->belongsTo('App\Models\Warehouse');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
     }
 }

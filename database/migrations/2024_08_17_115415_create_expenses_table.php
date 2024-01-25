@@ -16,8 +16,12 @@ class CreateExpensesTable extends Migration
             $table->double('amount');
             $table->text('note')->nullable();
             $table->foreignId('expense_category_id');
-            $table->foreignId('warehouse_id');
-            $table->foreignId('user_id');
+            $table->unsignedBigInteger('warehouse_id');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('shift_id');
+            $table->foreign('shift_id')->references('id')->on('shifts')->onDelete('cascade');
             $table->timestamps();
         });
     }

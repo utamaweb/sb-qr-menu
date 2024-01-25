@@ -7,11 +7,13 @@ use App\Models\Expense;
 use App\Models\Account;
 use App\Models\Warehouse;
 use App\Models\CashRegister;
+use App\Models\Shift;
 use App\Models\ExpenseCategory;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Auth;
 use DB;
+use Carbon\Carbon;
 
 class ExpenseController extends Controller
 {
@@ -163,16 +165,12 @@ class ExpenseController extends Controller
 
     public function store(Request $request)
     {
-        // $cash_register_data = CashRegister::where([
-        //     ['user_id', $data['user_id']],
-        //     ['warehouse_id', $data['warehouse_id']],
-        //     ['status', true]
-        // ])->first();
-        // if($cash_register_data)
-        //     $data['cash_register_id'] = $cash_register_data->id;
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
         Expense::create([
             // 'name' => $request->name,
             'qty' => $request->qty,
+            'shift_id' => $shift->id,
             'expense_category_id' => $request->expense_category_id,
             'warehouse_id' => Auth::user()->warehouse_id,
             'amount' => $request->amount,

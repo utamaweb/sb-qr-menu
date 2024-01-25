@@ -6,7 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PrinterController;
 use App\Http\Controllers\Api\TransactionController;
-use App\Http\Controllers\Api\CloseCashierController;
+use App\Http\Controllers\Api\ShiftController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,19 +44,8 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::post('transaction', [TransactionController::class, 'store']);
 
 
-    Route::post('close_cashier/open', [CloseCashierController::class, 'open']);
-    Route::post('close_cashier/close', [CloseCashierController::class, 'close']);
-
-
-    Route::put('wallets', [WalletController::class, 'update']);
-    Route::get('wallets', [WalletController::class, 'show']);
-
-    Route::get('transfer_histories', [TransferHistoryController::class, 'index']);
-
-    Route::post('top_ups', [TopUpController::class, 'store']);
-
-    Route::post('transfers', [TransferController::class, 'store']);
-
+    Route::post('shift/open', [ShiftController::class, 'open']);
+    Route::post('close_cashier/close', [ShiftController::class, 'close']);
 
 });
 

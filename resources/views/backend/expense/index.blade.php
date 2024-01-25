@@ -43,7 +43,7 @@
                     <td>{{$key}}</td>
                     <td>{{ $expense->expenseCategory->name }}</td>
                     <td>{{ $expense->qty }}</td>
-                    <td>{{ $expense->amount }}</td>
+                    <td>@currency($expense->amount)</td>
                     <td>{{ $expense->warehouse->name }}</td>
                     <td>{{ $expense->user->name }} | {{$expense->created_at}}</td>
                     @if(auth()->user()->hasRole('Kasir'))

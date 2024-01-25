@@ -17,8 +17,8 @@ return new class extends Migration
             $table->string("total_qty");
             $table->string("total_price")->nullable();
             $table->unsignedBigInteger('warehouse_id');
-            $table->unsignedBigInteger('close_cashier_id')->nullable();
-            $table->foreign('close_cashier_id')->references('id')->on('close_cashiers')->onDelete('cascade');
+            $table->unsignedBigInteger('shift_id')->nullable();
+            $table->foreign('shift_id')->references('id')->on('shifts')->onDelete('cascade');
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
         });

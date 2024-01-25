@@ -1,0 +1,176 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use App\Models\CloseCashier;
+use App\Models\CloseCashierProductSold;
+use App\Models\Transaction;
+use App\Models\StockPurchase;
+use App\Models\Product;
+use App\Models\Shift;
+use App\Models\Expense;
+use App\Models\TransactionDetail;
+use Carbon\Carbon;
+use DB;
+
+class ShiftController extends Controller
+{
+    public function open(Request $request) {
+        DB::beginTransaction();
+
+        try {
+            $dateNow = Carbon::now()->format('Y-m-d');
+            $checkShift = Shift::where('date', $dateNow)->where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
+            $shiftNumber = 1;
+            if($checkShift){
+                $shiftNumber = $checkShift->shift_number + 1;
+            }
+            $shiftOpen = Shift::create([
+                'shift_number' => $shiftNumber,
+                'date' => Carbon::now()->format('Y-m-d'),
+                'start_time' => Carbon::now()->format('Y-m-d H:i:s'),
+                'opening_balance' => $request->opening_balance,
+                'user_id' => auth()->user()->id,
+                'warehouse_id' => auth()->user()->warehouse_id,
+            ]);
+            // $shiftOpen = CloseCashier::create([
+            //     'date' => Carbon::now()->format('Y-m-d'),
+            //     'open_time' => Carbon::now()->format('Y-m-d H:i:s'),
+            //     'user_id' => auth()->user()->id,
+            //     'warehouse_id' => auth()->user()->warehouse_id,
+            //     'initial_balance' => $request->initial_balance,
+            // ]);
+            DB::commit();
+            return response()->json($shiftOpen, 200);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
+    }
+
+    public function close(Request $request) {
+        DB::beginTransaction();
+
+        try {
+            // $transaction_details = TransactionDetail::where('transaction_id', [1,2])->get();
+            // return $transaction_details;
+
+            $dateNow = Carbon::now()->format('Y-m-d');
+            $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                ->where('date', $dateNow)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->with('user')
+                ->first();
+            if($shift == NULL){
+                return response()->json(['message' => "Belum Ada Kasir Buka"], 500);
+            }
+
+            $transactions = Transaction::where('shift_id', $shift->id)->get();
+            // $expenses = StockPurchase::where('shift_id', $shift->id)->get();
+            $expenses = Expense::where('shift_id', $shift->id)->with('expenseCategory')->get();
+
+            $totalExpense = 0;
+            $totalCash = 0;
+            $totalNonCash = 0;
+            $totalProductSales = 0;
+            $totalQtyPerProduct = [];
+
+            foreach ($transactions as $transaction) {
+                if ($transaction['payment_method'] === 'Tunai') {
+                    $totalCash += $transaction['paid_amount'];
+                }
+                if ($transaction['payment_method'] === 'QRIS') {
+                    $totalNonCash += $transaction['paid_amount'];
+                }
+                $totalProductSales += $transaction['total_qty'];
+                $transactionDetails = TransactionDetail::where('transaction_id', $transaction->id)->get();
+                foreach ($transactionDetails as $item) {
+                    $productId = $item['product_id'];
+                    // Menambahkan qty ke total qty per produk
+                    if (isset($totalQtyPerProduct[$productId])) {
+                        $totalQtyPerProduct[$productId] += $item['qty'];
+                    } else {
+                        $totalQtyPerProduct[$productId] = $item['qty'];
+                    }
+                }
+            }
+            foreach ($expenses as $expense) {
+                // $totalExpense += $expense['total_price'];
+                $totalExpense += $expense['amount'];
+            }
+            // Menyiapkan struktur data yang diinginkan
+            $structuredData = [];
+            foreach ($totalQtyPerProduct as $productId => $totalQty) {
+                $productName = Product::find($productId)->name;
+
+                // Menambahkan struktur data yang diinginkan
+                $structuredData[] = [
+                    'product_name' => $productName,
+                    'qty' => $totalQty,
+                ];
+                CloseCashierProductSold::create([
+                    'close_cashier_id' => $shift->id,
+                    'product_name' => $productName,
+                    'qty' => $totalQty,
+                ]);
+            }
+            // Menghitung total money (gabungan total pendapatan tunai & QRIS)
+            $totalMoney = $totalCash + $totalNonCash;
+            // Update Shift Setelah tutup kasir
+
+            $shift->update([
+                'end_time' => Carbon::now()->format('Y-m-d H:i:s'),
+                'closing_balance' => $request->cash_in_drawer,
+                'total_transaction' => $totalMoney,
+                'is_closed' => 1
+            ]);
+            $transaction = Transaction::where('shift_id', $shift->id)->get();
+            $gofood_omzet = $transaction->where('payment_method', 'GOFOOD')->sum('total_amount');
+            $grabfood_omzet = $transaction->where('payment_method', 'GRABFOOD')->sum('total_amount');
+            $shopeefood_omzet = $transaction->where('payment_method', 'SHOPEEFOOD')->sum('total_amount');
+            $qris_omzet = $transaction->where('payment_method', 'QRIS')->sum('total_amount');
+            $transfer_omzet = $transaction->where('payment_method', 'TRANSFER')->sum('total_amount');
+            // $closeCashier = CloseCashier::find($shift->id);
+            // $closeCashier->update([
+            $closeCashierCheck = CloseCashier::where('shift_id', $shift->id)->where('is_closed', 1)->first();
+            if($closeCashierCheck){
+                return response()->json(['message' => 'Cashier Already Closed Before This'], 200);
+            }
+            $closeCashier = CloseCashier::create([
+                'shift_id' => $shift->id,
+                'date' => $shift->date,
+                'open_time' => $shift->start_time,
+                'close_time' => Carbon::now()->format('Y-m-d H:i:s'),
+                'initial_balance' => $shift->opening_balance,
+                'is_closed' => 1,
+                'total_cash' => $totalCash,
+                'total_non_cash' => $totalNonCash,
+                'gofood_omzet' => $gofood_omzet,
+                'grabfood_omzet' => $grabfood_omzet,
+                'shopeefood_omzet' => $shopeefood_omzet,
+                'qris_omzet' => $qris_omzet,
+                'transfer_omzet' => $transfer_omzet,
+                'total_income' => $totalMoney,
+                'total_product_sales' => $totalProductSales,
+                'total_expense' => $totalExpense,
+                'auto_balance' => $shift->opening_balance + $totalMoney - $totalExpense,
+                'cash_in_drawer' => $request->cash_in_drawer,
+                'difference' => ($shift->opening_balance + $totalMoney - $totalExpense) - $request->cash_in_drawer,
+            ]);
+            $closeCashier['product_sold'] = $structuredData;
+            $closeCashier['expenses'] = $expenses;
+            $closeCashier['shift'] = $shift;
+            $closeCashier['result'] = $totalCash - $totalNonCash - $totalExpense;
+            $closeCashier['cash_in_drawer_without_opening_balance'] = $request->cash_in_drawer;
+
+            DB::commit();
+            return response()->json($closeCashier, 200);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return response()->json(['message' => $th->getMessage()], 500);
+        }
+    }
+}

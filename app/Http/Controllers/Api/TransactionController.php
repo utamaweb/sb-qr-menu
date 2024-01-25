@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Transaction;
 use App\Models\Stock;
 use App\Models\Product;
-use App\Models\CloseCashier;
+use App\Models\Shift;
 use App\Models\IngredientProducts;
 use App\Models\Ingredient;
 use App\Models\Warehouse;
@@ -74,10 +74,13 @@ class TransactionController extends Controller
             } else {
                 $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
             }
-            $openCashier = CloseCashier::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+            $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+            if($shift == NULL){
+                return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
+            }
             $transaction = Transaction::create([
                 'warehouse_id' => auth()->user()->warehouse_id,
-                'close_cashier_id' => $openCashier->id,
+                'shift_id' => $shift->id,
                 'sequence_number' => $sequence_number + 1,
                 'order_type_id' => $request->order_type_id,
                 'user_id' => auth()->user()->id,

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('shifts', function (Blueprint $table) {
             $table->id();
-            $table->string("shift_name");
+            $table->integer("shift_number");
             $table->date("date");
             $table->datetime("start_time");
             $table->datetime("end_time")->nullable();
@@ -24,6 +24,7 @@ return new class extends Migration
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->boolean("is_closed")->default(0);
             $table->timestamps();
         });
     }

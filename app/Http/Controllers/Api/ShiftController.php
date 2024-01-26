@@ -31,6 +31,15 @@ class ShiftController extends Controller
             if($checkShift){
                 $shiftNumber = $checkShift->shift_number + 1;
             }
+            $checkUserShift = Shift::where('date', $dateNow)
+            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->where('user_id', auth()->user()->id)
+            ->orderBy('id', 'DESC')
+            ->first();
+            if($checkUserShift){
+                return response()->json(['message' => "Kasir dengan user : " . $checkUserShift->user->name . " sudah dibuka sebelumnya."], 500);
+            }
+
             $shiftOpen = Shift::create([
                 'shift_number' => $shiftNumber,
                 'date' => Carbon::now()->format('Y-m-d'),

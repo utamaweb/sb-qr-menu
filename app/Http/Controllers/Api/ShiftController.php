@@ -10,6 +10,7 @@ use App\Models\Transaction;
 use App\Models\StockPurchase;
 use App\Models\Product;
 use App\Models\Shift;
+use App\Models\Stock;
 use App\Models\Expense;
 use App\Models\TransactionDetail;
 use Carbon\Carbon;
@@ -18,6 +19,7 @@ use DB;
 class ShiftController extends Controller
 {
     public function open(Request $request) {
+
         DB::beginTransaction();
 
         try {
@@ -48,6 +50,14 @@ class ShiftController extends Controller
                 'user_id' => auth()->user()->id,
                 'warehouse_id' => auth()->user()->warehouse_id,
             ]);
+            if($request->stocks){
+                foreach ($request->stocks as $stock) {
+                    Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
+                        'last_stock' => $stock['stock']
+                    ]);
+                    // $transaction->transaction_details()->create($detail);
+                }
+            }
             // $shiftOpen = CloseCashier::create([
             //     'date' => Carbon::now()->format('Y-m-d'),
             //     'open_time' => Carbon::now()->format('Y-m-d H:i:s'),

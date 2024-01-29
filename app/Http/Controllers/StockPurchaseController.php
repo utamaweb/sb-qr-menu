@@ -9,6 +9,7 @@ use App\Models\TransactionInOut;
 use App\Models\Stock;
 use App\Models\Ingredient;
 use App\Models\CloseCashier;
+use App\Models\Shift;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
@@ -35,7 +36,7 @@ class StockPurchaseController extends Controller
     public function store(Request $request)
     {
         $dateNow = Carbon::now()->format('Y-m-d');
-        $openCashier = CloseCashier::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
         $qtyInt = array_map('intval', $request->qty);
         $totalQty = array_sum($qtyInt);
         $subtotalInt = array_map('intval', $request->subtotal);
@@ -52,7 +53,7 @@ class StockPurchaseController extends Controller
             'date' => $request->date,
             'total_qty' => $totalQty,
             'total_price' => $totalSubtotal,
-            'close_cashier_id' => $openCashier->id,
+            'shift_id' => $shift->id,
         ]);
         foreach ($request->qty as $item => $v) {
             $data = array(

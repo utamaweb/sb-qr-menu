@@ -26,6 +26,7 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th>Nama Bahan Baku</th>
+                    <th>Outlet</th>
                     <th>Stok Awal</th>
                     <th>Stok Masuk</th>
                     <th>Stok Terjual</th>
@@ -39,6 +40,7 @@
                 <tr data-id="{{$ingredient->id}}">
                     <td>{{$key}}</td>
                     <td>{{ $ingredient->ingredient->name }}</td>
+                    <td>{{ $ingredient->warehouse->name }}</td>
                     <td>{{ $ingredient->first_stock }}</td>
                     <td>{{ $ingredient->stock_in }}</td>
                     <td>{{ $ingredient->stock_used }}</td>

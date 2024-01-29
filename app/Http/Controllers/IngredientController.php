@@ -19,6 +19,10 @@ class IngredientController extends Controller
     {
         // $lims_ingredient_all = Ingredient::get();
         $lims_ingredient_all = Stock::get();
+        $roleName = auth()->user()->getRoleNames()[0];
+        if($roleName == 'Kasir'){
+            $lims_ingredient_all = Stock::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        }
         $units = Unit::get();
         return view('backend.ingredient.create', compact('lims_ingredient_all', 'units'));
     }

@@ -36,6 +36,7 @@ class ShiftController extends Controller
             $checkUserShift = Shift::where('date', $dateNow)
             ->where('warehouse_id', auth()->user()->warehouse_id)
             ->where('user_id', auth()->user()->id)
+            ->where('is_closed', 0)
             ->orderBy('id', 'DESC')
             ->first();
             if($checkUserShift){
@@ -188,6 +189,15 @@ class ShiftController extends Controller
             $closeCashier['shift'] = $shift;
             $closeCashier['result'] = $totalCash - $totalNonCash - $totalExpense;
             $closeCashier['cash_in_drawer_without_opening_balance'] = $request->cash_in_drawer;
+            if($request->stocks){
+                foreach ($request->stocks as $stock) {
+                    $ingredientStock = Stock::where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                    $realStock = $ingredientStock->ingredient->name . '-real';
+                    $closeCashier[$ingredientStock->ingredient->name] = $stock['stock'];
+                    $closeCashier[$realStock] = $ingredientStock->last_stock;
+                    $closeCashier['selisih-'.$ingredientStock->ingredient->name] = $ingredientStock->last_stock - $stock['stock'];
+                }
+            }
 
             DB::commit();
             return response()->json($closeCashier, 200);

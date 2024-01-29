@@ -35,6 +35,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('ingredients', [StockController::class, 'getAllIngredients']);
     Route::get('stocks', [StockController::class, 'getAllStocks']);
     Route::get('stock-warehouse', [StockController::class, 'getStockByWarehouse']);
+    Route::get('ingredient-sold', [StockController::class, 'getIngredientSold']);
 
 
     // Printer CRUD API

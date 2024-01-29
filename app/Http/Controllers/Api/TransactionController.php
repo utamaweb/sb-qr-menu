@@ -83,6 +83,7 @@ class TransactionController extends Controller
             if($shift == NULL){
                 return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
             }
+            // Insert ke table transaction
             $transaction = Transaction::create([
                 'warehouse_id' => auth()->user()->warehouse_id,
                 'shift_id' => $shift->id,
@@ -148,9 +149,6 @@ class TransactionController extends Controller
                 //     $ingredient->save();
                 // }
                 foreach ($ingredients as $ingredient) {
-                    // $ingredient->last_stock -= $qty;
-                    // $ingredient->stock_used += $qty;
-                    // $ingredient->save();
                     $stock = Stock::where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
                     if (!$stock) {
                         // Handle jika stok belum ada
@@ -159,15 +157,22 @@ class TransactionController extends Controller
                     $stock->last_stock -= $qty;
                     $stock->stock_used += $qty;
                     $stock->save();
-
+                    // Insert ke table transaction in out
                     TransactionInOut::create([
                         'warehouse_id' => auth()->user()->warehouse_id,
                         'ingredient_id' => $ingredient->id,
                         'transaction_id' => $transaction->id,
                         'qty' => $qty,
+                        'date' => $dateNow,
                         'transaction_type' => 'out',
                         'user_id' => auth()->user()->id,
                     ]);
+
+                    // TransactionIngredient::create([
+                    //     'warehouse_id' => auth()->user()->warehouse_id,
+                    //     'ingredient_id' => $ingredient->id,
+                    //     'transaction_id' => $transaction->id,
+                    // ]);
                 }
             }
             $transaction['order_type'] = $transaction->orderType;

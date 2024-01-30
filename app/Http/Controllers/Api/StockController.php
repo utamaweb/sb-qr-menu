@@ -18,8 +18,8 @@ class StockController extends Controller
     }
 
     public function getAllStocks() {
-        $stocks = Stock::with(['warehouse', 'ingredient'])->get();
-        return response()->json($stocks, 200);
+        $stockWithIngredients = Stock::with(['warehouse', 'ingredient'])->get();
+        return response()->json($stockWithIngredients, 200);
     }
 
     public function getStockByWarehouse() {

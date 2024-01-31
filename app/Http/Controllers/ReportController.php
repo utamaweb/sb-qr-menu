@@ -157,11 +157,11 @@ class ReportController extends Controller
             else
                 $warehouse_id = 0;
             if(!$warehouse_id) {
-                $total_item = DB::table('product_warehouse')
-                            ->join('products', 'product_warehouse.product_id', '=', 'products.id')
+                $total_item = DB::table('stocks')
+                            ->join('products', 'stock.product_id', '=', 'products.id')
                             ->where([
                                 ['products.is_active', true],
-                                ['product_warehouse.qty', '>' , 0]
+                                ['stocks.qty', '>' , 0]
                             ])->count();
 
                 $total_qty = Product::where('is_active', true)->sum('qty');
@@ -288,20 +288,12 @@ class ReportController extends Controller
                 else
                     $date = $year.'-'.$month.'-'.$start;
                 $query1 = array(
-                    'SUM(total_discount) AS total_discount',
-                    'SUM(order_discount) AS order_discount',
-                    'SUM(total_tax) AS total_tax',
-                    'SUM(order_tax) AS order_tax',
-                    'SUM(shipping_cost) AS shipping_cost',
-                    'SUM(grand_total) AS grand_total'
+                    'SUM(qty) AS total_qty',
+                    'SUM(amount) AS total_amount'
                 );
-                $purchase_data = Purchase::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-                $total_discount[$start] = $purchase_data[0]->total_discount;
-                $order_discount[$start] = $purchase_data[0]->order_discount;
-                $total_tax[$start] = $purchase_data[0]->total_tax;
-                $order_tax[$start] = $purchase_data[0]->order_tax;
-                $shipping_cost[$start] = $purchase_data[0]->shipping_cost;
-                $grand_total[$start] = $purchase_data[0]->grand_total;
+                $purchase_data = Expense::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
+                $total_qty[$start] = $purchase_data[0]->total_qty;
+                $total_amount[$start] = $purchase_data[0]->total_amount;
                 $start++;
             }
             $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
@@ -311,7 +303,7 @@ class ReportController extends Controller
             $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $warehouse_id = 0;
-            return view('backend.report.daily_purchase', compact('total_discount','order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'grand_total', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+            return view('backend.report.daily_purchase', compact('total_qty','total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -369,28 +361,19 @@ class ReportController extends Controller
                 $start_date = $year . '-'. date('m', $start).'-'.'01';
                 $end_date = $year . '-'. date('m', $start).'-'.'31';
 
-                $temp_total_discount = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_discount');
-                $total_discount[] = number_format((float)$temp_total_discount, config('decimal'), '.', '');
+                $temp_order_qty = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
+                $total_qty[] = number_format((float)$temp_order_qty, config('decimal'), '.', '');
 
-                $temp_order_discount = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('order_discount');
-                $order_discount[] = number_format((float)$temp_order_discount, config('decimal'), '.', '');
+                $total_paid_amount = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
+                $total_paid[] = number_format((float)$total_paid_amount, config('decimal'), '.', '');
 
-                $temp_total_tax = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_tax');
-                $total_tax[] = number_format((float)$temp_total_tax, config('decimal'), '.', '');
-
-                $temp_order_tax = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('order_tax');
-                $order_tax[] = number_format((float)$temp_order_tax, config('decimal'), '.', '');
-
-                $temp_shipping_cost = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('shipping_cost');
-                $shipping_cost[] = number_format((float)$temp_shipping_cost, config('decimal'), '.', '');
-
-                $temp_total = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-                $total[] = number_format((float)$temp_total, config('decimal'), '.', '');
+                $temp_total = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
+                $total_amount[] = number_format((float)$temp_total, config('decimal'), '.', '');
                 $start = strtotime("+1 month", $start);
             }
             $lims_warehouse_list = Warehouse::where('is_active',true)->get();
             $warehouse_id = 0;
-            return view('backend.report.monthly_sale', compact('year', 'total_discount', 'order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'total', 'lims_warehouse_list', 'warehouse_id'));
+            return view('backend.report.monthly_sale', compact('year', 'total_qty', 'total_paid', 'total_amount','lims_warehouse_list', 'warehouse_id'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -445,26 +428,18 @@ class ReportController extends Controller
                 $end_date = $year . '-'. date('m', $start).'-'.'31';
 
                 $query1 = array(
-                    'SUM(total_discount) AS total_discount',
-                    'SUM(order_discount) AS order_discount',
-                    'SUM(total_tax) AS total_tax',
-                    'SUM(order_tax) AS order_tax',
-                    'SUM(shipping_cost) AS shipping_cost',
-                    'SUM(grand_total) AS grand_total'
+                    'SUM(qty) AS total_qty',
+                    'SUM(amount) AS total_amount'
                 );
-                $purchase_data = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query1))->get();
+                $purchase_data = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query1))->get();
 
-                $total_discount[] = number_format((float)$purchase_data[0]->total_discount, config('decimal'), '.', '');
-                $order_discount[] = number_format((float)$purchase_data[0]->order_discount, config('decimal'), '.', '');
-                $total_tax[] = number_format((float)$purchase_data[0]->total_tax, config('decimal'), '.', '');
-                $order_tax[] = number_format((float)$purchase_data[0]->order_tax, config('decimal'), '.', '');
-                $shipping_cost[] = number_format((float)$purchase_data[0]->shipping_cost, config('decimal'), '.', '');
-                $grand_total[] = number_format((float)$purchase_data[0]->grand_total, config('decimal'), '.', '');
+                $total_qty[$start] = $purchase_data[0]->total_qty;
+                $total_amount[$start] = $purchase_data[0]->total_amount;
                 $start = strtotime("+1 month", $start);
             }
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $warehouse_id = 0;
-            return view('backend.report.monthly_purchase', compact('year', 'total_discount', 'order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'grand_total', 'lims_warehouse_list', 'warehouse_id'));
+            return view('backend.report.monthly_purchase', compact('year', 'total_qty', 'total_amount', 'lims_warehouse_list', 'warehouse_id'));
         }
         else
             return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
@@ -518,14 +493,15 @@ class ReportController extends Controller
                 $start_date = date("Y-m", $start).'-'.'01';
                 $end_date = date("Y-m", $start).'-'.'31';
 
-                $best_selling_qty = Product_Sale::select(DB::raw('product_id, sum(qty) as sold_qty'))->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->groupBy('product_id')->orderBy('sold_qty', 'desc')->take(1)->get();
+                $best_selling_qty = TransactionDetail::select(DB::raw('product_id, sum(qty) as sold_qty'))->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->groupBy('product_id')->orderBy('sold_qty', 'desc')->take(1)->get();
                 if(!count($best_selling_qty)){
                     $product[] = '';
                     $sold_qty[] = 0;
                 }
                 foreach ($best_selling_qty as $best_seller) {
                     $product_data = Product::find($best_seller->product_id);
-                    $product[] = $product_data->name.': '.$product_data->code;
+                    $product[] = $product_data->name;
+                    // $product[] = $product_data->name.': '.$product_data->code;
                     $sold_qty[] = $best_seller->sold_qty;
                 }
                 $start = strtotime("+1 month", $start);

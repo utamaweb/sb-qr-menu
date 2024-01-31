@@ -39,31 +39,19 @@
 						      <td><strong>December</strong></td>
 						    </tr>
 						    <tr>
-						    	@foreach($total_discount as $key => $discount)
+						    	@foreach($total_qty as $key => $discount)
 						        <td>
-						        	@if($discount > 0)
-							      	<strong>{{trans("file.Product Discount")}}</strong><br>
-							      	<span>{{$discount}}</span><br><br>
+							      	@if($total_qty[$key] > 0)
+							      	<strong>Total Jumlah Order (Qty)</strong><br>
+							      	<span>{{$total_qty[$key]}}</span><br><br>
 							      	@endif
-							      	@if($order_discount[$key] > 0)
-							      	<strong>{{trans("file.Order Discount")}}</strong><br>
-							      	<span>{{$order_discount[$key]}}</span><br><br>
+							      	@if($total_paid[$key] > 0)
+							      	<strong>Total Penerimaan uang</strong><br>
+							      	<span>{{$total_paid[$key]}}</span><br><br>
 							      	@endif
-							      	@if($total_tax[$key] > 0)
-							      	<strong>{{trans("file.Product Tax")}}</strong><br>
-							      	<span>{{$total_tax[$key]}}</span><br><br>
-							      	@endif
-							      	@if($order_tax[$key] > 0)
-							      	<strong>{{trans("file.Order Tax")}}</strong><br>
-							      	<span>{{$order_tax[$key]}}</span><br><br>
-							      	@endif
-							      	@if($shipping_cost[$key] > 0)
-							      	<strong>{{trans("file.Shipping Cost")}}</strong><br>
-							      	<span>{{$shipping_cost[$key]}}</span><br><br>
-							      	@endif
-							      	@if($total[$key] > 0)
-							      	<strong>{{trans("file.grand total")}}</strong><br>
-							      	<span>{{$total[$key]}}</span><br>
+							      	@if($total_amount[$key] > 0)
+							      	<strong>Total Pembayaran</strong><br>
+							      	<span>{{$total_amount[$key]}}</span><br>
 							      	@endif
 						        </td>
 						        @endforeach

@@ -32,7 +32,7 @@ class ShiftController extends Controller
             // return $checkShift->shift_number;
 
             $shiftNumber = 1;
-            if($checkShift->shift_number < 3){
+            if($checkShift && $checkShift->shift_number < 3){
                 $shiftNumber = $checkShift->shift_number + 1;
             }
             $checkUserShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)

@@ -74,8 +74,7 @@ class TransactionController extends Controller
             } else {
                 $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
             }
-            $shift = Shift::where('warehouse_id', auth()
-            ->user()->warehouse_id)
+            $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
             // ->where('date', $dateNow)
             ->where('user_id', auth()->user()->id)
             ->where('is_closed', 0)
@@ -123,7 +122,6 @@ class TransactionController extends Controller
             $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
             $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
             $transaction['product_count'] = count($request->transaction_details);
-
 
             $product_ids = [];
             foreach ($request->transaction_details as $detail) {
@@ -175,9 +173,8 @@ class TransactionController extends Controller
                     // ]);
                 }
             }
-            $transaction['order_type'] = $transaction->orderType;
+            $transaction['order_type'] = $transaction->order_type;
             $transaction['order_type_name'] = $transaction['order_type']['name'];
-
 
             DB::commit();
             return response()->json($transaction, 200);

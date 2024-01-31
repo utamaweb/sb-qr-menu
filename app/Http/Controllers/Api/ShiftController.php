@@ -189,15 +189,26 @@ class ShiftController extends Controller
             $closeCashier['shift'] = $shift;
             $closeCashier['result'] = $totalCash - $totalNonCash - $totalExpense;
             $closeCashier['cash_in_drawer_without_opening_balance'] = $request->cash_in_drawer;
-            if($request->stocks){
+            $stocks = [];
+
+            if ($request->stocks) {
                 foreach ($request->stocks as $stock) {
                     $ingredientStock = Stock::where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
-                    $realStock = $ingredientStock->ingredient->name . '-real';
-                    $closeCashier[$ingredientStock->ingredient->name] = $stock['stock'];
-                    $closeCashier[$realStock] = $ingredientStock->last_stock;
-                    $closeCashier['selisih-'.$ingredientStock->ingredient->name] = $ingredientStock->last_stock - $stock['stock'];
+                    $ingredientName = str_replace(' ', '_', $ingredientStock->ingredient->name);
+                    $realStock = $ingredientName . '_real';
+
+                    $stockData = [
+                        'ingredient_id' => $stock['ingredient_id'],
+                        'ingredient_name' => $ingredientStock->ingredient->name,
+                        'stock_real' => $ingredientStock->last_stock,
+                        'stock_input' => $stock['stock'],
+                        'difference_stock' => $ingredientStock->last_stock - $stock['stock'],
+                    ];
+
+                    $stocks[] = $stockData;
                 }
             }
+            $closeCashier['stocks'] = $stocks;
 
             DB::commit();
             return response()->json($closeCashier, 200);

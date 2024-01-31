@@ -1779,7 +1779,7 @@ class ReportController extends Controller
         $start_date = $data['start_date'];
         $end_date = $data['end_date'];
 
-        $lims_payment_data = Payment::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->get();
+        $lims_payment_data = Transaction::where('date', '>=' , $start_date)->where('date', '<=' , $end_date)->get();
         return view('backend.report.payment_report',compact('lims_payment_data', 'start_date', 'end_date'));
     }
 

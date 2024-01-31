@@ -3,12 +3,12 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header mt-2">
-                <h3 class="text-center">{{trans('file.Payment Report')}}</h3>
+                <h3 class="text-center">Laporan Pembayaran</h3>
             </div>
             {!! Form::open(['route' => 'report.paymentByDate', 'method' => 'post']) !!}
             <div class="col-md-6 offset-md-3 mt-3 mb-3">
                 <div class="form-group row">
-                    <label class="d-tc mt-2"><strong>{{trans('file.Choose Your Date')}}</strong> &nbsp;</label>
+                    <label class="d-tc mt-2"><strong>Pilih Tanggal</strong> &nbsp;</label>
                     <div class="d-tc">
                         <div class="input-group">
                             <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} To {{$end_date}}" required />
@@ -29,31 +29,26 @@
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>{{trans('file.Date')}}</th>
-                    <th>{{trans('file.Payment Reference')}} </th>
-                    <th>{{trans('file.Sale Reference')}}</th>
-                    <th>{{trans('file.Purchase Reference')}}</th>
-                    <th>{{trans('file.Paid By')}}</th>
-                    <th>{{trans('file.Amount')}}</th>
-                    <th>{{trans('file.Created By')}}</th>
+                    <th>Tanggal</th>
+                    <th>Outlet </th>
+                    <th>Tipe Pemesanan</th>
+                    <th>Tipe Pembayaran</th>
+                    <th>Total Pembayaran</th>
+                    <th>Total Pesanan (Qty)</th>
+                    <th>Kasir</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($lims_payment_data as $payment)
-                <?php
-                    $sale = DB::table('sales')->find($payment->sale_id);
-                    $purchase = DB::table('purchases')->find($payment->purchase_id);
-                    $user = DB::table('users')->find($payment->user_id);
-                ?>
                 <tr>
                     <td></td>
-                    <td>{{date($general_setting->date_format, strtotime($payment->created_at->toDateString())) . ' '. $payment->created_at->toTimeString()}}</td>
-                    <td>{{$payment->payment_reference}}</td>
-                    <td>@if($sale){{$sale->reference_no}}@endif</td>
-                    <td>@if($purchase){{$purchase->reference_no}}@endif</td>
-                    <td>{{$payment->paying_method}}</td>
-                    <td>{{$payment->amount}}</td>
-                    <td>{{$user->name}}<br>{{$user->email}}</td>
+                    <td>{{$payment->date}}</td>
+                    <td>{{$payment->warehouse->name}}</td>
+                    <td>{{$payment->order_type->name}}</td>
+                    <td>{{$payment->payment_method}}</td>
+                    <td>{{$payment->total_amount}}</td>
+                    <td>{{$payment->total_qty}}</td>
+                    <td>{{$payment->user->name}}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -63,7 +58,7 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th></th>
+                <th>{{number_format(0, $general_setting->decimal, '.', '')}}</th>
                 <th>{{number_format(0, $general_setting->decimal, '.', '')}}<</th>
                 <th></th>
             </tfoot>
@@ -186,9 +181,11 @@
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
 
+            $( dt_selector.column( 5 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
         }
         else {
+            $( dt_selector.column( 5 ).footer() ).html(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
         }
     }

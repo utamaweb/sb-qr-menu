@@ -20,7 +20,7 @@ class Transaction extends Model
     	return $this->belongsTo('App\Models\Shift');
     }
 
-    public function orderType()
+    public function order_type()
     {
     	return $this->belongsTo('App\Models\OrderType');
     }

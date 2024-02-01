@@ -68,7 +68,7 @@ class TransactionController extends Controller
             $change_money = $request->paid_amount - $total_amount;
             $dateNow = Carbon::now()->format('Y-m-d');
             $dateTimeNow = Carbon::now();
-            $transactionCheck = Transaction::count();
+            $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
             if ($transactionCheck < 1) {
                 $sequence_number = 0;
             } else {
@@ -117,8 +117,6 @@ class TransactionController extends Controller
             }
             $transaction['details'] = $transactionDetailsWithProducts;
             $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-            // $transaction['warehouse']['name'] = $transaction['warehouse']->name;
-            // $transaction['warehouse']['address'] = $transaction['warehouse']->address;
             $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
             $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
             $transaction['product_count'] = count($request->transaction_details);
@@ -141,17 +139,19 @@ class TransactionController extends Controller
                 // Ambil bahan baku terkait melalui model Ingredient
                 $ingredients = $product->ingredient;
 
-                // foreach ($ingredients as $ingredient) {
-                //     $ingredient->last_stock -= $qty;
-                //     $ingredient->stock_used += $qty;
-                //     $ingredient->save();
-                // }
                 foreach ($ingredients as $ingredient) {
                     $stock = Stock::where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
                     if (!$stock) {
                         // Handle jika stok belum ada
                         continue;
                     }
+
+                    if ($stock->last_stock < $qty) {
+                        // Jika stok kurang dari qty, return peringatan
+                        DB::rollback();
+                        return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 400);
+                    }
+
                     $stock->last_stock -= $qty;
                     $stock->stock_used += $qty;
                     $stock->save();
@@ -165,12 +165,6 @@ class TransactionController extends Controller
                         'transaction_type' => 'out',
                         'user_id' => auth()->user()->id,
                     ]);
-
-                    // TransactionIngredient::create([
-                    //     'warehouse_id' => auth()->user()->warehouse_id,
-                    //     'ingredient_id' => $ingredient->id,
-                    //     'transaction_id' => $transaction->id,
-                    // ]);
                 }
             }
             $transaction['order_type'] = $transaction->order_type;

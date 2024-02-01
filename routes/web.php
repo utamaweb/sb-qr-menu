@@ -71,6 +71,10 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+Route::fallback(function () {
+    return redirect()->route('admin.auth.index');
+});
+
 Route::get('migrate', function() {
 	Artisan::call('migrate');
 	dd('migrated');

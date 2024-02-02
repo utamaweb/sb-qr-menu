@@ -27,6 +27,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     // Products CRUD API
     Route::post('products', [ProductController::class, 'store']);
     Route::get('products', [ProductController::class, 'index']);
+    Route::get('product-warehouse', [ProductController::class, 'productByWarehouse']);
     Route::get('products/{id}', [ProductController::class, 'detail']);
     Route::put('products/{id}', [ProductController::class, 'update']);
     Route::delete('products/{id}', [ProductController::class, 'destroy']);

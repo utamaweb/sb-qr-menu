@@ -191,6 +191,36 @@
                                             </div>
                                     </div>
                                     </div>
+                                    <div class="col-md-12 mt-2" id="diffPrice-option">
+                                        <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1">&nbsp;
+                                            Barang ini
+                                            punya harga berbeda untuk cabang berbeda</h5>
+                                    </div>
+                                    <div class="col-md-6" id="diffPrice-section">
+                                        <div class="table-responsive ml-2">
+                                            <table id="diffPrice-table" class="table table-hover">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Cabang</th>
+                                                        <th>{{trans('file.Price')}}</th>
+                                                    </tr>
+                                                    @foreach($lims_warehouse_list as $warehouse)
+                                                    <tr>
+                                                        <td>
+                                                            <input type="hidden" name="warehouse_id[]"
+                                                                value="{{$warehouse->id}}">
+                                                            {{$warehouse->name}}
+                                                        </td>
+                                                        <td><input type="number" name="diff_price[]" class="form-control">
+                                                        </td>
+                                                    </tr>
+                                                    @endforeach
+                                                </thead>
+                                                <tbody>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">

@@ -26,17 +26,9 @@ class UserController extends Controller
 
     public function index()
     {
-        $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('users-index')){
-            $permissions = Role::findByName($role->name)->permissions;
-            foreach ($permissions as $permission)
-                $all_permission[] = $permission->name;
-            $lims_user_list = User::get();
-            $numberOfUserAccount = User::where('is_active', true)->count();
-            return view('backend.user.index', compact('lims_user_list', 'all_permission', 'numberOfUserAccount'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $lims_user_list = User::get();
+        $numberOfUserAccount = User::where('is_active', true)->count();
+        return view('backend.user.index', compact('lims_user_list', 'numberOfUserAccount'));
     }
 
     public function create()

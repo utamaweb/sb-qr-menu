@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
-use App\Models\ProductWarehouse;
+use App\Models\Product_Warehouse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Str;
@@ -22,8 +22,11 @@ class ProductController extends Controller
     }
 
     public function productByWarehouse() {
-        $productWarehouse = ProductWarehouse::where('warehouse_id', auth()->user()->warehouse_id)->get()->pluck('product_id');
-        return $productWarehouse;
+        $productWarehouse = Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->get()->pluck('product_id');
+        $products = Product::whereIn('id', $productWarehouse)->get()->map(function ($item) {
+            $item->image = $item->image ? url('storage/product_images/'.$item->image) : "";
+            return $item;
+        });
         return response()->json($products, 200);
     }
 

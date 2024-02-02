@@ -22,11 +22,15 @@ class ProductController extends Controller
     }
 
     public function productByWarehouse() {
-        $productWarehouse = Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->get()->pluck('product_id');
-        $products = Product::whereIn('id', $productWarehouse)->get()->map(function ($item) {
-            $item->image = $item->image ? url('storage/product_images/'.$item->image) : "";
-            return $item;
-        });
+        $warehouseId = auth()->user()->warehouse_id;
+
+        $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
+            ->where('product_warehouse.warehouse_id', $warehouseId)
+            ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
+            ->map(function ($item) {
+                $item->image = $item->image ? url('storage/product_images/'.$item->image) : "";
+                return $item;
+            });
         return response()->json($products, 200);
     }
 

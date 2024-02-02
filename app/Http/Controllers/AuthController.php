@@ -12,6 +12,7 @@ class AuthController extends Controller
 {
     public function index()
     {
+        return phpinfo();
         $general_setting =  Cache::remember('general_setting', 60*60*24*365, function () {
             return DB::table('general_settings')->latest()->first();
         });

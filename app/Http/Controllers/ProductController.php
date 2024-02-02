@@ -41,6 +41,7 @@ class ProductController extends Controller
 
     public function index()
     {
+        return phpinfo();
         $role = Role::find(Auth::user()->role_id);
         // if($role->hasPermissionTo('products-index')){
             $products = Product::get();
@@ -139,10 +140,11 @@ class ProductController extends Controller
 
 
         if(isset($data['is_diffPrice'])) {
+            $productInsert->udpate(['is_diffPrice' => 1]);
             foreach ($data['diff_price'] as $key => $diff_price) {
                 if($diff_price) {
                     Product_Warehouse::create([
-                        "product_id" => $lims_product_data->id,
+                        "product_id" => $productInsert->id,
                         "warehouse_id" => $data["warehouse_id"][$key],
                         "qty" => 0,
                         "price" => $diff_price

@@ -22,7 +22,7 @@ class CreateProductsTable extends Migration
             $table->double('cost')->nullable();
             $table->double('price')->nullable();
             $table->double('qty')->nullable();
-            // $table->double('alert_quantity')->nullable();
+            $table->double('alert_quantity')->nullable();
             // $table->tinyInteger('promotion')->nullable();
             // $table->string('promotion_price')->nullable();
             // $table->date('starting_date')->nullable();

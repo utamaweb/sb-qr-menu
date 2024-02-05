@@ -17,7 +17,7 @@
         "intervention/image": "^2.5",
         "kwn/number-to-words": "^1.12",
         "laravel/framework": "^10.15.0",
-        "laravel/sanctum": "^2.11",
+        "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
         "laravel/ui": "^4.0",
         "laravelcollective/html": "^6.2",
@@ -28,7 +28,7 @@
         "srmklive/paypal": "^3.0",
         "stripe/stripe-php": "^7.57",
         "twilio/sdk": "^6.10",
-        "tymon/jwt-auth": "^1.0"
+        "tymon/jwt-auth": "^2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",

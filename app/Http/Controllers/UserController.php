@@ -27,6 +27,7 @@ class UserController extends Controller
     public function index()
     {
         $lims_user_list = User::get();
+        // menghitung jumlah user
         $numberOfUserAccount = User::where('is_active', true)->count();
         return view('backend.user.index', compact('lims_user_list', 'numberOfUserAccount'));
     }

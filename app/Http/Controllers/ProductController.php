@@ -137,51 +137,16 @@ class ProductController extends Controller
             $productInsert->ingredient()->sync($request->ingredients);
         }
 
-        $initial_stock = 0;
-        if(isset($data['is_initial_stock']) && !isset($data['is_variant']) && !isset($data['is_batch'])) {
-            foreach ($data['stock_warehouse_id'] as $key => $warehouse_id) {
-                $stock = $data['stock'][$key];
-                if($stock > 0) {
-                    $this->autoPurchase($lims_product_data, $warehouse_id, $stock);
-                    $initial_stock += $stock;
-                }
-            }
-        }
-        if($initial_stock > 0) {
-            $lims_product_data->qty += $initial_stock;
-            $lims_product_data->save();
-        }
 
         if(isset($data['is_diffPrice'])) {
+            $productInsert->udpate(['is_diffPrice' => 1]);
             foreach ($data['diff_price'] as $key => $diff_price) {
                 if($diff_price) {
                     Product_Warehouse::create([
-                        "product_id" => $lims_product_data->id,
+                        "product_id" => $productInsert->id,
                         "warehouse_id" => $data["warehouse_id"][$key],
                         "qty" => 0,
                         "price" => $diff_price
-                    ]);
-                }
-            }
-        }
-        elseif(!isset($data['is_initial_stock']) && !isset($data['is_batch']) && config('without_stock') == 'yes') {
-            $warehouse_ids = Warehouse::where('is_active', true)->pluck('id');
-            foreach ($warehouse_ids as $warehouse_id) {
-                if(count($variant_ids)) {
-                    foreach ($variant_ids as $variant_id) {
-                        Product_Warehouse::create([
-                            "product_id" => $lims_product_data->id,
-                            "variant_id" => $variant_id,
-                            "warehouse_id" => $warehouse_id,
-                            "qty" => 0,
-                        ]);
-                    }
-                }
-                else {
-                    Product_Warehouse::create([
-                        "product_id" => $lims_product_data->id,
-                        "warehouse_id" => $warehouse_id,
-                        "qty" => 0,
                     ]);
                 }
             }

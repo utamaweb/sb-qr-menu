@@ -15,11 +15,10 @@ class CreateProductWarhouseTable extends Migration
     {
         Schema::create('product_warehouse', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('product_id');
-            $table->integer('product_batch_id')->nullable();
-            $table->integer('variant_id')->nullable();
-            $table->text('imei_number')->nullable();
-            $table->integer('warehouse_id');
+            $table->unsignedBigInteger('product_id');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->unsignedBigInteger('warehouse_id');
+            $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
             $table->double('qty');
             $table->double('price')->nullable();
             $table->timestamps();

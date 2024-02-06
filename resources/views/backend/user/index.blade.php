@@ -1,34 +1,39 @@
 @extends('backend.layout.main') @section('content')
-@if(session()->has('message1'))
-        <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{!! session()->get('message1') !!}</div>
-@endif
-@if(session()->has('message2'))
-        <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message2') }}</div>
-@endif
-@if(session()->has('message3'))
-        <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message3') }}</div>
-@endif
-@if(session()->has('not_permitted'))
-  <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-@endif
 
 <section>
-    @if(in_array("users-add", $all_permission))
-        <div class="container-fluid">
-            <a href="{{route('user.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> {{trans('file.Add User')}}</a>
-        </div>
+    <div class="container-fluid">
+
+    @if($errors->has('name'))
+    <div class="alert alert-danger alert-dismissible text-center">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
+    </div>
     @endif
+    @if(session()->has('message'))
+    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
+    @endif
+    @if(session()->has('not_permitted'))
+    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
+    @endif
+
+    <div class="container-fluid">
+        <a href="{{route('user.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> {{trans('file.Add User')}}</a>
+            {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
+    </div>
+    </div>
     <div class="table-responsive">
-        <table id="user-table" class="table">
+        <table id="ingredient-table" class="table">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>{{trans('file.UserName')}}</th>
-                    <th>{{trans('file.Email')}}</th>
-                    <th>{{trans('file.Phone Number')}}</th>
-                    <th>{{trans('file.Role')}}</th>
-                    <th>{{trans('file.Status')}}</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th>Nama</th>
+                    <th>Email</th>
+                    <th>No. Telp</th>
+                    <th>Hak Akses</th>
+                    <th>Status</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -52,19 +57,15 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
-                                @if(in_array("users-edit", $all_permission))
                                 <li>
                                 	<a href="{{ route('user.edit', $user->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</a>
                                 </li>
-                                @endif
                                 <li class="divider"></li>
-                                @if(in_array("users-delete", $all_permission))
                                 {{ Form::open(['route' => ['user.destroy', $user->id], 'method' => 'DELETE'] ) }}
                                 <li>
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                 </li>
                                 {{ Form::close() }}
-                                @endif
                             </ul>
                         </div>
                     </td>
@@ -75,37 +76,16 @@
     </div>
 </section>
 
-
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
+    $("ul#product").siblings('a').attr('aria-expanded','true');
+    $("ul#product").addClass("show");
+    $("ul#product #unit-menu").addClass("active");
 
-    $("ul#outlet").siblings('a').attr('aria-expanded','true');
-    $("ul#outlet").addClass("show");
-    $("ul#outlet #user-list-menu").addClass("active");
-
-    @if(config('database.connections.saleprosaas_landlord'))
-        if(localStorage.getItem("message")) {
-            alert(localStorage.getItem("message"));
-            localStorage.removeItem("message");
-        }
-        numberOfUserAccount = <?php echo json_encode($numberOfUserAccount)?>;
-        $.ajax({
-            type: 'GET',
-            async: false,
-            url: '{{route("package.fetchData", $general_setting->package_id)}}',
-            success: function(data) {
-                if(data['number_of_user_account'] > 0 && data['number_of_user_account'] <= numberOfUserAccount) {
-                    $("a.add-user-btn").addClass('d-none');
-                }
-            }
-        });
-    @endif
-
-    var user_id = [];
+    var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
-    var all_permission = <?php echo json_encode($all_permission) ?>;
 
     $.ajaxSetup({
         headers: {
@@ -113,14 +93,99 @@
         }
     });
 
-	function confirmDelete() {
-	    if (confirm("Are you sure want to delete?")) {
-	        return true;
-	    }
-	    return false;
-	}
+    $(document).ready(function() {
+    $(document).on('click', '.open-EditUnitDialog', function() {
+        var url = "ingredient/"
+        var id = $(this).data('id').toString();
+        url = url.concat(id).concat("/edit");
 
-    $('#user-table').DataTable( {
+        $.get(url, function(data) {
+            $("input[name='name']").val(data['name']);
+            $("input[name='first_stock']").val(data['first_stock']);
+            $("input[name='unit_id']").val(data['unit_id']);
+            $("input[name='operation_value']").val(data['operation_value']);
+            $("input[name='ingredient_id']").val(data['id']);
+            $("#base_unit_edit").val(data['base_unit']);
+            if(data['base_unit']!=null)
+            {
+                $(".operator").show();
+                $(".operation_value").show();
+            }
+            else
+            {
+                $(".operator").hide();
+                $(".operation_value").hide();
+            }
+            $('.selectpicker').selectpicker('refresh');
+
+        });
+    });
+
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+
+    $( "#select_all" ).on( "change", function() {
+        if ($(this).is(':checked')) {
+            $("tbody input[type='checkbox']").prop('checked', true);
+        }
+        else {
+            $("tbody input[type='checkbox']").prop('checked', false);
+        }
+    });
+
+    $("#export").on("click", function(e){
+        e.preventDefault();
+        var unit = [];
+        $(':checkbox:checked').each(function(i){
+          unit[i] = $(this).val();
+        });
+        $.ajax({
+           type:'POST',
+           url:'/exportunit',
+           data:{
+
+                unitArray: unit
+            },
+           success:function(data){
+            alert('Exported to CSV file successfully! Click Ok to download file');
+            window.location.href = data;
+           }
+        });
+    });
+
+    $('.open-CreateUnitDialog').on('click', function() {
+        $(".operator").hide();
+        $(".operation_value").hide();
+
+    });
+
+    $('#base_unit_create').on('change', function() {
+        if($(this).val()){
+            $("#createModal .operator").show();
+            $("#createModal .operation_value").show();
+        }
+        else{
+            $("#createModal .operator").hide();
+            $("#createModal .operation_value").hide();
+        }
+    });
+
+    $('#base_unit_edit').on('change', function() {
+        if($(this).val()){
+            $("#editModal .operator").show();
+            $("#editModal .operation_value").show();
+        }
+        else{
+            $("#editModal .operator").hide();
+            $("#editModal .operation_value").hide();
+        }
+    });
+});
+
+    $('#ingredient-table').DataTable( {
         "order": [],
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
@@ -134,7 +199,7 @@
         'columnDefs': [
             {
                 "orderable": false,
-                'targets': [0, 7]
+                'targets': [0, 2]
             },
             {
                 'render': function(data, type, row, meta){
@@ -191,19 +256,18 @@
                 text: '<i title="delete" class="dripicons-cross"></i>',
                 className: 'buttons-delete',
                 action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
-                        user_id.length = 0;
+                        ingredient_id.length = 0;
                         $(':checkbox:checked').each(function(i){
                             if(i){
-                                user_id[i-1] = $(this).closest('tr').data('id');
+                                ingredient_id[i-1] = $(this).closest('tr').data('id');
                             }
                         });
-                        if(user_id.length && confirm("Are you sure want to delete?")) {
+                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
                             $.ajax({
                                 type:'POST',
-                                url:'user/deletebyselection',
+                                url:'ingredient/deletebyselection',
                                 data:{
-                                    userIdArray: user_id
+                                    unitIdArray: ingredient_id
                                 },
                                 success:function(data){
                                     alert(data);
@@ -211,11 +275,8 @@
                             });
                             dt.rows({ page: 'current', selected: true }).remove().draw(false);
                         }
-                        else if(!user_id.length)
-                            alert('No user is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
+                        else if(!ingredient_id.length)
+                            alert('No unit is selected!');
                 }
             },
             {
@@ -225,8 +286,5 @@
             },
         ],
     } );
-
-    if(all_permission.indexOf("users-delete") == -1)
-        $('.buttons-delete').addClass('d-none');
 </script>
 @endpush

@@ -16,13 +16,6 @@
          </li>
          @endif
          <li id="exp-list-menu"><a href="{{route('expenses.index')}}">Daftar Pengeluaran</a></li>
-         {{-- <?php
-            $add_permission_active = $role_has_permissions_list->where('name', 'expenses-add')->first();
-            ?>
-         @if($add_permission_active)
-         <li><a id="add-expense" href=""> {{trans('file.Add Expense')}}</a>
-         </li>
-         @endif --}}
       </ul>
    </li>
    @endif
@@ -130,28 +123,6 @@
             <a href="{{url('admin/report/monthly_purchase/'.date('Y'))}}">Pembelian Bulanan</a>
          </li>
          @endif
-         {{-- @if($sale_report_active)
-         <li id="sale-report-menu">
-            {!! Form::open(['route' => 'report.sale', 'method' => 'post', 'id' => 'sale-report-form']) !!}
-            <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
-            <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <input type="hidden" name="warehouse_id" value="0" />
-            <a id="sale-report-link" href="">{{trans('file.Sale Report')}}</a>
-            {!! Form::close() !!}
-         </li>
-         @endif --}}
-         {{-- @if($sale_report_chart_active)
-         <li id="sale-report-chart-menu">
-            {!! Form::open(['route' => 'report.saleChart', 'method' => 'post', 'id' =>
-            'sale-report-chart-form']) !!}
-            <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
-            <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <input type="hidden" name="warehouse_id" value="0" />
-            <input type="hidden" name="time_period" value="weekly" />
-            <a id="sale-report-chart-link" href="">{{trans('file.Sale Report Chart')}}</a>
-            {!! Form::close() !!}
-         </li>
-         @endif --}}
          @if($payment_report_active)
          <li id="payment-report-menu">
             {!! Form::open(['route' => 'report.paymentByDate', 'method' => 'post', 'id' =>
@@ -162,82 +133,11 @@
             {!! Form::close() !!}
          </li>
          @endif
-         {{-- @if($purchase_report_active)
-         <li id="purchase-report-menu">
-            {!! Form::open(['route' => 'report.purchase', 'method' => 'post', 'id' => 'purchase-report-form'])
-            !!}
-            <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
-            <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <input type="hidden" name="warehouse_id" value="0" />
-            <a id="purchase-report-link" href="">{{trans('file.Purchase Report')}}</a>
-            {!! Form::close() !!}
-         </li>
-         @endif --}}
-         {{-- @if($customer_report_active)
-         <li id="customer-report-menu">
-            <a id="customer-report-link" href="">{{trans('file.Customer Report')}}</a>
-         </li>
-         @endif --}}
-         {{-- @if($customer_report_active)
-         <li id="customer-report-menu">
-            <a id="customer-group-report-link" href="">{{trans('file.Customer Group Report')}}</a>
-         </li>
-         @endif --}}
-         {{-- @if($due_report_active)
-         <li id="due-report-menu">
-            {!! Form::open(['route' => 'report.customerDueByDate', 'method' => 'post', 'id' =>
-            'customer-due-report-form']) !!}
-            <input type="hidden" name="start_date" value="{{date('Y-m-d', strtotime('-1 year'))}}" />
-            <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <a id="due-report-link" href="">{{trans('file.Customer Due Report')}}</a>
-            {!! Form::close() !!}
-         </li>
-         @endif --}}
-         {{-- @if($supplier_report_active)
-         <li id="supplier-report-menu">
-            <a id="supplier-report-link" href="">{{trans('file.Supplier Report')}}</a>
-         </li>
-         @endif --}}
-         {{-- @if($supplier_due_report_active)
-         <li id="supplier-due-report-menu">
-            {!! Form::open(['route' => 'report.supplierDueByDate', 'method' => 'post', 'id' =>
-            'supplier-due-report-form']) !!}
-            <input type="hidden" name="start_date" value="{{date('Y-m-d', strtotime('-1 year'))}}" />
-            <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <a id="supplier-due-report-link" href="">{{trans('file.Supplier Due Report')}}</a>
-            {!! Form::close() !!}
-         </li> --}}
-         {{-- @endif --}}
          @if($warehouse_report_active)
          <li id="warehouse-report-menu">
             <a id="warehouse-report-link" href="">Laporan Cabang</a>
          </li>
          @endif
-         {{-- @if($warehouse_stock_report_active)
-         <li id="warehouse-stock-report-menu">
-            <a href="{{route('report.warehouseStock')}}">Chart Persediaan Cabang</a>
-         </li>
-         @endif --}}
-         {{-- @if($product_expiry_report_active)
-         <li id="productExpiry-report-menu">
-            <a href="{{route('report.productExpiry')}}">{{trans('file.Product Expiry Report')}}</a>
-         </li>
-         @endif --}}
-         {{-- @if($product_qty_alert_active)
-         <li id="qtyAlert-report-menu">
-            <a href="{{route('report.qtyAlert')}}">{{trans('file.Product Quantity Alert')}}</a>
-         </li>
-         @endif --}}
-         {{-- @if($dso_report_active)
-         <li id="daily-sale-objective-menu">
-            <a href="{{route('report.dailySaleObjective')}}">{{trans('file.Daily Sale Objective Report')}}</a>
-         </li>
-         @endif --}}
-         {{-- @if($user_report_active)
-         <li id="user-report-menu">
-            <a id="user-report-link" href="">{{trans('file.User Report')}}</a>
-         </li>
-         @endif --}}
       </ul>
    </li>
    @endif

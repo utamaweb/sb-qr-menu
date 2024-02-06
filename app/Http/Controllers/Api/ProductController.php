@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Product_Warehouse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Str;
@@ -17,6 +18,19 @@ class ProductController extends Controller
                                 $item->image = $item->image ? url('storage/product_images/'.$item->image) : "";
                                 return $item;
                             });
+        return response()->json($products, 200);
+    }
+
+    public function productByWarehouse() {
+        $warehouseId = auth()->user()->warehouse_id;
+
+        $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
+            ->where('product_warehouse.warehouse_id', $warehouseId)
+            ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
+            ->map(function ($item) {
+                $item->image = $item->image ? url('storage/product_images/'.$item->image) : "";
+                return $item;
+            });
         return response()->json($products, 200);
     }
 

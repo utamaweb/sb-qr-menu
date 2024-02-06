@@ -37,6 +37,9 @@ class StockPurchaseController extends Controller
     {
         $dateNow = Carbon::now()->format('Y-m-d');
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+        if($shift == NULL){
+            return redirect()->route('stock-purchase.index')->with('not_permitted', 'Belum ada kasir yang dibuka');
+        }
         $qtyInt = array_map('intval', $request->qty);
         $totalQty = array_sum($qtyInt);
         $subtotalInt = array_map('intval', $request->subtotal);

@@ -35,6 +35,9 @@ class StockPurchaseController extends Controller
 
     public function store(Request $request)
     {
+        if($request->notes < 1){
+            return redirect()->route('stock-purchase.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
+        }
         $dateNow = Carbon::now()->format('Y-m-d');
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
         if($shift == NULL){

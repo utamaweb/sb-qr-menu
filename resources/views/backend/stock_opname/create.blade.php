@@ -5,6 +5,10 @@
 @section('content')
 <section class="forms">
     <div class="container-fluid">
+        @if(session()->has('not_permitted'))
+        <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
+        @endif
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -68,7 +72,8 @@
                                         <input type="number" name="qty[]" class="form-control" placeholder="Stok Aktual">
                                     </div>
                                     <div class="col-md-2">
-                                        <a href="javascript:void(0);" class="addCF btn btn-warning" id="add_more"><i class="fa fa-plus"></i></a>
+                                        <a href="javascript:void(0);" class="addCF btn btn-warning add_more"><i class="fa fa-plus"></i></a>
+                                        <strong><a href="javascript:void(0);" class="remCF btn btn-danger"><i class="fa fa-times"></i></a></strong>
                                     </div>
                                 </div>
                             </div>
@@ -115,12 +120,35 @@
                         <input type="number" name="qty[]" class="form-control" placeholder="Stok Aktual">\n\
                     </div>\n\
                     <div class="col-md-2 hapus">\n\
-                    <strong><a href="javascript:void(0);" class="remCF"><i class="fa fa-times"></i>&nbsp; Hapus</a></strong>   \n\
+                        <a href="javascript:void(0);" class="addCF btn btn-warning add_more"><i class="fa fa-plus"></i></a>\n\
+                    <strong><a href="javascript:void(0);" class="remCF btn btn-danger"><i class="fa fa-times"></i></a></strong>  \n\
                     </div>');
                 maxAppend++;
                 $("#add_new").append(add_new);
             }
         });
+
+        $('#add_new').on('click', '.add_more', function() {
+        var add_new = $('<div class="form-group row">\n\
+            <label for="example-text-input" class="col-md-2 col-form-label">Bahan Baku</label>\n\
+                    <div class="col-md-6">\n\
+                        <select name="ingredient_id[]" required class="form-control" data-live-search="true" data-live-search-style="begins"> \n\
+                                            <option value="">Pilih Bahan Baku</option> \n\
+                                            @foreach($ingredients as $ingredient) \n\
+                                            <option value="{{$ingredient->id}}">{{$ingredient->name}}</option> \n\
+                                            @endforeach \n\
+                                        </select> \n\
+                    </div>\n\
+                    <div class="col-md-2">\n\
+                        <input type="number" name="qty[]" class="form-control" placeholder="Stok Aktual">\n\
+                    </div>\n\
+                    <div class="col-md-2 hapus">\n\
+                        <a href="javascript:void(0);" class="addCF btn btn-warning add_more"><i class="fa fa-plus"></i></a>\n\
+                <strong><a href="javascript:void(0);" class="remCF btn btn-danger"><i class="fa fa-times"></i></a></strong>   \n\
+                    </div>');
+        maxAppend++;
+        $(this).closest('.form-group').after(add_new);
+    });
 
         $("#add_new").on('click', '.remCF', function() {
             $(this).parent().parent().parent().remove();

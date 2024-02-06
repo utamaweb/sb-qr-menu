@@ -5,6 +5,10 @@
 @section('content')
 <section class="forms">
     <div class="container-fluid">
+        @if(session()->has('not_permitted'))
+        <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
+        @endif
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -66,14 +70,15 @@
                                         <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan">
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" placeholder="Subtotal" name="subtotal[]" class="form-control subtotal">
+                                        <input type="number" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal">
                                     </div>
                                     <div class="col-md-2">
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control">
                                     </div>
 
                                     <div class="col-md-2">
-                                        <a href="javascript:void(0);" class="addCF btn btn-warning" id="add_more"><i class="fa fa-plus"></i></a>
+                                        <a href="javascript:void(0);" class="addCF btn btn-warning add_more"><i class="fa fa-plus"></i></a>
+                                        <strong><a href="javascript:void(0);" class="remCF btn btn-danger"><i class="fa fa-times"></i></a></strong>
                                     </div>
                                 </div>
                             </div>
@@ -123,13 +128,14 @@
                                         <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
-                                        <input type="number" placeholder="Subtotal" name="subtotal[]" class="form-control subtotal">\n\
+                                        <input type="number" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control">\n\
                                     </div>\n\
                     <div class="col-md-2 hapus">\n\
-                    <strong><a href="javascript:void(0);" class="remCF"><i class="fa fa-times"></i>&nbsp; Hapus</a></strong>   \n\
+                        <a href="javascript:void(0);" class="addCF btn btn-warning add_more"><i class="fa fa-plus"></i></a>\n\
+                    <strong><a href="javascript:void(0);" class="remCF btn btn-danger"><i class="fa fa-times"></i></a></strong>  \n\
                     </div>');
                 maxAppend++;
                 $("#add_new").append(add_new);
@@ -146,6 +152,37 @@
         var subtotal = hargaSatuan * qty;
         $(row).find('.subtotal').val(subtotal); // Assuming 2 decimal places
     }
+
+    $('#add_new').on('click', '.add_more', function() {
+        var add_new = $('<div class="form-group row">\n\
+            <label for="example-text-input" class="col-md-1 col-form-label"></label>\n\
+                    <div class="col-md-2">\n\
+                                        <select name="ingredient_id[]" required class="form-control">\n\
+                                            <option value="">Pilih Bahan Baku</option>\n\
+                                            @foreach($ingredients as $ingredient)\n\
+                                            <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>\n\
+                                            @endforeach\n\
+                                        </select>\n\
+                                    </div>\n\
+                                    <div class="col-md-1">\n\
+                                        <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity">\n\
+                                    </div>\n\
+                                    <div class="col-md-2">\n\
+                                        <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan">\n\
+                                    </div>\n\
+                                    <div class="col-md-2">\n\
+                                        <input type="number" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal">\n\
+                                    </div>\n\
+                                    <div class="col-md-2">\n\
+                                        <input type="text" placeholder="Catatan" name="notes[]" class="form-control">\n\
+                                    </div>\n\
+                    <div class="col-md-2 hapus">\n\
+                        <a href="javascript:void(0);" class="addCF btn btn-warning add_more"><i class="fa fa-plus"></i></a>\n\
+                <strong><a href="javascript:void(0);" class="remCF btn btn-danger"><i class="fa fa-times"></i></a></strong>   \n\
+                    </div>');
+        maxAppend++;
+        $(this).closest('.form-group').after(add_new);
+    });
 
     // Event listener for changes in harga satuan or qty
     $('#add_new').on('input', '.harga-satuan, .quantity', function() {

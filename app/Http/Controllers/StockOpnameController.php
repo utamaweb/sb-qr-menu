@@ -37,6 +37,9 @@ class StockOpnameController extends Controller
         $this->validate($request, [
             'name' => 'required|max:255',
         ]);
+        if($request->ingredient_id < 1){
+            return redirect()->route('stock-purchase.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
+        }
         // Store Table StockOpname
         $stockOpname = StockOpname::create([
             'name' => $request->name,

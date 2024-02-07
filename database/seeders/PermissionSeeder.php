@@ -22,10 +22,10 @@ class PermissionSeeder extends Seeder
             $taskDescription = str_replace('-', ' ', strtolower($task->name));
 
             Permission::insert([
-                ["name" => "lihat-{$name}", "guard_name" => "api", "menu_id" => $task->id],
-                ["name" => "tambah-{$name}", "guard_name" => "api", "menu_id" => $task->id],
-                ["name" => "ubah-{$name}", "guard_name" => "api", "menu_id" => $task->id],
-                ["name" => "hapus-{$name}", "guard_name" => "api", "menu_id" => $task->id],
+                ["name" => "lihat-{$name}", "guard_name" => "web", "menu_id" => $task->id],
+                ["name" => "tambah-{$name}", "guard_name" => "web", "menu_id" => $task->id],
+                ["name" => "ubah-{$name}", "guard_name" => "web", "menu_id" => $task->id],
+                ["name" => "hapus-{$name}", "guard_name" => "web", "menu_id" => $task->id],
             ]);
         }
 

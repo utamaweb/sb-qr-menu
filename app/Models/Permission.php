@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Permission extends Model
 {
+    protected $guard_name = 'web';
     use HasFactory;
     protected $fillable = [];
     protected $guarded = [];

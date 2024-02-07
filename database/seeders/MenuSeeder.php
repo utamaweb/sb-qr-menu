@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Menu;
+use Carbon\Carbon;
 
 class MenuSeeder extends Seeder
 {
@@ -20,45 +21,76 @@ class MenuSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
-                "name" => "Order", "description" => "Order Management",
+                "name" => "Pengeluaran", "description" => "Nama (Kategori) Pengeluaran",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
-                "name" => "Purchase", "description" => "Purchase Management",
+                "name" => "DaftarPengeluaran", "description" => "Daftar Pengeluaran",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
-                "name" => "Product", "description" => "Product Management",
+                "name" => "Laporan", "description" => "Laporan",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
-                "name" => "Category", "description" => "Category Management",
+                "name" => "Kategori", "description" => "Kategori Produk",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
-                "name" => "Unit", "description" => "Unit Management",
+                "name" => "Produk", "description" => "Produk",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
-                "name" => "Customer", "description" => "Customer Management",
+                "name" => "Unit", "description" => "Unit",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
-                "name" => "Supplier", "description" => "Supplier Management",
+                "name" => "TipePesanan", "description" => "Tipe Pesanan",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ],
             [
-                "name" => "User", "description" => "User Management",
+                "name" => "BahanBaku", "description" => "Bahan Baku",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
-            ]
+            ],
+            [
+                "name" => "StokOpname", "description" => "Stok Opname",
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                "name" => "PembelianStok", "description" => "Pembelian Stok",
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                "name" => "Role", "description" => "Role",
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                "name" => "User", "description" => "User",
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                "name" => "Warehouse", "description" => "Warehouse",
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
+                "name" => "Setting", "description" => "Setting",
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+
         ]);
     }
 }

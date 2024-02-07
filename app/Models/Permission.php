@@ -5,16 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Menu extends Model
+class Permission extends Model
 {
     use HasFactory;
-    protected $table = 'menus';
     protected $fillable = [];
     protected $guarded = [];
 
-
-    public function permissions()
+    public function roles()
     {
-        return $this->hasMany(Permission::class, 'menu_id');
+        return $this->belongsToMany(Role::class, 'roles_permissions');
+    }
+
+    public function menu()
+    {
+        return $this->belongsTo(Menu::class);
     }
 }

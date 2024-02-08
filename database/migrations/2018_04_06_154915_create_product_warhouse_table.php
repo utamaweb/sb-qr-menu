@@ -19,8 +19,7 @@ class CreateProductWarhouseTable extends Migration
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->unsignedBigInteger('warehouse_id');
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
-            $table->double('qty');
-            $table->double('price')->nullable();
+            $table->bigInteger('price')->nullable();
             $table->timestamps();
         });
     }

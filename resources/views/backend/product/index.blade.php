@@ -44,14 +44,14 @@
                 @foreach($products as $key=>$product)
                 <tr data-id="{{$product->id}}">
                     <td>{{$key}}</td>
-                    <td><img src="{{Storage::url('product_images/'.$product->image)}}" alt=""></td>
-                    <td>{{ $product->name }}</td>
-                    <td>{{ $product->code }}</td>
-                    <td>{{ $product->category_name }}</td>
+                    <td><img src="{{Storage::url('product_images/'.$product->product->image)}}" alt=""></td>
+                    <td>{{ $product->product->name }}</td>
+                    <td>{{ $product->product->code }}</td>
+                    <td>{{ $product->product->category_name }}</td>
                     {{-- <td>{{ $product->qty }}</td> --}}
-                    <td>{{ $product->unit_name }}</td>
+                    <td>{{ $product->product->unit_name }}</td>
                     <td>{{ $product->price }}</td>
-                    <td>@foreach($product->ingredient as $ingredient)
+                    <td>@foreach($product->product->ingredient as $ingredient)
                         {{$ingredient->name}}
                         @if( !$loop->last)
                         ,

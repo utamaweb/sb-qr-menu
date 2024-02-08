@@ -175,10 +175,12 @@
                                             </div>
                                     </div>
                                     </div>
+                                    @if($roleName == 'Superadmin')
                                     <div class="col-md-12 mt-2" id="diffPrice-option">
                                         <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1">&nbsp;
                                             Produk ini punya harga berbeda untuk cabang berbeda</h5>
                                     </div>
+                                    @endif
                                     <div class="col-md-6" id="diffPrice-section">
                                         <div class="table-responsive ml-2">
                                             <table id="diffPrice-table" class="table table-hover">

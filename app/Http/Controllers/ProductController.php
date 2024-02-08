@@ -8,8 +8,8 @@ use Keygen\Keygen;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Unit;
-use App\Models\Tax;
 use App\Models\Warehouse;
+use App\Models\Tax;
 use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\ProductBatch;
@@ -41,47 +41,25 @@ class ProductController extends Controller
 
     public function index()
     {
-        $role = Role::find(Auth::user()->role_id);
-        // if($role->hasPermissionTo('products-index')){
-            $products = Product::get();
-            // $permissions = Role::findByName($role->name)->permissions;
-            // foreach ($permissions as $permission)
-            //     $all_permission[] = $permission->name;
-            // if(empty($all_permission))
-            //     $all_permission[] = 'dummy text';
-            // $role_id = $role->id;
-            $numberOfProduct = DB::table('products')->where('is_active', true)->count();
-            $custom_fields = CustomField::where([
-                                ['belongs_to', 'product'],
-                                ['is_table', true]
-                            ])->pluck('name');
-            $field_name = [];
-            foreach($custom_fields as $fieldName) {
-                $field_name[] = str_replace(" ", "_", strtolower($fieldName));
-            }
-            return view('backend.product.index', compact('numberOfProduct', 'custom_fields', 'field_name', 'products'));
-        // }
-        // else
-            // return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $roleName = auth()->user()->getRoleNames()[0];
+        $products = Product_Warehouse::get();
+        if($roleName == 'Kasir'){
+            $products = Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        }
+        $numberOfProduct = DB::table('products')->where('is_active', true)->count();
+        return view('backend.product.index', compact('numberOfProduct', 'products'));
     }
 
     public function create()
     {
-        $role = Role::firstOrCreate(['id' => Auth::user()->role_id]);
-        if ($role->hasPermissionTo('products-add')){
-            // $lims_product_list_with_variant = $this->productWithVariant();
-            // $lims_brand_list = Brand::where('is_active', true)->get();
-            $lims_category_list = Category::where('is_active', true)->get();
-            $ingredients = Ingredient::get();
-            $lims_unit_list = Unit::where('is_active', true)->get();
-            $lims_tax_list = Tax::where('is_active', true)->get();
-            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            $numberOfProduct = Product::where('is_active', true)->count();
-            $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.create',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'custom_fields', 'ingredients'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $roleName = auth()->user()->getRoleNames()[0];
+       $lims_category_list = Category::where('is_active', true)->get();
+       $ingredients = Ingredient::get();
+       $lims_unit_list = Unit::where('is_active', true)->get();
+       $lims_tax_list = Tax::where('is_active', true)->get();
+       $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+       $numberOfProduct = Product::where('is_active', true)->count();
+       return view('backend.product.create',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'ingredients','roleName'));
     }
 
     public function store(Request $request)
@@ -136,6 +114,23 @@ class ProductController extends Controller
         if (isset($request->ingredients)) {
             $productInsert->ingredient()->sync($request->ingredients);
         }
+        $roleName = auth()->user()->getRoleNames()[0];
+        if($roleName == 'Kasir'){
+            Product_Warehouse::create([
+                'product_id' => $productInsert->id,
+                'warehouse_id' => auth()->user()->warehouse_id,
+                'price' => $request->price
+            ]);
+        } else {
+            $warehouses = Warehouse::get();
+            foreach ($warehouses as $key => $warehouse) {
+                Product_Warehouse::create([
+                    "product_id" => $productInsert->id,
+                    "warehouse_id" => $warehouse->id,
+                    "price" => $request->price
+                ]);
+            }
+        }
 
 
         if(isset($data['is_diffPrice'])) {
@@ -145,7 +140,6 @@ class ProductController extends Controller
                     Product_Warehouse::create([
                         "product_id" => $productInsert->id,
                         "warehouse_id" => $data["warehouse_id"][$key],
-                        "qty" => 0,
                         "price" => $diff_price
                     ]);
                 }

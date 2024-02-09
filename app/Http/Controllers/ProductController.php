@@ -115,23 +115,6 @@ class ProductController extends Controller
             $productInsert->ingredient()->sync($request->ingredients);
         }
         $roleName = auth()->user()->getRoleNames()[0];
-        if($roleName == 'Kasir'){
-            Product_Warehouse::create([
-                'product_id' => $productInsert->id,
-                'warehouse_id' => auth()->user()->warehouse_id,
-                'price' => $request->price
-            ]);
-        } else {
-            $warehouses = Warehouse::get();
-            foreach ($warehouses as $key => $warehouse) {
-                Product_Warehouse::create([
-                    "product_id" => $productInsert->id,
-                    "warehouse_id" => $warehouse->id,
-                    "price" => $request->price
-                ]);
-            }
-        }
-
 
         if(isset($data['is_diffPrice'])) {
             $productInsert->udpate(['is_diffPrice' => 1]);
@@ -141,6 +124,23 @@ class ProductController extends Controller
                         "product_id" => $productInsert->id,
                         "warehouse_id" => $data["warehouse_id"][$key],
                         "price" => $diff_price
+                    ]);
+                }
+            }
+        } else {
+            if($roleName == 'Kasir'){
+                Product_Warehouse::create([
+                    'product_id' => $productInsert->id,
+                    'warehouse_id' => auth()->user()->warehouse_id,
+                    'price' => $request->price
+                ]);
+            } else {
+                $warehouses = Warehouse::get();
+                foreach ($warehouses as $key => $warehouse) {
+                    Product_Warehouse::create([
+                        "product_id" => $productInsert->id,
+                        "warehouse_id" => $warehouse->id,
+                        "price" => $request->price
                     ]);
                 }
             }
@@ -184,77 +184,6 @@ class ProductController extends Controller
                 ],
             ]);
 
-            $lims_product_data = Product::findOrFail($request->input('id'));
-            $data = $request->except('image', 'file', 'prev_img');
-            $data['name'] = htmlspecialchars(trim($data['name']));
-            $data['slug'] = Str::slug($data['name'], '-');
-            $data['slug'] = preg_replace('/[^A-Za-z0-9\-]/', '', $data['slug']);
-            $data['slug'] = str_replace( '\/', '/', $data['slug'] );
-            if($data['type'] == 'combo') {
-                $data['product_list'] = implode(",", $data['product_id']);
-                $data['variant_list'] = implode(",", $data['variant_id']);
-                $data['qty_list'] = implode(",", $data['product_qty']);
-                $data['price_list'] = implode(",", $data['unit_price']);
-                $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
-            }
-            elseif($data['type'] == 'digital' || $data['type'] == 'service')
-                $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
-
-            if(!isset($data['is_sync_disable']) && \Schema::hasColumn('products', 'is_sync_disable'))
-                $data['is_sync_disable'] = null;
-
-            $data['product_details'] = str_replace('"', '@', $data['product_details']);
-            // $data['product_details'] = $data['product_details'];
-            $previous_images = [];
-            //dealing with previous images
-            // if($request->prev_img) {
-            //     foreach ($request->prev_img as $key => $prev_img) {
-            //         if(!in_array($prev_img, $previous_images))
-            //             $previous_images[] = $prev_img;
-            //     }
-            //     $lims_product_data->image = implode(",", $previous_images);
-            //     $lims_product_data->save();
-            // }
-            // else {
-            //     $lims_product_data->image = null;
-            //     $lims_product_data->save();
-            // }
-
-
-            $new_product_variant_ids = [];
-            //deleting old product variant if not exist
-            if(isset($data['is_diffPrice'])) {
-                foreach ($data['diff_price'] as $key => $diff_price) {
-                    if($diff_price) {
-                        $lims_product_warehouse_data = Product_Warehouse::FindProductWithoutVariant($lims_product_data->id, $data['warehouse_id'][$key])->first();
-                        if($lims_product_warehouse_data) {
-                            $lims_product_warehouse_data->price = $diff_price;
-                            $lims_product_warehouse_data->save();
-                        }
-                        else {
-                            Product_Warehouse::create([
-                                "product_id" => $lims_product_data->id,
-                                "warehouse_id" => $data["warehouse_id"][$key],
-                                "qty" => 0,
-                                "price" => $diff_price
-                            ]);
-                        }
-                    }
-                }
-            }
-            else {
-                $data['is_diffPrice'] = false;
-                // foreach ($data['warehouse_id'] as $key => $warehouse_id) {
-                //     $lims_product_warehouse_data = Product_Warehouse::FindProductWithoutVariant($lims_product_data->id, $warehouse_id)->first();
-                //     if($lims_product_warehouse_data) {
-                //         $lims_product_warehouse_data->price = null;
-                //         $lims_product_warehouse_data->save();
-                //     }
-                // }
-            }
-            // $lims_product_data->update($data);
-            // if(count($custom_field_data))
-                // DB::table('products')->where('id', $lims_product_data->id)->update($custom_field_data);
             $image = $request->image;
             $productFind = Product::findOrFail($id);
             if($image){
@@ -279,8 +208,40 @@ class ProductController extends Controller
             if (isset($request->ingredients)) {
                 $editProduct->ingredient()->sync($request->ingredients);
             }
+
+            $roleName = auth()->user()->getRoleNames()[0];
+
+            if(isset($data['is_diffPrice'])) {
+                $productInsert->udpate(['is_diffPrice' => 1]);
+                foreach ($data['diff_price'] as $key => $diff_price) {
+                    if($diff_price) {
+                        Product_Warehouse::where('product_id', $id)->where('warehouse_id', $data['warehouse_id'][$key])->update([
+                            "product_id" => $id,
+                            "warehouse_id" => $data["warehouse_id"][$key],
+                            "price" => $diff_price
+                        ]);
+                    }
+                }
+            } else {
+                if($roleName == 'Kasir'){
+                    Product_Warehouse::where('product_id', $id)->where('warehouse_id', auth()->user()->warehouse_id)->update([
+                        'product_id' => $productInsert->id,
+                        'warehouse_id' => auth()->user()->warehouse_id,
+                        'price' => $request->price
+                    ]);
+                } else {
+                    $warehouses = Warehouse::get();
+                    foreach ($warehouses as $key => $warehouse) {
+                        Product_Warehouse::where('product_id', $id)->where('warehouse_id', $warehouse->id)->update([
+                            "product_id" => $productInsert->id,
+                            "warehouse_id" => $warehouse->id,
+                            "price" => $request->price
+                        ]);
+                    }
+                }
+            }
+
             $this->cacheForget('product_list');
-            $this->cacheForget('product_list_with_variant');
             // \Session::flash('edit_message', 'Product updated successfully');
             return redirect('admin/products')->with('message', 'Data updated successfully');
     }

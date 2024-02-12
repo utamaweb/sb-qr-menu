@@ -18,10 +18,10 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
 
-    <div class="container-fluid">
+        @can('tambah-produk')
             <a href="{{route('products.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('file.add_product')}}</a>
             {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
-    </div>
+        @endcan
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
@@ -74,11 +74,14 @@
 
                     <td>{{ $product->price }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
                     <td>
+                        @can('ubah-produk')
                         <a href={{route('products.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</a>
-
+                        @endcan
+                        @can('hapus-produk')
                         {{ Form::open(['route' => ['products.destroy', $product->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                 {{ Form::close() }}
+                        @endcan
                     </td>
                 </tr>
                 @endforeach

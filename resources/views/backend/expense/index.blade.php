@@ -33,7 +33,7 @@
                     <th>Cabang</th>
                     <th>Dibuat | Waktu</th>
                     @if(auth()->user()->hasRole('Kasir'))
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th class="not-exported">Aksi</th>
                     @endif
                 </tr>
             </thead>
@@ -48,7 +48,8 @@
                     <td>{{ $expense->user->name }} | {{$expense->created_at}}</td>
                     @if(auth()->user()->hasRole('Kasir'))
                     <td>
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                        @can('ubah-daftarpengeluaran')
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense->id}}"><i class="dripicons-document-edit"></i> Uba</button>
                         {{-- Edit Modal --}}
                         <div id="editModal-{{$expense->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
                             <div role="document" class="modal-dialog">
@@ -58,7 +59,7 @@
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
-                                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                                     <form action="{{route('expenses.update', $expense->id)}}" method="POST">
                                         @csrf
                                         @method('PUT')
@@ -99,15 +100,19 @@
                                         </div>
 
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
-                                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                                        <input type="submit" value="Submit" class="btn btn-primary">
                                     </form>
                                 </div>
                             </div>
                             </div>
                         </div>
+                        @endcan
+
+                        @can('hapus-daftarpengeluaran')
                         {{ Form::open(['route' => ['expenses.destroy', $expense->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 {{ Form::close() }}
+                        @endcan
                     </td>
                     @endif
                 </tr>
@@ -128,7 +133,7 @@
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>{{trans('file.Inputan yang memiliki tanda (*) wajib diisi')}}.</small></p>
+                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                     <div class="row">
                         <div class="col-md-6 form-group">
                             <label>Nama Pengeluaran *</label>
@@ -167,7 +172,7 @@
                             <input type="text" name="created_at" readonly class="form-control" value="{{\Carbon\Carbon::now()->format('d-m-Y')}}">
                         </div>
                     </div>
-                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                        <input type="submit" value="Submit" class="btn btn-primary">
         </div>
         {{ Form::close() }}
     </div>

@@ -29,7 +29,7 @@
                     <th>Nama Stock Opname</th>
                     <th>Tanggal</th>
                     <th>Outlet</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -88,7 +88,7 @@
                     </div>
                     @endforeach
 
-                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                    <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>
         {{ Form::close() }}

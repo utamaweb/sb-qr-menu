@@ -33,7 +33,7 @@
                     <th>Stok Terjual</th>
                     <th>Stok Akhir</th>
                     <th>Unit</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -50,7 +50,7 @@
                     <td>
                         <div class="row">
                             @can('ubah-bahanbaku')
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
                         {{-- Edit Modal --}}
                         <div id="editModal-{{$ingredient->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
                             <div role="document" class="modal-dialog">
@@ -60,7 +60,7 @@
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
-                                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                                     <form action="{{route('ingredient.update', $ingredient->id)}}" method="POST">
                                         @csrf
                                         @method('PUT')
@@ -90,7 +90,7 @@
                                         </div> --}}
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
                                         </div>
-                                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                                        <input type="submit" value="Submit" class="btn btn-primary">
                                     </form>
                                 </div>
                             </div>
@@ -100,7 +100,7 @@
 
                         @can('hapus-bahanbaku')
                         {{ Form::open(['route' => ['ingredient.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 {{ Form::close() }}
                         @endcan
                     </td>
@@ -148,7 +148,7 @@
                             <input type="number" name="max_stock" required class="form-control">
                         </div>
                     </div> --}}
-                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                    <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>
         {{ Form::close() }}

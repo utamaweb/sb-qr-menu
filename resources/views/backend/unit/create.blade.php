@@ -24,20 +24,19 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
 
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> {{trans('file.Add Unit')}}</a>&nbsp;
-        <a href="#" data-toggle="modal" data-target="#importUnit" class="btn btn-primary"><i class="dripicons-copy"></i> {{trans('file.Import Unit')}}</a>
+    @can('tambah-unit')
+        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i>Tambah Unit</a>&nbsp;
+    @endcan
+        {{-- <a href="#" data-toggle="modal" data-target="#importUnit" class="btn btn-primary"><i class="dripicons-copy"></i> {{trans('file.Import Unit')}}</a> --}}
     </div>
     <div class="table-responsive">
         <table id="unit-table" class="table">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>{{trans('file.Code')}}</th>
-                    <th>{{trans('file.name')}}</th>
-                    <th>{{trans('file.Base Unit')}}</th>
-                    <th>{{trans('file.Operator')}}</th>
-                    <th>{{trans('file.Operation Value')}}</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th>Kode</th>
+                    <th>Nama</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -46,41 +45,32 @@
                     <td>{{$key}}</td>
                     <td>{{ $unit->unit_code }}</td>
                     <td>{{ $unit->unit_name }}</td>
-                    @if($unit->base_unit)
-                        <?php $base_unit = DB::table('units')->where('id', $unit->base_unit)->first(); ?>
-                        <td>{{ $base_unit->unit_name }}</td>
-                    @else
-                        <td>N/A</td>
-                    @endif
-                    @if($unit->operator)
-                        <td>{{ $unit->operator }}</td>
-                    @else
-                        <td>N/A</td>
-                    @endif
-                    @if($unit->operation_value)
-                        <td>{{ $unit->operation_value }}</td>
-                    @else
-                        <td>N/A</td>
-                    @endif
                     <td>
+                        @canany(['ubah-unit', 'hapus-unit'])
                         <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{trans('file.action')}}
+                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
                                 <span class="caret"></span>
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
+                                @can('ubah-unit')
                                 <li>
-                                    <button type="button" data-id="{{$unit->id}}" class="open-EditUnitDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}
+                                    <button type="button" data-id="{{$unit->id}}" class="open-EditUnitDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> Ubah
                                 </button>
                                 </li>
+                                @endcan
+
                                 <li class="divider"></li>
+                                @can('hapus-unit')
                                 {{ Form::open(['route' => ['unit.destroy', $unit->id], 'method' => 'DELETE'] ) }}
                                 <li>
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 </li>
                                 {{ Form::close() }}
+                                @endcan
                             </ul>
                         </div>
+                        @endcanany
                     </td>
                 </tr>
                 @endforeach
@@ -95,38 +85,21 @@
         <div class="modal-content">
             {!! Form::open(['route' => 'unit.store', 'method' => 'post']) !!}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Unit')}}</h5>
+                <h5 id="exampleModalLabel" class="modal-title">Tambah Unit</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                 <form>
                     <div class="form-group">
-                    <label>{{trans('file.Code')}} *</label>
+                    <label>Kode *</label>
                     {{Form::text('unit_code',null,array('required' => 'required', 'class' => 'form-control'))}}
                     </div>
                     <div class="form-group">
-                        <label>{{trans('file.name')}} *</label>
+                        <label>Nama *</label>
                         {{Form::text('unit_name',null,array('required' => 'required', 'class' => 'form-control'))}}
                     </div>
-                    <div class="form-group">
-                        <label>{{trans('file.Base Unit')}}</label>
-                        <select class="form-control selectpicker" id="base_unit_create" name="base_unit">
-                            <option value="">No Base Unit</option>
-                            @foreach($lims_unit_all as $unit)
-                                @if($unit->base_unit==null)
-                                <option value="{{$unit->id}}">{{$unit->unit_name}}</option>
-                                @endif
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group operator">
-                        <label>{{trans('file.Operator')}}</label> <input type="text" name="operator" placeholder="Enter your Name" class="form-control" />
-                    </div>
-                    <div class="form-group operation_value">
-                        <label>{{trans('file.Operation Value')}}</label><input type="number" name="operation_value" placeholder="Enter operation value" class="form-control" step="any"/>
-                    </div>
-                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                    <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>
         {{ Form::close() }}
@@ -139,37 +112,20 @@
       <div class="modal-content">
         {!! Form::open(['route' => ['unit.update',1], 'method' => 'put']) !!}
         <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Update Unit')}}</h5>
+          <h5 id="exampleModalLabel" class="modal-title"> Update Unint</h5>
           <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
         </div>
         <div class="modal-body">
-          <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+          <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
             <form>
                 <input type="hidden" name="unit_id">
                 <div class="form-group">
-                <label>{{trans('file.Code')}} *</label>
+                <label>Kode *</label>
                 {{Form::text('unit_code',null,array('required' => 'required', 'class' => 'form-control'))}}
                 </div>
                 <div class="form-group">
-                    <label>{{trans('file.name')}} *</label>
+                    <label>Nama *</label>
                     {{Form::text('unit_name',null,array('required' => 'required', 'class' => 'form-control'))}}
-                </div>
-                <div class="form-group">
-                    <label>{{trans('file.Base Unit')}}</label>
-                    <select class="form-control selectpicker" id="base_unit_edit" name="base_unit">
-                        <option value="">No Base Unit</option>
-                        @foreach($lims_unit_all as $unit)
-                            @if($unit->base_unit==null)
-                            <option value="{{$unit->id}}">{{$unit->unit_name}}</option>
-                            @endif
-                        @endforeach
-                    </select>
-                </div>
-                <div class="form-group operator">
-                    <label>{{trans('file.Operator')}}</label> <input type="text" name="operator" placeholder="Enter your Name" class="form-control" />
-                </div>
-                <div class="form-group operation_value">
-                    <label>{{trans('file.Operation Value')}}</label><input type="number" name="operation_value" placeholder="Enter operation value" class="form-control" step="any"/>
                 </div>
                 <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
             </form>
@@ -342,7 +298,7 @@
         'columnDefs': [
             {
                 "orderable": false,
-                'targets': [0, 6]
+                'targets': [0, 3]
             },
             {
                 'render': function(data, type, row, meta){

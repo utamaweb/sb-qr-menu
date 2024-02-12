@@ -31,7 +31,7 @@
                     <th>Total Pembayaran</th>
                     <th>Dibuat Oleh</th>
                     <th>Outlet</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>

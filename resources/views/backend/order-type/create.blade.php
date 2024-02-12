@@ -27,7 +27,7 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th>Tipe Pesanan</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -37,17 +37,17 @@
                     <td>{{ $orderType->name }}</td>
                     <td>
                         @can('ubah-tipepesanan')
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$orderType->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$orderType->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
                         {{-- Edit Modal --}}
                         <div id="editModal-{{$orderType->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
                             <div role="document" class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Update Bahan Baku')}}</h5>
+                                <h5 id="exampleModalLabel" class="modal-title">Update Tipe Pesanan</h5>
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
-                                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                                     <form action="{{route('order_type.update', $orderType->id)}}" method="POST">
                                         @csrf
                                         @method('PUT')
@@ -57,7 +57,7 @@
                                             <input type="text" value="{{$orderType->name}}" name="name" required class="form-control">
                                         </div>
                                         </div>
-                                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                                        <input type="submit" value="Submit" class="btn btn-primary">
                                     </form>
                                 </div>
                             </div>
@@ -67,7 +67,7 @@
 
                         @can('hapus-tipepesanan')
                         {{ Form::open(['route' => ['order_type.destroy', $orderType->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                         {{ Form::close() }}
                         @endcan
                     </td>
@@ -89,13 +89,13 @@
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>{{trans('file.Inputan yang memiliki tanda (*) wajib diisi')}}.</small></p>
+                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                 <form>
                     <div class="form-group">
                         <label>Nama *</label>
                         <input type="text" name="name" required class="form-control">
                     </div>
-                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                    <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>
         {{ Form::close() }}

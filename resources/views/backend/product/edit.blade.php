@@ -7,11 +7,11 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>{{trans('file.Update Product')}}</h4>
+                        <h4>Update Produk</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
-                            <small>{{trans('file.The field labels marked with * are required input fields')}}.</small>
+                            <small>Inputan yang ditandai dengan * wajib diisi.</small>
                         </p>
                         <form id="product-form" action="{{route('products.update', $lims_product_data->id)}}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -90,7 +90,7 @@
                                             <div class="form-group">
                                                 <label>Gambar Produk</strong> </label> <i
                                                     class="dripicons-question" data-toggle="tooltip"
-                                                    title="{{trans('file.You can upload multiple image. Only .jpeg, .jpg, .png, .gif file can be uploaded. First image will be base image.')}}"></i>
+                                                    title="Upload gambar dengan format .jpeg, .jpg, .png, .gif."></i>
                                                 {{-- <div id="imageUpload" class="dropzone"></div> --}}
                                                 <input type="file" class="form-control" name="image">
                                                 <p>Gambar Sebelumnya : <img width="20%" src="{{Storage::url('product_images/'.$lims_product_data->image)}}" alt=""></p>
@@ -201,7 +201,7 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Cabang</th>
-                                                        <th>{{trans('file.Price')}}</th>
+                                                        <th>Harga</th>
                                                     </tr>
                                                     @foreach($product_warehouses as $warehouse)
                                                     <tr>
@@ -226,7 +226,7 @@
                                         <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                     <div class="form-group mt-3">
-                                        <button class="btn btn-primary" type="submit" id="">{{trans('file.submit')}}</button>
+                                        <button class="btn btn-primary" type="submit" id="">Submit</button>
                                     </div>
                                 </div>
                             </div>

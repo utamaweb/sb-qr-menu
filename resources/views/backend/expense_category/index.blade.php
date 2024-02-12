@@ -17,8 +17,9 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
-
+        @can('tambah-pengeluaran')
         <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Nama Pengeluaran</a>&nbsp;
+        @endcan
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
@@ -26,7 +27,7 @@
                 <tr>
                     <th class="not-exported"></th>
                     <th>Nama Pengeluaran</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -35,7 +36,8 @@
                     <td>{{$key}}</td>
                     <td>{{ $expense_category->name }}</td>
                     <td>
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense_category->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                        @can('ubah-pengeluaran')
+                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense_category->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
                         {{-- Edit Modal --}}
                         <div id="editModal-{{$expense_category->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
                             <div role="document" class="modal-dialog">
@@ -45,7 +47,7 @@
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
-                                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                                     <form action="{{route('expense_categories.update', $expense_category->id)}}" method="POST">
                                         @csrf
                                         @method('PUT')
@@ -56,15 +58,18 @@
                                         </div>
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
                                         </div>
-                                        <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                                        <input type="submit" value="Submit" class="btn btn-primary">
                                     </form>
                                 </div>
                             </div>
                             </div>
                         </div>
+                        @endcan
+                        @can('hapus-pengeluaran')
                         {{ Form::open(['route' => ['expense_categories.destroy', $expense_category->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 {{ Form::close() }}
+                        @endcan
                     </td>
                 </tr>
                 @endforeach
@@ -84,13 +89,13 @@
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>{{trans('file.Inputan yang memiliki tanda (*) wajib diisi')}}.</small></p>
+                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                 <form>
                     <div class="form-group">
                         <label>Nama Pengeluaran *</label>
                         <input type="text" name="name" required class="form-control">
                     </div>
-                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                    <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>
         {{ Form::close() }}

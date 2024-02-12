@@ -32,12 +32,10 @@
                     <th>Nama</th>
                     <th>Kode</th>
                     <th>Kategori</th>
-                    {{-- <th>Kuantitas</th> --}}
                     <th>Unit</th>
                     <th>Bahan Baku</th>
                     <th>Harga</th>
-                    {{-- <th>{{trans('file.Stock Worth (Price/Cost)')}}</th> --}}
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -75,11 +73,11 @@
                     <td>{{ $product->price }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
                     <td>
                         @can('ubah-produk')
-                        <a href={{route('products.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</a>
+                        <a href={{route('products.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
                         @endcan
                         @can('hapus-produk')
                         {{ Form::open(['route' => ['products.destroy', $product->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 {{ Form::close() }}
                         @endcan
                     </td>

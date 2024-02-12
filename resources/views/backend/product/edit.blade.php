@@ -182,7 +182,7 @@
                                             <div class="search-box input-group mb-4">
                                                 {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
                                                 {{-- <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" /> --}}
-                                                <select required class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
+                                                <select class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
                                                     {{-- <option value="" disabled>Select Product Unit...</option> --}}
                                                     @foreach($ingredients as $ingredient)
                                                     <option value="{{$ingredient->id}}" @if(in_array($ingredient->id, $ingredientProducts)) selected @endif>{{$ingredient->name}}</option>
@@ -192,9 +192,8 @@
                                     </div>
                                     </div>
                                     <div class="col-md-12 mt-2" id="diffPrice-option">
-                                        <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1">&nbsp;
-                                            Barang ini
-                                            punya harga berbeda untuk cabang berbeda</h5>
+                                        <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1" {{$lims_product_data->is_diffPrice == 1 ? 'checked' : ''}}>&nbsp;
+                                            Barang ini punya harga berbeda untuk cabang berbeda</h5>
                                     </div>
                                     <div class="col-md-6" id="diffPrice-section">
                                         <div class="table-responsive ml-2">
@@ -204,14 +203,14 @@
                                                         <th>Cabang</th>
                                                         <th>{{trans('file.Price')}}</th>
                                                     </tr>
-                                                    @foreach($lims_warehouse_list as $warehouse)
+                                                    @foreach($product_warehouses as $warehouse)
                                                     <tr>
                                                         <td>
                                                             <input type="hidden" name="warehouse_id[]"
-                                                                value="{{$warehouse->id}}">
-                                                            {{$warehouse->name}}
+                                                                value="{{$warehouse->warehouse_id}}">
+                                                            {{$warehouse->warehouse->name}}
                                                         </td>
-                                                        <td><input type="number" name="diff_price[]" class="form-control">
+                                                        <td><input type="number" name="diff_price[]" value="{{$warehouse->price}}" class="form-control">
                                                         </td>
                                                     </tr>
                                                     @endforeach

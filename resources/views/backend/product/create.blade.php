@@ -194,7 +194,7 @@
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">
-                                        <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
+                                        <a href="{{ route('products.index') }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                     <div class="form-group mt-3">
                                         <input type="submit" value="{{trans('file.submit')}}" id=""

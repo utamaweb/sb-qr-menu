@@ -139,98 +139,84 @@ class ProductController extends Controller
 
     public function edit($id)
     {
-        $role = Role::firstOrCreate(['id' => Auth::user()->role_id]);
-        if ($role->hasPermissionTo('products-edit')) {
-            // $lims_product_list_without_variant = $this->productWithoutVariant();
-            // $lims_product_list_with_variant = $this->productWithVariant();
-            // $lims_brand_list = Brand::where('is_active', true)->get();
-            $lims_category_list = Category::where('is_active', true)->get();
-            $ingredients = Ingredient::get();
-            $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
-            $lims_unit_list = Unit::where('is_active', true)->get();
-            $lims_tax_list = Tax::where('is_active', true)->get();
-            $lims_product_data = Product::where('id', $id)->first();
-            if($lims_product_data->variant_option) {
-                $lims_product_data->variant_option = json_decode($lims_product_data->variant_option);
-                $lims_product_data->variant_value = json_decode($lims_product_data->variant_value);
-            }
-            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            $noOfVariantValue = 0;
-            $custom_fields = CustomField::where('belongs_to', 'product')->get();
-            return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_warehouse_list', 'noOfVariantValue', 'custom_fields','ingredients','ingredientProducts'));
+        $lims_category_list = Category::where('is_active', true)->get();
+        $ingredients = Ingredient::get();
+        $product_warehouses = Product_Warehouse::where('product_id', $id)->get();
+        $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
+        $lims_unit_list = Unit::where('is_active', true)->get();
+        $lims_tax_list = Tax::where('is_active', true)->get();
+        $lims_product_data = Product::where('id', $id)->first();
+        if($lims_product_data->variant_option) {
+            $lims_product_data->variant_option = json_decode($lims_product_data->variant_option);
+            $lims_product_data->variant_value = json_decode($lims_product_data->variant_value);
         }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $noOfVariantValue = 0;
+        return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_warehouse_list', 'noOfVariantValue','ingredients','ingredientProducts', 'product_warehouses'));
     }
 
     public function update(Request $request, $id)
     {
-            $this->validate($request, [
-                'name' => [
-                    'max:255',
-                ],
-            ]);
+        $image = $request->image;
+        $productFind = Product::findOrFail($id);
+        if($image){
+            $this->fileDelete('storage/product_images/', $productFind->image);
+            $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+            $uploadImage = $image->storeAs('public/product_images', $imageName);
+        } else {
+            $imageName = $productFind->image;
+        }
+        $editProduct = Product::findOrFail($id);
+        $editProduct->update([
+            'type' => $request->type,
+            'name' => $request->name,
+            'slug' => Str::slug($request->name),
+            'code' => $request->code,
+            'category_id' => $request->category_id,
+            'unit_id' => $request->unit_id,
+            'product_details' => $request->product_details,
+            'price' => $request->price,
+            'image' => $imageName,
+        ]);
+        if (isset($request->ingredients)) {
+            $editProduct->ingredient()->sync($request->ingredients);
+        }
 
-            $image = $request->image;
-            $productFind = Product::findOrFail($id);
-            if($image){
-                $this->fileDelete('storage/product_images/', $productFind->image);
-                $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
-                $uploadImage = $image->storeAs('public/product_images', $imageName);
-            } else {
-                $imageName = $productFind->image;
-            }
-            $editProduct = Product::findOrFail($id);
-            $editProduct->update([
-                'type' => $request->type,
-                'name' => $request->name,
-                'slug' => Str::slug($request->name),
-                'code' => $request->code,
-                'category_id' => $request->category_id,
-                'unit_id' => $request->unit_id,
-                'product_details' => $request->product_details,
-                'price' => $request->price,
-                'image' => $imageName,
-            ]);
-            if (isset($request->ingredients)) {
-                $editProduct->ingredient()->sync($request->ingredients);
-            }
+        $roleName = auth()->user()->getRoleNames()[0];
 
-            $roleName = auth()->user()->getRoleNames()[0];
-
-            if(isset($data['is_diffPrice'])) {
-                $productInsert->udpate(['is_diffPrice' => 1]);
-                foreach ($data['diff_price'] as $key => $diff_price) {
-                    if($diff_price) {
-                        Product_Warehouse::where('product_id', $id)->where('warehouse_id', $data['warehouse_id'][$key])->update([
-                            "product_id" => $id,
-                            "warehouse_id" => $data["warehouse_id"][$key],
-                            "price" => $diff_price
-                        ]);
-                    }
-                }
-            } else {
-                if($roleName == 'Kasir'){
-                    Product_Warehouse::where('product_id', $id)->where('warehouse_id', auth()->user()->warehouse_id)->update([
-                        'product_id' => $productInsert->id,
-                        'warehouse_id' => auth()->user()->warehouse_id,
-                        'price' => $request->price
+        if(isset($data['is_diffPrice'])) {
+            $editProduct->update(['is_diffPrice' => 1]);
+            foreach ($data['diff_price'] as $key => $diff_price) {
+                if($diff_price) {
+                    Product_Warehouse::where('product_id', $id)->where('warehouse_id', $data['warehouse_id'][$key])->update([
+                        "product_id" => $id,
+                        "warehouse_id" => $data["warehouse_id"][$key],
+                        "price" => $diff_price
                     ]);
-                } else {
-                    $warehouses = Warehouse::get();
-                    foreach ($warehouses as $key => $warehouse) {
-                        Product_Warehouse::where('product_id', $id)->where('warehouse_id', $warehouse->id)->update([
-                            "product_id" => $productInsert->id,
-                            "warehouse_id" => $warehouse->id,
-                            "price" => $request->price
-                        ]);
-                    }
                 }
             }
+        } else {
+            if($roleName == 'Kasir'){
+                Product_Warehouse::where('product_id', $id)->where('warehouse_id', auth()->user()->warehouse_id)->update([
+                    'product_id' => $editProduct->id,
+                    'warehouse_id' => auth()->user()->warehouse_id,
+                    'price' => $request->price
+                ]);
+            } else {
+                $warehouses = Warehouse::get();
+                foreach ($warehouses as $key => $warehouse) {
+                    Product_Warehouse::where('product_id', $id)->where('warehouse_id', $warehouse->id)->update([
+                        "product_id" => $editProduct->id,
+                        "warehouse_id" => $warehouse->id,
+                        "price" => $request->price
+                    ]);
+                }
+            }
+        }
 
-            $this->cacheForget('product_list');
-            // \Session::flash('edit_message', 'Product updated successfully');
-            return redirect('admin/products')->with('message', 'Data updated successfully');
+        $this->cacheForget('product_list');
+        // \Session::flash('edit_message', 'Product updated successfully');
+        return redirect('admin/products')->with('message', 'Data updated successfully');
     }
 
     public function generateCode()

@@ -39,7 +39,11 @@ class StockPurchaseController extends Controller
             return redirect()->route('stock-purchase.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
         }
         $dateNow = Carbon::now()->format('Y-m-d');
+        $roleName = auth()->user()->getRoleNames()[0];
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+        if($roleName == 'Superadmin'){
+            $shift = Shift::where('date', $dateNow)->where('is_closed', 0)->first();
+        }
         if($shift == NULL){
             return redirect()->route('stock-purchase.index')->with('not_permitted', 'Belum ada kasir yang dibuka');
         }
@@ -92,6 +96,7 @@ class StockPurchaseController extends Controller
                 'ingredient_id' => $request->ingredient_id[$item],
                 'qty' => $request->qty[$item],
                 'transaction_type' => 'in',
+                'date' => $dateNow,
                 'user_id' => auth()->user()->id,
             ]);
             // $ingredient = Ingredient::find($request->ingredient_id[$item]);

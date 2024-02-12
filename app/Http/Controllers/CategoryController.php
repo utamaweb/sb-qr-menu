@@ -23,12 +23,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::get();
-        $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('category')) {
-            return view('backend.category.create', compact('categories'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        return view('backend.category.create', compact('categories'));
     }
 
     public function categoryData(Request $request)

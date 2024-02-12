@@ -20,7 +20,7 @@
       <a href="#report" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-document-remove"></i><span>Laporan</span></a>
       <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
-        <li id="stock-opname"><a  href="{{route('close-cashier.index')}}">Laporan Tutup Kasir</a></li>
+        <li id="laporan-tutup-kasir"><a  href="{{route('close-cashier.index')}}">Laporan Tutup Kasir</a></li>
 
          <li id="product-report-menu">
             {!! Form::open(['route' => 'report.product', 'method' => 'get', 'id' => 'product-report-form']) !!}

@@ -67,13 +67,13 @@
                                         <input type="text" name="company_name" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->company_name}}@endif" />
                                     </div>
                                 </div>
-                                <div class="col-md-4 d-none">
+                                {{-- <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.VAT Registration Number')}}</label>
                                         <input type="text" name="vat_registration_number" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->vat_registration_number}}@endif" />
                                     </div>
-                                </div>
-                                <div class="col-md-4">
+                                </div> --}}
+                                {{-- <div class="col-md-4">
                                     <div class="form-group">
                                         <label>{{trans('file.Time Zone')}}</label>
                                         @if($lims_general_setting_data)
@@ -85,8 +85,8 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-4 d-none">
+                                </div> --}}
+                                {{-- <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Currency')}} *</label>
                                         <select name="currency" class="form-control" required>
@@ -99,8 +99,8 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-4 d-none">
+                                </div> --}}
+                                {{-- <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Currency Position')}} *</label><br>
                                         @if($lims_general_setting_data->currency_position == 'prefix')
@@ -119,14 +119,14 @@
                                         </label>
                                         @endif
                                     </div>
-                                </div>
-                                <div class="col-md-4">
+                                </div> --}}
+                                {{-- <div class="col-md-4">
                                     <div class="form-group">
                                         <label>{{trans('file.Digits after deciaml point')}}*</label>
                                         <input class="form-control" type="number" name="decimal" value="@if($lims_general_setting_data){{$lims_general_setting_data->decimal}}@endif" max="6" min="0">
                                     </div>
-                                </div>
-                                <div class="col-md-4 d-none">
+                                </div> --}}
+                                {{-- <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Theme')}} *</label>
                                         <div class="row ml-1">
@@ -136,8 +136,8 @@
                                             <div class="col-md-3 theme-option" data-color="dark.css" style="background: #34495e; min-height: 40px;max-width: 50px;" title="Dark"></div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
+                                </div> --}}
+                                {{-- <div class="col-md-4">
                                     <div class="form-group">
                                         <label>{{trans('file.Sale and Quotation without stock')}} *</label><br>
                                         @if($lims_general_setting_data->without_stock == 'yes')
@@ -156,8 +156,8 @@
                                         </label>
                                         @endif
                                     </div>
-                                </div>
-                                <div class="col-md-4">
+                                </div> --}}
+                                {{-- <div class="col-md-4">
                                     <div class="form-group">
                                         <label>{{trans('file.Staff Access')}} *</label>
                                         @if($lims_general_setting_data)
@@ -168,8 +168,8 @@
                                             <option value="own"> {{trans('file.Own Records')}}</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-4 d-none">
+                                </div> --}}
+                                {{-- <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Invoice Format')}} *</label>
                                         @if($lims_general_setting_data)
@@ -180,8 +180,8 @@
                                             <option value="gst">Indian GST</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div id="state" class="col-md-4 d-none">
+                                </div> --}}
+                                {{-- <div id="state" class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.State')}} *</label>
                                         @if($lims_general_setting_data)
@@ -192,8 +192,8 @@
                                             <option value="2">Buyer State</option>
                                         </select>
                                     </div>
-                                </div>
-                                <div class="col-md-4">
+                                </div> --}}
+                                {{-- <div class="col-md-4">
                                     <div class="form-group">
                                         <label>{{trans('file.Date Format')}} *</label>
                                         @if($lims_general_setting_data)
@@ -211,14 +211,14 @@
                                             <option value="Y.m.d"> yyy.mm.dd</option>
                                         </select>
                                     </div>
-                                </div>
+                                </div> --}}
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label>{{trans('file.Developed By')}}</label>
                                         <input type="text" name="developed_by" class="form-control" value="{{$lims_general_setting_data->developed_by}}">
                                     </div>
                                 </div>
-                                @if(config('database.connections.saleprosaas_landlord'))
+                                {{-- @if(config('database.connections.saleprosaas_landlord'))
                                     <br>
                                     <div class="col-md-2">
                                         <div class="form-group">
@@ -280,7 +280,7 @@
                                             <p>{{date($lims_general_setting_data->date_format, strtotime($lims_general_setting_data->expiry_date))}}</p>
                                         </div>
                                     </div>
-                                @endif
+                                @endif --}}
                             </div>
                             <div class="form-group">
                                 <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">

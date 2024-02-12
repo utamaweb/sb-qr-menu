@@ -120,10 +120,11 @@ Route::group(['prefix' => 'developer-section'], function () {
 });
 
 Route::group(['prefix' => 'admin'], function () {
-
-    Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');
-    Route::post('login', [AuthController::class, 'login'])->name('admin.auth.login');
-    Route::post('logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
+    Route::middleware(['guest'])->group(function () {
+        Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');
+        Route::post('login', [AuthController::class, 'login'])->name('admin.auth.login');
+        Route::post('logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
+    });
 
     Route::get('/documentation', [HomeController::class, 'documentation']);
 

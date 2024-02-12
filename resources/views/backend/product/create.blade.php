@@ -5,6 +5,10 @@
 @section('content')
 <section class="forms">
     <div class="container-fluid">
+        @if(session()->has('not_permitted'))
+    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
+    @endif
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -27,7 +31,7 @@
                                                     <select name="type" required class="form-control selectpicker"
                                                         id="type">
                                                         <option value="standard">Standard</option>
-                                                        <option value="combo">Paket</option>
+                                                        {{-- <option value="combo">Paket</option> --}}
                                                     </select>
                                                 </div>
                                             </div>
@@ -35,8 +39,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Nama Produk *</strong> </label>
-                                                <input type="text" name="name" class="form-control" id="name"
-                                                    aria-describedby="name" required>
+                                                <input type="text" name="name" class="form-control" id="name" aria-describedby="name" required value="{{old('name')}}">
                                                 <span class="validation-msg" id="name-error"></span>
                                             </div>
                                         </div>
@@ -45,7 +48,7 @@
                                                 <label>Kode Produk *</strong> </label>
                                                 <div class="input-group">
                                                     <input type="text" name="code" class="form-control" id="code"
-                                                        aria-describedby="code" required>
+                                                        aria-describedby="code" required value="{{old('code')}}">
                                                     <div class="input-group-append">
                                                         <button id="genbutton" type="button"
                                                             class="btn btn-sm btn-default"
@@ -64,7 +67,7 @@
                                                         class="selectpicker form-control" data-live-search="true"
                                                         data-live-search-style="begins" title="Select Category...">
                                                         @foreach($lims_category_list as $category)
-                                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                                        <option value="{{$category->id}}" {{old('category_id') == $category->id ? 'selected' : ''}}>{{$category->name}}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -131,32 +134,14 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Harga Produk *</strong> </label>
-                                                <input type="number" name="price" required class="form-control"
-                                                    step="any">
+                                                <input type="number" name="price" required class="form-control" step="any" value="{{old('price')}}">
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>
-                                        {{-- <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Kuantitas *</strong> </label>
-                                                <input type="number" name="qty" required class="form-control"
-                                                    step="any">
-                                                <span class="validation-msg"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Modal *</strong> </label>
-                                                <input type="number" name="cost" required class="form-control"
-                                                    step="any">
-                                                <span class="validation-msg"></span>
-                                            </div>
-                                        </div> --}}
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Detail Produk</label>
-                                                <input name="product_details" class="form-control"
-                                                    rows="3">
+                                                <input name="product_details" class="form-control" rows="3" value="{{old('product_details')}}">
                                             </div>
                                         </div>
                                         <div class="col-md-4">

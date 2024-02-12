@@ -42,12 +42,12 @@ class ProductController extends Controller
     public function index()
     {
         $roleName = auth()->user()->getRoleNames()[0];
-        $products = Product_Warehouse::get();
+        $products = Product::get();
         if($roleName == 'Kasir'){
             $products = Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->get();
         }
         $numberOfProduct = DB::table('products')->where('is_active', true)->count();
-        return view('backend.product.index', compact('numberOfProduct', 'products'));
+        return view('backend.product.index', compact('numberOfProduct', 'products','roleName'));
     }
 
     public function create()
@@ -64,32 +64,19 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-        // return $request;
-        $this->validate($request, [
-            'code' => [
-                'max:255',
-                    Rule::unique('products')->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ],
-            'name' => [
-                'max:255',
-                    Rule::unique('products')->where(function ($query) {
-                    return $query->where('is_active', 1);
-                }),
-            ]
-        ]);
+        $isCodeExists = Product::where('code', $request->code)->first();
+        if($isCodeExists){
+            return redirect()->back()->with('not_permitted', 'Maaf, Kode Produk Tersebut Sudah Digunakan, Gunakan Kode Lain.');
+        }
         $data = $request->except('image', 'file');
         $data['name'] = preg_replace('/[\n\r]/', "<br>", htmlspecialchars(trim($data['name'])));
-        if($data['type'] == 'combo') {
-            $data['product_list'] = implode(",", $data['product_id']);
-            $data['variant_list'] = implode(",", $data['variant_id']);
-            $data['qty_list'] = implode(",", $data['product_qty']);
-            $data['price_list'] = implode(",", $data['unit_price']);
-            $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
-        }
-        elseif($data['type'] == 'digital' || $data['type'] == 'service')
-            $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
+        // if($data['type'] == 'combo') {
+        //     $data['product_list'] = implode(",", $data['product_id']);
+        //     $data['variant_list'] = implode(",", $data['variant_id']);
+        //     $data['qty_list'] = implode(",", $data['product_qty']);
+        //     $data['price_list'] = implode(",", $data['unit_price']);
+        //     $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
+        // }
 
         // $data['product_details'] = str_replace('"', '@', $data['product_details']);
         $data['is_active'] = true;
@@ -117,7 +104,7 @@ class ProductController extends Controller
         $roleName = auth()->user()->getRoleNames()[0];
 
         if(isset($data['is_diffPrice'])) {
-            $productInsert->udpate(['is_diffPrice' => 1]);
+            $productInsert->update(['is_diffPrice' => 1]);
             foreach ($data['diff_price'] as $key => $diff_price) {
                 if($diff_price) {
                     Product_Warehouse::create([
@@ -145,9 +132,9 @@ class ProductController extends Controller
                 }
             }
         }
-        $this->cacheForget('product_list');
-        $this->cacheForget('product_list_with_variant');
-        return redirect('products')->with('message', 'Data inserted successfully');
+        // $this->cacheForget('product_list');
+        // $this->cacheForget('product_list_with_variant');
+        return redirect('admin/products')->with('message', 'Data inserted successfully');
     }
 
     public function edit($id)

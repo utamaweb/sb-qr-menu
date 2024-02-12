@@ -16,6 +16,10 @@ class Product_Warehouse extends Model
     {
         return $this->belongsTo('App\Models\Product');
     }
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse');
+    }
 
     public function scopeFindProductWithVariant($query, $product_id, $variant_id, $warehouse_id)
     {

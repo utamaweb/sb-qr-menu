@@ -17,8 +17,9 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
-
+        @can('tambah-bahanbaku')
         <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>&nbsp;
+        @endcan
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
@@ -48,6 +49,7 @@
                     <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
                     <td>
                         <div class="row">
+                            @can('ubah-bahanbaku')
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
                         {{-- Edit Modal --}}
                         <div id="editModal-{{$ingredient->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
@@ -94,10 +96,13 @@
                             </div>
                             </div>
                         </div>
+                        @endcan
 
+                        @can('hapus-bahanbaku')
                         {{ Form::open(['route' => ['ingredient.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                 {{ Form::close() }}
+                        @endcan
                     </td>
                 </div>
                 </tr>

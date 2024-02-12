@@ -14,16 +14,18 @@
 
 <section>
     <div class="container-fluid">
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> {{trans('file.Add Role')}} </a>
+        @can('tambah-role')
+        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Role </a>
+        @endcan
     </div>
     <div class="table-responsive">
         <table id="role-table" class="table table-hover">
             <thead>
                 <tr>
                     <th class="not-exported"></th>
-                    <th>{{trans('file.name')}}</th>
-                    <th>{{trans('file.Description')}}</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th>Nama</th>
+                    <th>Deskripsi</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -34,25 +36,30 @@
                     <td>{{ $role->description }}</td>
                     <td>
                         <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{trans('file.action')}}
+                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
                                 <span class="caret"></span>
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
+                                @can('ubah-role')
                                 <li>
-                                    <button type="button" data-id="{{$role->id}}" class="open-EditroleDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}
+                                    <button type="button" data-id="{{$role->id}}" class="open-EditroleDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> Ubah
                                 </button>
                                 </li>
                                 <li class="divider"></li>
+
                                 <li>
-                                    <a href="{{ route('role.permission', ['id' => $role->id]) }}" class="btn btn-link"><i class="dripicons-lock-open"></i> {{trans('file.Change Permission')}}</a>
+                                    <a href="{{ route('role.permission', ['id' => $role->id]) }}" class="btn btn-link"><i class="dripicons-lock-open"></i> Ubah Hak Akses</a>
                                 </li>
-                                @if($role->id > 2 && $role->id != 5)
+                                @endcan
+                                @if($role->id != 1)
+                                @can('hapus-role')
                                 {{ Form::open(['route' => ['role.destroy', $role->id], 'method' => 'DELETE'] ) }}
                                 <li>
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 </li>
                                 {{ Form::close() }}
+                                @endcan
                                 @endif
                             </ul>
                         </div>
@@ -69,18 +76,18 @@
         <div class="modal-content">
             {!! Form::open(['route' => 'role.store', 'method' => 'post']) !!}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Add Role')}}</h5>
+                <h5 id="exampleModalLabel" class="modal-title">Tambah Role</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                 <form>
                     <div class="form-group">
-                    <label>{{trans('file.name')}} *</label>
+                    <label>Nama *</label>
                     {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}}
                     </div>
                     <div class="form-group">
-                        <label>{{trans('file.Description')}}</label>
+                        <label>Deskripsi</label>
                         {{Form::textarea('description',null,array('rows'=> 5, 'class' => 'form-control'))}}
                     </div>
                     <input type="hidden" name="guard_name" value="web">
@@ -90,7 +97,7 @@
                         btn-outline-primary">Kembali</a>
                     </div> --}}
                     <div class="form-group mt-3">
-                        <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                        <input type="submit" value="Submit" id="submit-btn" class="btn btn-primary">
                     </div>
                 </div>
             	</form>
@@ -105,19 +112,19 @@
 		  <div class="modal-content">
 		    {!! Form::open(['route' => ['role.update',1], 'method' => 'put']) !!}
 		    <div class="modal-header">
-		      <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Update Role')}}</h5>
+		      <h5 id="exampleModalLabel" class="modal-title">Update Role</h5>
 		      <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
 		    </div>
 		    <div class="modal-body">
-		      <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+		      <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
 		        <form>
 		            <input type="hidden" name="role_id">
 		            <div class="form-group">
-		                <label>{{trans('file.name')}} *</label>
+		                <label>Nama *</label>
 		                {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}}
 		            </div>
 		            <div class="form-group">
-		                <label>{{trans('file.Description')}}</label>
+		                <label>Deskripsi</label>
 		                {{Form::textarea('description',null,array('rows'=> 5, 'class' => 'form-control'))}}
 		            </div>
 		            <div class="col-md-12 d-flex justify-content-end">
@@ -126,7 +133,7 @@
                         btn-outline-primary">Kembali</a>
                     </div> --}}
                     <div class="form-group mt-3">
-                        <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
+                        <input type="submit" value="Submit" id="submit-btn" class="btn btn-primary">
                     </div>
                 </div>
 		        </form>

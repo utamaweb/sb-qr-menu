@@ -17,8 +17,9 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
-
+    @can('tambah-tipepesanan')
         <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Tipe Pesanan</a>&nbsp;
+    @endcan
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
@@ -35,6 +36,7 @@
                     <td>{{$key}}</td>
                     <td>{{ $orderType->name }}</td>
                     <td>
+                        @can('ubah-tipepesanan')
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$orderType->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
                         {{-- Edit Modal --}}
                         <div id="editModal-{{$orderType->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
@@ -61,9 +63,13 @@
                             </div>
                             </div>
                         </div>
+                        @endcan
+
+                        @can('hapus-tipepesanan')
                         {{ Form::open(['route' => ['order_type.destroy', $orderType->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
-                                {{ Form::close() }}
+                        {{ Form::close() }}
+                        @endcan
                     </td>
                 </tr>
                 @endforeach

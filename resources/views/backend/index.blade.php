@@ -66,8 +66,9 @@
                   <div class="wrapper count-title">
                     <div class="icon"><i class="dripicons-graph-bar" style="color: #733686"></i></div>
                     <div>
-                        <div class="count-number revenue-data">{{number_format((float)$revenue,$general_setting->decimal, '.', '')}}</div>
-                        <div class="name"><strong style="color: #733686">{{ trans('file.revenue') }}</strong></div>
+                        {{-- <div class="count-number revenue-data">{{number_format((float)$revenue,$general_setting->decimal, '.', '')}}</div> --}}
+                        <div class="count-number revenue-data">@currency($revenue)</div>
+                        <div class="name"><strong style="color: #733686">Pendapatan</strong></div>
                     </div>
                   </div>
                 </div>
@@ -77,7 +78,7 @@
                     <div class="icon"><i class="dripicons-return" style="color: #ff8952"></i></div>
                     <div>
                         <div class="count-number return-data">{{number_format((float)$return,$general_setting->decimal, '.', '')}}</div>
-                        <div class="name"><strong style="color: #ff8952">{{trans('file.Sale Return')}}</strong></div>
+                        <div class="name"><strong style="color: #ff8952">Pengeluaran</strong></div>
                     </div>
                   </div>
                 </div>

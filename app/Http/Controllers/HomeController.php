@@ -9,6 +9,7 @@ use App\Models\ReturnPurchase;
 use App\Models\ProductPurchase;
 use App\Models\Purchase;
 use App\Models\Expense;
+use App\Models\Transaction;
 use App\Models\Payroll;
 use App\Models\Quotation;
 use App\Models\Payment;
@@ -132,7 +133,8 @@ class HomeController extends Controller
                                 ->groupBy('product_sales.product_id', 'product_sales.product_batch_id')
                                 ->get();
             $product_cost = $this->calculateAverageCOGS($product_sale_data);
-            $revenue = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('grand_total - shipping_cost'));
+            // $revenue = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('grand_total - shipping_cost'));
+            $revenue = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
             $return = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $revenue = $revenue - $return;

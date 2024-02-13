@@ -83,7 +83,7 @@
                                         <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                     <div class="form-group mt-3">
-                                        <input type="submit" value="{{trans('file.submit')}}" id=""
+                                        <input type="submit" value="Submit" id=""
                                             class="btn btn-primary">
                                     </div>
                                 </div>
@@ -99,6 +99,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+    $("#stock-opname").addClass("active");
     $(document).ready(function() {
         var maxAppend = 0;
         $("#add_more").click(function() {

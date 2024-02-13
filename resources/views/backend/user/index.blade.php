@@ -17,12 +17,11 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
-
-    <div class="container-fluid">
-        <a href="{{route('user.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> {{trans('file.Add User')}}</a>
+    @can('tambah-user')
+        <a href="{{route('user.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah User</a>
             {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
-    </div>
-    </div>
+    @endcan
+        </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
             <thead>
@@ -46,28 +45,34 @@
                     <?php $role = DB::table('roles')->find($user->role_id);?>
                     <td>{{ $role->name }}</td>
                     @if($user->is_active)
-                    <td><div class="badge badge-success">Active</div></td>
+                    <td><div class="badge badge-success">Aktif</div></td>
                     @else
-                    <td><div class="badge badge-danger">Inactive</div></td>
+                    <td><div class="badge badge-danger">Tidak Aktif</div></td>
                     @endif
                     <td>
+                        @canany(['ubah-user', 'hapus-user'])
                         <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{trans('file.action')}}
+                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
                                 <span class="caret"></span>
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
+                                @can('ubah-user')
                                 <li>
-                                	<a href="{{ route('user.edit', $user->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</a>
+                                	<a href="{{ route('user.edit', $user->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
                                 </li>
+                                @endcan
                                 <li class="divider"></li>
+                                @can('hapus-user')
                                 {{ Form::open(['route' => ['user.destroy', $user->id], 'method' => 'DELETE'] ) }}
                                 <li>
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 </li>
                                 {{ Form::close() }}
+                                @endcan
                             </ul>
                         </div>
+                        @endcanany
                     </td>
                 </tr>
                 @endforeach
@@ -80,9 +85,9 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#product").siblings('a').attr('aria-expanded','true');
-    $("ul#product").addClass("show");
-    $("ul#product #unit-menu").addClass("active");
+    $("ul#outlet").siblings('a').attr('aria-expanded','true');
+    $("ul#outlet").addClass("show");
+    $("ul#outlet #user-list-menu").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

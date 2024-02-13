@@ -123,9 +123,9 @@
 @push('scripts')
 <script type="text/javascript">
 
-    $("ul#people").siblings('a').attr('aria-expanded','true');
-    $("ul#people").addClass("show");
-    $("ul#people #user-create-menu").addClass("active");
+$("ul#outlet").siblings('a').attr('aria-expanded','true');
+    $("ul#outlet").addClass("show");
+    $("ul#outlet #user-list-menu").addClass("active");
 
     $('#warehouseId').hide();
     $('#biller-id').hide();

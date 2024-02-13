@@ -7,11 +7,11 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>{{trans('file.Update Product')}}</h4>
+                        <h4>Update Produk</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
-                            <small>{{trans('file.The field labels marked with * are required input fields')}}.</small>
+                            <small>Inputan yang ditandai dengan * wajib diisi.</small>
                         </p>
                         <form id="product-form" action="{{route('products.update', $lims_product_data->id)}}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -90,7 +90,7 @@
                                             <div class="form-group">
                                                 <label>Gambar Produk</strong> </label> <i
                                                     class="dripicons-question" data-toggle="tooltip"
-                                                    title="{{trans('file.You can upload multiple image. Only .jpeg, .jpg, .png, .gif file can be uploaded. First image will be base image.')}}"></i>
+                                                    title="Upload gambar dengan format .jpeg, .jpg, .png, .gif."></i>
                                                 {{-- <div id="imageUpload" class="dropzone"></div> --}}
                                                 <input type="file" class="form-control" name="image">
                                                 <p>Gambar Sebelumnya : <img width="20%" src="{{Storage::url('product_images/'.$lims_product_data->image)}}" alt=""></p>
@@ -182,7 +182,7 @@
                                             <div class="search-box input-group mb-4">
                                                 {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
                                                 {{-- <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" /> --}}
-                                                <select required class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
+                                                <select class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
                                                     {{-- <option value="" disabled>Select Product Unit...</option> --}}
                                                     @foreach($ingredients as $ingredient)
                                                     <option value="{{$ingredient->id}}" @if(in_array($ingredient->id, $ingredientProducts)) selected @endif>{{$ingredient->name}}</option>
@@ -192,9 +192,8 @@
                                     </div>
                                     </div>
                                     <div class="col-md-12 mt-2" id="diffPrice-option">
-                                        <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1">&nbsp;
-                                            Barang ini
-                                            punya harga berbeda untuk cabang berbeda</h5>
+                                        <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1" {{$lims_product_data->is_diffPrice == 1 ? 'checked' : ''}}>&nbsp;
+                                            Barang ini punya harga berbeda untuk cabang berbeda</h5>
                                     </div>
                                     <div class="col-md-6" id="diffPrice-section">
                                         <div class="table-responsive ml-2">
@@ -202,16 +201,16 @@
                                                 <thead>
                                                     <tr>
                                                         <th>Cabang</th>
-                                                        <th>{{trans('file.Price')}}</th>
+                                                        <th>Harga</th>
                                                     </tr>
-                                                    @foreach($lims_warehouse_list as $warehouse)
+                                                    @foreach($product_warehouses as $warehouse)
                                                     <tr>
                                                         <td>
                                                             <input type="hidden" name="warehouse_id[]"
-                                                                value="{{$warehouse->id}}">
-                                                            {{$warehouse->name}}
+                                                                value="{{$warehouse->warehouse_id}}">
+                                                            {{$warehouse->warehouse->name}}
                                                         </td>
-                                                        <td><input type="number" name="diff_price[]" class="form-control">
+                                                        <td><input type="number" name="diff_price[]" value="{{$warehouse->price}}" class="form-control">
                                                         </td>
                                                     </tr>
                                                     @endforeach
@@ -227,7 +226,7 @@
                                         <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                     <div class="form-group mt-3">
-                                        <button class="btn btn-primary" type="submit" id="">{{trans('file.submit')}}</button>
+                                        <button class="btn btn-primary" type="submit" id="">Submit</button>
                                     </div>
                                 </div>
                             </div>
@@ -244,8 +243,9 @@
 @push('scripts')
 <script type="text/javascript">
 
-    $("ul#product").siblings('a').attr('aria-expanded','true');
+$("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
+    $("ul#product #product-list-menu").addClass("active");
     var product_id = <?php echo json_encode($lims_product_data->id) ?>;
     var is_batch = <?php echo json_encode($lims_product_data->is_batch) ?>;
     var is_variant = <?php echo json_encode($lims_product_data->is_variant) ?>;

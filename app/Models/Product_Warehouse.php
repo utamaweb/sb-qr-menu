@@ -9,8 +9,17 @@ class Product_Warehouse extends Model
 	protected $table = 'product_warehouse';
     protected $fillable =[
 
-        "product_id", "product_batch_id", "variant_id", "imei_number", "warehouse_id", "qty", "price"
+        "product_id", "warehouse_id", "price"
     ];
+
+    public function product()
+    {
+        return $this->belongsTo('App\Models\Product');
+    }
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse');
+    }
 
     public function scopeFindProductWithVariant($query, $product_id, $variant_id, $warehouse_id)
     {

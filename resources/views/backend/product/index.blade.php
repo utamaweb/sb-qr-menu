@@ -18,10 +18,10 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
 
-    <div class="container-fluid">
+        @can('tambah-produk')
             <a href="{{route('products.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('file.add_product')}}</a>
             {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
-    </div>
+        @endcan
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
@@ -32,25 +32,35 @@
                     <th>Nama</th>
                     <th>Kode</th>
                     <th>Kategori</th>
-                    {{-- <th>Kuantitas</th> --}}
                     <th>Unit</th>
-                    <th>Harga</th>
                     <th>Bahan Baku</th>
-                    {{-- <th>{{trans('file.Stock Worth (Price/Cost)')}}</th> --}}
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th>Harga</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($products as $key=>$product)
                 <tr data-id="{{$product->id}}">
                     <td>{{$key}}</td>
+                    @if($roleName == 'Kasir')
+                    <td><img src="{{Storage::url('product_images/'.$product->product->image)}}" alt=""></td>
+                    <td>{{ $product->product->name }}</td>
+                    <td>{{ $product->product->code }}</td>
+                    <td>{{ $product->product->category_name }}</td>
+                    <td>{{ $product->product->unit_name }}</td>
+                    <td>@foreach($product->product->ingredient as $ingredient)
+                        {{$ingredient->name}}
+                        @if( !$loop->last)
+                        ,
+                        @endif
+                        @endforeach
+                    </td>
+                    @else
                     <td><img src="{{Storage::url('product_images/'.$product->image)}}" alt=""></td>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->code }}</td>
                     <td>{{ $product->category_name }}</td>
-                    {{-- <td>{{ $product->qty }}</td> --}}
                     <td>{{ $product->unit_name }}</td>
-                    <td>{{ $product->price }}</td>
                     <td>@foreach($product->ingredient as $ingredient)
                         {{$ingredient->name}}
                         @if( !$loop->last)
@@ -58,12 +68,18 @@
                         @endif
                         @endforeach
                     </td>
-                    <td>
-                        <a href={{route('products.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</a>
+                    @endif
 
+                    <td>{{ $product->price }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
+                    <td>
+                        @can('ubah-produk')
+                        <a href={{route('products.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
+                        @endcan
+                        @can('hapus-produk')
                         {{ Form::open(['route' => ['products.destroy', $product->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 {{ Form::close() }}
+                        @endcan
                     </td>
                 </tr>
                 @endforeach
@@ -78,7 +94,7 @@
 <script type="text/javascript">
     $("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
-    $("ul#product #unit-menu").addClass("active");
+    $("ul#product #product-list-menu").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

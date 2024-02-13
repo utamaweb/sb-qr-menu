@@ -20,6 +20,7 @@ class OutletSeeder extends Seeder
             ['Outlet 3', 'Jl. Selili', 1],
             ['Outlet 4', 'Jl. Juanda', 1],
             ['Outlet 5', 'Jl. Antasari', 1],
+            ['Outlet 6', 'Jl. Padat Karya', 1],
         ];
 
         foreach ($outlets as $outlet) {

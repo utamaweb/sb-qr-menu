@@ -244,7 +244,7 @@
                 $general_setting_permission_active = $role_has_permissions_list->where('name', 'general_setting')->first();
             ?>
             @if($sale_add_permission_active)
-            <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> POS</span></a></li>
+            {{-- <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> POS</span></a></li> --}}
             @endif
             {{-- <li class="nav-item"><a id="switch-theme" data-toggle="tooltip" title="{{trans('file.Switch Theme')}}"><i class="dripicons-brightness-max"></i></a></li> --}}
             <li class="nav-item"><a id="btnFullscreen" data-toggle="tooltip" title="{{trans('file.Full Screen')}}"><i class="dripicons-expand"></i></a></li>
@@ -369,7 +369,7 @@
                     </li>
                     @endif
                     <li>
-                    <a href="{{url('my-transactions/'.date('Y').'/'.date('m'))}}"><i class="dripicons-swap"></i> {{trans('file.My Transaction')}}</a>
+                    {{-- <a href="{{url('my-transactions/'.date('Y').'/'.date('m'))}}"><i class="dripicons-swap"></i> {{trans('file.My Transaction')}}</a> --}}
                     </li>
                     {{-- @if(Auth::user()->role_id != 5)
                     <li>

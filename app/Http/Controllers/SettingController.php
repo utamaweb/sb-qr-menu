@@ -62,7 +62,7 @@ class SettingController extends Controller
     {
         $lims_general_setting_data = GeneralSetting::latest()->first();
         // $lims_account_list = Account::where('is_active', true)->get();
-        $lims_currency_list = Currency::get();
+        // $lims_currency_list = Currency::get();
         $zones_array = array();
         $timestamp = time();
         foreach(timezone_identifiers_list() as $key => $zone) {
@@ -70,7 +70,7 @@ class SettingController extends Controller
             $zones_array[$key]['zone'] = $zone;
             $zones_array[$key]['diff_from_GMT'] = 'UTC/GMT ' . date('P', $timestamp);
         }
-        return view('backend.setting.general_setting', compact('lims_general_setting_data', 'zones_array', 'lims_currency_list'));
+        return view('backend.setting.general_setting', compact('lims_general_setting_data', 'zones_array'));
     }
 
     public function generalSettingStore(Request $request)

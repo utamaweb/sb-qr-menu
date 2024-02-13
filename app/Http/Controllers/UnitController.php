@@ -13,13 +13,8 @@ class UnitController extends Controller
 {
     public function index()
     {
-        $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('unit')) {
-            $lims_unit_all = Unit::where('is_active', true)->get();
-            return view('backend.unit.create', compact('lims_unit_all'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $lims_unit_all = Unit::where('is_active', true)->get();
+        return view('backend.unit.create', compact('lims_unit_all'));
     }
 
     public function store(Request $request)

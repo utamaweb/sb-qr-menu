@@ -17,8 +17,9 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
-
+        @can('tambah-pembelianstok')
         <a href="{{route('stock-purchase.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Pembelian Stok</a>&nbsp;
+        @endcan
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
@@ -30,7 +31,7 @@
                     <th>Total Pembayaran</th>
                     <th>Dibuat Oleh</th>
                     <th>Outlet</th>
-                    <th class="not-exported">{{trans('file.action')}}</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -58,9 +59,7 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#product").siblings('a').attr('aria-expanded','true');
-    $("ul#product").addClass("show");
-    $("ul#product #unit-menu").addClass("active");
+    $("#stock-purchase").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

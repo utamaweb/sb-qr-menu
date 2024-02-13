@@ -18,7 +18,7 @@ class UserTableSeeder extends Seeder
             'phone' => '0888',
             'role_id' => '1',
         ]);
-        $superadmin->assignRole('superadmin');
+        $superadmin->assignRole('Superadmin');
 
         $kasir = User::create([
             'name' => 'kasir',
@@ -28,7 +28,7 @@ class UserTableSeeder extends Seeder
             'warehouse_id' => 1,
             'role_id' => '2',
         ]);
-        $kasir->assignRole('kasir');
+        $kasir->assignRole('Kasir');
 
         $customer = User::create([
             'name' => 'customer',
@@ -38,6 +38,6 @@ class UserTableSeeder extends Seeder
             'warehouse_id' => 1,
             'role_id' => '3',
         ]);
-        $kasir->assignRole('customer');
+        $customer->assignRole('Customer');
     }
 }

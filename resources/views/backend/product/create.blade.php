@@ -5,15 +5,19 @@
 @section('content')
 <section class="forms">
     <div class="container-fluid">
+        @if(session()->has('not_permitted'))
+    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
+            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
+    @endif
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>{{trans('file.add_product')}}</h4>
+                        <h4>Tambah Produk</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
-                            <small>{{trans('file.The field labels marked with * are required input fields')}}.</small>
+                            <small>Inputan yang ditandai dengan * wajib diisi.</small>
                         </p>
                         <form action="{{route('products.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
@@ -27,7 +31,7 @@
                                                     <select name="type" required class="form-control selectpicker"
                                                         id="type">
                                                         <option value="standard">Standard</option>
-                                                        <option value="combo">Paket</option>
+                                                        {{-- <option value="combo">Paket</option> --}}
                                                     </select>
                                                 </div>
                                             </div>
@@ -35,8 +39,7 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Nama Produk *</strong> </label>
-                                                <input type="text" name="name" class="form-control" id="name"
-                                                    aria-describedby="name" required>
+                                                <input type="text" name="name" class="form-control" id="name" aria-describedby="name" required value="{{old('name')}}">
                                                 <span class="validation-msg" id="name-error"></span>
                                             </div>
                                         </div>
@@ -45,7 +48,7 @@
                                                 <label>Kode Produk *</strong> </label>
                                                 <div class="input-group">
                                                     <input type="text" name="code" class="form-control" id="code"
-                                                        aria-describedby="code" required>
+                                                        aria-describedby="code" required value="{{old('code')}}">
                                                     <div class="input-group-append">
                                                         <button id="genbutton" type="button"
                                                             class="btn btn-sm btn-default"
@@ -64,7 +67,7 @@
                                                         class="selectpicker form-control" data-live-search="true"
                                                         data-live-search-style="begins" title="Select Category...">
                                                         @foreach($lims_category_list as $category)
-                                                        <option value="{{$category->id}}">{{$category->name}}</option>
+                                                        <option value="{{$category->id}}" {{old('category_id') == $category->id ? 'selected' : ''}}>{{$category->name}}</option>
                                                         @endforeach
                                                     </select>
                                                 </div>
@@ -89,7 +92,7 @@
                                             <div class="form-group">
                                                 <label>Gambar Produk</strong> </label> <i
                                                     class="dripicons-question" data-toggle="tooltip"
-                                                    title="{{trans('file.You can upload multiple image. Only .jpeg, .jpg, .png, .gif file can be uploaded. First image will be base image.')}}"></i>
+                                                    title="Upload gambar dengan format .jpeg, .jpg, .png, .gif."></i>
                                                 {{-- <div id="imageUpload" class="dropzone"></div> --}}
                                                 <input type="file" class="form-control" name="image">
                                                 <span class="validation-msg" id="image-error"></span>
@@ -101,13 +104,13 @@
                             </div>
                             <div class="row">
                                 <div id="combo" class="col-md-12 mb-1">
-                                    <label>{{trans('file.add_product')}}</label>
+                                    <label>Tambah Produk</label>
                                     <div class="search-box input-group mb-3">
                                         <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button>
                                         <input type="text" name="product_code_name" id="lims_productcodeSearch"
                                             placeholder="Pilih produk..." class="form-control" />
                                     </div>
-                                    <label>{{trans('file.Combo Products')}}</label>
+                                    <label>Produk Kombo</label>
                                     <div class="table-responsive">
                                         <table id="myTable" class="table table-hover order-list">
                                             <thead>
@@ -131,32 +134,14 @@
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Harga Produk *</strong> </label>
-                                                <input type="number" name="price" required class="form-control"
-                                                    step="any">
+                                                <input type="number" name="price" required class="form-control" step="any" value="{{old('price')}}">
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>
-                                        {{-- <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Kuantitas *</strong> </label>
-                                                <input type="number" name="qty" required class="form-control"
-                                                    step="any">
-                                                <span class="validation-msg"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Modal *</strong> </label>
-                                                <input type="number" name="cost" required class="form-control"
-                                                    step="any">
-                                                <span class="validation-msg"></span>
-                                            </div>
-                                        </div> --}}
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Detail Produk</label>
-                                                <input name="product_details" class="form-control"
-                                                    rows="3">
+                                                <input name="product_details" class="form-control" rows="3" value="{{old('product_details')}}">
                                             </div>
                                         </div>
                                         <div class="col-md-4">
@@ -175,17 +160,19 @@
                                             </div>
                                     </div>
                                     </div>
+                                    @if($roleName == 'Superadmin')
                                     <div class="col-md-12 mt-2" id="diffPrice-option">
                                         <h5><input name="is_diffPrice" type="checkbox" id="is-diffPrice" value="1">&nbsp;
                                             Produk ini punya harga berbeda untuk cabang berbeda</h5>
                                     </div>
+                                    @endif
                                     <div class="col-md-6" id="diffPrice-section">
                                         <div class="table-responsive ml-2">
                                             <table id="diffPrice-table" class="table table-hover">
                                                 <thead>
                                                     <tr>
                                                         <th>Cabang</th>
-                                                        <th>{{trans('file.Price')}}</th>
+                                                        <th>Harga</th>
                                                     </tr>
                                                     @foreach($lims_warehouse_list as $warehouse)
                                                     <tr>
@@ -207,10 +194,10 @@
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">
-                                        <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
+                                        <a href="{{ route('products.index') }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                     <div class="form-group mt-3">
-                                        <input type="submit" value="{{trans('file.submit')}}" id=""
+                                        <input type="submit" value="Submit" id=""
                                             class="btn btn-primary">
                                     </div>
                                 </div>
@@ -236,7 +223,7 @@ $( '#multiple-select-field' ).select2( {
 } );
     $("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
-    $("ul#product #product-create-menu").addClass("active");
+    $("ul#product #product-list-menu").addClass("active");
 
     @if(config('database.connections.saleprosaas_landlord'))
     numberOfProduct = <?php echo json_encode($numberOfProduct)?>;

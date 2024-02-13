@@ -24,11 +24,6 @@ class Product extends Model
         }
     }
 
-    public function brand()
-    {
-    	return $this->belongsTo('App\Models\Brand');
-    }
-
     public function unit()
     {
         return $this->belongsTo('App\Models\Unit');

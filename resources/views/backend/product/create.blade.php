@@ -223,7 +223,7 @@ $( '#multiple-select-field' ).select2( {
 } );
     $("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
-    $("ul#product #product-create-menu").addClass("active");
+    $("ul#product #product-list-menu").addClass("active");
 
     @if(config('database.connections.saleprosaas_landlord'))
     numberOfProduct = <?php echo json_encode($numberOfProduct)?>;

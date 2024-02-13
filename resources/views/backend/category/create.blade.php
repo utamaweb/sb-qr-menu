@@ -141,7 +141,7 @@
 <script type="text/javascript">
     $("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
-    $("ul#product #unit-menu").addClass("active");
+    $("ul#product #category-menu").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

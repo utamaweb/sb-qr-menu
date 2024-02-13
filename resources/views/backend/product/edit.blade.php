@@ -243,8 +243,9 @@
 @push('scripts')
 <script type="text/javascript">
 
-    $("ul#product").siblings('a').attr('aria-expanded','true');
+$("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
+    $("ul#product #product-list-menu").addClass("active");
     var product_id = <?php echo json_encode($lims_product_data->id) ?>;
     var is_batch = <?php echo json_encode($lims_product_data->is_batch) ?>;
     var is_variant = <?php echo json_encode($lims_product_data->is_variant) ?>;

@@ -10,7 +10,7 @@ use App\Models\ProductPurchase;
 use App\Models\Purchase;
 use App\Models\Expense;
 use App\Models\Transaction;
-use App\Models\Payroll;
+use App\Models\StockPurchase;
 use App\Models\Quotation;
 use App\Models\Payment;
 use App\Models\Account;
@@ -141,6 +141,8 @@ class HomeController extends Controller
             $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $profit = $revenue + $purchase_return - $product_cost;
             $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+            $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
+            $expense = $expense + $stockPurchase;
         }
 
         //cash flow of last 6 months

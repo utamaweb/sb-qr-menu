@@ -77,7 +77,8 @@
                   <div class="wrapper count-title">
                     <div class="icon"><i class="dripicons-return" style="color: #ff8952"></i></div>
                     <div>
-                        <div class="count-number return-data">{{number_format((float)$return,$general_setting->decimal, '.', '')}}</div>
+                        {{-- <div class="count-number return-data">{{number_format((float)$return,$general_setting->decimal, '.', '')}}</div> --}}
+                        <div class="count-number return-data">@currency($expense)</div>
                         <div class="name"><strong style="color: #ff8952">Pengeluaran</strong></div>
                     </div>
                   </div>

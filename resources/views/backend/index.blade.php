@@ -89,7 +89,7 @@
                     <div class="icon"><i class="dripicons-media-loop" style="color: #00c689"></i></div>
                     <div>
                         <div class="count-number purchase_return-data">{{number_format((float)$purchase_return,$general_setting->decimal, '.', '')}}</div>
-                        <div class="name"><strong style="color: #00c689">{{trans('file.Purchase Return')}}</strong></div>
+                        <div class="name"><strong style="color: #00c689">Produk Terjual</strong></div>
                     </div>
                   </div>
                 </div>
@@ -98,7 +98,7 @@
                   <div class="wrapper count-title">
                     <div class="icon"><i class="dripicons-trophy" style="color: #297ff9"></i></div>
                     <div>
-                        <div class="count-number profit-data">{{number_format((float)$profit,$general_setting->decimal, '.', '')}}</div>
+                        <div class="count-number profit-data">@currency($profit)</div>
                         <div class="name"><strong style="color: #297ff9">{{trans('file.profit')}}</strong></div>
                     </div>
                   </div>
@@ -131,7 +131,7 @@
                   <h4>{{date('F')}} {{date('Y')}}</h4>
                 </div>
                 <div class="pie-chart mb-2">
-                    <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$revenue}} data-purchase={{$purchase}} data-expense={{$expense}} data-label1="{{trans('file.Purchase')}}" data-label2="{{trans('file.revenue')}}" data-label3="{{trans('file.Expense')}}" width="100" height="95"> </canvas>
+                    <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$revenue}} data-purchase={{$purchase}} data-expense={{$expense}} data-label2="Pendapatan" data-label3="Pengeluaran" width="100" height="95"> </canvas>
                 </div>
               </div>
             </div>
@@ -139,7 +139,7 @@
           </div>
         </div>
 
-        <div class="container-fluid">
+        {{-- <div class="container-fluid">
           <div class="row">
             @php
               $yearly_report = $role_has_permissions_list->where('name', 'yearly_report')->first();
@@ -322,7 +322,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> --}}
       </section>
 
 

@@ -36,7 +36,7 @@
             'profitLoss-report-form']) !!}
             <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
             <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <a id="profitLoss-link" href="">Ringkasan Laporan</a>
+            {{-- <a id="profitLoss-link" href="">Ringkasan Laporan</a> --}}
             {!! Form::close() !!}
          </li>
 

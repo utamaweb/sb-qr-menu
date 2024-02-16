@@ -239,7 +239,7 @@ $(document).ready(function () {
                             brandPrimary
                         ],
                         borderWidth: 1,
-                        data: [ 
+                        data: [
                                 sold_qty[0], sold_qty[1],
                                 sold_qty[2], 0],
                     }
@@ -284,7 +284,7 @@ $(document).ready(function () {
                             brandPrimaryRgba,
                             "rgba(255, 137, 82, 0.8)",
                             "rgb(133, 140, 133, 0.8)",
-                            
+
                         ],
                     }]
             },
@@ -299,7 +299,7 @@ $(document).ready(function () {
         brandPrimary = TRANSACTIONCHART.data('color');
         brandPrimaryRgba = TRANSACTIONCHART.data('color_rgba');
         var revenue = TRANSACTIONCHART.data('revenue');
-        var purchase = TRANSACTIONCHART.data('purchase');
+        // var purchase = TRANSACTIONCHART.data('purchase');
         var expense = TRANSACTIONCHART.data('expense');
         var label1 = TRANSACTIONCHART.data('label1');
         var label2 = TRANSACTIONCHART.data('label2');
@@ -308,32 +308,32 @@ $(document).ready(function () {
             type: 'doughnut',
             data: {
                 labels: [
-                    label1,
+                    // label1,
                     label2,
                     label3
                 ],
                 datasets: [
                     {
-                        data: [purchase, revenue, expense],
+                        data: [revenue, expense],
                         borderWidth: [1, 1, 1],
                         backgroundColor: [
                             brandPrimary,
                             "#ff8952",
                             "#858c85",
-                            
+
                         ],
                         hoverBackgroundColor: [
                             brandPrimaryRgba,
                             "rgba(255, 137, 82, 0.8)",
                             "rgb(133, 140, 133, 0.8)",
-                            
+
                         ],
                        hoverBorderWidth: [4, 4, 4],
                        hoverBorderColor: [
                             brandPrimaryRgba,
                             "rgba(255, 137, 82, 0.8)",
                             "rgb(133, 140, 133, 0.8)",
-                            
+
                         ],
                     }]
             }

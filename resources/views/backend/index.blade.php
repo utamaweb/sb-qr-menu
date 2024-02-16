@@ -45,10 +45,10 @@
             @endphp
             @if($revenue_profit_summary)
             <div class="filter-toggle btn-group">
-              <button class="btn btn-secondary date-btn" data-start_date="{{date('Y-m-d')}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.Today')}}</button>
-              <button class="btn btn-secondary date-btn" data-start_date="{{date('Y-m-d', strtotime(' -7 day'))}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.Last 7 Days')}}</button>
-              <button class="btn btn-secondary date-btn active" data-start_date="{{date('Y').'-'.date('m').'-'.'01'}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.This Month')}}</button>
-              <button class="btn btn-secondary date-btn" data-start_date="{{date('Y').'-01'.'-01'}}" data-end_date="{{date('Y').'-12'.'-31'}}">{{trans('file.This Year')}}</button>
+              {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y-m-d')}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.Today')}}</button> --}}
+              {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y-m-d', strtotime(' -7 day'))}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.Last 7 Days')}}</button> --}}
+              <button style="cursor: auto;" class="btn btn-secondary date-btn" disabled data-start_date="{{date('Y').'-'.date('m').'-'.'01'}}" data-end_date="{{date('Y-m-d')}}">{{date('F')}} {{date('Y')}}</button>
+              {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y').'-01'.'-01'}}" data-end_date="{{date('Y').'-12'.'-31'}}">{{trans('file.This Year')}}</button> --}}
             </div>
             @endif
           </div>
@@ -66,8 +66,9 @@
                   <div class="wrapper count-title">
                     <div class="icon"><i class="dripicons-graph-bar" style="color: #733686"></i></div>
                     <div>
-                        <div class="count-number revenue-data">{{number_format((float)$revenue,$general_setting->decimal, '.', '')}}</div>
-                        <div class="name"><strong style="color: #733686">{{ trans('file.revenue') }}</strong></div>
+                        {{-- <div class="count-number revenue-data">{{number_format((float)$revenue,$general_setting->decimal, '.', '')}}</div> --}}
+                        <div class="count-number revenue-data">@currency($revenue)</div>
+                        <div class="name"><strong style="color: #733686">Pendapatan</strong></div>
                     </div>
                   </div>
                 </div>
@@ -76,8 +77,9 @@
                   <div class="wrapper count-title">
                     <div class="icon"><i class="dripicons-return" style="color: #ff8952"></i></div>
                     <div>
-                        <div class="count-number return-data">{{number_format((float)$return,$general_setting->decimal, '.', '')}}</div>
-                        <div class="name"><strong style="color: #ff8952">{{trans('file.Sale Return')}}</strong></div>
+                        {{-- <div class="count-number return-data">{{number_format((float)$return,$general_setting->decimal, '.', '')}}</div> --}}
+                        <div class="count-number return-data">@currency($expense)</div>
+                        <div class="name"><strong style="color: #ff8952">Pengeluaran</strong></div>
                     </div>
                   </div>
                 </div>
@@ -87,7 +89,7 @@
                     <div class="icon"><i class="dripicons-media-loop" style="color: #00c689"></i></div>
                     <div>
                         <div class="count-number purchase_return-data">{{number_format((float)$purchase_return,$general_setting->decimal, '.', '')}}</div>
-                        <div class="name"><strong style="color: #00c689">{{trans('file.Purchase Return')}}</strong></div>
+                        <div class="name"><strong style="color: #00c689">Produk Terjual</strong></div>
                     </div>
                   </div>
                 </div>
@@ -96,7 +98,7 @@
                   <div class="wrapper count-title">
                     <div class="icon"><i class="dripicons-trophy" style="color: #297ff9"></i></div>
                     <div>
-                        <div class="count-number profit-data">{{number_format((float)$profit,$general_setting->decimal, '.', '')}}</div>
+                        <div class="count-number profit-data">@currency($profit)</div>
                         <div class="name"><strong style="color: #297ff9">{{trans('file.profit')}}</strong></div>
                     </div>
                   </div>
@@ -111,10 +113,10 @@
             <div class="col-md-7 mt-4">
               <div class="card line-chart-example">
                 <div class="card-header d-flex align-items-center">
-                  <h4>{{trans('file.Cash Flow')}}</h4>
+                  <h4>Arus Uang</h4>
                 </div>
                 <div class="card-body">
-                  <canvas id="cashFlow" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-recieved = "{{json_encode($payment_recieved)}}" data-sent = "{{json_encode($payment_sent)}}" data-month = "{{json_encode($month)}}" data-label1="{{trans('file.Payment Recieved')}}" data-label2="{{trans('file.Payment Sent')}}"></canvas>
+                  <canvas id="cashFlow" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-recieved = "{{json_encode($payment_recieved)}}" data-sent = "{{json_encode($payment_sent)}}" data-month = "{{json_encode($month)}}" data-label1="Pendapatan" data-label2="Pengeluaran"></canvas>
                 </div>
               </div>
             </div>
@@ -129,7 +131,7 @@
                   <h4>{{date('F')}} {{date('Y')}}</h4>
                 </div>
                 <div class="pie-chart mb-2">
-                    <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$revenue}} data-purchase={{$purchase}} data-expense={{$expense}} data-label1="{{trans('file.Purchase')}}" data-label2="{{trans('file.revenue')}}" data-label3="{{trans('file.Expense')}}" width="100" height="95"> </canvas>
+                    <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$revenue}} data-purchase={{$purchase}} data-expense={{$expense}} data-label2="Pendapatan" data-label3="Pengeluaran" width="100" height="95"> </canvas>
                 </div>
               </div>
             </div>
@@ -137,7 +139,7 @@
           </div>
         </div>
 
-        <div class="container-fluid">
+        {{-- <div class="container-fluid">
           <div class="row">
             @php
               $yearly_report = $role_has_permissions_list->where('name', 'yearly_report')->first();
@@ -320,7 +322,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> --}}
       </section>
 
 

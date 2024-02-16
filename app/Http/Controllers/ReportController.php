@@ -205,38 +205,34 @@ class ReportController extends Controller
     public function dailySale($year, $month)
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('daily-sale')){
-            $start = 1;
-            $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
-            while($start <= $number_of_day)
-            {
-                if($start < 10)
-                    $date = $year.'-'.$month.'-0'.$start;
-                else
-                    $date = $year.'-'.$month.'-'.$start;
-                $query1 = array(
-                    'SUM(total_qty) AS total_qty',
-                    'SUM(paid_amount) AS total_paid_amount',
-                    'SUM(total_amount) AS total_amount'
-                );
-                // $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-                $sale_data = Transaction::where('date', $date)->selectRaw(implode(',', $query1))->get();
-                $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
-                $total_qty[$start] = $sale_data[0]->total_qty;
-                $total_amount[$start] = $sale_data[0]->total_amount;
-                $start++;
-            }
-            $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
-            $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-            $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-            $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-            $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            $warehouse_id = 0;
-            return view('backend.report.daily_sale', compact('total_paid_amount','total_qty', 'total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+        $start = 1;
+        $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
+        while($start <= $number_of_day)
+        {
+            if($start < 10)
+                $date = $year.'-'.$month.'-0'.$start;
+            else
+                $date = $year.'-'.$month.'-'.$start;
+            $query1 = array(
+                'SUM(total_qty) AS total_qty',
+                'SUM(paid_amount) AS total_paid_amount',
+                'SUM(total_amount) AS total_amount'
+            );
+            // $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
+            $sale_data = Transaction::where('date', $date)->selectRaw(implode(',', $query1))->get();
+            $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
+            $total_qty[$start] = $sale_data[0]->total_qty;
+            $total_amount[$start] = $sale_data[0]->total_amount;
+            $start++;
         }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
+        $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
+        $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
+        $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
+        $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $warehouse_id = 0;
+        return view('backend.report.daily_sale', compact('total_paid_amount','total_qty', 'total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
     }
 
     public function dailySaleByWarehouse(Request $request,$year,$month)
@@ -278,35 +274,31 @@ class ReportController extends Controller
     public function dailyPurchase($year, $month)
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('daily-purchase')){
-            $start = 1;
-            $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
-            while($start <= $number_of_day)
-            {
-                if($start < 10)
-                    $date = $year.'-'.$month.'-0'.$start;
-                else
-                    $date = $year.'-'.$month.'-'.$start;
-                $query1 = array(
-                    'SUM(qty) AS total_qty',
-                    'SUM(amount) AS total_amount'
-                );
-                $purchase_data = Expense::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-                $total_qty[$start] = $purchase_data[0]->total_qty;
-                $total_amount[$start] = $purchase_data[0]->total_amount;
-                $start++;
-            }
-            $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
-            $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-            $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-            $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-            $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            $warehouse_id = 0;
-            return view('backend.report.daily_purchase', compact('total_qty','total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+        $start = 1;
+        $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
+        while($start <= $number_of_day)
+        {
+            if($start < 10)
+                $date = $year.'-'.$month.'-0'.$start;
+            else
+                $date = $year.'-'.$month.'-'.$start;
+            $query1 = array(
+                'SUM(qty) AS total_qty',
+                'SUM(amount) AS total_amount'
+            );
+            $purchase_data = Expense::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
+            $total_qty[$start] = $purchase_data[0]->total_qty;
+            $total_amount[$start] = $purchase_data[0]->total_amount;
+            $start++;
         }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
+        $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
+        $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
+        $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
+        $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $warehouse_id = 0;
+        return view('backend.report.daily_purchase', compact('total_qty','total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
     }
 
     public function dailyPurchaseByWarehouse(Request $request, $year, $month)
@@ -353,30 +345,26 @@ class ReportController extends Controller
     public function monthlySale($year)
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('monthly-sale')){
-            $start = strtotime($year .'-01-01');
-            $end = strtotime($year .'-12-31');
-            while($start <= $end)
-            {
-                $start_date = $year . '-'. date('m', $start).'-'.'01';
-                $end_date = $year . '-'. date('m', $start).'-'.'31';
+        $start = strtotime($year .'-01-01');
+        $end = strtotime($year .'-12-31');
+        while($start <= $end)
+        {
+            $start_date = $year . '-'. date('m', $start).'-'.'01';
+            $end_date = $year . '-'. date('m', $start).'-'.'31';
 
-                $temp_order_qty = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
-                $total_qty[] = number_format((float)$temp_order_qty, config('decimal'), '.', '');
+            $temp_order_qty = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
+            $total_qty[] = number_format((float)$temp_order_qty, config('decimal'), '.', '');
 
-                $total_paid_amount = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
-                $total_paid[] = number_format((float)$total_paid_amount, config('decimal'), '.', '');
+            $total_paid_amount = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
+            $total_paid[] = number_format((float)$total_paid_amount, config('decimal'), '.', '');
 
-                $temp_total = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
-                $total_amount[] = number_format((float)$temp_total, config('decimal'), '.', '');
-                $start = strtotime("+1 month", $start);
-            }
-            $lims_warehouse_list = Warehouse::where('is_active',true)->get();
-            $warehouse_id = 0;
-            return view('backend.report.monthly_sale', compact('year', 'total_qty', 'total_paid', 'total_amount','lims_warehouse_list', 'warehouse_id'));
+            $temp_total = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
+            $total_amount[] = number_format((float)$temp_total, config('decimal'), '.', '');
+            $start = strtotime("+1 month", $start);
         }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $lims_warehouse_list = Warehouse::where('is_active',true)->get();
+        $warehouse_id = 0;
+        return view('backend.report.monthly_sale', compact('year', 'total_qty', 'total_paid', 'total_amount','lims_warehouse_list', 'warehouse_id'));
     }
 
     public function monthlySaleByWarehouse(Request $request, $year)
@@ -419,30 +407,26 @@ class ReportController extends Controller
     public function monthlyPurchase($year)
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('monthly-purchase')){
-            $start = strtotime($year .'-01-01');
-            $end = strtotime($year .'-12-31');
-            while($start <= $end)
-            {
-                $start_date = $year . '-'. date('m', $start).'-'.'01';
-                $end_date = $year . '-'. date('m', $start).'-'.'31';
+        $start = strtotime($year .'-01-01');
+        $end = strtotime($year .'-12-31');
+        while($start <= $end)
+        {
+            $start_date = $year . '-'. date('m', $start).'-'.'01';
+            $end_date = $year . '-'. date('m', $start).'-'.'31';
 
-                $query1 = array(
-                    'SUM(qty) AS total_qty',
-                    'SUM(amount) AS total_amount'
-                );
-                $purchase_data = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query1))->get();
+            $query1 = array(
+                'SUM(qty) AS total_qty',
+                'SUM(amount) AS total_amount'
+            );
+            $purchase_data = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query1))->get();
 
-                $total_qty[$start] = $purchase_data[0]->total_qty;
-                $total_amount[$start] = $purchase_data[0]->total_amount;
-                $start = strtotime("+1 month", $start);
-            }
-            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            $warehouse_id = 0;
-            return view('backend.report.monthly_purchase', compact('year', 'total_qty', 'total_amount', 'lims_warehouse_list', 'warehouse_id'));
+            $total_qty[$start] = $purchase_data[0]->total_qty;
+            $total_amount[$start] = $purchase_data[0]->total_amount;
+            $start = strtotime("+1 month", $start);
         }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $warehouse_id = 0;
+        return view('backend.report.monthly_purchase', compact('year', 'total_qty', 'total_amount', 'lims_warehouse_list', 'warehouse_id'));
     }
 
     public function monthlyPurchaseByWarehouse(Request $request, $year)
@@ -484,36 +468,32 @@ class ReportController extends Controller
     public function bestSeller()
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('best-seller')){
-            $start = strtotime(date("Y-m", strtotime("-2 months")).'-01');
-            $end = strtotime(date("Y").'-'.date("m").'-31');
+        $start = strtotime(date("Y-m", strtotime("-2 months")).'-01');
+        $end = strtotime(date("Y").'-'.date("m").'-31');
 
-            while($start <= $end)
-            {
-                $start_date = date("Y-m", $start).'-'.'01';
-                $end_date = date("Y-m", $start).'-'.'31';
+        while($start <= $end)
+        {
+            $start_date = date("Y-m", $start).'-'.'01';
+            $end_date = date("Y-m", $start).'-'.'31';
 
-                $best_selling_qty = TransactionDetail::select(DB::raw('product_id, sum(qty) as sold_qty'))->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->groupBy('product_id')->orderBy('sold_qty', 'desc')->take(1)->get();
-                if(!count($best_selling_qty)){
-                    $product[] = '';
-                    $sold_qty[] = 0;
-                }
-                foreach ($best_selling_qty as $best_seller) {
-                    $product_data = Product::find($best_seller->product_id);
-                    $product[] = $product_data->name;
-                    // $product[] = $product_data->name.': '.$product_data->code;
-                    $sold_qty[] = $best_seller->sold_qty;
-                }
-                $start = strtotime("+1 month", $start);
+            $best_selling_qty = TransactionDetail::select(DB::raw('product_id, sum(qty) as sold_qty'))->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->groupBy('product_id')->orderBy('sold_qty', 'desc')->take(1)->get();
+            if(!count($best_selling_qty)){
+                $product[] = '';
+                $sold_qty[] = 0;
             }
-            $start_month = date("F Y", strtotime('-2 month'));
-            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            $warehouse_id = 0;
-            //return $product;
-            return view('backend.report.best_seller', compact('product', 'sold_qty', 'start_month', 'lims_warehouse_list', 'warehouse_id'));
+            foreach ($best_selling_qty as $best_seller) {
+                $product_data = Product::find($best_seller->product_id);
+                $product[] = $product_data->name;
+                // $product[] = $product_data->name.': '.$product_data->code;
+                $sold_qty[] = $best_seller->sold_qty;
+            }
+            $start = strtotime("+1 month", $start);
         }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        $start_month = date("F Y", strtotime('-2 month'));
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $warehouse_id = 0;
+        //return $product;
+        return view('backend.report.best_seller', compact('product', 'sold_qty', 'start_month', 'lims_warehouse_list', 'warehouse_id'));
     }
 
     public function bestSellerByWarehouse(Request $request)

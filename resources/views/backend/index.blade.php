@@ -47,7 +47,7 @@
             <div class="filter-toggle btn-group">
               {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y-m-d')}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.Today')}}</button> --}}
               {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y-m-d', strtotime(' -7 day'))}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.Last 7 Days')}}</button> --}}
-              <button class="btn btn-secondary date-btn active" disabled data-start_date="{{date('Y').'-'.date('m').'-'.'01'}}" data-end_date="{{date('Y-m-d')}}">{{date('F')}} {{date('Y')}}</button>
+              <button style="cursor: auto;" class="btn btn-secondary date-btn" disabled data-start_date="{{date('Y').'-'.date('m').'-'.'01'}}" data-end_date="{{date('Y-m-d')}}">{{date('F')}} {{date('Y')}}</button>
               {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y').'-01'.'-01'}}" data-end_date="{{date('Y').'-12'.'-31'}}">{{trans('file.This Year')}}</button> --}}
             </div>
             @endif

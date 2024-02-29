@@ -173,7 +173,7 @@ class ReportController extends Controller
                             ->join('products', 'product_warehouse.product_id', '=', 'products.id')
                             ->where([
                                 ['products.is_active', true],
-                                ['product_warehouse.qty', '>' , 0],
+                                ['product_warehouse.price', '>' , 0],
                                 ['product_warehouse.warehouse_id', $warehouse_id]
                             ])->count();
                 $total_qty = DB::table('product_warehouse')
@@ -181,19 +181,19 @@ class ReportController extends Controller
                                 ->where([
                                     ['products.is_active', true],
                                     ['product_warehouse.warehouse_id', $warehouse_id]
-                                ])->sum('product_warehouse.qty');
+                                ])->sum('product_warehouse.price');
                 $total_price = DB::table('product_warehouse')
                                 ->join('products', 'product_warehouse.product_id', '=', 'products.id')
                                 ->where([
                                     ['products.is_active', true],
                                     ['product_warehouse.warehouse_id', $warehouse_id]
-                                ])->sum(DB::raw('products.price * product_warehouse.qty'));
+                                ])->sum(DB::raw('products.price * product_warehouse.price'));
                 $total_cost = DB::table('product_warehouse')
                                 ->join('products', 'product_warehouse.product_id', '=', 'products.id')
                                 ->where([
                                     ['products.is_active', true],
                                     ['product_warehouse.warehouse_id', $warehouse_id]
-                                ])->sum(DB::raw('products.cost * product_warehouse.qty'));
+                                ])->sum(DB::raw('products.cost * product_warehouse.price'));
             }
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             return view('backend.report.warehouse_stock', compact('total_item', 'total_qty', 'total_price', 'total_cost', 'lims_warehouse_list', 'warehouse_id'));
@@ -601,13 +601,13 @@ class ReportController extends Controller
         $total_purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->count();
         $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
         $total_expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->count();
-        $payroll = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
-        $total_payroll = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->count();
+        // $payroll = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
+        // $total_payroll = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->count();
         $total_item = DB::table('product_warehouse')
                     ->join('products', 'product_warehouse.product_id', '=', 'products.id')
                     ->where([
                         ['products.is_active', true],
-                        ['product_warehouse.qty', '>' , 0]
+                        ['product_warehouse.price', '>' , 0]
                     ])->count();
         $payment_recieved_number = DB::table('payments')->whereNotNull('sale_id')->whereDate('created_at', '>=' , $start_date)
             ->whereDate('created_at', '<=' , $end_date)->count();
@@ -671,7 +671,7 @@ class ReportController extends Controller
             $warehouse_expense[] = Expense::where('warehouse_id', $warehouse->id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
         }
 
-        return view('backend.report.profit_loss', compact('purchase', 'product_cost', 'product_tax', 'total_purchase', 'sale', 'total_sale', 'return', 'purchase_return', 'total_return', 'total_purchase_return', 'expense', 'payroll', 'total_expense', 'total_payroll', 'payment_recieved', 'payment_recieved_number', 'cash_payment_sale', 'cheque_payment_sale', 'credit_card_payment_sale', 'gift_card_payment_sale', 'paypal_payment_sale', 'deposit_payment_sale', 'payment_sent', 'payment_sent_number', 'cash_payment_purchase', 'cheque_payment_purchase', 'credit_card_payment_purchase', 'warehouse_name', 'warehouse_sale', 'warehouse_purchase', 'warehouse_return', 'warehouse_purchase_return', 'warehouse_expense', 'start_date', 'end_date'));
+        return view('backend.report.profit_loss', compact('purchase', 'product_cost', 'product_tax', 'total_purchase', 'sale', 'total_sale', 'return', 'purchase_return', 'total_return', 'total_purchase_return', 'expense', 'total_expense', 'payment_recieved', 'payment_recieved_number', 'cash_payment_sale', 'cheque_payment_sale', 'credit_card_payment_sale', 'gift_card_payment_sale', 'paypal_payment_sale', 'deposit_payment_sale', 'payment_sent', 'payment_sent_number', 'cash_payment_purchase', 'cheque_payment_purchase', 'credit_card_payment_purchase', 'warehouse_name', 'warehouse_sale', 'warehouse_purchase', 'warehouse_return', 'warehouse_purchase_return', 'warehouse_expense', 'start_date', 'end_date'));
     }
 
     public function calculateAverageCOGS($product_sale_data)

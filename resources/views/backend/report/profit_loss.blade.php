@@ -88,7 +88,7 @@
         </div>
         <div class="row mt-2">
             <div class="col-md-4">
-                <div class="card"> 
+                <div class="card">
                     <div class="card-body">
 
                         <h3><i class="fa fa-money"></i> {{trans('file.profit')}} / {{trans('file.Loss')}}</h3>
@@ -180,7 +180,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            {{-- <div class="col-md-3">
                 <div class="card">
                     <div class="card-body">
 
@@ -192,7 +192,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
         <div class="row mt-2">
             <div class="col-md-4 offset-md-4">
@@ -207,8 +207,8 @@
                             <p class="mt-2">{{trans('file.Sale Return')}} <span class="float-right">- {{number_format((float)$return[0]->grand_total, $general_setting->decimal, '.', '')}}</span></p>
                             <p class="mt-2">{{trans('file.Purchase Return')}} <span class="float-right"> {{number_format((float)$purchase_return[0]->grand_total, $general_setting->decimal, '.', '')}}</span></p>
                             <p class="mt-2">{{trans('file.Expense')}} <span class="float-right">- {{number_format((float)$expense, $general_setting->decimal, '.', '')}}</span></p>
-                            <p class="mt-2">{{trans('file.Payroll')}} <span class="float-right">- {{number_format((float)$payroll, $general_setting->decimal, '.', '')}}</span></p>
-                            <p class="mt-2">{{trans('file.In Hand')}} <span class="float-right">{{number_format((float)($payment_recieved - $payment_sent - $return[0]->grand_total + $purchase_return[0]->grand_total - $expense - $payroll), $general_setting->decimal, '.', '')}}</span></p>
+                            {{-- <p class="mt-2">{{trans('file.Payroll')}} <span class="float-right">- {{number_format((float)$payroll, $general_setting->decimal, '.', '')}}</span></p> --}}
+                            {{-- <p class="mt-2">{{trans('file.In Hand')}} <span class="float-right">{{number_format((float)($payment_recieved - $payment_sent - $return[0]->grand_total + $purchase_return[0]->grand_total - $expense - $payroll), $general_setting->decimal, '.', '')}}</span></p> --}}
                         </div>
                     </div>
                 </div>

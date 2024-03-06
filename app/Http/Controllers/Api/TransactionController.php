@@ -103,7 +103,7 @@ class TransactionController extends Controller
             $transactionDetailsWithProducts = [];
             foreach ($transaction_details as $detail) {
                 $productDetail = [
-                    'transaction_id' => $detail['transaction_id'],
+                    'transaction_id' => $transaction->id,
                     'product_id' => $detail['product_id'],
                     'qty' => $detail['qty'],
                     'subtotal' => $detail['subtotal'],

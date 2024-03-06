@@ -25,8 +25,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->is_active;
     }
 
-    public function holiday() {
-        return $this->hasMany('App\Models\Holiday');
+    public function warehouse()
+    {
+        return $this->belongsTo('App\Models\Warehouse');
     }
 
     public function getJWTIdentifier()

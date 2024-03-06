@@ -191,13 +191,9 @@ class ExpenseController extends Controller
     public function edit($id)
     {
         $role = Role::firstOrCreate(['id' => Auth::user()->role_id]);
-        if ($role->hasPermissionTo('expenses-edit')) {
             $lims_expense_data = Expense::find($id);
             $lims_expense_data->date = date('d-m-Y', strtotime($lims_expense_data->created_at->toDateString()));
             return $lims_expense_data;
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
     public function update(Request $request, $id)

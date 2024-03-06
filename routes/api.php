@@ -56,6 +56,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
 
     Route::post('shift/open', [ShiftController::class, 'open']);
     Route::post('close_cashier/close', [ShiftController::class, 'close']);
+    Route::post('shift/check', [ShiftController::class, 'checkCashier']);
 
 });
 

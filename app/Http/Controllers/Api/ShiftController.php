@@ -220,4 +220,13 @@ class ShiftController extends Controller
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }
+
+    public function checkCashier() {
+        $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
+        if($checkShift){
+            return response()->json(['status' => True,'message' => "Kasir di outlet ". auth()->user()->warehouse->name . " telah buka"], 200);
+        } else {
+            return response()->json(['status' => False, 'message' => "Tidak ada kasir buka di outlet ". auth()->user()->warehouse->name], 404);
+        }
+    }
 }

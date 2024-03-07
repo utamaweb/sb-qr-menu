@@ -18,7 +18,6 @@ class StockCountController extends Controller
     public function index()
     {
         $role = Role::find(Auth::user()->role_id);
-        if( $role->hasPermissionTo('stock_count') ) {
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $lims_brand_list = Brand::where('is_active', true)->get();
             $lims_category_list = Category::where('is_active', true)->get();
@@ -29,9 +28,6 @@ class StockCountController extends Controller
                 $lims_stock_count_all = StockCount::orderBy('id', 'desc')->get();
 
             return view('backend.stock_count.index', compact('lims_warehouse_list', 'lims_brand_list', 'lims_category_list', 'lims_stock_count_all'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
     public function store(Request $request)

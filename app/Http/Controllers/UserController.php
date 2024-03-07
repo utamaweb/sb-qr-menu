@@ -35,16 +35,12 @@ class UserController extends Controller
     public function create()
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('users-add')){
             $lims_role_list = Roles::get();
             // $lims_biller_list = Biller::where('is_active', true)->get();
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             $lims_customer_group_list = CustomerGroup::where('is_active', true)->get();
             $numberOfUserAccount = User::where('is_active', true)->count();
             return view('backend.user.create', compact('lims_role_list', 'lims_warehouse_list', 'lims_customer_group_list', 'numberOfUserAccount'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
     public function generatePassword()
@@ -104,15 +100,11 @@ class UserController extends Controller
     public function edit($id)
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('users-edit')){
             $lims_user_data = User::find($id);
             $lims_role_list = Roles::get();
             // $lims_biller_list = Biller::where('is_active', true)->get();
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             return view('backend.user.edit', compact('lims_user_data', 'lims_role_list', 'lims_warehouse_list'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
     public function update(Request $request, $id)

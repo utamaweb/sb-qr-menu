@@ -22,17 +22,35 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function latest()
     {
-        //
-    }
+        $transaction = Transaction::where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
+        // dari add
+        $dateTimeNow = Carbon::now();
+        $transaction_details = $transaction->transaction_details;
+        // return $transaction_details;
+        $transactionDetailsWithProducts = [];
+            foreach ($transaction_details as $detail) {
+                $productDetail = [
+                    'transaction_id' => $transaction->id,
+                    'product_id' => $detail['product_id'],
+                    'qty' => $detail['qty'],
+                    'subtotal' => $detail['subtotal'],
+                    'product_name' => \App\Models\Product::find($detail['product_id'])->name,
+                ];
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+                // Menambahkan data detail produk ke array
+                $transactionDetailsWithProducts[] = $productDetail;
+            }
+            $transaction['details'] = $transactionDetailsWithProducts;
+            $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
+            $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
+            // $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
+            $transaction['product_count'] = count($transaction_details);
+            $transaction['order_type'] = $transaction->order_type;
+            $transaction['order_type_name'] = $transaction['order_type']['name'];
+            unset($transaction['transaction_details'], $transaction['transaction_code']);
+            return response()->json($transaction, 200);
     }
 
     /**

@@ -41,18 +41,13 @@ class ReportController extends Controller
     public function productQuantityAlert()
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('product-qty-alert')){
             $lims_product_data = Product::select('name','code', 'image', 'qty', 'alert_quantity')->where('is_active', true)->whereColumn('alert_quantity', '>', 'qty')->get();
             return view('backend.report.qty_alert_report', compact('lims_product_data'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
     public function dailySaleObjective(Request $request)
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('dso-report')) {
             if($request->input('starting_date')) {
                 $starting_date = $request->input('starting_date');
                 $ending_date = $request->input('ending_date');
@@ -62,9 +57,6 @@ class ReportController extends Controller
                 $ending_date = date("Y-m-d");
             }
             return view('backend.report.daily_sale_objective', compact('starting_date', 'ending_date'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
     public function dailySaleObjectiveData(Request $request)
@@ -151,7 +143,6 @@ class ReportController extends Controller
     public function warehouseStock(Request $request)
     {
         $role = Role::find(Auth::user()->role_id);
-        if($role->hasPermissionTo('warehouse-stock-report')) {
             if(isset($request->warehouse_id))
                 $warehouse_id = $request->warehouse_id;
             else
@@ -197,9 +188,7 @@ class ReportController extends Controller
             }
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
             return view('backend.report.warehouse_stock', compact('total_item', 'total_qty', 'total_price', 'total_cost', 'lims_warehouse_list', 'warehouse_id'));
-        }
-        else
-            return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+
     }
 
     public function dailySale($year, $month)

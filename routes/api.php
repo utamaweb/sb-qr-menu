@@ -52,12 +52,13 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::put('users', [UserController::class, 'update']);
 
     Route::post('transaction', [TransactionController::class, 'store']);
-    Route::post('transaction/latest', [TransactionController::class, 'latest']);
+    Route::get('transaction/latest', [TransactionController::class, 'latest']);
+    Route::get('transaction/order-types', [TransactionController::class, 'orderType']);
 
 
     Route::post('shift/open', [ShiftController::class, 'open']);
     Route::post('close_cashier/close', [ShiftController::class, 'close']);
-    Route::post('shift/check', [ShiftController::class, 'checkCashier']);
+    Route::get('shift/check', [ShiftController::class, 'checkCashier']);
 
 });
 

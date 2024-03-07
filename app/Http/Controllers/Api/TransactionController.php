@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Shift;
 use App\Models\IngredientProducts;
 use App\Models\Ingredient;
+use App\Models\OrderType;
 use App\Models\Warehouse;
 use App\Models\TransactionDetail;
 use App\Models\TransactionInOut;
@@ -199,9 +200,10 @@ class TransactionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function orderType()
     {
-        //
+        $orderTypes = OrderType::get();
+        return response()->json($orderTypes, 200);
     }
 
     /**

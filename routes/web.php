@@ -75,50 +75,6 @@ Route::fallback(function () {
     return redirect()->route('admin.auth.index');
 });
 
-Route::get('migrate', function() {
-	Artisan::call('migrate');
-	dd('migrated');
-});
-
-Route::get('clear',function() {
-    Artisan::call('optimize:clear');
-    cache()->forget('biller_list');
-    cache()->forget('brand_list');
-    cache()->forget('category_list');
-    cache()->forget('coupon_list');
-    cache()->forget('customer_list');
-    cache()->forget('customer_group_list');
-    cache()->forget('product_list');
-    cache()->forget('product_list_with_variant');
-    cache()->forget('warehouse_list');
-    cache()->forget('table_list');
-    cache()->forget('tax_list');
-    cache()->forget('currency');
-    cache()->forget('general_setting');
-    cache()->forget('pos_setting');
-    cache()->forget('user_role');
-    cache()->forget('permissions');
-    cache()->forget('role_has_permissions');
-    cache()->forget('role_has_permissions_list');
-    dd('cleared');
-});
-
-
-
-Route::get('update-coupon', [CouponController::class, 'updateCoupon']);
-
-Route::get('auto-update-dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-// Auto Update
-Route::group(['prefix' => 'developer-section'], function () {
-    Route::controller(DeveloperSectionController::class)->group(function () {
-        Route::get('/', 'index')->name('developer-section.index');
-        Route::post('/', 'submit')->name('developer-section.submit');
-        Route::post('/bug-update-setting', 'bugUpdateSetting')->name('bug-update-setting.submit');
-        Route::post('/version-upgrade-setting', 'versionUpgradeSetting')->name('version-upgrade-setting.submit');
-     });
-});
-
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware(['guest'])->group(function () {
         Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');
@@ -198,7 +154,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('category/deletebyselection', 'deleteBySelection');
             Route::post('category/category-data', 'categoryData');
         });
-        Route::resource('category', CategoryController::class);
+        Route::resource('kategori', CategoryController::class);
 
 
         Route::controller(BrandController::class)->group(function () {

@@ -827,7 +827,7 @@
       $("div.alert:not(#update-alert-section)").delay(4000).slideUp(800);
 
       function confirmDelete() {
-          if (confirm("Are you sure want to delete?")) {
+          if (confirm("Yakin ingin hapus data ini?")) {
               return true;
           }
           return false;

@@ -91,7 +91,7 @@
          class="dripicons-list"></i><span>Produk</span><span></a>
       <ul id="product" class="collapse list-unstyled " style="border-radius: 10px;">
         @canany(['lihat-kategori', 'tambah-kategori', 'ubah-kategori', 'hapus-kategori'])
-         <li id="category-menu"><a href="{{route('category.index')}}">Kategori</a></li>
+         <li id="category-menu"><a href="{{route('kategori.index')}}">Kategori</a></li>
         @endcanany
         @canany(['lihat-produk', 'tambah-produk', 'ubah-produk', 'hapus-produk'])
          <li id="product-list-menu"><a href="{{route('products.index')}}">Daftar Produk</a>

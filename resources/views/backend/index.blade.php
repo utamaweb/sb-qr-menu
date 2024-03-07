@@ -40,17 +40,12 @@
             <div class="brand-text float-left mt-4">
                 <h3>{{trans('file.welcome')}} <span>{{Auth::user()->name}}</span></h3>
             </div>
-            @php
-              $revenue_profit_summary = $role_has_permissions_list->where('name', 'revenue_profit_summary')->first();
-            @endphp
-            @if($revenue_profit_summary)
             <div class="filter-toggle btn-group">
               {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y-m-d')}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.Today')}}</button> --}}
               {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y-m-d', strtotime(' -7 day'))}}" data-end_date="{{date('Y-m-d')}}">{{trans('file.Last 7 Days')}}</button> --}}
               <button style="cursor: auto;" class="btn btn-secondary date-btn" disabled data-start_date="{{date('Y').'-'.date('m').'-'.'01'}}" data-end_date="{{date('Y-m-d')}}">{{date('F')}} {{date('Y')}}</button>
               {{-- <button class="btn btn-secondary date-btn" data-start_date="{{date('Y').'-01'.'-01'}}" data-end_date="{{date('Y').'-12'.'-31'}}">{{trans('file.This Year')}}</button> --}}
             </div>
-            @endif
           </div>
         </div>
       </div>
@@ -58,7 +53,6 @@
       <section class="dashboard-counts">
         <div class="container-fluid">
           <div class="row">
-            @if($revenue_profit_summary)
             <div class="col-md-12 form-group">
               <div class="row">
                 <!-- Count item widget-->
@@ -105,11 +99,6 @@
                 </div>
               </div>
             </div>
-            @endif
-            @php
-              $cash_flow = $role_has_permissions_list->where('name', 'cash_flow')->first();
-            @endphp
-            @if($cash_flow)
             <div class="col-md-7 mt-4">
               <div class="card line-chart-example">
                 <div class="card-header d-flex align-items-center">
@@ -120,11 +109,6 @@
                 </div>
               </div>
             </div>
-            @endif
-            @php
-              $monthly_summary = $role_has_permissions_list->where('name', 'monthly_summary')->first();
-            @endphp
-            @if($monthly_summary)
             <div class="col-md-5 mt-4">
               <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -135,7 +119,6 @@
                 </div>
               </div>
             </div>
-            @endif
           </div>
         </div>
 

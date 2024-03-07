@@ -64,12 +64,13 @@
                             </div>
                         </div>
                         @endcan
-
+                        @if($category->name != "Makanan" && $category->name != "Minuman" && $category->name != "Tambahan")
                         @can('hapus-kategori')
                         {{ Form::open(['route' => ['category.destroy', $category->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                {{ Form::close() }}
+                            <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                        {{ Form::close() }}
                         @endcan
+                        @endif
                     </td>
                 </tr>
                 @endforeach

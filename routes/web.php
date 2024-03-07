@@ -107,7 +107,7 @@ Route::group(['prefix' => 'admin'], function () {
 
 
         // Need to check again
-        Route::resource('products',ProductController::class)->except([ 'show']);
+        Route::resource('produk',ProductController::class)->except([ 'show']);
         Route::controller(ProductController::class)->group(function () {
             Route::post('products/product-data', 'productData');
             Route::get('products/gencode', 'generateCode');

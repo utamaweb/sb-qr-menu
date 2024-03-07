@@ -94,13 +94,9 @@
          <li id="category-menu"><a href="{{route('kategori.index')}}">Kategori</a></li>
         @endcanany
         @canany(['lihat-produk', 'tambah-produk', 'ubah-produk', 'hapus-produk'])
-         <li id="product-list-menu"><a href="{{route('products.index')}}">Daftar Produk</a>
+         <li id="product-list-menu"><a href="{{route('produk.index')}}">Daftar Produk</a>
          </li>
         @endcanany
-
-         {{-- @if($print_barcode_active)
-         <li id="printBarcode-menu"><a href="{{route('product.printBarcode')}}">{{__('file.print_barcode')}}</a></li>
-         @endif --}}
          @canany(['lihat-unit', 'tambah-unit', 'ubah-unit', 'hapus-unit'])
          <li id="unit-menu"><a href="{{route('unit.index')}}">Unit</a></li>
         @endcanany

@@ -88,7 +88,7 @@ class ProductController extends Controller
             $uploadImage = $image->storeAs('public/product_images', $imageName);
         }
         $productInsert = Product::create([
-            'type' => $request->type,
+            'type' => 'standard',
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'code' => $request->code,
@@ -168,7 +168,6 @@ class ProductController extends Controller
         }
         $editProduct = Product::findOrFail($id);
         $editProduct->update([
-            'type' => $request->type,
             'name' => $request->name,
             'slug' => Str::slug($request->name),
             'code' => $request->code,

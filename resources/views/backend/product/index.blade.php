@@ -19,7 +19,7 @@
     @endif
 
         @can('tambah-produk')
-            <a href="{{route('products.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> {{__('file.add_product')}}</a>
+            <a href="{{route('produk.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> Tambah Produk</a>
             {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
         @endcan
     </div>
@@ -27,7 +27,7 @@
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
+                    <th class="text-center">#</th>
                     <th>Gambar</th>
                     <th>Nama</th>
                     <th>Kode</th>
@@ -41,7 +41,7 @@
             <tbody>
                 @foreach($products as $key=>$product)
                 <tr data-id="{{$product->id}}">
-                    <td>{{$key}}</td>
+                    <td class="text-center">{{++$key}}</td>
                     @if($roleName == 'Kasir')
                     <td><img src="{{Storage::url('product_images/'.$product->product->image)}}" alt=""></td>
                     <td>{{ $product->product->name }}</td>
@@ -73,10 +73,10 @@
                     <td>{{ $product->price }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
                     <td>
                         @can('ubah-produk')
-                        <a href={{route('products.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
+                        <a href={{route('produk.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> Edit</a>
                         @endcan
                         @can('hapus-produk')
-                        {{ Form::open(['route' => ['products.destroy', $product->id], 'method' => 'DELETE'] ) }}
+                        {{ Form::open(['route' => ['produk.destroy', $product->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                                 {{ Form::close() }}
                         @endcan
@@ -202,7 +202,7 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
@@ -213,20 +213,7 @@
                 "orderable": false,
                 'targets': [0, 2]
             },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -264,33 +251,7 @@
                     rows: ':visible'
                 },
             },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                        ingredient_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                ingredient_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'ingredient/deletebyselection',
-                                data:{
-                                    unitIdArray: ingredient_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!ingredient_id.length)
-                            alert('No unit is selected!');
-                }
-            },
+
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

@@ -33,7 +33,7 @@
         <table id="unit-table" class="table">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
+                    <th class="text-center">#</th>
                     <th>Kode</th>
                     <th>Nama</th>
                     <th class="not-exported">Aksi</th>
@@ -42,7 +42,7 @@
             <tbody>
                 @foreach($lims_unit_all as $key=>$unit)
                 <tr data-id="{{$unit->id}}">
-                    <td>{{$key}}</td>
+                    <td class="text-center">{{++$key}}</td>
                     <td>{{ $unit->unit_code }}</td>
                     <td>{{ $unit->unit_name }}</td>
                     <td>
@@ -55,7 +55,7 @@
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
                                 @can('ubah-unit')
                                 <li>
-                                    <button type="button" data-id="{{$unit->id}}" class="open-EditUnitDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> Ubah
+                                    <button type="button" data-id="{{$unit->id}}" class="open-EditUnitDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> Update
                                 </button>
                                 </li>
                                 @endcan
@@ -112,7 +112,7 @@
       <div class="modal-content">
         {!! Form::open(['route' => ['unit.update',1], 'method' => 'put']) !!}
         <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> Update Unint</h5>
+          <h5 id="exampleModalLabel" class="modal-title"> Update Unit</h5>
           <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
         </div>
         <div class="modal-body">
@@ -289,7 +289,7 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
@@ -300,20 +300,7 @@
                 "orderable": false,
                 'targets': [0, 3]
             },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -351,37 +338,33 @@
                     rows: ':visible'
                 },
             },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
-                        unit_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                unit_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(unit_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'unit/deletebyselection',
-                                data:{
-                                    unitIdArray: unit_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!unit_id.length)
-                            alert('No unit is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
-                }
-            },
+            // {
+            //     text: '<i title="delete" class="dripicons-cross"></i>',
+            //     className: 'buttons-delete',
+            //     action: function ( e, dt, node, config ) {
+            //             unit_id.length = 0;
+            //             $(':checkbox:checked').each(function(i){
+            //                 if(i){
+            //                     unit_id[i-1] = $(this).closest('tr').data('id');
+            //                 }
+            //             });
+            //             if(unit_id.length && confirm("Are you sure want to delete?")) {
+            //                 $.ajax({
+            //                     type:'POST',
+            //                     url:'unit/deletebyselection',
+            //                     data:{
+            //                         unitIdArray: unit_id
+            //                     },
+            //                     success:function(data){
+            //                         alert(data);
+            //                     }
+            //                 });
+            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
+            //             }
+            //             else if(!unit_id.length)
+            //                 alert('No unit is selected!');
+            //     }
+            // },
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

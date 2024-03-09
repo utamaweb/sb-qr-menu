@@ -189,7 +189,7 @@ Route::group(['prefix' => 'admin'], function () {
         //     Route::post('category/category-data', 'categoryData');
         // });
 
-        Route::resource('order_type', OrderTypeController::class);
+        Route::resource('tipe-pesanan', OrderTypeController::class);
 
         Route::controller(IngredientController::class)->group(function () {
             Route::post('ingredient/import', 'import')->name('ingredient.import');

@@ -48,7 +48,7 @@
                                 </div>
                                 <div class="modal-body">
                                 <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('order_type.update', $orderType->id)}}" method="POST">
+                                    <form action="{{route('tipe-pesanan.update', $orderType->id)}}" method="POST">
                                         @csrf
                                         @method('PUT')
                                         <div class="form-group">
@@ -66,7 +66,7 @@
                         @endcan
 
                         @can('hapus-tipepesanan')
-                        {{ Form::open(['route' => ['order_type.destroy', $orderType->id], 'method' => 'DELETE'] ) }}
+                        {{ Form::open(['route' => ['tipe-pesanan.destroy', $orderType->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                         {{ Form::close() }}
                         @endcan
@@ -83,7 +83,7 @@
 <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {!! Form::open(['route' => 'order_type.store', 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'tipe-pesanan.store', 'method' => 'post']) !!}
             <div class="modal-header">
                 <h5 id="exampleModalLabel" class="modal-title">Tambah Bahan Baku</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>

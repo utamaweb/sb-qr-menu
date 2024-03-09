@@ -202,7 +202,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('stock-opname-detail/{id}', [StockOpnameController::class,'updateDetail'])->name('updateDetailStockOpname');
         Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 
-        Route::resource('stock-purchase', StockPurchaseController::class);
+        Route::resource('pembelian-stok', StockPurchaseController::class);
 
 
         Route::controller(ShiftController::class)->group(function () {

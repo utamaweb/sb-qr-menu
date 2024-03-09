@@ -307,10 +307,10 @@
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
             // {
             //     'render': function(data, type, row, meta){
             //         if(type === 'display'){

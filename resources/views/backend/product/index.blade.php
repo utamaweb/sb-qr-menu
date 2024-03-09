@@ -209,10 +209,10 @@
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
 
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},

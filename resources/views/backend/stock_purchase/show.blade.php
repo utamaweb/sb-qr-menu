@@ -15,8 +15,6 @@
                         <p class="italic">
                             {{-- <small>Label yang bertanda (*) wajib diisi.</small> --}}
                         </p>
-                        <form action="{{route('stock-purchase.store')}}" method="POST" enctype="multipart/form-data">
-                            @csrf
                             <div class="row">
 
                                 <div class="col-12">
@@ -101,7 +99,6 @@
                                         <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                 </div>
-                        </form>
                     </div>
                 </div>
             </div>

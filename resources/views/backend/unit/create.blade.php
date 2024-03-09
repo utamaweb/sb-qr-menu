@@ -296,10 +296,10 @@
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 3]
-            },
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 3]
+            // },
 
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},

@@ -19,7 +19,7 @@
                         <p class="italic">
                             <small>Label yang bertanda (*) wajib diisi.</small>
                         </p>
-                        <form action="{{route('stock-purchase.store')}}" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('pembelian-stok.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
 

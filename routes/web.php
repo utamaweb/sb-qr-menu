@@ -196,7 +196,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('ingredient/deletebyselection', 'deleteBySelection');
             Route::post('ingredient/ingredient-data', 'ingredientData');
         });
-        Route::resource('ingredient', IngredientController::class);
+        Route::resource('bahan-baku', IngredientController::class);
         Route::resource('stock-opname', StockOpnameController::class);
         Route::resource('close-cashier', CloseCashierController::class);
         Route::put('stock-opname-detail/{id}', [StockOpnameController::class,'updateDetail'])->name('updateDetailStockOpname');

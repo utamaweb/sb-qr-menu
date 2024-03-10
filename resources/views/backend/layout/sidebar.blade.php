@@ -160,7 +160,7 @@
          <li id="user-list-menu"><a href="{{route('user.index')}}">User</a></li>
          @endcanany
          @canany(['lihat-warehouse', 'tambah-warehouse', 'ubah-warehouse', 'hapus-warehouse'])
-        <li id="warehouse-menu"><a href="{{route('warehouse.index')}}">Cabang</a></li>
+        <li id="warehouse-menu"><a href="{{route('outlet.index')}}">Outlet</a></li>
         @endcanany
         {{-- <li id="shift-menu"><a href="{{route('shift.index')}}">Shift</a></li> --}}
         {{-- <li id="table-menu"><a href="{{route('tables.index')}}">Meja</a></li>
@@ -175,13 +175,14 @@
    @endcanany
 
    @canany(['lihat-setting', 'tambah-setting', 'ubah-setting', 'hapus-setting'])
-   <li>
+   {{-- <li>
       <a href="#setting" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-gear"></i><span>{{trans('file.settings')}}</span></a>
       <ul id="setting" class="collapse list-unstyled " style="border-radius: 10px;">
          <li id="general-setting-menu"><a href="{{route('setting.general')}}">{{trans('file.General Setting')}}</a></li>
-         {{-- <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">POS {{trans('file.settings')}}</a></li> --}}
+         <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">POS {{trans('file.settings')}}</a></li>
       </ul>
-   </li>
+   </li> --}}
+   <li id="general-setting-menu"><a  href="{{route('setting.general')}}"> <i class="dripicons-gear"></i><span>Pengaturan</span></a></li>
    @endcanany
 </ul>

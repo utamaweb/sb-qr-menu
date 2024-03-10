@@ -175,12 +175,12 @@ Route::group(['prefix' => 'admin'], function () {
 
 
         Route::controller(WarehouseController::class)->group(function () {
-            Route::post('importwarehouse', 'importWarehouse')->name('warehouse.import');
+            Route::post('importwarehouse', 'importWarehouse')->name('outlet.import');
             Route::post('warehouse/deletebyselection', 'deleteBySelection');
             Route::get('warehouse/lims_warehouse_search', 'limsWarehouseSearch')->name('warehouse.search');
             Route::get('warehouse/all', 'warehouseAll')->name('warehouse.all');
         });
-        Route::resource('warehouse', WarehouseController::class)->except('show');
+        Route::resource('outlet', WarehouseController::class)->except('show');
 
 
         // Route::controller(CategoryController::class)->group(function () {

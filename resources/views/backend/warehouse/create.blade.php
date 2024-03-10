@@ -25,7 +25,7 @@
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
+                    <th>#</th>
                     <th>Nama Outlet</th>
                     <th>Alamat</th>
                     <th class="not-exported">Aksi</th>
@@ -34,7 +34,7 @@
             <tbody>
                 @foreach($lims_warehouse_all as $key=>$warehouse)
                 <tr data-id="{{$warehouse->id}}">
-                    <td>{{$key}}</td>
+                    <td>{{++$key}}</td>
                     <td>{{ $warehouse->name }}</td>
                     <td>{{ $warehouse->address }}</td>
                     <td>
@@ -45,12 +45,12 @@
                             <div role="document" class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> Update Outlet</h5>
+                                <h5 id="exampleModalLabel" class="modal-title"> Ubah Outlet</h5>
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
                                 <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('warehouse.update', $warehouse->id)}}" method="POST">
+                                    <form action="{{route('outlet.update', $warehouse->id)}}" method="POST">
                                         @csrf
                                         @method('PUT')
                                         <div class="form-group">
@@ -73,7 +73,7 @@
                         </div>
                         @endcan
                         @can('hapus-warehouse')
-                        {{ Form::open(['route' => ['warehouse.destroy', $warehouse->id], 'method' => 'DELETE'] ) }}
+                        {{ Form::open(['route' => ['outlet.destroy', $warehouse->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                 {{ Form::close() }}
                         @endcan
@@ -90,7 +90,7 @@
 <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {!! Form::open(['route' => 'warehouse.store', 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'outlet.store', 'method' => 'post']) !!}
             <div class="modal-header">
                 <h5 id="exampleModalLabel" class="modal-title">Tambah Outlet</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
@@ -117,13 +117,13 @@
 <div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
       <div class="modal-content">
-        {!! Form::open(['route' => 'warehouse.import', 'method' => 'post', 'files' => true]) !!}
+        {!! Form::open(['route' => 'outlet.import', 'method' => 'post', 'files' => true]) !!}
         <div class="modal-header">
           <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
           <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
         </div>
         <div class="modal-body">
-            <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
             <p>{{trans('file.The correct column order is')}} (name*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
             <div class="row">
                 <div class="col-md-6">
@@ -260,31 +260,31 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
+            // {
+            //     'render': function(data, type, row, meta){
+            //         if(type === 'display'){
+            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+            //         }
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
+            //        return data;
+            //     },
+            //     'checkboxes': {
+            //        'selectRow': true,
+            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
+            //     },
+            //     'targets': [0]
+            // }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -322,37 +322,33 @@
                     rows: ':visible'
                 },
             },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
-                        ingredient_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                ingredient_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'ingredient/deletebyselection',
-                                data:{
-                                    unitIdArray: ingredient_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!ingredient_id.length)
-                            alert('No unit is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
-                }
-            },
+            // {
+            //     text: '<i title="delete" class="dripicons-cross"></i>',
+            //     className: 'buttons-delete',
+            //     action: function ( e, dt, node, config ) {
+            //             ingredient_id.length = 0;
+            //             $(':checkbox:checked').each(function(i){
+            //                 if(i){
+            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
+            //                 }
+            //             });
+            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
+            //                 $.ajax({
+            //                     type:'POST',
+            //                     url:'ingredient/deletebyselection',
+            //                     data:{
+            //                         unitIdArray: ingredient_id
+            //                     },
+            //                     success:function(data){
+            //                         alert(data);
+            //                     }
+            //                 });
+            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
+            //             }
+            //             else if(!ingredient_id.length)
+            //                 alert('No unit is selected!');
+            //     }
+            // },
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

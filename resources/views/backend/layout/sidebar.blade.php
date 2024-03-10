@@ -157,7 +157,7 @@
          <li id="role-menu"><a href="{{route('role.index')}}">Role</a></li>
          @endcanany
          @canany(['lihat-user', 'tambah-user', 'ubah-user', 'hapus-user'])
-         <li id="user-list-menu"><a href="{{route('user.index')}}">Karyawan</a></li>
+         <li id="user-list-menu"><a href="{{route('user.index')}}">User</a></li>
          @endcanany
          @canany(['lihat-warehouse', 'tambah-warehouse', 'ubah-warehouse', 'hapus-warehouse'])
         <li id="warehouse-menu"><a href="{{route('warehouse.index')}}">Cabang</a></li>

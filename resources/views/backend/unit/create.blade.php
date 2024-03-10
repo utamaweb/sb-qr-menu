@@ -144,7 +144,7 @@
           <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
         </div>
         <div class="modal-body">
-            <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
             <p>{{trans('file.The correct column order is')}} (unit_code*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
             <div class="row">
                 <div class="col-md-6">

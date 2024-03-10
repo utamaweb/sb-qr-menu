@@ -12,7 +12,7 @@
                         <h4>{{trans('file.Update User')}}</h4>
                     </div>
                     <div class="card-body">
-                        <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                        <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                         {!! Form::open(['route' => ['user.update', $lims_user_data->id], 'method' => 'put', 'files' => true]) !!}
                             <div class="row">
                                 <div class="col-md-6">

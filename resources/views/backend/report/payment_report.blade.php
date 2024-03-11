@@ -28,7 +28,7 @@
         <table id="report-table" class="table table-hover">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
+                    <th>#</th>
                     <th>Tanggal</th>
                     <th>Outlet </th>
                     <th>Tipe Pemesanan</th>
@@ -41,7 +41,7 @@
             <tbody>
                 @foreach($lims_payment_data as $payment)
                 <tr>
-                    <td></td>
+                    <td>{{$loop->iteration}}</td>
                     <td>{{$payment->date}}</td>
                     <td>{{$payment->warehouse->name}}</td>
                     <td>{{$payment->order_type->name}}</td>
@@ -79,31 +79,31 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': 0
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
+            // {
+            //     "orderable": false,
+            //     'targets': 0
+            // },
+            // {
+            //     'render': function(data, type, row, meta){
+            //         if(type === 'display'){
+            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+            //         }
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
+            //        return data;
+            //     },
+            //     'checkboxes': {
+            //        'selectRow': true,
+            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
+            //     },
+            //     'targets': [0]
+            // }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],

@@ -46,7 +46,7 @@
         <table id="ingredient-table" class="table table-hover" style="width: 100%">
             <thead>
                 <tr>
-                    <th class="not-exported-sale"></th>
+                    <th>#</th>
                     <th>Tanggal</th>
                     <th>Jumlah Produk</th>
                     <th>Total Uang</th>
@@ -56,7 +56,7 @@
             <tbody>
                 @forelse ($transactions as $key => $transaction)
                 <tr>
-                    <td>{{$transaction->id}}</td>
+                    <td>{{$loop->iteration}}</td>
                     <td>{{$transaction->date}}</td>
                     <td>{{$transaction->total_qty}}</td>
                     <td>@currency($transaction->total_amount)</td>
@@ -74,9 +74,9 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#product").siblings('a').attr('aria-expanded','true');
-    $("ul#product").addClass("show");
-    $("ul#product #unit-menu").addClass("active");
+    $("ul#report").siblings('a').attr('aria-expanded','true');
+    $("ul#report").addClass("show");
+    $("ul#report #warehouse-report-menu").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
@@ -197,31 +197,31 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
+            // {
+            //     'render': function(data, type, row, meta){
+            //         if(type === 'display'){
+            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+            //         }
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
+            //        return data;
+            //     },
+            //     'checkboxes': {
+            //        'selectRow': true,
+            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
+            //     },
+            //     'targets': [0]
+            // }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -259,37 +259,33 @@
                     rows: ':visible'
                 },
             },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
-                        ingredient_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                ingredient_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'ingredient/deletebyselection',
-                                data:{
-                                    unitIdArray: ingredient_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!ingredient_id.length)
-                            alert('No unit is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
-                }
-            },
+            // {
+            //     text: '<i title="delete" class="dripicons-cross"></i>',
+            //     className: 'buttons-delete',
+            //     action: function ( e, dt, node, config ) {
+            //             ingredient_id.length = 0;
+            //             $(':checkbox:checked').each(function(i){
+            //                 if(i){
+            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
+            //                 }
+            //             });
+            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
+            //                 $.ajax({
+            //                     type:'POST',
+            //                     url:'ingredient/deletebyselection',
+            //                     data:{
+            //                         unitIdArray: ingredient_id
+            //                     },
+            //                     success:function(data){
+            //                         alert(data);
+            //                     }
+            //                 });
+            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
+            //             }
+            //             else if(!ingredient_id.length)
+            //                 alert('No unit is selected!');
+            //     }
+            // },
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

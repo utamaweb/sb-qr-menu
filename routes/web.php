@@ -75,50 +75,6 @@ Route::fallback(function () {
     return redirect()->route('admin.auth.index');
 });
 
-Route::get('migrate', function() {
-	Artisan::call('migrate');
-	dd('migrated');
-});
-
-Route::get('clear',function() {
-    Artisan::call('optimize:clear');
-    cache()->forget('biller_list');
-    cache()->forget('brand_list');
-    cache()->forget('category_list');
-    cache()->forget('coupon_list');
-    cache()->forget('customer_list');
-    cache()->forget('customer_group_list');
-    cache()->forget('product_list');
-    cache()->forget('product_list_with_variant');
-    cache()->forget('warehouse_list');
-    cache()->forget('table_list');
-    cache()->forget('tax_list');
-    cache()->forget('currency');
-    cache()->forget('general_setting');
-    cache()->forget('pos_setting');
-    cache()->forget('user_role');
-    cache()->forget('permissions');
-    cache()->forget('role_has_permissions');
-    cache()->forget('role_has_permissions_list');
-    dd('cleared');
-});
-
-
-
-Route::get('update-coupon', [CouponController::class, 'updateCoupon']);
-
-Route::get('auto-update-dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-// Auto Update
-Route::group(['prefix' => 'developer-section'], function () {
-    Route::controller(DeveloperSectionController::class)->group(function () {
-        Route::get('/', 'index')->name('developer-section.index');
-        Route::post('/', 'submit')->name('developer-section.submit');
-        Route::post('/bug-update-setting', 'bugUpdateSetting')->name('bug-update-setting.submit');
-        Route::post('/version-upgrade-setting', 'versionUpgradeSetting')->name('version-upgrade-setting.submit');
-     });
-});
-
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware(['guest'])->group(function () {
         Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');
@@ -151,7 +107,7 @@ Route::group(['prefix' => 'admin'], function () {
 
 
         // Need to check again
-        Route::resource('products',ProductController::class)->except([ 'show']);
+        Route::resource('produk',ProductController::class)->except([ 'show']);
         Route::controller(ProductController::class)->group(function () {
             Route::post('products/product-data', 'productData');
             Route::get('products/gencode', 'generateCode');
@@ -198,7 +154,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('category/deletebyselection', 'deleteBySelection');
             Route::post('category/category-data', 'categoryData');
         });
-        Route::resource('category', CategoryController::class);
+        Route::resource('kategori', CategoryController::class);
 
 
         Route::controller(BrandController::class)->group(function () {
@@ -219,12 +175,12 @@ Route::group(['prefix' => 'admin'], function () {
 
 
         Route::controller(WarehouseController::class)->group(function () {
-            Route::post('importwarehouse', 'importWarehouse')->name('warehouse.import');
+            Route::post('importwarehouse', 'importWarehouse')->name('outlet.import');
             Route::post('warehouse/deletebyselection', 'deleteBySelection');
             Route::get('warehouse/lims_warehouse_search', 'limsWarehouseSearch')->name('warehouse.search');
             Route::get('warehouse/all', 'warehouseAll')->name('warehouse.all');
         });
-        Route::resource('warehouse', WarehouseController::class)->except('show');
+        Route::resource('outlet', WarehouseController::class)->except('show');
 
 
         // Route::controller(CategoryController::class)->group(function () {
@@ -233,20 +189,20 @@ Route::group(['prefix' => 'admin'], function () {
         //     Route::post('category/category-data', 'categoryData');
         // });
 
-        Route::resource('order_type', OrderTypeController::class);
+        Route::resource('tipe-pesanan', OrderTypeController::class);
 
         Route::controller(IngredientController::class)->group(function () {
             Route::post('ingredient/import', 'import')->name('ingredient.import');
             Route::post('ingredient/deletebyselection', 'deleteBySelection');
             Route::post('ingredient/ingredient-data', 'ingredientData');
         });
-        Route::resource('ingredient', IngredientController::class);
+        Route::resource('bahan-baku', IngredientController::class);
         Route::resource('stock-opname', StockOpnameController::class);
         Route::resource('close-cashier', CloseCashierController::class);
         Route::put('stock-opname-detail/{id}', [StockOpnameController::class,'updateDetail'])->name('updateDetailStockOpname');
         Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 
-        Route::resource('stock-purchase', StockPurchaseController::class);
+        Route::resource('pembelian-stok', StockPurchaseController::class);
 
 
         Route::controller(ShiftController::class)->group(function () {
@@ -515,14 +471,14 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('expense_categories/deletebyselection', 'deleteBySelection');
             Route::get('expense_categories/all', 'expenseCategoriesAll')->name('expense_category.all');;
         });
-        Route::resource('expense_categories', ExpenseCategoryController::class);
+        Route::resource('nama-pengeluaran', ExpenseCategoryController::class);
 
 
         Route::controller(ExpenseController::class)->group(function () {
             Route::post('expenses/expense-data', 'expenseData')->name('expenses.data');
             Route::post('expenses/deletebyselection', 'deleteBySelection');
         });
-        Route::resource('expenses', ExpenseController::class);
+        Route::resource('pengeluaran', ExpenseController::class);
 
         Route::controller(CouponController::class)->group(function () {
             Route::get('coupons/gencode', 'generateCode');

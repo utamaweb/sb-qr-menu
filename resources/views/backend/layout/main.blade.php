@@ -408,7 +408,7 @@
         <div class="container-fluid">
           <div class="row">
             <div class="col-sm-12">
-              <p>&copy; {{$general_setting->site_title}} | Utamaweb</p>
+              <p>&copy; {{$general_setting->site_title}} | {{$general_setting->developed_by}}</p>
             </div>
           </div>
         </div>
@@ -827,7 +827,7 @@
       $("div.alert:not(#update-alert-section)").delay(4000).slideUp(800);
 
       function confirmDelete() {
-          if (confirm("Are you sure want to delete?")) {
+          if (confirm("Yakin ingin hapus data ini?")) {
               return true;
           }
           return false;

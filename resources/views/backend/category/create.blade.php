@@ -25,7 +25,7 @@
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
+                    <th class="text-center">#</th>
                     <th>Nama Kategori</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
@@ -33,7 +33,7 @@
             <tbody>
                 @foreach($categories as $key=>$category)
                 <tr data-id="{{$category->id}}">
-                    <td>{{$key}}</td>
+                    <td class="text-center">{{++$key}}</td>
                     <td>{{ $category->name }}</td>
                     <td>
                         @can('ubah-kategori')
@@ -43,12 +43,12 @@
                             <div role="document" class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> Update Kategori</h5>
+                                <h5 id="exampleModalLabel" class="modal-title"> Ubah Kategori</h5>
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
                                 <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('category.update', $category->id)}}" method="POST">
+                                    <form action="{{route('kategori.update', $category->id)}}" method="POST">
                                         @csrf
                                         @method('PUT')
                                         <div class="form-group">
@@ -64,12 +64,13 @@
                             </div>
                         </div>
                         @endcan
-
+                        @if($category->id != 7 && $category->id != 8 && $category->id != 9)
                         @can('hapus-kategori')
-                        {{ Form::open(['route' => ['category.destroy', $category->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                {{ Form::close() }}
+                        {{ Form::open(['route' => ['kategori.destroy', $category->id], 'method' => 'DELETE'] ) }}
+                            <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                        {{ Form::close() }}
                         @endcan
+                        @endif
                     </td>
                 </tr>
                 @endforeach
@@ -83,7 +84,7 @@
 <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {!! Form::open(['route' => 'category.store', 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'kategori.store', 'method' => 'post']) !!}
             <div class="modal-header">
                 <h5 id="exampleModalLabel" class="modal-title">Tambah Kategori</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
@@ -103,37 +104,6 @@
 </div>
 </div>
 
-<div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => 'category.import', 'method' => 'post', 'files' => true]) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-            <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-            <p>{{trans('file.The correct column order is')}} (name*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{trans('file.Upload CSV File')}} *</label>
-                        {{Form::file('file', array('class' => 'form-control','required'))}}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label> {{trans('file.Sample File')}}</label>
-                        <a href="sample_file/category.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
-                    </div>
-                </div>
-            </div>
-            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-        </div>
-        {{ Form::close() }}
-      </div>
-    </div>
-</div>
 
 @endsection
 
@@ -143,8 +113,7 @@
     $("ul#product").addClass("show");
     $("ul#product #category-menu").addClass("active");
 
-    var ingredient_id = [];
-    var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
+    var category_id = [];
 
     $.ajaxSetup({
         headers: {
@@ -154,7 +123,7 @@
 
     $(document).ready(function() {
     $(document).on('click', '.open-EditUnitDialog', function() {
-        var url = "ingredient/"
+        var url = "category/"
         var id = $(this).data('id').toString();
         url = url.concat(id).concat("/edit");
 
@@ -163,7 +132,7 @@
             $("input[name='first_stock']").val(data['first_stock']);
             $("input[name='unit_id']").val(data['unit_id']);
             $("input[name='operation_value']").val(data['operation_value']);
-            $("input[name='ingredient_id']").val(data['id']);
+            $("input[name='category_id']").val(data['id']);
             $("#base_unit_edit").val(data['base_unit']);
             if(data['base_unit']!=null)
             {
@@ -249,31 +218,18 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -311,37 +267,7 @@
                     rows: ':visible'
                 },
             },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
-                        ingredient_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                ingredient_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'ingredient/deletebyselection',
-                                data:{
-                                    unitIdArray: ingredient_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!ingredient_id.length)
-                            alert('No unit is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
-                }
-            },
+
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

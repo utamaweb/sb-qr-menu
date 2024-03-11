@@ -18,15 +18,15 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
         @can('tambah-stokopname')
-        <a href="{{route('stock-opname.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Stock Opname</a>&nbsp;
+        <a href="{{route('stock-opname.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Stok Opname</a>&nbsp;
         @endcan
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
-                    <th>Nama Stock Opname</th>
+                    <th class="text-center">#</th>
+                    <th>Nama Stok Opname</th>
                     <th>Tanggal</th>
                     <th>Outlet</th>
                     <th class="not-exported">Aksi</th>
@@ -35,7 +35,7 @@
             <tbody>
                 @foreach($stockOpnames as $key=>$stockOpname)
                 <tr data-id="{{$stockOpname->id}}">
-                    <td>{{$key}}</td>
+                    <td class="text-center">{{++$key}}</td>
                     <td>{{ $stockOpname->name }}</td>
                     <td>{{ $stockOpname->created_at}}</td>
                     <td>{{ $stockOpname->warehouse->name}}</td>
@@ -208,31 +208,17 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
-
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -270,37 +256,37 @@
                     rows: ':visible'
                 },
             },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
-                        ingredient_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                ingredient_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'ingredient/deletebyselection',
-                                data:{
-                                    unitIdArray: ingredient_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!ingredient_id.length)
-                            alert('No unit is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
-                }
-            },
+            // {
+            //     text: '<i title="delete" class="dripicons-cross"></i>',
+            //     className: 'buttons-delete',
+            //     action: function ( e, dt, node, config ) {
+            //         if(user_verified == '1') {
+            //             ingredient_id.length = 0;
+            //             $(':checkbox:checked').each(function(i){
+            //                 if(i){
+            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
+            //                 }
+            //             });
+            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
+            //                 $.ajax({
+            //                     type:'POST',
+            //                     url:'ingredient/deletebyselection',
+            //                     data:{
+            //                         unitIdArray: ingredient_id
+            //                     },
+            //                     success:function(data){
+            //                         alert(data);
+            //                     }
+            //                 });
+            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
+            //             }
+            //             else if(!ingredient_id.length)
+            //                 alert('No unit is selected!');
+            //         }
+            //         else
+            //             alert('This feature is disable for demo!');
+            //     }
+            // },
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

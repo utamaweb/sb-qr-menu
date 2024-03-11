@@ -7,33 +7,19 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>Update Produk</h4>
+                        <h4>Edit Produk</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
                             <small>Inputan yang ditandai dengan * wajib diisi.</small>
                         </p>
-                        <form id="product-form" action="{{route('products.update', $lims_product_data->id)}}" method="POST" enctype="multipart/form-data">
+                        <form id="product-form" action="{{route('produk.update', $lims_product_data->id)}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
                             <input type="hidden" name="id" value="{{$lims_product_data->id}}" />
                             <div class="row">
                                 <div class="col-12">
                                     <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Tipe Produk *</strong> </label>
-                                                <div class="input-group">
-                                                    <select name="type" required class="form-control selectpicker"
-                                                        id="type">
-                                                        <option value="standard">Standard</option>
-                                                        <option value="combo">Paket</option>
-                                                    </select>
-                                                    <input type="hidden" name="type_hidden"
-                                                        value="{{$lims_product_data->type}}">
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Nama Produk *</strong> </label>
@@ -97,71 +83,6 @@
                                                 <span class="validation-msg" id="image-error"></span>
                                             </div>
                                         </div>
-                                        <div id="combo" class="col-md-9 mb-1">
-                                            <label>{{trans('file.add_product')}}</label>
-                                            <div class="search-box input-group mb-3">
-                                                <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button>
-                                                <input type="text" name="product_code_name" id="lims_productcodeSearch"
-                                                    placeholder="Please type product code and select..."
-                                                    class="form-control" />
-                                            </div>
-                                            <label>{{trans('file.Combo Products')}}</label>
-                                            <div class="table-responsive">
-                                                <table id="myTable" class="table table-hover order-list">
-                                                    <thead>
-                                                        <tr>
-                                                            <th>{{trans('file.product')}}</th>
-                                                            <th>{{trans('file.Quantity')}}</th>
-                                                            <th>{{trans('file.Unit Price')}}</th>
-                                                            <th><i class="dripicons-trash"></i></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @if($lims_product_data->type == 'combo')
-                                                        <?php
-                                                            $product_list = explode(",", $lims_product_data->product_list);
-                                                            $qty_list = explode(",", $lims_product_data->qty_list);
-                                                            $variant_list = explode(",", $lims_product_data->variant_list);
-                                                            $price_list = explode(",", $lims_product_data->price_list);
-                                                        ?>
-                                                        @foreach($product_list as $key=>$id)
-                                                        <tr>
-                                                            <?php
-                                                                $product = App\Models\Product::find($id);
-                                                                if($lims_product_data->variant_list && $variant_list[$key]) {
-                                                                    $product_variant_data = App\Models\ProductVariant::select('item_code')->FindExactProduct($id, $variant_list[$key])->first();
-                                                                    $lims_product_data->code = $product_variant_data->item_code;
-                                                                }
-                                                                else
-                                                                    $variant_list[$key] = "";
-                                                            ?>
-                                                            <td>{{$lims_product_data->name}} [{{$lims_product_data->code}}]</td>
-                                                            <td><input type="number" class="form-control qty"
-                                                                    name="product_qty[]" value="{{$qty_list[$key]}}"
-                                                                    step="any"></td>
-                                                            <td><input type="number" class="form-control unit_price"
-                                                                    name="unit_price[]" value="{{$price_list[$key]}}"
-                                                                    step="any" /></td>
-                                                            <td><button type="button"
-                                                                    class="ibtnDel btn btn-danger btn-sm">X</button>
-                                                            </td>
-                                                            <input type="hidden" class="product-id" name="product_id[]"
-                                                                value="{{$id}}" />
-                                                            <input type="hidden" class="variant-id" name="variant_id[]"
-                                                                value="{{$variant_list[$key]}}" />
-                                                        </tr>
-                                                        @endforeach
-                                                        @endif
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div id="unit" class="col-md-12">
-                                    <div class="row ">
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Harga Produk *</strong> </label>
@@ -170,14 +91,20 @@
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div id="unit" class="col-md-12">
+                                    <div class="row ">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Detail Produk</label>
                                                 <input name="product_details" class="form-control"
                                                     rows="3" value="{{$lims_product_data->product_details}}">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label>Bahan Baku</label>
                                             <div class="search-box input-group mb-4">
                                                 {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}

@@ -19,23 +19,11 @@
                         <p class="italic">
                             <small>Inputan yang ditandai dengan * wajib diisi.</small>
                         </p>
-                        <form action="{{route('products.store')}}" method="POST" enctype="multipart/form-data">
+                        <form action="{{route('produk.store')}}" method="POST" enctype="multipart/form-data">
                             @csrf
                             <div class="row">
                                 <div class="col-12">
                                     <div class="row">
-                                        <div class="col-md-4">
-                                            <div class="form-group">
-                                                <label>Tipe Produk *</strong> </label>
-                                                <div class="input-group">
-                                                    <select name="type" required class="form-control selectpicker"
-                                                        id="type">
-                                                        <option value="standard">Standard</option>
-                                                        {{-- <option value="combo">Paket</option> --}}
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Nama Produk *</strong> </label>
@@ -98,39 +86,6 @@
                                                 <span class="validation-msg" id="image-error"></span>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                            <div class="row">
-                                <div id="combo" class="col-md-12 mb-1">
-                                    <label>Tambah Produk</label>
-                                    <div class="search-box input-group mb-3">
-                                        <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button>
-                                        <input type="text" name="product_code_name" id="lims_productcodeSearch"
-                                            placeholder="Pilih produk..." class="form-control" />
-                                    </div>
-                                    <label>Produk Kombo</label>
-                                    <div class="table-responsive">
-                                        <table id="myTable" class="table table-hover order-list">
-                                            <thead>
-                                                <tr>
-                                                    <th>{{trans('file.product')}}</th>
-                                                    <th>{{trans('file.Quantity')}}</th>
-                                                    <th>{{trans('file.Unit Price')}}</th>
-                                                    <th><i class="dripicons-trash"></i></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div id="unit" class="col-md-12">
-                                    <div class="row ">
-
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Harga Produk *</strong> </label>
@@ -138,13 +93,20 @@
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row">
+                                <div id="unit" class="col-md-12">
+                                    <div class="row ">
+                                        <div class="col-md-6">
                                             <div class="form-group">
                                                 <label>Detail Produk</label>
                                                 <input name="product_details" class="form-control" rows="3" value="{{old('product_details')}}">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label>Bahan Baku</label>
                                             <div class="search-box input-group mb-4">
                                                 {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
@@ -194,7 +156,7 @@
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">
-                                        <a href="{{ route('products.index') }}" class="btn btn-outline-primary">Kembali</a>
+                                        <a href="{{ route('produk.index') }}" class="btn btn-outline-primary">Kembali</a>
                                     </div>
                                     <div class="form-group mt-3">
                                         <input type="submit" value="Submit" id=""
@@ -234,7 +196,7 @@ $( '#multiple-select-field' ).select2( {
         success: function(data) {
             if(data['number_of_product'] > 0 && data['number_of_product'] <= numberOfProduct) {
                 localStorage.setItem("message", "You don't have permission to create another product as you already exceed the limit! Subscribe to another package if you wants more!");
-                location.href = "{{route('products.index')}}";
+                location.href = "{{route('produk.index')}}";
             }
         }
     });
@@ -1032,7 +994,7 @@ $( '#multiple-select-field' ).select2( {
                                     paramName: 'image',
                                     clickable: true,
                                     method: 'POST',
-                                    url: '{{route('products.store')}}',
+                                    url: '{{route('produk.store')}}',
                                     headers: {
                                         'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                                     },
@@ -1061,7 +1023,7 @@ $( '#multiple-select-field' ).select2( {
                                                     formData.append('file',file[0]);
                                                     $.ajax({
                                                         type:'POST',
-                                                        url:'{{route('products.store')}}',
+                                                        url:'{{route('produk.store')}}',
                                                         data: formData,
                                                         contentType: false,
                                                         processData: false,

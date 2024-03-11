@@ -9,11 +9,11 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>{{trans('file.Add User')}}</h4>
+                        <h4>Tambah User</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
-                            <small>{{trans('file.The field labels marked with * are required input fields')}}.</small>
+                            <small>Inputan yang ditandai dengan * wajib diisi.</small>
                         </p>
                         {!! Form::open(['route' => 'user.store', 'method' => 'post', 'files' => true]) !!}
                         <div class="row">
@@ -84,7 +84,7 @@
                                 <div class="form-group">
                                     <label><strong>{{trans('file.Role')}} *</strong></label>
                                     <select name="role_id" required class="selectpicker form-control"
-                                        data-live-search="true" data-live-search-style="begins" title="Select Role...">
+                                        data-live-search="true" data-live-search-style="begins" title="Pilih Role...">
                                         @foreach($lims_role_list as $role)
                                         <option value="{{$role->id}}">{{$role->name}}</option>
                                         @endforeach

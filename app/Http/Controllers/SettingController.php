@@ -75,9 +75,6 @@ class SettingController extends Controller
 
     public function generalSettingStore(Request $request)
     {
-        if(!env('USER_VERIFIED'))
-            return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-
         $this->validate($request, [
             'site_logo' => 'image|mimes:jpg,jpeg,png,gif|max:100000',
         ]);
@@ -85,37 +82,11 @@ class SettingController extends Controller
         $data = $request->except('site_logo');
         //return $data;
         //writting timezone info in .env file
-        $path = app()->environmentFilePath();
-        $searchArray = array('APP_TIMEZONE='.env('APP_TIMEZONE'));
-        $replaceArray = array('APP_TIMEZONE='.$data['timezone']);
-
-        file_put_contents($path, str_replace($searchArray, $replaceArray, file_get_contents($path)));
-
-        if(isset($data['is_rtl']))
-            $data['is_rtl'] = true;
-        else
-            $data['is_rtl'] = false;
-
         $general_setting = GeneralSetting::latest()->first();
         $general_setting->id = 1;
         $general_setting->site_title = $data['site_title'];
-        $general_setting->is_rtl = $data['is_rtl'];
-        if(isset($data['is_zatca'])) {
-            $general_setting->is_zatca = true;
-        }
-        else
-            $general_setting->is_zatca = false;
         $general_setting->company_name = $data['company_name'];
-        $general_setting->vat_registration_number = $data['vat_registration_number'];
-        $general_setting->currency = $data['currency'];
-        $general_setting->currency_position = $data['currency_position'];
-        $general_setting->decimal = $data['decimal'];
-        $general_setting->staff_access = $data['staff_access'];
-        $general_setting->without_stock = $data['without_stock'];
-        $general_setting->date_format = $data['date_format'];
         $general_setting->developed_by = $data['developed_by'];
-        $general_setting->invoice_format = $data['invoice_format'];
-        $general_setting->state = $data['state'];
         $logo = $request->site_logo;
         if ($logo) {
             $this->fileDelete('storage/images/logo', $general_setting->site_logo);

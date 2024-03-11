@@ -26,7 +26,7 @@
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
+                    <th>#</th>
                     <th>Nama</th>
                     <th>Email</th>
                     <th>No. Telp</th>
@@ -38,7 +38,7 @@
             <tbody>
                 @foreach($lims_user_list as $key=>$user)
                 <tr data-id="{{$user->id}}">
-                    <td>{{$key}}</td>
+                    <td>{{++$key}}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email}}</td>
                     <td>{{ $user->phone}}</td>
@@ -195,31 +195,31 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
+            // {
+            //     'render': function(data, type, row, meta){
+            //         if(type === 'display'){
+            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+            //         }
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
+            //        return data;
+            //     },
+            //     'checkboxes': {
+            //        'selectRow': true,
+            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
+            //     },
+            //     'targets': [0]
+            // }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -257,33 +257,33 @@
                     rows: ':visible'
                 },
             },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                        ingredient_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                ingredient_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'ingredient/deletebyselection',
-                                data:{
-                                    unitIdArray: ingredient_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!ingredient_id.length)
-                            alert('No unit is selected!');
-                }
-            },
+            // {
+            //     text: '<i title="delete" class="dripicons-cross"></i>',
+            //     className: 'buttons-delete',
+            //     action: function ( e, dt, node, config ) {
+            //             ingredient_id.length = 0;
+            //             $(':checkbox:checked').each(function(i){
+            //                 if(i){
+            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
+            //                 }
+            //             });
+            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
+            //                 $.ajax({
+            //                     type:'POST',
+            //                     url:'ingredient/deletebyselection',
+            //                     data:{
+            //                         unitIdArray: ingredient_id
+            //                     },
+            //                     success:function(data){
+            //                         alert(data);
+            //                     }
+            //                 });
+            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
+            //             }
+            //             else if(!ingredient_id.length)
+            //                 alert('No unit is selected!');
+            //     }
+            // },
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

@@ -12,7 +12,7 @@
                         <a href="{{route('close-cashier.index')}}" class="btn btn-info"><i class="dripicons-arrow-thin-left"></i> Kembali </a>
                     </div>
                     <div class="card-body">
-                        <h4>Detail Tutup Kasir - {{$closeCashier->user->name}}</h4>
+                        <h4>Detail Tutup Kasir - {{$closeCashier->shift->user->name}}</h4>
                         <hr>
                         <div class="row">
                             <div class="col-md-6">

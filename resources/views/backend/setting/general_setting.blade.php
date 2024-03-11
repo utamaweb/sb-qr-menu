@@ -12,21 +12,21 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>{{trans('file.General Setting')}}</h4>
+                        <h4>Pengaturan General</h4>
                     </div>
                     <div class="card-body">
-                        <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
+                        <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                         {!! Form::open(['route' => 'setting.generalStore', 'files' => true, 'method' => 'post']) !!}
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>{{trans('file.System Title')}} *</label>
+                                        <label>Nama Sistem *</label>
                                         <input type="text" name="site_title" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->site_title}}@endif" required />
                                     </div>
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>{{trans('file.System Logo')}} *</label>
+                                        <label>Logo</label>
                                         <input type="file" name="site_logo" class="form-control" value=""/>
                                     </div>
                                     @if($errors->has('site_logo'))
@@ -47,45 +47,13 @@
 
                                     </div>
                                 </div> --}}
-                                @if(config('database.connections.saleprosaas_landlord'))
-                                    <div class="col-md-4 mt-4">
-                                        <div class="form-group">
-                                            @if($lims_general_setting_data->is_zatca)
-                                            <input type="checkbox" name="is_zatca" value="1" checked>
-                                            @else
-                                            <input type="checkbox" name="is_zatca" value="1" />
-                                            @endif
-                                            &nbsp;
-                                            <label>{{trans('file.ZATCA QrCode')}}</label>
-
-                                        </div>
-                                    </div>
-                                @endif
-                                <div class="col-md-4">
+                                {{-- <div class="col-md-4">
                                     <div class="form-group">
                                         <label>{{trans('file.Company Name')}}</label>
                                         <input type="text" name="company_name" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->company_name}}@endif" />
                                     </div>
-                                </div>
-                                {{-- <div class="col-md-4 d-none">
-                                    <div class="form-group">
-                                        <label>{{trans('file.VAT Registration Number')}}</label>
-                                        <input type="text" name="vat_registration_number" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->vat_registration_number}}@endif" />
-                                    </div>
                                 </div> --}}
-                                {{-- <div class="col-md-4">
-                                    <div class="form-group">
-                                        <label>{{trans('file.Time Zone')}}</label>
-                                        @if($lims_general_setting_data)
-                                        <input type="hidden" name="timezone_hidden" value="{{env('APP_TIMEZONE')}}">
-                                        @endif
-                                        <select name="timezone" class="selectpicker form-control" data-live-search="true" title="Select TimeZone...">
-                                            @foreach($zones_array as $zone)
-                                            <option value="{{$zone['zone']}}">{{$zone['diff_from_GMT'] . ' - ' . $zone['zone']}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div> --}}
+                           
                                 {{-- <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Currency')}} *</label>
@@ -214,7 +182,7 @@
                                 </div> --}}
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>{{trans('file.Developed By')}}</label>
+                                        <label>Dikembangkan Oleh *</label>
                                         <input type="text" name="developed_by" class="form-control" value="{{$lims_general_setting_data->developed_by}}">
                                     </div>
                                 </div>
@@ -297,9 +265,10 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#setting").siblings('a').attr('aria-expanded','true');
-    $("ul#setting").addClass("show");
-    $("ul#setting #general-setting-menu").addClass("active");
+    // $("ul#setting").siblings('a').attr('aria-expanded','true');
+    // $("ul#setting").addClass("show");
+    // $("ul#setting #general-setting-menu").addClass("active");
+    $("#general-setting-menu").addClass("active");
 
     $("select[name=invoice_format]").on("change", function (argument) {
         if($(this).val() == 'standard') {

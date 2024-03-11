@@ -25,7 +25,7 @@
 						            <th colspan="4" class="text-center">
 						            	<div class="checkbox">
 						            		<input type="checkbox" id="select_all">
-						            		<label for="select_all">{{trans('file.Permissions')}}</label>
+						            		<label for="select_all">Centang Semua</label>
 						            	</div>
 						            </th>
 						        </tr>

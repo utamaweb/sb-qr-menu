@@ -22,7 +22,7 @@
         <table id="role-table" class="table table-hover">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
+                    <th>#</th>
                     <th>Nama</th>
                     <th>Deskripsi</th>
                     <th class="not-exported">Aksi</th>
@@ -31,7 +31,7 @@
             <tbody>
                 @foreach($lims_role_all as $key=>$role)
                 <tr>
-                    <td>{{$key}}</td>
+                    <td>{{++$key}}</td>
                     <td>{{ $role->name }}</td>
                     <td>{{ $role->description }}</td>
                     <td>
@@ -112,7 +112,7 @@
 		  <div class="modal-content">
 		    {!! Form::open(['route' => ['role.update',1], 'method' => 'put']) !!}
 		    <div class="modal-header">
-		      <h5 id="exampleModalLabel" class="modal-title">Update Role</h5>
+		      <h5 id="exampleModalLabel" class="modal-title">Ubah Role</h5>
 		      <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
 		    </div>
 		    <div class="modal-body">
@@ -183,31 +183,31 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 3]
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 3]
+            // },
+            // {
+            //     'render': function(data, type, row, meta){
+            //         if(type === 'display'){
+            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+            //         }
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
+            //        return data;
+            //     },
+            //     'checkboxes': {
+            //        'selectRow': true,
+            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
+            //     },
+            //     'targets': [0]
+            // }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],

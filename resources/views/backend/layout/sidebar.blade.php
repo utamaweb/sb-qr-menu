@@ -8,10 +8,10 @@
       <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
       <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
         @if(auth()->user()->hasRole('Superadmin'))
-         <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">Nama Pengeluaran</a>
+         <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
          </li>
          @endif
-         <li id="exp-list-menu"><a href="{{route('expenses.index')}}">Daftar Pengeluaran</a></li>
+         <li id="exp-list-menu"><a href="{{route('pengeluaran.index')}}">Daftar Pengeluaran</a></li>
       </ul>
    </li>
 
@@ -91,16 +91,12 @@
          class="dripicons-list"></i><span>Produk</span><span></a>
       <ul id="product" class="collapse list-unstyled " style="border-radius: 10px;">
         @canany(['lihat-kategori', 'tambah-kategori', 'ubah-kategori', 'hapus-kategori'])
-         <li id="category-menu"><a href="{{route('category.index')}}">Kategori</a></li>
+         <li id="category-menu"><a href="{{route('kategori.index')}}">Kategori</a></li>
         @endcanany
         @canany(['lihat-produk', 'tambah-produk', 'ubah-produk', 'hapus-produk'])
-         <li id="product-list-menu"><a href="{{route('products.index')}}">Daftar Produk</a>
+         <li id="product-list-menu"><a href="{{route('produk.index')}}">Daftar Produk</a>
          </li>
         @endcanany
-
-         {{-- @if($print_barcode_active)
-         <li id="printBarcode-menu"><a href="{{route('product.printBarcode')}}">{{__('file.print_barcode')}}</a></li>
-         @endif --}}
          @canany(['lihat-unit', 'tambah-unit', 'ubah-unit', 'hapus-unit'])
          <li id="unit-menu"><a href="{{route('unit.index')}}">Unit</a></li>
         @endcanany
@@ -124,16 +120,16 @@
    </li>
    @endif --}}
    @canany(['lihat-tipepesanan', 'tambah-tipepesanan', 'ubah-tipepesanan', 'hapus-tipepesanan'])
-    <li id="order-type"><a href="{{route('order_type.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
+    <li id="order-type"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
     @endcanany
     @canany(['lihat-bahanbaku', 'tambah-bahanbaku', 'ubah-bahanbaku', 'hapus-bahanbaku'])
-    <li id="ingredient"><a  href="{{route('ingredient.index')}}"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
+    <li id="ingredient"><a  href="{{route('bahan-baku.index')}}"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
     @endcanany
     @canany(['lihat-stokopname', 'tambah-stokopname', 'ubah-stokopname', 'hapus-stokopname'])
     <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stok Opname</span></a></li>
     @endcanany
     @canany(['lihat-pembelianstok', 'tambah-pembelianstok', 'ubah-pembelianstok', 'hapus-pembelianstok'])
-    <li id="stock-purchase"><a  href="{{route('stock-purchase.index')}}"> <i class="dripicons-view-thumb"></i><span>Pembelian Stok</span></a></li>
+    <li id="stock-purchase"><a  href="{{route('pembelian-stok.index')}}"> <i class="dripicons-view-thumb"></i><span>Pembelian Stok</span></a></li>
     @endcanany
     {{-- <li>
         <a href="#bahan-baku" aria-expanded="false" data-toggle="collapse"> <i
@@ -161,10 +157,10 @@
          <li id="role-menu"><a href="{{route('role.index')}}">Role</a></li>
          @endcanany
          @canany(['lihat-user', 'tambah-user', 'ubah-user', 'hapus-user'])
-         <li id="user-list-menu"><a href="{{route('user.index')}}">Karyawan</a></li>
+         <li id="user-list-menu"><a href="{{route('user.index')}}">User</a></li>
          @endcanany
          @canany(['lihat-warehouse', 'tambah-warehouse', 'ubah-warehouse', 'hapus-warehouse'])
-        <li id="warehouse-menu"><a href="{{route('warehouse.index')}}">Cabang</a></li>
+        <li id="warehouse-menu"><a href="{{route('outlet.index')}}">Outlet</a></li>
         @endcanany
         {{-- <li id="shift-menu"><a href="{{route('shift.index')}}">Shift</a></li> --}}
         {{-- <li id="table-menu"><a href="{{route('tables.index')}}">Meja</a></li>
@@ -179,13 +175,14 @@
    @endcanany
 
    @canany(['lihat-setting', 'tambah-setting', 'ubah-setting', 'hapus-setting'])
-   <li>
+   {{-- <li>
       <a href="#setting" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-gear"></i><span>{{trans('file.settings')}}</span></a>
       <ul id="setting" class="collapse list-unstyled " style="border-radius: 10px;">
          <li id="general-setting-menu"><a href="{{route('setting.general')}}">{{trans('file.General Setting')}}</a></li>
-         {{-- <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">POS {{trans('file.settings')}}</a></li> --}}
+         <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">POS {{trans('file.settings')}}</a></li>
       </ul>
-   </li>
+   </li> --}}
+   <li id="general-setting-menu"><a  href="{{route('setting.general')}}"> <i class="dripicons-gear"></i><span>Pengaturan</span></a></li>
    @endcanany
 </ul>

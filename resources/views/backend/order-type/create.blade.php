@@ -25,7 +25,7 @@
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
-                    <th class="not-exported"></th>
+                    <th class="text-center">#</th>
                     <th>Tipe Pesanan</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
@@ -33,7 +33,7 @@
             <tbody>
                 @foreach($orderTypes as $key=>$orderType)
                 <tr data-id="{{$orderType->id}}">
-                    <td>{{$key}}</td>
+                    <td class="text-center">{{++$key}}</td>
                     <td>{{ $orderType->name }}</td>
                     <td>
                         @can('ubah-tipepesanan')
@@ -43,12 +43,12 @@
                             <div role="document" class="modal-dialog">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title">Update Tipe Pesanan</h5>
+                                <h5 id="exampleModalLabel" class="modal-title">Ubah Tipe Pesanan</h5>
                                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                 </div>
                                 <div class="modal-body">
                                 <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('order_type.update', $orderType->id)}}" method="POST">
+                                    <form action="{{route('tipe-pesanan.update', $orderType->id)}}" method="POST">
                                         @csrf
                                         @method('PUT')
                                         <div class="form-group">
@@ -66,7 +66,7 @@
                         @endcan
 
                         @can('hapus-tipepesanan')
-                        {{ Form::open(['route' => ['order_type.destroy', $orderType->id], 'method' => 'DELETE'] ) }}
+                        {{ Form::open(['route' => ['tipe-pesanan.destroy', $orderType->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
                         {{ Form::close() }}
                         @endcan
@@ -83,7 +83,7 @@
 <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
     <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {!! Form::open(['route' => 'order_type.store', 'method' => 'post']) !!}
+            {!! Form::open(['route' => 'tipe-pesanan.store', 'method' => 'post']) !!}
             <div class="modal-header">
                 <h5 id="exampleModalLabel" class="modal-title">Tambah Bahan Baku</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
@@ -215,31 +215,31 @@
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  '{{trans("file.Search")}}',
+            "search":  'Cari',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            {
-                "orderable": false,
-                'targets': [0, 2]
-            },
-            {
-                'render': function(data, type, row, meta){
-                    if(type === 'display'){
-                        data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-                    }
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
+            // {
+            //     'render': function(data, type, row, meta){
+            //         if(type === 'display'){
+            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+            //         }
 
-                   return data;
-                },
-                'checkboxes': {
-                   'selectRow': true,
-                   'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-                },
-                'targets': [0]
-            }
+            //        return data;
+            //     },
+            //     'checkboxes': {
+            //        'selectRow': true,
+            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
+            //     },
+            //     'targets': [0]
+            // }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -277,37 +277,33 @@
                     rows: ':visible'
                 },
             },
-            {
-                text: '<i title="delete" class="dripicons-cross"></i>',
-                className: 'buttons-delete',
-                action: function ( e, dt, node, config ) {
-                    if(user_verified == '1') {
-                        ingredient_id.length = 0;
-                        $(':checkbox:checked').each(function(i){
-                            if(i){
-                                ingredient_id[i-1] = $(this).closest('tr').data('id');
-                            }
-                        });
-                        if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-                            $.ajax({
-                                type:'POST',
-                                url:'ingredient/deletebyselection',
-                                data:{
-                                    unitIdArray: ingredient_id
-                                },
-                                success:function(data){
-                                    alert(data);
-                                }
-                            });
-                            dt.rows({ page: 'current', selected: true }).remove().draw(false);
-                        }
-                        else if(!ingredient_id.length)
-                            alert('No unit is selected!');
-                    }
-                    else
-                        alert('This feature is disable for demo!');
-                }
-            },
+            // {
+            //     text: '<i title="delete" class="dripicons-cross"></i>',
+            //     className: 'buttons-delete',
+            //     action: function ( e, dt, node, config ) {
+            //             ingredient_id.length = 0;
+            //             $(':checkbox:checked').each(function(i){
+            //                 if(i){
+            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
+            //                 }
+            //             });
+            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
+            //                 $.ajax({
+            //                     type:'POST',
+            //                     url:'ingredient/deletebyselection',
+            //                     data:{
+            //                         unitIdArray: ingredient_id
+            //                     },
+            //                     success:function(data){
+            //                         alert(data);
+            //                     }
+            //                 });
+            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
+            //             }
+            //             else if(!ingredient_id.length)
+            //                 alert('No unit is selected!');
+            //     }
+            // },
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

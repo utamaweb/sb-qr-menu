@@ -471,14 +471,14 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('expense_categories/deletebyselection', 'deleteBySelection');
             Route::get('expense_categories/all', 'expenseCategoriesAll')->name('expense_category.all');;
         });
-        Route::resource('expense_categories', ExpenseCategoryController::class);
+        Route::resource('nama-pengeluaran', ExpenseCategoryController::class);
 
 
         Route::controller(ExpenseController::class)->group(function () {
             Route::post('expenses/expense-data', 'expenseData')->name('expenses.data');
             Route::post('expenses/deletebyselection', 'deleteBySelection');
         });
-        Route::resource('expenses', ExpenseController::class);
+        Route::resource('pengeluaran', ExpenseController::class);
 
         Route::controller(CouponController::class)->group(function () {
             Route::get('coupons/gencode', 'generateCode');

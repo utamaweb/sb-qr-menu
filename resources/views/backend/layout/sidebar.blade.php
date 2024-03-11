@@ -8,10 +8,10 @@
       <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
       <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
         @if(auth()->user()->hasRole('Superadmin'))
-         <li id="exp-cat-menu"><a href="{{route('expense_categories.index')}}">Nama Pengeluaran</a>
+         <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
          </li>
          @endif
-         <li id="exp-list-menu"><a href="{{route('expenses.index')}}">Daftar Pengeluaran</a></li>
+         <li id="exp-list-menu"><a href="{{route('pengeluaran.index')}}">Daftar Pengeluaran</a></li>
       </ul>
    </li>
 

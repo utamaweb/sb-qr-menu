@@ -64,7 +64,7 @@
                             </div>
                         </div>
                         @endcan
-                        @if($category->name != "Makanan" && $category->name != "Minuman" && $category->name != "Tambahan")
+                        @if($category->id != 7 && $category->id != 8 && $category->id != 9)
                         @can('hapus-kategori')
                         {{ Form::open(['route' => ['kategori.destroy', $category->id], 'method' => 'DELETE'] ) }}
                             <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>

@@ -53,7 +53,10 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
 
     Route::post('transaction', [TransactionController::class, 'store']);
     Route::get('transaction/latest', [TransactionController::class, 'latest']);
+    Route::get('transaction/all', [TransactionController::class, 'all']);
+    Route::get('transaction/not-paid', [TransactionController::class, 'notPaid']);
     Route::get('transaction/order-types', [TransactionController::class, 'orderType']);
+    Route::get('transaction/{id}', [TransactionController::class, 'detail']);
 
 
     Route::post('shift/open', [ShiftController::class, 'open']);

@@ -54,6 +54,84 @@ class TransactionController extends Controller
             return response()->json($transaction, 200);
     }
 
+    public function detail($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        // dari add
+        $dateTimeNow = Carbon::now();
+        $transaction_details = $transaction->transaction_details;
+        // return $transaction_details;
+        $transactionDetailsWithProducts = [];
+            foreach ($transaction_details as $detail) {
+                $productDetail = [
+                    'transaction_id' => $transaction->id,
+                    'product_id' => $detail['product_id'],
+                    'qty' => $detail['qty'],
+                    'subtotal' => $detail['subtotal'],
+                    'product_name' => \App\Models\Product::find($detail['product_id'])->name,
+                ];
+
+                // Menambahkan data detail produk ke array
+                $transactionDetailsWithProducts[] = $productDetail;
+            }
+            $transaction['details'] = $transactionDetailsWithProducts;
+            $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
+            $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
+            // $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
+            $transaction['product_count'] = count($transaction_details);
+            $transaction['order_type'] = $transaction->order_type;
+            $transaction['order_type_name'] = $transaction['order_type']['name'];
+            unset($transaction['transaction_details'], $transaction['transaction_code']);
+            return response()->json($transaction, 200);
+    }
+
+    public function all()
+    {
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $transactions = Transaction::where('warehouse_id', auth()->user()->warehouse_id)
+                                    ->where('date', $dateNow)
+                                    ->orderBy('id', 'desc')
+                                    ->get();
+        $formattedTransactions = [];
+        foreach ($transactions as $transaction) {
+            $formattedTransaction = [
+                'id' => $transaction->id,
+                'nomor_antrian' => $transaction->sequence_number,
+                'tipe_pesanan' => $transaction->order_type->name,
+                'metode_bayar' => $transaction->payment_method,
+                'total_tagihan' => $transaction->total_amount,
+                'waktu_pembayaran' => $transaction->created_at->format('Y-m-d H:i:s'), // Atau gunakan format tertentu
+                'status_bayar' => $transaction->paid_amount == $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+            ];
+            $formattedTransactions[] = $formattedTransaction;
+        }
+        return response()->json($formattedTransactions, 200);
+    }
+
+    public function notPaid()
+    {
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $transactions = Transaction::where('warehouse_id', auth()->user()->warehouse_id)
+                                    ->where('date', $dateNow)
+                                    ->whereNull('paid_amount')
+                                    ->orderBy('id', 'desc')
+                                    ->get();
+        $formattedTransactions = [];
+        foreach ($transactions as $transaction) {
+            $formattedTransaction = [
+                'id' => $transaction->id,
+                'nomor_antrian' => $transaction->sequence_number,
+                'tipe_pesanan' => $transaction->order_type->name,
+                'metode_bayar' => $transaction->payment_method,
+                'total_tagihan' => $transaction->total_amount,
+                'waktu_pembayaran' => $transaction->paid_amount != NULL ? $transaction->created_at->format('Y-m-d H:i:s') : '-',
+                'status_bayar' => $transaction->paid_amount == $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+            ];
+            $formattedTransactions[] = $formattedTransaction;
+        }
+        return response()->json($formattedTransactions, 200);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

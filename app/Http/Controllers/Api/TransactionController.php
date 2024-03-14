@@ -54,6 +54,28 @@ class TransactionController extends Controller
             return response()->json($transaction, 200);
     }
 
+    public function all()
+    {
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $transactions = Transaction::where('warehouse_id', auth()->user()->warehouse_id)
+                                    ->where('date', $dateNow)
+                                    ->orderBy('id', 'desc')
+                                    ->get();
+        $formattedTransactions = [];
+        foreach ($transactions as $transaction) {
+            $formattedTransaction = [
+                'nomor_antrian' => $transaction->sequence_number,
+                'tipe_pesanan' => $transaction->order_type->name,
+                'metode_bayar' => $transaction->payment_method,
+                'total_tagihan' => $transaction->total_amount,
+                'waktu_pembayaran' => $transaction->created_at->format('Y-m-d H:i:s'), // Atau gunakan format tertentu
+                'status_bayar' => $transaction->paid_amount == $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+            ];
+            $formattedTransactions[] = $formattedTransaction;
+        }
+        return response()->json($formattedTransactions, 200);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

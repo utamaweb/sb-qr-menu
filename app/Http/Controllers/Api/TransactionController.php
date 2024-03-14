@@ -95,6 +95,7 @@ class TransactionController extends Controller
         $formattedTransactions = [];
         foreach ($transactions as $transaction) {
             $formattedTransaction = [
+                'id' => $transaction->id,
                 'nomor_antrian' => $transaction->sequence_number,
                 'tipe_pesanan' => $transaction->order_type->name,
                 'metode_bayar' => $transaction->payment_method,
@@ -112,17 +113,18 @@ class TransactionController extends Controller
         $dateNow = Carbon::now()->format('Y-m-d');
         $transactions = Transaction::where('warehouse_id', auth()->user()->warehouse_id)
                                     ->where('date', $dateNow)
-                                    ->where('')
+                                    ->whereNull('paid_amount')
                                     ->orderBy('id', 'desc')
                                     ->get();
         $formattedTransactions = [];
         foreach ($transactions as $transaction) {
             $formattedTransaction = [
+                'id' => $transaction->id,
                 'nomor_antrian' => $transaction->sequence_number,
                 'tipe_pesanan' => $transaction->order_type->name,
                 'metode_bayar' => $transaction->payment_method,
                 'total_tagihan' => $transaction->total_amount,
-                'waktu_pembayaran' => $transaction->created_at->format('Y-m-d H:i:s'), // Atau gunakan format tertentu
+                'waktu_pembayaran' => $transaction->paid_amount != NULL ? $transaction->created_at->format('Y-m-d H:i:s') : '-',
                 'status_bayar' => $transaction->paid_amount == $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
             ];
             $formattedTransactions[] = $formattedTransaction;

@@ -28,7 +28,7 @@ return new class extends Migration
             $table->string('notes')->nullable();
             $table->bigInteger('total_amount');
             $table->bigInteger('total_qty');
-            $table->bigInteger('paid_amount');
+            $table->bigInteger('paid_amount')->nullable();
             $table->bigInteger('change_money')->default(0);
             $table->timestamps();
         });

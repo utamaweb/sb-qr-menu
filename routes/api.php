@@ -23,7 +23,7 @@ use App\Http\Controllers\Api\StockController;
 Route::post('login', [AuthController::class, 'login']);
 
 Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
-    Route::get('refresh-token', [AuthController::class, 'refreshToken']);
+    Route::post('refresh-token', [AuthController::class, 'refreshToken']);
     Route::post('logout', [AuthController::class, 'logout']);
     // Products CRUD API
     Route::post('products', [ProductController::class, 'store']);

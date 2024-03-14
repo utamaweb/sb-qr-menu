@@ -88,48 +88,90 @@ class TransactionController extends Controller
     public function all()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
-        $transactions = Transaction::where('warehouse_id', auth()->user()->warehouse_id)
-                                    ->where('date', $dateNow)
-                                    ->orderBy('id', 'desc')
-                                    ->get();
+
+        $transactions = Transaction::with('order_type', 'transaction_details.product')
+            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->whereDate('date', $dateNow)
+            ->orderByDesc('id')
+            ->get();
+
         $formattedTransactions = [];
+
         foreach ($transactions as $transaction) {
             $formattedTransaction = [
                 'id' => $transaction->id,
-                'nomor_antrian' => $transaction->sequence_number,
-                'tipe_pesanan' => $transaction->order_type->name,
-                'metode_bayar' => $transaction->payment_method,
-                'total_tagihan' => $transaction->total_amount,
-                'waktu_pembayaran' => $transaction->created_at->format('Y-m-d H:i:s'), // Atau gunakan format tertentu
-                'status_bayar' => $transaction->paid_amount == $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                'sequence_number' => $transaction->sequence_number,
+                'order_type' => $transaction->order_type->name,
+                'payment_method' => $transaction->payment_method,
+                'total_amount' => $transaction->total_amount,
+                'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
+                'status' => $transaction->paid_amount == $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                'items' => [],
             ];
+
+            foreach ($transaction->transaction_details as $detail) {
+                $productDetail = [
+                    'transaction_id' => $transaction->id,
+                    'product_id' => $detail->product_id,
+                    'product_name' => $detail->product->name,
+                    'price' => $detail->product->price,
+                    'qty' => $detail->qty,
+                    'subtotal' => $detail->subtotal,
+                ];
+
+                $formattedTransaction['items'][] = $productDetail;
+            }
+
             $formattedTransactions[] = $formattedTransaction;
         }
+
         return response()->json($formattedTransactions, 200);
+
     }
 
     public function notPaid()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
-        $transactions = Transaction::where('warehouse_id', auth()->user()->warehouse_id)
-                                    ->where('date', $dateNow)
-                                    ->whereNull('paid_amount')
-                                    ->orderBy('id', 'desc')
-                                    ->get();
+
+        $transactions = Transaction::with('order_type', 'transaction_details.product')
+            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->whereDate('date', $dateNow)
+            ->whereNull('paid_amount')
+            ->orderByDesc('id')
+            ->get();
+
         $formattedTransactions = [];
+
         foreach ($transactions as $transaction) {
             $formattedTransaction = [
                 'id' => $transaction->id,
-                'nomor_antrian' => $transaction->sequence_number,
-                'tipe_pesanan' => $transaction->order_type->name,
-                'metode_bayar' => $transaction->payment_method,
-                'total_tagihan' => $transaction->total_amount,
-                'waktu_pembayaran' => $transaction->paid_amount != NULL ? $transaction->created_at->format('Y-m-d H:i:s') : '-',
-                'status_bayar' => $transaction->paid_amount == $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                'sequence_number' => $transaction->sequence_number,
+                'order_type' => $transaction->order_type->name,
+                'payment_method' => $transaction->payment_method,
+                'total_amount' => $transaction->total_amount,
+                'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
+                'status' => $transaction->paid_amount == $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                'items' => [],
             ];
+
+            foreach ($transaction->transaction_details as $detail) {
+                $productDetail = [
+                    'transaction_id' => $transaction->id,
+                    'product_id' => $detail->product_id,
+                    'product_name' => $detail->product->name,
+                    'price' => $detail->product->price,
+                    'qty' => $detail->qty,
+                    'subtotal' => $detail->subtotal,
+                ];
+
+                $formattedTransaction['items'][] = $productDetail;
+            }
+
             $formattedTransactions[] = $formattedTransaction;
         }
+
         return response()->json($formattedTransactions, 200);
+
     }
 
     /**

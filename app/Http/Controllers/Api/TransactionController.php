@@ -319,7 +319,7 @@ class TransactionController extends Controller
                     $transaction->update([
                         'payment_method' => $request->payment_method,
                         'paid_amount' => $request->paid_amount,
-                        'change_money' => $change_money,
+                        'change_money' => $request->change_money,
                     ]);
                     DB::commit();
                 } else {

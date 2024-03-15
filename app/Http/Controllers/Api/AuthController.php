@@ -32,14 +32,20 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Login credentials are invalid'], 400);
             }
 
-            $userResponse = getUser($request->email);
+            $user = getUser($request->email);
             // $userResponse->token = $token;
             // $userResponse->token_expires_in = auth()->factory()->getTTL() * 60;
             // $userResponse->token_expires_in = auth('api')->factory()->getTTL() * 60;
             // $userResponse->token_type = 'bearer';
 
-            $response['user'] = $userResponse;
-            $response['token'] = $token;
+            $refreshToken = JWTAuth::fromUser($user);
+
+            // Menyertakan token refresh bersama dengan token akses dalam respons
+            $response = [
+                'user' => $user,
+                'access_token' => $token,
+                'refresh_token' => $refreshToken
+            ];
 
 
             return response()->json($response);
@@ -57,13 +63,28 @@ class AuthController extends Controller
         return response()->json(['message' => 'Log out success']);
     }
 
-    public function refreshToken()
+    public function refreshToken(Request $request)
     {
+        $refreshToken = $request->input('refresh_token');
+
         try {
-            $token = JWTAuth::parseToken()->refresh();
-            return response()->json(['token' => $token], 200);
+            $token = JWTAuth::refresh($refreshToken);
+
+            // Mendapatkan user terkait dengan token baru
+            $user = JWTAuth::setToken($token)->toUser();
+            $refreshToken = JWTAuth::fromUser($user);
+
+            // Menyertakan token akses baru dalam respons
+            $response = [
+                'user' => $user,
+                'access_token' => $token,
+                'refresh_token' => $refreshToken
+            ];
+
+            return response()->json($response);
+
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Failed to refresh token'], 401);
+            return response()->json(['message' => 'Token refresh failed'], 500);
         }
     }
 

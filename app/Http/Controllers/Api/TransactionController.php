@@ -181,12 +181,12 @@ class TransactionController extends Controller
     {
         $data = $request->all();
         $validator = Validator::make($data, [
-            'order_type_id' => 'required',
-            'payment_method' => 'required',
-            'transaction_details' => 'required|array|min:1', // minimal ada satu transaksi_detail
-            'transaction_details.*.product_id' => 'required|numeric',
-            'transaction_details.*.qty' => 'required|numeric',
-            'transaction_details.*.subtotal' => 'required|numeric',
+            // 'order_type_id' => 'required',
+            // 'payment_method' => 'required',
+            // 'transaction_details' => 'required|array|min:1', // minimal ada satu transaksi_detail
+            // 'transaction_details.*.product_id' => 'required|numeric',
+            // 'transaction_details.*.qty' => 'required|numeric',
+            // 'transaction_details.*.subtotal' => 'required|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -196,121 +196,134 @@ class TransactionController extends Controller
         DB::beginTransaction();
 
         try {
-            $total_amount = 0;
-            foreach ($request->transaction_details as $detail) {
-                $total_amount += $detail['subtotal'];
-            }
-            $total_qty = 0;
-            foreach ($request->transaction_details as $detail) {
-                $total_qty += $detail['qty'];
-            }
-            $change_money = $request->paid_amount - $total_amount;
-            $dateNow = Carbon::now()->format('Y-m-d');
-            $dateTimeNow = Carbon::now();
-            $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
-            if ($transactionCheck < 1) {
-                $sequence_number = 0;
-            } else {
-                $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
-            }
-            $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-            // ->where('date', $dateNow)
-            ->where('user_id', auth()->user()->id)
-            ->where('is_closed', 0)
-            ->first();
-            if($shift == NULL){
-                return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
-            }
-            // Insert ke table transaction
-            $transaction = Transaction::create([
-                'warehouse_id' => auth()->user()->warehouse_id,
-                'shift_id' => $shift->id,
-                'sequence_number' => $sequence_number + 1,
-                'order_type_id' => $request->order_type_id,
-                'user_id' => auth()->user()->id,
-                'payment_method' => $request->payment_method,
-                'date' => $dateNow,
-                'notes' => $request->notes,
-                'total_amount' => $total_amount,
-                'total_qty' => $total_qty,
-                'paid_amount' => $request->paid_amount,
-                'change_money' => $change_money,
-            ]);
-
-            // Simpan detail transaksi
-            $transaction_details = $request->input('transaction_details');
-            $transactionDetailsWithProducts = [];
-            foreach ($transaction_details as $detail) {
-                $productDetail = [
-                    'transaction_id' => $transaction->id,
-                    'product_id' => $detail['product_id'],
-                    'qty' => $detail['qty'],
-                    'subtotal' => $detail['subtotal'],
-                    'product_name' => \App\Models\Product::find($detail['product_id'])->name,
-                ];
-
-                // Menambahkan data detail produk ke array
-                $transactionDetailsWithProducts[] = $productDetail;
-
-                $transaction->transaction_details()->create($detail);
-            }
-            $transaction['details'] = $transactionDetailsWithProducts;
-            $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-            $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
-            $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
-            $transaction['product_count'] = count($request->transaction_details);
-
-            $product_ids = [];
-            foreach ($request->transaction_details as $detail) {
-                array_push($product_ids, $detail['product_id']);
-            }
-            $products = Product::whereIn('id', $product_ids)->get();
-            $ingredient_product_ids = IngredientProducts::whereIn('product_id', $product_ids)->get()->pluck('ingredient_id');
-            $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
-            // $ingredients = Ingredient::whereIn('id', $ingredient_product_ids)->get();
-            $ingredients = Stock::whereIn('id', $ingredient_product_ids)->get();
-            foreach ($request->transaction_details as $detail) {
-                $product_id = $detail['product_id'];
-                $qty = $detail['qty'];
-                // Ambil produk terkait
-                $product = $products->where('id', $product_id)->first();
-
-                // Ambil bahan baku terkait melalui model Ingredient
-                $ingredients = $product->ingredient;
-
-                foreach ($ingredients as $ingredient) {
-                    $stock = Stock::where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
-                    if (!$stock) {
-                        // Handle jika stok belum ada
-                        continue;
-                    }
-
-                    if ($stock->last_stock < $qty) {
-                        // Jika stok kurang dari qty, return peringatan
-                        DB::rollback();
-                        return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 400);
-                    }
-
-                    $stock->last_stock -= $qty;
-                    $stock->stock_used += $qty;
-                    $stock->save();
-                    // Insert ke table transaction in out
-                    TransactionInOut::create([
-                        'warehouse_id' => auth()->user()->warehouse_id,
-                        'ingredient_id' => $ingredient->id,
-                        'transaction_id' => $transaction->id,
-                        'qty' => $qty,
-                        'date' => $dateNow,
-                        'transaction_type' => 'out',
-                        'user_id' => auth()->user()->id,
-                    ]);
+            if($request->transaction_details){
+                $total_amount = 0;
+                foreach ($request->transaction_details as $detail) {
+                    $total_amount += $detail['subtotal'];
                 }
-            }
-            $transaction['order_type'] = $transaction->order_type;
-            $transaction['order_type_name'] = $transaction['order_type']['name'];
+                $total_qty = 0;
+                foreach ($request->transaction_details as $detail) {
+                    $total_qty += $detail['qty'];
+                }
+                $change_money = $request->paid_amount - $total_amount;
+                $dateNow = Carbon::now()->format('Y-m-d');
+                $dateTimeNow = Carbon::now();
+                $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
+                if ($transactionCheck < 1) {
+                    $sequence_number = 0;
+                } else {
+                    $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
+                }
+                $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                // ->where('date', $dateNow)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
+                if($shift == NULL){
+                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
+                }
+                // Insert ke table transaction (step 1 : buat transaksi)
+                $transaction = Transaction::create([
+                    'warehouse_id' => auth()->user()->warehouse_id,
+                    'shift_id' => $shift->id,
+                    'sequence_number' => $sequence_number + 1,
+                    'order_type_id' => $request->order_type_id,
+                    'user_id' => auth()->user()->id,
+                    // 'payment_method' => $request->payment_method,
+                    'date' => $dateNow,
+                    'notes' => $request->notes,
+                    'total_amount' => $total_amount,
+                    'total_qty' => $total_qty,
+                    // 'paid_amount' => $request->paid_amount,
+                    // 'change_money' => $change_money,
+                ]);
 
-            DB::commit();
-            return response()->json($transaction, 200);
+                // Simpan detail transaksi
+                $transaction_details = $request->input('transaction_details');
+                $transactionDetailsWithProducts = [];
+                foreach ($transaction_details as $detail) {
+                    $productDetail = [
+                        'transaction_id' => $transaction->id,
+                        'product_id' => $detail['product_id'],
+                        'qty' => $detail['qty'],
+                        'subtotal' => $detail['subtotal'],
+                        'product_name' => \App\Models\Product::find($detail['product_id'])->name,
+                    ];
+
+                    // Menambahkan data detail produk ke array
+                    $transactionDetailsWithProducts[] = $productDetail;
+
+                    $transaction->transaction_details()->create($detail);
+                }
+                $transaction['details'] = $transactionDetailsWithProducts;
+                $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
+                $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
+                // $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
+                $transaction['product_count'] = count($request->transaction_details);
+
+                $product_ids = [];
+                foreach ($request->transaction_details as $detail) {
+                    array_push($product_ids, $detail['product_id']);
+                }
+                $products = Product::whereIn('id', $product_ids)->get();
+                $ingredient_product_ids = IngredientProducts::whereIn('product_id', $product_ids)->get()->pluck('ingredient_id');
+                $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
+                // $ingredients = Ingredient::whereIn('id', $ingredient_product_ids)->get();
+                $ingredients = Stock::whereIn('id', $ingredient_product_ids)->get();
+                foreach ($request->transaction_details as $detail) {
+                    $product_id = $detail['product_id'];
+                    $qty = $detail['qty'];
+                    // Ambil produk terkait
+                    $product = $products->where('id', $product_id)->first();
+
+                    // Ambil bahan baku terkait melalui model Ingredient
+                    $ingredients = $product->ingredient;
+
+                    foreach ($ingredients as $ingredient) {
+                        $stock = Stock::where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                        if (!$stock) {
+                            // Handle jika stok belum ada
+                            continue;
+                        }
+
+                        if ($stock->last_stock < $qty) {
+                            // Jika stok kurang dari qty, return peringatan
+                            DB::rollback();
+                            return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 400);
+                        }
+
+                        $stock->last_stock -= $qty;
+                        $stock->stock_used += $qty;
+                        $stock->save();
+                        // Insert ke table transaction in out
+                        TransactionInOut::create([
+                            'warehouse_id' => auth()->user()->warehouse_id,
+                            'ingredient_id' => $ingredient->id,
+                            'transaction_id' => $transaction->id,
+                            'qty' => $qty,
+                            'date' => $dateNow,
+                            'transaction_type' => 'out',
+                            'user_id' => auth()->user()->id,
+                        ]);
+                    }
+                }
+                $transaction['order_type'] = $transaction->order_type;
+                $transaction['order_type_name'] = $transaction['order_type']['name'];
+                DB::commit();
+                return response()->json($transaction, 200);
+            } else {
+                $latest_transaction = Transaction::where('user_id', auth()->user()->id)->orderBy('id', 'DESC')->first();
+                $change_money = $request->paid_amount - $latest_transaction->total_amount;
+                $latest_transaction->update([
+                    'payment_method' => $request->payment_method,
+                    'paid_amount' => $request->paid_amount,
+                    'change_money' => $change_money,
+                ]);
+                DB::commit();
+                return response()->json($latest_transaction, 200);
+            }
+
+
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json(['message' => $th->getMessage()], 500);

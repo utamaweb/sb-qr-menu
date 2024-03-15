@@ -312,15 +312,15 @@ class TransactionController extends Controller
                 DB::commit();
                 return response()->json($transaction, 200);
             } else {
-                $latest_transaction = Transaction::where('user_id', auth()->user()->id)->orderBy('id', 'DESC')->first();
-                $change_money = $request->paid_amount - $latest_transaction->total_amount;
-                $latest_transaction->update([
+                $transaction = Transaction::findOrFail($request->transaction_id);
+                $change_money = $request->paid_amount - $transaction->total_amount;
+                $transaction->update([
                     'payment_method' => $request->payment_method,
                     'paid_amount' => $request->paid_amount,
                     'change_money' => $change_money,
                 ]);
                 DB::commit();
-                return response()->json($latest_transaction, 200);
+                return response()->json($transaction, 200);
             }
 
 

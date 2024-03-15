@@ -216,7 +216,7 @@ class TransactionController extends Controller
                 }
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
                 // ->where('date', $dateNow)
-                ->where('user_id', auth()->user()->id)
+                // ->where('user_id', auth()->user()->id)
                 ->where('is_closed', 0)
                 ->first();
                 if($shift == NULL){

@@ -18,12 +18,12 @@ return new class extends Migration
             $table->foreign('shift_id')->references('id')->on('shifts')->onDelete('cascade');
             $table->unsignedBigInteger('warehouse_id');
             $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
-            $table->string('sequence_number');
+            $table->bigInteger('sequence_number')->nullable();
             $table->unsignedBigInteger('order_type_id');
             $table->foreign('order_type_id')->references('id')->on('order_types')->onDelete('cascade');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->string('payment_method');
+            $table->string('payment_method')->nullable();
             $table->date('date');
             $table->string('notes')->nullable();
             $table->bigInteger('total_amount');

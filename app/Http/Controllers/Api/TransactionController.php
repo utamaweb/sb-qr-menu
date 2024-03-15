@@ -314,12 +314,17 @@ class TransactionController extends Controller
             } else {
                 $transaction = Transaction::findOrFail($request->transaction_id);
                 $change_money = $request->paid_amount - $transaction->total_amount;
-                $transaction->update([
-                    'payment_method' => $request->payment_method,
-                    'paid_amount' => $request->paid_amount,
-                    'change_money' => $change_money,
-                ]);
-                DB::commit();
+                if($transaction->paid_amount < $transaction->total_amount){
+
+                    $transaction->update([
+                        'payment_method' => $request->payment_method,
+                        'paid_amount' => $request->paid_amount,
+                        'change_money' => $change_money,
+                    ]);
+                    DB::commit();
+                } else {
+                    return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 400);
+                }
                 return response()->json($transaction, 200);
             }
 

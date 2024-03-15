@@ -54,12 +54,12 @@
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label><strong>Cabang *</strong></label>
+                                        <label><strong>Outlet *</strong></label>
                                         <input type="hidden" name="warehouse_id_hidden" value="{{$lims_user_data->warehouse_id}}">
                                         <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
-                                            title="Pilih cabang...">
+                                            title="Pilih outlet...">
                                             @foreach($lims_warehouse_list as $warehouse)
-                                            <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                            <option value="{{$warehouse->id}}" {{$warehouse->id == $lims_user_data->warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>

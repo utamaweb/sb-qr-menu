@@ -68,7 +68,7 @@ class AuthController extends Controller
         $refreshToken = $request->input('refresh_token');
 
         try {
-            $token = JWTAuth::refresh($refreshToken);
+            $token = JWTAuth::parseToken()->refresh();
 
             // Mendapatkan user terkait dengan token baru
             $user = JWTAuth::setToken($token)->toUser();

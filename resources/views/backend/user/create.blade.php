@@ -73,9 +73,9 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label><strong>Cabang *</strong></label>
+                                    <label><strong>Outlet *</strong></label>
                                     <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
-                                        data-live-search-style="begins" title="Pilih cabang...">
+                                        data-live-search-style="begins" title="Pilih outlet...">
                                         @foreach($lims_warehouse_list as $warehouse)
                                         <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                         @endforeach

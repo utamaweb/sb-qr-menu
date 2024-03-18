@@ -77,7 +77,7 @@
       </ul>
     </li>
     @endcan
-    <li id="list-transaction"><a href="{{url('/list-transaksi')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a>
+    <li id="list-transaction"><a href="{{route('report.listTransaction')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a>
     </li>
 
    <hr>

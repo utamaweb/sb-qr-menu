@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('transaction_code')->nullable();
             $table->unsignedBigInteger('shift_id')->nullable();
             $table->foreign('shift_id')->references('id')->on('shifts')->onDelete('cascade');
             $table->unsignedBigInteger('warehouse_id');

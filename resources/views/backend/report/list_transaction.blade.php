@@ -34,7 +34,12 @@
                     <td>{{$transaction->payment_method}}</td>
                     <td>{{$transaction->total_amount}}</td>
                     <td>{{$transaction->total_qty}}</td>
-                    <td>{{$transaction->paid_amount != NULL ? 'Lunas' : 'Belum Lunas'}}</td>
+                    <td>@if($transaction->paid_amount != NULL)
+                        <div class="badge badge-success">Lunas</div>
+                        @else
+                        <div class="badge badge-danger">Belum Lunas</div>
+                        @endif
+                    </td>
                 </tr>
                 @empty
                 <p>No users</p>

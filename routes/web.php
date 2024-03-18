@@ -386,6 +386,7 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('best_seller', 'bestSellerByWarehouse')->name('report.bestSellerByWarehouse');
                 Route::post('profit_loss', 'profitLoss')->name('report.profitLoss');
                 Route::get('product_report', 'productReport')->name('report.product');
+                Route::get('list-transaksi', 'listTransaction')->name('report.listTransaction');
                 Route::post('product_report_data', 'productReportData');
                 Route::post('purchase', 'purchaseReport')->name('report.purchase');
                 Route::post('sale_report', 'saleReport')->name('report.sale');

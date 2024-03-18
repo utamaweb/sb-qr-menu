@@ -77,6 +77,8 @@
       </ul>
     </li>
     @endcan
+    <li><a href="{{url('/dashboard')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a>
+    </li>
 
    <hr>
 

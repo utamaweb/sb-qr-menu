@@ -822,6 +822,50 @@ class ReportController extends Controller
 
     }
 
+    public function listTransaction(Request $request)
+    {
+        $data = $request->all();
+        $start_date = Carbon::now()->format('Y-m-d');;
+        $end_date = Carbon::now()->format('Y-m-d');;
+        $warehouse_id = 1;
+
+        if ($warehouse_id == 0) {
+            $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+                ->whereBetween('transactions.date', [$start_date, $end_date])
+                ->get(['transaction_details.*']);
+        } else {
+            $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+                ->whereBetween('transactions.date', [$start_date, $end_date])
+                ->where('transactions.warehouse_id', $warehouse_id)
+                ->get(['transaction_details.*']);
+        }
+
+        $totalQtyPerProduct = [];
+        $totalSubtotalPerProduct = [];
+        $products = Product::get();
+        $transactions = Transaction::orderBy('id', 'DESC')->get();
+
+        // $productId = [];
+
+        // foreach ($transaction_details as $item) {
+        //     $productId = $item['product_id'];
+        //     if (isset($totalQtyPerProduct[$productId])) {
+        //         $totalQtyPerProduct[$productId] += $item['qty'];
+        //     } else {
+        //         $totalQtyPerProduct[$productId] = $item['qty'];
+        //     }
+        //     if (isset($totalSubtotalPerProduct[$productId])) {
+        //         $totalSubtotalPerProduct[$productId] += $item['subtotal'];
+        //     } else {
+        //         $totalSubtotalPerProduct[$productId] = $item['subtotal'];
+        //     }
+        // }
+
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        return view('backend.report.list_transaction', compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct', 'products'));
+
+    }
+
     public function productReportData(Request $request)
     {
         $data = $request->all();

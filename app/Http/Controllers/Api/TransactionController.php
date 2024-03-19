@@ -247,7 +247,9 @@ class TransactionController extends Controller
                         'product_id' => $detail['product_id'],
                         'qty' => $detail['qty'],
                         'subtotal' => $detail['subtotal'],
-                        'product_name' => \App\Models\Product::find($detail['product_id'])->name,
+                        // 'product_name' => \App\Models\Product::find($detail['product_id'])->name,
+                        'product_name' => $detail['product_name'],
+                        'product_price' => $detail['product_price'],
                     ];
 
                     // Menambahkan data detail produk ke array

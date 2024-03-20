@@ -196,6 +196,7 @@ class TransactionController extends Controller
         DB::beginTransaction();
 
         try {
+            // Step 1. Create Transaction
             if($request->transaction_details){
                 $total_amount = 0;
                 foreach ($request->transaction_details as $detail) {
@@ -313,8 +314,40 @@ class TransactionController extends Controller
                 $transaction['order_type_name'] = $transaction['order_type']['name'];
                 DB::commit();
                 return response()->json($transaction, 200);
+            // Step 2. Payment Transaction
             } else {
                 $transaction = Transaction::findOrFail($request->transaction_id);
+                // Simpan detail transaksi
+                $transaction_details = $request->input('payment_details');
+                $transactionDetailsWithProducts = [];
+                foreach ($transaction_details as $detail) {
+                    $productDetail = [
+                        'transaction_id' => $transaction->id,
+                        'product_id' => $detail['product_id'],
+                        'qty' => $detail['qty'],
+                        'subtotal' => $detail['subtotal'],
+                    ];
+
+                    // Menambahkan data detail produk ke array
+                    $transactionDetailsWithProducts[] = $productDetail;
+                    $detail_transaction = TransactionDetail::where('product_id', $detail['product_id'])->where('transaction_id', $transaction->id)->update([
+                        'qty' => $detail['qty'],
+                        'subtotal' => $detail['subtotal']
+                    ]);
+                }
+                $total_amount = 0;
+                foreach ($request->payment_details as $detail) {
+                    $total_amount += $detail['subtotal'];
+                }
+                $total_qty = 0;
+                foreach ($request->payment_details as $detail) {
+                    $total_qty += $detail['qty'];
+                }
+                $transaction->update([
+                    'total_amount' => $total_amount,
+                    'total_qty' => $total_qty
+                ]);
+
                 $change_money = $request->paid_amount - $transaction->total_amount;
                 if($transaction->paid_amount < $transaction->total_amount){
 
@@ -327,6 +360,7 @@ class TransactionController extends Controller
                 } else {
                     return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 400);
                 }
+                $transaction['details'] = $transactionDetailsWithProducts;
                 return response()->json($transaction, 200);
             }
 

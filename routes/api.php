@@ -52,7 +52,10 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::put('users', [UserController::class, 'update']);
 
     Route::post('transaction', [TransactionController::class, 'store']);
+    Route::post('transaction/online', [TransactionController::class, 'storeOnline']);
     Route::get('transaction/latest', [TransactionController::class, 'latest']);
+    Route::get('transaction/history/online', [TransactionController::class, 'online']);
+    Route::get('transaction/history/offline', [TransactionController::class, 'offline']);
     Route::get('transaction/all', [TransactionController::class, 'all']);
     Route::get('transaction/not-paid', [TransactionController::class, 'notPaid']);
     Route::get('transaction/order-types', [TransactionController::class, 'orderType']);

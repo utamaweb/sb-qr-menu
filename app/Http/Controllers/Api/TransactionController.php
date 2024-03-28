@@ -229,6 +229,7 @@ class TransactionController extends Controller
                     'shift_id' => $shift->id,
                     'sequence_number' => $sequence_number + 1,
                     'order_type_id' => $request->order_type_id,
+                    'category_order' => $request->category_order,
                     'user_id' => auth()->user()->id,
                     // 'payment_method' => $request->payment_method,
                     'date' => $dateNow,

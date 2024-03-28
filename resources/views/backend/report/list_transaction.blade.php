@@ -31,7 +31,7 @@
                     <td>{{$transaction->warehouse->name}}</td>
                     <td>{{$transaction->sequence_number}}</td>
                     <td>{{$transaction->order_type->name}}</td>
-                    <td>{{$transaction->payment_method}}</td>
+                    <td>{{$transaction->payment_method}} ({{$transaction->category_order}})</td>
                     <td>{{$transaction->total_amount}}</td>
                     <td>{{$transaction->total_qty}}</td>
                     <td>@if($transaction->paid_amount != NULL)

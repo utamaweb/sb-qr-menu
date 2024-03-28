@@ -20,6 +20,7 @@ return new class extends Migration
             $table->bigInteger('sequence_number')->nullable();
             $table->unsignedBigInteger('order_type_id');
             $table->foreign('order_type_id')->references('id')->on('order_types')->onDelete('cascade');
+            $table->string('category_order')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('payment_method')->nullable();

@@ -109,7 +109,7 @@ class ShiftController extends Controller
                 if ($transaction['payment_method'] === 'Tunai') {
                     $totalCash += $transaction['paid_amount'];
                 }
-                if ($transaction['payment_method'] === 'QRIS') {
+                if ($transaction['payment_method'] !== 'Tunai') {
                     $totalNonCash += $transaction['paid_amount'];
                 }
                 $totalProductSales += $transaction['total_qty'];

@@ -92,8 +92,6 @@ class UserController extends Controller
         ]);
 
         $input = $request->except('password');
-        if(!isset($input['is_active']))
-            $input['is_active'] = false;
         if(!empty($request['password']))
             $input['password'] = bcrypt($request['password']);
         $lims_user_data = User::find($id);

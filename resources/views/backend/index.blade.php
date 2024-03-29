@@ -102,7 +102,7 @@
             <div class="col-md-7 mt-4">
               <div class="card line-chart-example">
                 <div class="card-header d-flex align-items-center">
-                  <h4>Arus Uang</h4>
+                  <h4>Arus Uang 6 Bulan Terakhir</h4>
                 </div>
                 <div class="card-body">
                   <canvas id="cashFlow" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-recieved = "{{json_encode($payment_recieved)}}" data-sent = "{{json_encode($payment_sent)}}" data-month = "{{json_encode($month)}}" data-label1="Pendapatan" data-label2="Pengeluaran"></canvas>

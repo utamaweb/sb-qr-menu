@@ -76,7 +76,7 @@ Route::fallback(function () {
 });
 
 Route::group(['prefix' => 'admin'], function () {
-    Route::middleware(['guest'])->group(function () {
+    Route::middleware(['web'])->group(function () {
         Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');
         Route::post('login', [AuthController::class, 'login'])->name('admin.auth.login');
         Route::post('logout', [AuthController::class, 'logout'])->name('admin.auth.logout');

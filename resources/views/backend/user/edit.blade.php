@@ -17,7 +17,7 @@
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label><strong>{{trans('file.UserName')}} *</strong> </label>
+                                        <label><strong>Username *</strong> </label>
                                         <input type="text" name="name" required class="form-control" value="{{$lims_user_data->name}}">
                                         @if($errors->has('name'))
                                        <span>
@@ -26,7 +26,7 @@
                                         @endif
                                     </div>
                                     <div class="form-group">
-                                        <label><strong>{{trans('file.Change Password')}}</strong> </label>
+                                        <label><strong>Ganti Password (Kosongkan bila tidak)</strong> </label>
                                         <div class="input-group">
                                             <input type="password" name="password" class="form-control">
                                             <div class="input-group-append">
@@ -42,14 +42,6 @@
                                            <strong>{{ $errors->first('email') }}</strong>
                                         </span>
                                         @endif
-                                    </div>
-                                    <div class="form-group">
-                                        @if($lims_user_data->is_active)
-                                        <input class="mt-2" type="checkbox" name="is_active" value="1" checked>
-                                        @else
-                                        <input class="mt-2" type="checkbox" name="is_active" value="1">
-                                        @endif
-                                        <label class="mt-2"><strong>{{trans('file.Active')}}</strong></label>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
@@ -73,7 +65,7 @@
                                         </select>
                                     </div>
                                     <div class="form-group mt-3">
-                                        <label><strong>{{trans('file.Phone Number')}} *</strong></label>
+                                        <label><strong>Nomor HP *</strong></label>
                                         <input type="text" name="phone" required class="form-control" value="{{$lims_user_data->phone}}">
                                     </div>
                                 </div>

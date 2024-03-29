@@ -66,10 +66,6 @@
                                         <input type="text" name="country" class="form-control">
                                     </div>
                                 </div>
-                                <div class="form-group">
-                                    <input class="mt-2" type="checkbox" name="is_active" value="1" checked>
-                                    <label class="mt-2"><strong>{{trans('file.Active')}}</strong></label>
-                                </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -91,7 +87,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label><strong>{{trans('file.Phone Number')}} *</strong></label>
+                                    <label><strong>Nomor HP *</strong></label>
                                     <input type="text" name="phone_number" required class="form-control">
                                     @if($errors->has('phone_number'))
                                     <small>

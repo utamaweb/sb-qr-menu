@@ -248,9 +248,9 @@
             @endif
             {{-- <li class="nav-item"><a id="switch-theme" data-toggle="tooltip" title="{{trans('file.Switch Theme')}}"><i class="dripicons-brightness-max"></i></a></li> --}}
             <li class="nav-item"><a id="btnFullscreen" data-toggle="tooltip" title="{{trans('file.Full Screen')}}"><i class="dripicons-expand"></i></a></li>
-            @if(\Auth::user()->role_id <= 2)
+            {{-- @if(\Auth::user()->role_id <= 2)
                 <li class="nav-item"><a href="{{route('cashRegister.index')}}" data-toggle="tooltip" title="{{trans('file.Cash Register List')}}"><i class="dripicons-archive"></i></a></li>
-            @endif
+            @endif --}}
             {{-- @if($product_qty_alert_active && ($alert_product + $dso_alert_product_no + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count() ) > 0) --}}
             @if($product_qty_alert_active && ($alert_product + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count() ) > 0)
                 <li class="nav-item" id="notification-icon">

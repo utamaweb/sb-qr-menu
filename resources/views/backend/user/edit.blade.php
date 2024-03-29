@@ -74,8 +74,7 @@
                                     </div>
                                     <div class="form-group mt-3">
                                         <label><strong>Nomor HP *</strong></label>
-</strong></label>
-ne" required class="form-control" value="{{$lims_user_data->phone}}">
+                                        <input type="text" name="phone" required class="form-control" value="{{$lims_user_data->phone}}">
                                     </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">

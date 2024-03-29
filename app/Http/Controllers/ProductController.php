@@ -134,7 +134,7 @@ class ProductController extends Controller
         }
         // $this->cacheForget('product_list');
         // $this->cacheForget('product_list_with_variant');
-        return redirect('admin/products')->with('message', 'Data inserted successfully');
+        return redirect()->back()->with('message', 'Data inserted successfully');
     }
 
     public function edit($id)
@@ -215,7 +215,7 @@ class ProductController extends Controller
 
         $this->cacheForget('product_list');
         // \Session::flash('edit_message', 'Product updated successfully');
-        return redirect('admin/products')->with('message', 'Data updated successfully');
+        return redirect()->back()->with('message', 'Data updated successfully');
     }
 
     public function generateCode()
@@ -329,6 +329,6 @@ class ProductController extends Controller
         $lims_product_data->delete();
         $this->cacheForget('product_list');
         $this->cacheForget('product_list_with_variant');
-        return redirect('admin/products')->with('message', 'Product deleted successfully');
+        return redirect()->back()->with('message', 'Product deleted successfully');
     }
 }

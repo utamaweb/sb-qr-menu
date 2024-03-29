@@ -26,18 +26,18 @@ class WarehouseController extends Controller
         $this->validate($request, [
             'name' => 'max:255',
         ]);
-        $input = $request->all();
         $input['is_active'] = true;
-        $image = $request->image;
-        $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
-        $uploadImage = $image->storeAs('public/outlet_logo', $imageName);
+        // $image = $request->image;
+        // $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+        // $uploadImage = $image->storeAs('public/outlet_logo', $imageName);
         $warehouse = Warehouse::create([
             'name' => $request->name,
-            'logo' => $imageName,
+            'is_active' => 1,
+            // 'logo' => $imageName,
             'address' => $request->address,
         ]);
         $this->cacheForget('warehouse_list');
-        return redirect('admin/warehouse')->with('message', 'Data inserted successfully');
+        return redirect()->back()->with('message', 'Data inserted successfully');
     }
 
     public function edit($id)
@@ -67,7 +67,7 @@ class WarehouseController extends Controller
             'logo' => $imageName,
         ]);
         $this->cacheForget('warehouse_list');
-        return redirect('admin/warehouse')->with('message', 'Data updated successfully');
+        return redirect()->back()->with('message', 'Data updated successfully');
     }
 
     public function importWarehouse(Request $request)
@@ -109,7 +109,7 @@ class WarehouseController extends Controller
            $warehouse->save();
         }
         $this->cacheForget('warehouse_list');
-        return redirect('admin/warehouse')->with('message', 'Warehouse imported successfully');
+        return redirect()->back()->with('message', 'Warehouse imported successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -129,7 +129,7 @@ class WarehouseController extends Controller
         $lims_warehouse_data = Warehouse::find($id);
         $lims_warehouse_data->delete();
         $this->cacheForget('warehouse_list');
-        return redirect('admin/warehouse')->with('not_permitted', 'Data deleted successfully');
+        return redirect()->back()->with('not_permitted', 'Data deleted successfully');
     }
 
     public function warehouseAll()

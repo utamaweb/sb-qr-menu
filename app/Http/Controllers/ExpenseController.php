@@ -50,113 +50,6 @@ class ExpenseController extends Controller
         //     return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
     }
 
-    public function expenseData(Request $request)
-    {
-        $columns = array(
-            1 => 'created_at',
-            2 => 'reference_no',
-        );
-
-        $warehouse_id = $request->input('warehouse_id');
-        $q = Expense::whereDate('created_at', '>=' ,$request->input('starting_date'))
-                     ->whereDate('created_at', '<=' ,$request->input('ending_date'));
-        if(Auth::user()->role_id > 2 && config('staff_access') == 'own')
-            $q = $q->where('user_id', Auth::id());
-        if($warehouse_id)
-            $q = $q->where('warehouse_id', $warehouse_id);
-
-        $totalData = $q->count();
-        $totalFiltered = $totalData;
-
-        if($request->input('length') != -1)
-            $limit = $request->input('length');
-        else
-            $limit = $totalData;
-        $start = $request->input('start');
-        $order = 'expenses.'.$columns[$request->input('order.0.column')];
-        $dir = $request->input('order.0.dir');
-        if(empty($request->input('search.value'))) {
-            $q = Expense::with('warehouse', 'expenseCategory')
-                ->whereDate('created_at', '>=' ,$request->input('starting_date'))
-                ->whereDate('created_at', '<=' ,$request->input('ending_date'))
-                ->offset($start)
-                ->limit($limit)
-                ->orderBy($order, $dir);
-            if(Auth::user()->role_id > 2 && config('staff_access') == 'own')
-                $q = $q->where('user_id', Auth::id());
-            if($warehouse_id)
-                $q = $q->where('warehouse_id', $warehouse_id);
-            $expenses = $q->get();
-        }
-        else
-        {
-            $search = $request->input('search.value');
-            $q = Expense::whereDate('expenses.created_at', '=' , date('Y-m-d', strtotime(str_replace('/', '-', $search))))
-                ->offset($start)
-                ->limit($limit)
-                ->orderBy($order,$dir);
-            if(Auth::user()->role_id > 2 && config('staff_access') == 'own') {
-                $expenses =  $q->select('expenses.*')
-                                ->with('warehouse', 'expenseCategory')
-                                ->where('expenses.user_id', Auth::id())
-                                ->orwhere([
-                                    ['reference_no', 'LIKE', "%{$search}%"],
-                                    ['user_id', Auth::id()]
-                                ])
-                                ->get();
-                $totalFiltered = $q->where('expenses.user_id', Auth::id())->count();
-            }
-            else {
-                $expenses =  $q->select('expenses.*')
-                                ->with('warehouse', 'expenseCategory')
-                                ->orwhere('reference_no', 'LIKE', "%{$search}%")
-                                ->get();
-
-                $totalFiltered = $q->orwhere('expenses.reference_no', 'LIKE', "%{$search}%")->count();
-            }
-        }
-        $data = array();
-        if(!empty($expenses))
-        {
-            foreach ($expenses as $key=>$expense)
-            {
-                $nestedData['id'] = $expense->id;
-                $nestedData['key'] = $key;
-                $nestedData['date'] = date(config('date_format'), strtotime($expense->created_at->toDateString()));
-                $nestedData['reference_no'] = $expense->reference_no;
-                $nestedData['warehouse'] = $expense->warehouse->name;
-                $nestedData['expenseCategory'] = $expense->expenseCategory->name;
-                $nestedData['amount'] = number_format($expense->amount, config('decimal'));
-                $nestedData['note'] = $expense->note;
-                $nestedData['options'] = '<div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">'.trans("file.action").'
-                              <span class="caret"></span>
-                              <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">';
-                if(in_array("expenses-edit", $request['all_permission'])) {
-                    $nestedData['options'] .= '<li>
-                        <button type="button" data-id="'.$expense->id.'" class="open-Editexpense_categoryDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i>'.trans('file.edit').'</button>
-                        </li>';
-                }
-                if(in_array("expenses-delete", $request['all_permission']))
-                    $nestedData['options'] .= \Form::open(["route" => ["expenses.destroy", $expense->id], "method" => "DELETE"] ).'
-                            <li>
-                              <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> '.trans("file.delete").'</button>
-                            </li>'.\Form::close().'
-                        </ul>
-                    </div>';
-                $data[] = $nestedData;
-            }
-        }
-        $json_data = array(
-            "draw"            => intval($request->input('draw')),
-            "recordsTotal"    => intval($totalData),
-            "recordsFiltered" => intval($totalFiltered),
-            "data"            => $data
-        );
-        echo json_encode($json_data);
-    }
 
     public function create()
     {
@@ -168,7 +61,7 @@ class ExpenseController extends Controller
         $dateNow = Carbon::now()->format('Y-m-d');
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
         if($shift == NULL){
-            return redirect('admin/expenses')->with('not_permitted', 'Belum ada kasir yang dibuka');
+            return redirect()->back()->with('not_permitted', 'Belum ada kasir yang dibuka');
         }
         Expense::create([
             // 'name' => $request->name,
@@ -180,7 +73,7 @@ class ExpenseController extends Controller
             'note' => $request->note,
             'user_id' => Auth::id()
         ]);
-        return redirect('admin/expenses')->with('message', 'Data Berhasil Ditambahkan');
+        return redirect()->back()->with('message', 'Data Berhasil Ditambahkan');
     }
 
     public function show($id)
@@ -207,7 +100,7 @@ class ExpenseController extends Controller
             'amount' => $request->amount,
             'note' => $request->note,
         ]);
-        return redirect('admin/expenses')->with('message', 'Data updated successfully');
+        return redirect()->back()->with('message', 'Data updated successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -224,6 +117,6 @@ class ExpenseController extends Controller
     {
         $lims_expense_data = Expense::find($id);
         $lims_expense_data->delete();
-        return redirect('admin/expenses')->with('not_permitted', 'Data deleted successfully');
+        return redirect()->back()->with('not_permitted', 'Data deleted successfully');
     }
 }

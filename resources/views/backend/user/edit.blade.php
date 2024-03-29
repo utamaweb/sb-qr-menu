@@ -43,6 +43,14 @@
                                         </span>
                                         @endif
                                     </div>
+                                    <div class="form-group">
+                                        @if($lims_user_data->is_active)
+                                        <input class="mt-2" type="checkbox" name="is_active" value="1" checked>
+                                        @else
+                                        <input class="mt-2" type="checkbox" name="is_active" value="1">
+                                        @endif
+                                        <label class="mt-2"><strong>{{trans('file.Active')}}</strong></label>
+                                    </div>
                                 </div>
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -66,7 +74,8 @@
                                     </div>
                                     <div class="form-group mt-3">
                                         <label><strong>Nomor HP *</strong></label>
-                                        <input type="text" name="phone" required class="form-control" value="{{$lims_user_data->phone}}">
+</strong></label>
+ne" required class="form-control" value="{{$lims_user_data->phone}}">
                                     </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">

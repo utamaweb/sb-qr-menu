@@ -24,7 +24,6 @@
                 <tr>
                     <th>#</th>
                     <th>Nama</th>
-                    <th>Deskripsi</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
@@ -33,7 +32,6 @@
                 <tr>
                     <td>{{++$key}}</td>
                     <td>{{ $role->name }}</td>
-                    <td>{{ $role->description }}</td>
                     <td>
                         <div class="btn-group">
                             <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
@@ -86,10 +84,6 @@
                     <label>Nama *</label>
                     {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}}
                     </div>
-                    <div class="form-group">
-                        <label>Deskripsi</label>
-                        {{Form::textarea('description',null,array('rows'=> 5, 'class' => 'form-control'))}}
-                    </div>
                     <input type="hidden" name="guard_name" value="web">
                     <div class="col-md-12 d-flex justify-content-end">
                         {{-- <div class="form-group mt-3 mr-2">
@@ -122,10 +116,6 @@
 		            <div class="form-group">
 		                <label>Nama *</label>
 		                {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}}
-		            </div>
-		            <div class="form-group">
-		                <label>Deskripsi</label>
-		                {{Form::textarea('description',null,array('rows'=> 5, 'class' => 'form-control'))}}
 		            </div>
 		            <div class="col-md-12 d-flex justify-content-end">
                         {{-- <div class="form-group mt-3 mr-2">

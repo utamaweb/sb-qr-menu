@@ -38,7 +38,6 @@ class RoleController extends Controller
         ]);
         Roles::create([
             'name'  => $request->name,
-            'description'  => $request->description,
             'guard_name'  => $request->guard_name,
         ]);
         return redirect('admin/role')->with('message', 'Data inserted successfully');

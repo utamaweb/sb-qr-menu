@@ -36,7 +36,7 @@ class StockPurchaseController extends Controller
     public function store(Request $request)
     {
         if($request->notes < 1){
-            return redirect()->route('stock-purchase.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
+            return redirect()->route('pembelian-stok.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
         }
         $dateNow = Carbon::now()->format('Y-m-d');
         $roleName = auth()->user()->getRoleNames()[0];
@@ -45,7 +45,7 @@ class StockPurchaseController extends Controller
             $shift = Shift::where('date', $dateNow)->where('is_closed', 0)->first();
         }
         if($shift == NULL){
-            return redirect()->route('stock-purchase.index')->with('not_permitted', 'Belum ada kasir yang dibuka');
+            return redirect()->route('pembelian-stok.index')->with('not_permitted', 'Belum ada kasir yang dibuka');
         }
         $qtyInt = array_map('intval', $request->qty);
         $totalQty = array_sum($qtyInt);
@@ -105,7 +105,7 @@ class StockPurchaseController extends Controller
             // );
             // Ingredient::find($request->ingredient_id[$item])->update($data2);
         }
-        return redirect()->route('stock-purchase.index')->with('message', 'Data berhasil ditambahkan');
+        return redirect()->route('pembelian-stok.index')->with('message', 'Data berhasil ditambahkan');
     }
 
     public function show($id) {
@@ -146,6 +146,6 @@ class StockPurchaseController extends Controller
         $stockOpnameDetails = StockOpnameDetail::whereStockOpnameId($id)->delete();
         $stockOpname->delete();
         // $this->cacheForget('ingredient_list');
-        return redirect()->route('stock-opname.index')->with('not_permitted', 'Data berhasil dihapus');
+        return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 }

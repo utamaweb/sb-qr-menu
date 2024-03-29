@@ -40,7 +40,7 @@ class IngredientController extends Controller
             'unit_id' => $request->unit_id,
         ]);
         $this->cacheForget('ingredient_list');
-        return redirect()->route('ingredient.index')->with('message', 'Data berhasil ditambahkan');
+        return redirect()->back()->with('message', 'Data berhasil ditambahkan');
     }
 
     public function edit($id)
@@ -63,7 +63,7 @@ class IngredientController extends Controller
             'unit_id' => $request->unit_id,
         ]);
         $this->cacheForget('ingredient_list');
-        return redirect()->route('ingredient.index')->with('message', 'Data berhasil diedit');
+        return redirect()->back()->with('message', 'Data berhasil diedit');
     }
 
     public function deleteBySelection(Request $request)
@@ -83,6 +83,6 @@ class IngredientController extends Controller
         $lims_order_type_data = Ingredient::find($id);
         $lims_order_type_data->delete();
         $this->cacheForget('ingredient_list');
-        return redirect()->route('ingredient.index')->with('not_permitted', 'Data berhasil dihapus');
+        return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 }

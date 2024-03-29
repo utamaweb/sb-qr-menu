@@ -2,7 +2,6 @@
 
 <section>
     <div class="container-fluid">
-        Fitur Masih Dalam Perbaikan
     @if($errors->has('name'))
     <div class="alert alert-danger alert-dismissible text-center">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span

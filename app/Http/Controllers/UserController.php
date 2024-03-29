@@ -60,40 +60,12 @@ class UserController extends Controller
             ],
         ]);
 
-        if($request->role_id == 5) {
-            $this->validate($request, [
-                'phone_number' => [
-                    'max:255',
-                        Rule::unique('customers')->where(function ($query) {
-                        return $query->where('is_active', 1);
-                    }),
-                ],
-            ]);
-        }
         $data = $request->all();
         $message = 'User created successfully';
-        $mail_setting = MailSetting::latest()->first();
-        if($mail_setting) {
-            $this->setMailInfo($mail_setting);
-            try {
-                Mail::to($data['email'])->send(new UserDetails($data));
-            }
-            catch(\Exception $e){
-                $message = 'User created successfully. Please setup your <a href="setting/mail_setting">mail setting</a> to send mail.';
-            }
-        }
-        if(!isset($data['is_active']))
-            $data['is_active'] = false;
         $data['password'] = bcrypt($data['password']);
         $data['phone'] = $data['phone_number'];
         $roleName = Role::find($request->role_id)->pluck('name');
         User::create($data)->assignRole($roleName);;
-        if($data['role_id'] == 5) {
-            $data['name'] = $data['customer_name'];
-            $data['phone_number'] = $data['phone'];
-            $data['is_active'] = true;
-            Customer::create($data);
-        }
         return redirect('admin/user')->with('message1', $message);
     }
 

@@ -252,7 +252,7 @@
                 <li class="nav-item"><a href="{{route('cashRegister.index')}}" data-toggle="tooltip" title="{{trans('file.Cash Register List')}}"><i class="dripicons-archive"></i></a></li>
             @endif --}}
             {{-- @if($product_qty_alert_active && ($alert_product + $dso_alert_product_no + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count() ) > 0) --}}
-            @if($product_qty_alert_active && ($alert_product + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count() ) > 0)
+            {{-- @if($product_qty_alert_active && ($alert_product + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count() ) > 0)
                 <li class="nav-item" id="notification-icon">
                     <a rel="nofollow" data-toggle="tooltip" title="{{__('Notifications')}}" class="nav-link dropdown-item"><i class="dripicons-bell"></i><span class="badge badge-danger notification-number">{{$alert_product + $dso_alert_product_no + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count()}}</span>
                     </a>
@@ -260,11 +260,11 @@
                         <li class="notifications">
                             <a href="{{route('report.qtyAlert')}}" class="btn btn-link"> {{$alert_product}} product exceeds alert quantity</a>
                         </li>
-                        {{-- @if($dso_alert_product_no)
+                        @if($dso_alert_product_no)
                         <li class="notifications">
                             <a href="{{route('report.dailySaleObjective')}}" class="btn btn-link"> {{$dso_alert_product_no}} product could not fulfill daily sale objective</a>
                         </li>
-                        @endif --}}
+                        @endif
                         @foreach(\Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d')) as $key => $notification)
                             <li class="notifications">
                                 @if($notification->data['document_name'])
@@ -276,7 +276,7 @@
                         @endforeach
                     </ul>
                 </li>
-            @endif
+            @endif --}}
 
             {{-- <li class="nav-item">
                     <a rel="nofollow" title="{{trans('file.language')}}" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-web"></i></a>

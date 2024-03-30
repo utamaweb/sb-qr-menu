@@ -29,7 +29,7 @@ class OrderTypeController extends Controller
         $input = $request->all();
         OrderType::create($input);
         $this->cacheForget('order_type_list');
-        return redirect()->route('tipe-pesanan.index')->with('message', 'Data inserted successfully');
+        return redirect()->route('tipe-pesanan.index')->with('message', 'Data berhasil ditambah');
     }
 
     public function edit($id)
@@ -47,7 +47,7 @@ class OrderTypeController extends Controller
             'name' => $request->name
         ]);
         $this->cacheForget('order_type_list');
-        return redirect()->route('tipe-pesanan.index')->with('message', 'Data updated successfully');
+        return redirect()->route('tipe-pesanan.index')->with('message', 'Data berhasil diubah');
     }
 
     public function importOrderType(Request $request)
@@ -109,7 +109,7 @@ class OrderTypeController extends Controller
         $lims_order_type_data = OrderType::find($id);
         $lims_order_type_data->delete();
         $this->cacheForget('order_type_list');
-        return redirect()->route('tipe-pesanan.index')->with('not_permitted', 'Data deleted successfully');
+        return redirect()->route('tipe-pesanan.index')->with('not_permitted', 'Data berhasil dihapus');
     }
 
     public function order_typeAll()

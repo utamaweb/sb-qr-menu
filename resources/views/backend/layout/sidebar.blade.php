@@ -1,6 +1,6 @@
 <ul id="side-main-menu" class="side-menu list-unstyled">
    {{-- DASHBOARD --}}
-   <li><a href="{{url('/dashboard')}}"> <i
+   <li id="dashboard"><a href="{{route('admin.dashboard')}}"> <i
       class="dripicons-meter"></i><span>Beranda</span></a></li>
 
    {{-- PENGELUARAN --}}

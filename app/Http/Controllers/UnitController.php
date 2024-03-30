@@ -37,12 +37,9 @@ class UnitController extends Controller
         ]);
         $input = $request->all();
         $input['is_active'] = true;
-        if(!$input['base_unit']){
-            $input['operator'] = '*';
-            $input['operation_value'] = 1;
-        }
+
         Unit::create($input);
-        return redirect('admin/unit');
+        return redirect()->back()->with('message', 'Data berhasil ditambah');
     }
 
     public function limsUnitSearch()
@@ -77,13 +74,10 @@ class UnitController extends Controller
         ]);
 
         $input = $request->all();
-        if(!$input['base_unit']){
-            $input['operator'] = '*';
-            $input['operation_value'] = 1;
-        }
+
         $lims_unit_data = Unit::where('id',$input['unit_id'])->first();
         $lims_unit_data->update($input);
-        return redirect('admin/unit');
+        return redirect()->back()->with('message', 'Data berhasil diubah');
     }
 
     public function importUnit(Request $request)
@@ -152,6 +146,6 @@ class UnitController extends Controller
         $lims_unit_data = Unit::findOrFail($id);
         $lims_unit_data->is_active = false;
         $lims_unit_data->save();
-        return redirect('admin/unit');
+        return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 }

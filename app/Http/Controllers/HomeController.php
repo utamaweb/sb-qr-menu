@@ -117,24 +117,23 @@ class HomeController extends Controller
         // Elemen Paling Atas di dashboard
         if(auth()->user()->warehouse_id == NULL){
             $revenue = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
-            $return = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
+            // $return = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             // $purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $purchase_return = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
-            $revenue = $revenue - $return;
-            $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-            $profit = $revenue + $purchase_return - $product_cost;
+            // $revenue = $revenue - $return;
+            // $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
+
             $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
             $expense = $expense + $stockPurchase;
             $profit = $revenue - $expense;
         } else {
             $revenue = Transaction::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
-            $return = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
+            // $return = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             // $purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $purchase_return = Transaction::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
-            $revenue = $revenue - $return;
-            $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-            $profit = $revenue + $purchase_return - $product_cost;
+            // $revenue = $revenue - $return;
+            // $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
             $expense = $expense + $stockPurchase;
@@ -158,15 +157,17 @@ class HomeController extends Controller
                 // $sent_amount = DB::table('payments')->whereNotNull('purchase_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $sent_amount = DB::table('expenses')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
-                $return_amount = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-                $purchase_return_amount = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
+                // $return_amount = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
+                // $purchase_return_amount = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
                 $expense_amount = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 // $payroll_amount = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
 
-                $sent_amount = $sent_amount + $return_amount + $expense_amount + $stockPurchase;
+                // $sent_amount = $sent_amount + $return_amount + $expense_amount + $stockPurchase;
+                $sent_amount = $sent_amount + $expense_amount + $stockPurchase;
                 // $sent_amount = $sent_amount + $return_amount + $expense_amount + $payroll_amount;
 
-                $payment_recieved[] = number_format((float)($recieved_amount + $purchase_return_amount), config('decimal'), '.', '');
+                // $payment_recieved[] = number_format((float)($recieved_amount + $purchase_return_amount), config('decimal'), '.', '');
+                $payment_recieved[] = number_format((float)($recieved_amount), config('decimal'), '.', '');
                 $payment_sent[] = number_format((float)$sent_amount, config('decimal'), '.', '');
                 $month[] = date("F", strtotime($start_date));
                 $start = strtotime("+1 month", $start);
@@ -179,15 +180,16 @@ class HomeController extends Controller
                 // $sent_amount = DB::table('payments')->whereNotNull('purchase_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $sent_amount = DB::table('expenses')->where('warehouse_id', auth()->user()->warehouse_id)->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
-                $return_amount = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-                $purchase_return_amount = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
+                // $return_amount = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
+                // $purchase_return_amount = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
                 $expense_amount = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 // $payroll_amount = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
 
-                $sent_amount = $sent_amount + $return_amount + $expense_amount + $stockPurchase;
+                $sent_amount = $sent_amount + $expense_amount + $stockPurchase;
                 // $sent_amount = $sent_amount + $return_amount + $expense_amount + $payroll_amount;
 
-                $payment_recieved[] = number_format((float)($recieved_amount + $purchase_return_amount), config('decimal'), '.', '');
+                // $payment_recieved[] = number_format((float)($recieved_amount + $purchase_return_amount), config('decimal'), '.', '');
+                $payment_recieved[] = number_format((float)($recieved_amount), config('decimal'), '.', '');
                 $payment_sent[] = number_format((float)$sent_amount, config('decimal'), '.', '');
                 $month[] = date("F", strtotime($start_date));
                 $start = strtotime("+1 month", $start);
@@ -195,25 +197,6 @@ class HomeController extends Controller
         }
         // end arus uang
 
-        // yearly report
-        $start = strtotime(date("Y") .'-01-01');
-        $end = strtotime(date("Y") .'-12-31');
-        while($start < $end)
-        {
-            $start_date = date("Y").'-'.date('m', $start).'-'.'01';
-            $end_date = date("Y").'-'.date('m', $start).'-'.date('t', mktime(0, 0, 0, date("m", $start), 1, date("Y", $start)));
-            if(Auth::user()->role_id > 2 && cache()->get('general_setting')->staff_access == 'own') {
-                $sale_amount = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('user_id', Auth::id())->sum('grand_total');
-                $purchase_amount = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('user_id', Auth::id())->sum('grand_total');
-            }
-            else{
-                $sale_amount = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-                $purchase_amount = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-            }
-            $yearly_sale_amount[] = number_format((float)$sale_amount, config('decimal'), '.', '');
-            $yearly_purchase_amount[] = number_format((float)$purchase_amount, config('decimal'), '.', '');
-            $start = strtotime("+1 month", $start);
-        }
         //making strict mode true for this query
         config()->set('database.connections.mysql.strict', true);
         DB::reconnect();
@@ -226,7 +209,7 @@ class HomeController extends Controller
         else {
             $autoUpdateData = $alertBugEnable = $alertVersionUpgradeEnable = '';
         }
-        return view('backend.index', compact('revenue', 'purchase', 'expense', 'return', 'purchase_return', 'profit', 'payment_recieved', 'payment_sent', 'month', 'yearly_sale_amount', 'yearly_purchase_amount', 'alertBugEnable','alertVersionUpgradeEnable'));
+        return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'alertBugEnable','alertVersionUpgradeEnable'));
     }
 
     public function yearlyBestSellingPrice()

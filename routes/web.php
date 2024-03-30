@@ -196,6 +196,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('ingredient/deletebyselection', 'deleteBySelection');
             Route::post('ingredient/ingredient-data', 'ingredientData');
         });
+        Route::get('ingredient', [IngredientController::class, 'ingredient'])->name('bahan-baku.ingredient');
         Route::resource('bahan-baku', IngredientController::class);
         Route::resource('stock-opname', StockOpnameController::class);
         Route::resource('close-cashier', CloseCashierController::class);

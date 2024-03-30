@@ -28,7 +28,7 @@
                     <th class="text-center">#</th>
                     <th>Nama Bahan Baku</th>
                     <th>Outlet</th>
-                    <th>Stok Awal</th>
+                    {{-- <th>Stok Awal</th> --}}
                     <th>Stok Masuk</th>
                     <th>Stok Terjual</th>
                     <th>Stok Akhir</th>
@@ -42,7 +42,7 @@
                     <td class="text-center">{{++$key}}</td>
                     <td>{{ $ingredient->ingredient->name }}</td>
                     <td>{{ $ingredient->warehouse->name }}</td>
-                    <td>{{ $ingredient->first_stock }}</td>
+                    {{-- <td>{{ $ingredient->first_stock }}</td> --}}
                     <td>{{ $ingredient->stock_in }}</td>
                     <td>{{ $ingredient->stock_used }}</td>
                     <td>{{ $ingredient->last_stock }}</td>

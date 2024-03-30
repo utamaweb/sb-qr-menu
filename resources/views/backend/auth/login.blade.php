@@ -40,11 +40,12 @@
             <div class="form-outer text-center d-flex align-items-center">
                 <div class="form-inner">
                     <div class="logo">
-                        @if($general_setting->site_logo)
+                        {{-- @if($general_setting->site_logo)
                         <img src="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}" width="110">
                         @else
                         <span>{{$general_setting->site_title}}</span>
-                        @endif
+                        @endif --}}
+                        <img src="{{ asset('logo/sb-logo.png') }}" width="110">
                     </div>
                     @if(session()->has('delete_message'))
                     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close"

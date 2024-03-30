@@ -128,14 +128,15 @@
       <!-- Side Navbar -->
       <nav class="side-navbar pl-0 px-2">
         <span class="brand-big">
-            @if($general_setting->site_logo)
+            {{-- @if($general_setting->site_logo)
             <a href="{{url('/')}}"><img src="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}"
-                    width="115"></a>
-            @else
-            <a href="{{url('/')}}">
-                <h1 class="d-inline">{{$general_setting->site_title}}</h1>
-            </a>
-            @endif
+                width="115"></a>
+                @else
+                <a href="{{url('/')}}">
+                    <h1 class="d-inline">{{$general_setting->site_title}}</h1>
+                </a>
+                @endif --}}
+                <a href="{{url('/')}}"><img src="{{ asset('logo/sb-logo.png') }}" width="50">
         </span>
         @include('backend.layout.sidebar')
       </nav>

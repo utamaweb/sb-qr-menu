@@ -92,7 +92,7 @@ class ShiftController extends Controller
                 ->with('user')
                 ->first();
             if($shift == NULL){
-                return response()->json(['message' => "Belum Ada Kasir Buka"], 500);
+                return response()->json(['message' => "Belum Ada Kasir Buka"], 404);
             }
 
             $transactions = Transaction::where('shift_id', $shift->id)->get();
@@ -164,7 +164,7 @@ class ShiftController extends Controller
             // $closeCashier->update([
             $closeCashierCheck = CloseCashier::where('shift_id', $shift->id)->where('is_closed', 1)->first();
             if($closeCashierCheck){
-                return response()->json(['message' => 'Cashier Already Closed Before This'], 200);
+                return response()->json(['message' => 'Cashier Already Closed Before This'], 409);
             }
             $closeCashier = CloseCashier::create([
                 'shift_id' => $shift->id,

@@ -213,6 +213,47 @@ class ShiftController extends Controller
             }
             $closeCashier['stocks'] = $stocks;
 
+            // OPEN UNTUK SELANJUTNYA
+            $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+            // ->where('date', $dateNow)
+            // ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->orderBy('id', 'DESC')
+            ->first();
+            // return $checkShift->shift_number;
+
+            $shiftNumber = 1;
+            if($checkShift && $checkShift->shift_number < 3){
+                $shiftNumber = $checkShift->shift_number + 1;
+            }
+            $checkUserShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+            // ->where('date', $dateNow)
+            // ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->where('user_id', auth()->user()->id)
+            ->where('is_closed', 0)
+            ->orderBy('id', 'DESC')
+            ->first();
+            if($checkUserShift){
+                return response()->json(['message' => "Kasir dengan user : " . $checkUserShift->user->name . " sudah dibuka sebelumnya."], 500);
+            }
+
+            $shiftOpen = Shift::create([
+                'shift_number' => $shiftNumber,
+                'date' => Carbon::now()->format('Y-m-d'),
+                'start_time' => Carbon::now()->format('Y-m-d H:i:s'),
+                // 'opening_balance' => $request->opening_balance,
+                'opening_balance' => $request->cash_in_drawer,
+                'user_id' => auth()->user()->id,
+                'warehouse_id' => auth()->user()->warehouse_id,
+            ]);
+            if($request->stocks){
+                foreach ($request->stocks as $stock) {
+                    Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
+                        'last_stock' => $stock['stock']
+                    ]);
+                    // $transaction->transaction_details()->create($detail);
+                }
+            }
+
             DB::commit();
             return response()->json($closeCashier, 200);
         } catch (\Throwable $th) {

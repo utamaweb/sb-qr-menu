@@ -229,4 +229,25 @@ class ShiftController extends Controller
             return response()->json(['status' => False, 'message' => "Tidak ada kasir buka di outlet ". auth()->user()->warehouse->name], 404);
         }
     }
+
+    public function latest() {
+        $latestShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
+
+        $stocks = [];
+        $ingredientStock = Stock::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        foreach ($ingredientStock as $stock) {
+            $ingredientStock = Stock::where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+            $ingredientName = str_replace(' ', '_', $ingredientStock->ingredient->name);
+
+            $stockData = [
+                'ingredient_id' => $stock['ingredient_id'],
+                'ingredient_name' => $ingredientStock->ingredient->name,
+                'stock' => $ingredientStock->last_stock,
+            ];
+
+            $stocks[] = $stockData;
+        }
+        $latestShift['stocks'] = $stocks;
+        return response()->json($latestShift,200);
+    }
 }

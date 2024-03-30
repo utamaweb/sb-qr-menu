@@ -82,7 +82,6 @@
                                     </div>
                                 </div>
                             </div>
-
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">
                                         <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>

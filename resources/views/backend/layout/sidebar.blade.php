@@ -125,7 +125,8 @@
     <li id="order-type"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
     @endcanany
     @canany(['lihat-bahanbaku', 'tambah-bahanbaku', 'ubah-bahanbaku', 'hapus-bahanbaku'])
-    <li id="ingredient"><a  href="{{route('bahan-baku.index')}}"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
+    <li id="ingredient"><a  href="{{route('bahan-baku.ingredient')}}"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
+    <li id="stok"><a  href="{{route('bahan-baku.index')}}"> <i class="dripicons-view-thumb"></i><span>Daftar Stok</span></a></li>
     @endcanany
     @canany(['lihat-stokopname', 'tambah-stokopname', 'ubah-stokopname', 'hapus-stokopname'])
     <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stok Opname</span></a></li>

@@ -17,9 +17,9 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
-        {{-- @can('tambah-bahanbaku')
+        @can('tambah-bahanbaku')
         <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>&nbsp;
-        @endcan --}}
+        @endcan
     </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
@@ -27,11 +27,6 @@
                 <tr>
                     <th class="text-center">#</th>
                     <th>Nama Bahan Baku</th>
-                    <th>Outlet</th>
-                    <th>Stok Awal</th>
-                    <th>Stok Masuk</th>
-                    <th>Stok Terjual</th>
-                    <th>Stok Akhir</th>
                     <th>Unit</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
@@ -40,13 +35,8 @@
                 @foreach($lims_ingredient_all as $key=>$ingredient)
                 <tr data-id="{{$ingredient->id}}">
                     <td class="text-center">{{++$key}}</td>
-                    <td>{{ $ingredient->ingredient->name }}</td>
-                    <td>{{ $ingredient->warehouse->name }}</td>
-                    <td>{{ $ingredient->first_stock }}</td>
-                    <td>{{ $ingredient->stock_in }}</td>
-                    <td>{{ $ingredient->stock_used }}</td>
-                    <td>{{ $ingredient->last_stock }}</td>
-                    <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
+                    <td>{{ $ingredient->name }}</td>
+                    <td>{{ $ingredient->unit->unit_name }}</td>
                     <td>
                         <div class="row">
                             @can('ubah-bahanbaku')
@@ -67,14 +57,14 @@
                                         <div class="form-group">
                                         <div class="form-group">
                                             <label>Nama Bahan Baku *</label>
-                                            <input type="text" value="{{$ingredient->ingredient->name}}" name="name" required class="form-control">
+                                            <input type="text" value="{{$ingredient->name}}" name="name" required class="form-control">
                                         </div>
                                         <div class="form-group">
                                             <label>Unit *</label>
                                             <select name="unit_id" id="" class="form-control">
-                                                <option value="">---Pilih Unit---</option>
+                                                <option value="---Pilih Unit---"></option>
                                                 @foreach($units as $unit)
-                                                <option value="{{$unit->id}}" {{$ingredient->ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
+                                                <option value="{{$unit->id}}" {{$ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
                                                 @endforeach
                                             </select>
                                         </div>
@@ -132,7 +122,7 @@
                     <div class="form-group">
                         <label>Unit *</label>
                         <select name="unit_id" id="" class="form-control">
-                            <option value="">---Pilih Unit---</option>
+                            <option value="---Pilih Unit---"></option>
                             @foreach($units as $unit)
                             <option value="{{$unit->id}}">{{$unit->unit_name}} ({{$unit->unit_code}})</option>
                             @endforeach
@@ -192,7 +182,7 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("#stok").addClass("active");
+    $("#ingredient").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

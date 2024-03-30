@@ -27,6 +27,14 @@ class IngredientController extends Controller
         return view('backend.ingredient.create', compact('lims_ingredient_all', 'units'));
     }
 
+    public function ingredient()
+    {
+        $lims_ingredient_all = Ingredient::get();
+        // $lims_ingredient_all = Stock::get();
+        $units = Unit::get();
+        return view('backend.bahan_baku.create', compact('lims_ingredient_all', 'units'));
+    }
+
     public function store(Request $request)
     {
         $this->validate($request, [

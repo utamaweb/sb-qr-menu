@@ -43,7 +43,7 @@ class ShiftController extends Controller
             ->orderBy('id', 'DESC')
             ->first();
             if($checkUserShift){
-                return response()->json(['message' => "Kasir dengan user : " . $checkUserShift->user->name . " sudah dibuka sebelumnya."], 500);
+                return response()->json(['message' => "Kasir dengan user : " . $checkUserShift->user->name . " sudah dibuka sebelumnya."], 200);
             }
 
             $shiftOpen = Shift::create([
@@ -92,7 +92,7 @@ class ShiftController extends Controller
                 ->with('user')
                 ->first();
             if($shift == NULL){
-                return response()->json(['message' => "Belum Ada Kasir Buka"], 404);
+                return response()->json(['message' => "Belum Ada Kasir Buka"], 200);
             }
 
             $transactions = Transaction::where('shift_id', $shift->id)->get();
@@ -164,7 +164,7 @@ class ShiftController extends Controller
             // $closeCashier->update([
             $closeCashierCheck = CloseCashier::where('shift_id', $shift->id)->where('is_closed', 1)->first();
             if($closeCashierCheck){
-                return response()->json(['message' => 'Cashier Already Closed Before This'], 409);
+                return response()->json(['message' => 'Cashier Already Closed Before This'], 200);
             }
             $closeCashier = CloseCashier::create([
                 'shift_id' => $shift->id,
@@ -226,7 +226,7 @@ class ShiftController extends Controller
         if($checkShift){
             return response()->json(['status' => True,'message' => "Kasir di outlet ". auth()->user()->warehouse->name . " telah buka"], 200);
         } else {
-            return response()->json(['status' => False, 'message' => "Tidak ada kasir buka di outlet ". auth()->user()->warehouse->name], 404);
+            return response()->json(['status' => False, 'message' => "Tidak ada kasir buka di outlet ". auth()->user()->warehouse->name], 200);
         }
     }
 

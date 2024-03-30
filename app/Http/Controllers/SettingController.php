@@ -85,7 +85,6 @@ class SettingController extends Controller
         $general_setting = GeneralSetting::latest()->first();
         $general_setting->id = 1;
         $general_setting->site_title = $data['site_title'];
-        $general_setting->company_name = $data['company_name'];
         $general_setting->developed_by = $data['developed_by'];
         $logo = $request->site_logo;
         if ($logo) {

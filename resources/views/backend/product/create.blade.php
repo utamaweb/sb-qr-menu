@@ -177,6 +177,26 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script type="text/javascript">
+
+$(document).ready(function() {
+    $('#genbutton').click(function() {
+        var randomCode = generateRandomCode(8); // Panggil fungsi untuk menghasilkan 8 angka acak
+        $('#code').val(randomCode); // Set nilai input dengan angka acak yang dihasilkan
+    });
+});
+
+// Fungsi untuk menghasilkan 8 angka acak
+function generateRandomCode(length) {
+    var result = '';
+    var characters = '0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+
 $( '#multiple-select-field' ).select2( {
     theme: "bootstrap-5",
     width: $( this ).data( 'width' ) ? $( this ).data( 'width' ) : $( this ).hasClass( 'w-100' ) ? '100%' : 'style',
@@ -227,11 +247,11 @@ $( '#multiple-select-field' ).select2( {
         }
     });
 
-    $('#genbutton').on("click", function(){
-        $.get('gencode', function(data){
-            $("input[name='code']").val(data);
-        });
-    });
+    // $('#genbutton').on("click", function(){
+    //     $.get('gencode', function(data){
+    //         $("input[name='code']").val(data);
+    //     });
+    // });
 
 
     //start variant related js

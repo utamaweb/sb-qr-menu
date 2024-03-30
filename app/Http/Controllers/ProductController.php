@@ -56,10 +56,9 @@ class ProductController extends Controller
        $lims_category_list = Category::where('is_active', true)->get();
        $ingredients = Ingredient::get();
        $lims_unit_list = Unit::where('is_active', true)->get();
-       $lims_tax_list = Tax::where('is_active', true)->get();
        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
        $numberOfProduct = Product::where('is_active', true)->count();
-       return view('backend.product.create',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_warehouse_list', 'numberOfProduct', 'ingredients','roleName'));
+       return view('backend.product.create',compact('lims_category_list', 'lims_unit_list', 'lims_warehouse_list', 'numberOfProduct', 'ingredients','roleName'));
     }
 
     public function store(Request $request)
@@ -144,7 +143,6 @@ class ProductController extends Controller
         $product_warehouses = Product_Warehouse::where('product_id', $id)->get();
         $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
         $lims_unit_list = Unit::where('is_active', true)->get();
-        $lims_tax_list = Tax::where('is_active', true)->get();
         $lims_product_data = Product::where('id', $id)->first();
         if($lims_product_data->variant_option) {
             $lims_product_data->variant_option = json_decode($lims_product_data->variant_option);
@@ -152,7 +150,7 @@ class ProductController extends Controller
         }
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         $noOfVariantValue = 0;
-        return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_tax_list', 'lims_product_data', 'lims_warehouse_list', 'noOfVariantValue','ingredients','ingredientProducts', 'product_warehouses'));
+        return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_product_data', 'lims_warehouse_list', 'noOfVariantValue','ingredients','ingredientProducts', 'product_warehouses'));
     }
 
     public function update(Request $request, $id)

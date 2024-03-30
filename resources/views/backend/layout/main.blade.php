@@ -277,23 +277,7 @@
                     </ul>
                 </li>
             @endif
-            @if(\Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count() > 0)
-                <li class="nav-item" id="notification-icon">
-                    <a rel="nofollow" data-toggle="tooltip" title="{{__('Notifications')}}" class="nav-link dropdown-item"><i class="dripicons-bell"></i><span class="badge badge-danger notification-number">{{\Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count()}}</span>
-                    </a>
-                    <ul class="right-sidebar">
-                        @foreach(\Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d')) as $key => $notification)
-                            <li class="notifications">
-                                @if($notification->data['document_name'])
-                                <a target="_blank" href="{{url('public/documents/notification', $notification->data['document_name'])}}" class="btn btn-link">{{ $notification->data['message'] }}</a>
-                                @else
-                                <a href="#" class="btn btn-link">{{ $notification->data['message'] }}</a>
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
-            @endif
+
             {{-- <li class="nav-item">
                     <a rel="nofollow" title="{{trans('file.language')}}" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-web"></i></a>
                     <ul class="right-sidebar">

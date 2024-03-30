@@ -115,7 +115,7 @@
                   <h4>{{date('F')}} {{date('Y')}}</h4>
                 </div>
                 <div class="pie-chart mb-2">
-                    <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$revenue}} data-purchase={{$purchase}} data-expense={{$expense}} data-label2="Pendapatan" data-label3="Pengeluaran" width="100" height="95"> </canvas>
+                    <canvas id="transactionChart" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-revenue={{$revenue}} data-expense={{$expense}} data-label2="Pendapatan" data-label3="Pengeluaran" width="100" height="95"> </canvas>
                 </div>
               </div>
             </div>
@@ -313,6 +313,7 @@
 
 @push('scripts')
 <script type="text/javascript">
+$("#dashboard").addClass("active");
     $(document).ready(function(){
       $.ajax({
         url: '{{url("/yearly-best-selling-price")}}',

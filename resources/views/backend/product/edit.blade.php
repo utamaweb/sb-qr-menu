@@ -169,6 +169,23 @@
 
 @push('scripts')
 <script type="text/javascript">
+$(document).ready(function() {
+    $('#genbutton').click(function() {
+        var randomCode = generateRandomCode(8); // Panggil fungsi untuk menghasilkan 8 angka acak
+        $('#code').val(randomCode); // Set nilai input dengan angka acak yang dihasilkan
+    });
+});
+
+// Fungsi untuk menghasilkan 8 angka acak
+function generateRandomCode(length) {
+    var result = '';
+    var characters = '0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
 
 $("ul#product").siblings('a').attr('aria-expanded','true');
     $("ul#product").addClass("show");
@@ -243,11 +260,11 @@ $("ul#product").siblings('a').attr('aria-expanded','true');
         }
     });
 
-    $('#genbutton').on("click", function(){
-      $.get('../gencode', function(data){
-        $("input[name='code']").val(data);
-      });
-    });
+    // $('#genbutton').on("click", function(){
+    //   $.get('../gencode', function(data){
+    //     $("input[name='code']").val(data);
+    //   });
+    // });
 
     $('.selectpicker').selectpicker({
       style: 'btn-link',

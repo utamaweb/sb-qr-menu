@@ -43,7 +43,7 @@ class ShiftController extends Controller
             ->orderBy('id', 'DESC')
             ->first();
             if($checkUserShift){
-                return response()->json(['message' => "Kasir dengan user : " . $checkUserShift->user->name . " sudah dibuka sebelumnya."], 500);
+                return response()->json(['message' => "Kasir dengan user : " . $checkUserShift->user->name . " sudah dibuka sebelumnya."], 200);
             }
 
             $shiftOpen = Shift::create([
@@ -92,7 +92,7 @@ class ShiftController extends Controller
                 ->with('user')
                 ->first();
             if($shift == NULL){
-                return response()->json(['message' => "Belum Ada Kasir Buka"], 500);
+                return response()->json(['message' => "Belum Ada Kasir Buka"], 200);
             }
 
             $transactions = Transaction::where('shift_id', $shift->id)->get();
@@ -226,7 +226,7 @@ class ShiftController extends Controller
         if($checkShift){
             return response()->json(['status' => True,'message' => "Kasir di outlet ". auth()->user()->warehouse->name . " telah buka"], 200);
         } else {
-            return response()->json(['status' => False, 'message' => "Tidak ada kasir buka di outlet ". auth()->user()->warehouse->name], 404);
+            return response()->json(['status' => False, 'message' => "Tidak ada kasir buka di outlet ". auth()->user()->warehouse->name], 200);
         }
     }
 

@@ -97,7 +97,7 @@ class ShiftController extends Controller
 
             $checkTransactionInShift = Transaction::where('shift_id', $shift->id)->whereNull('paid_amount')->whereNull('payment_method')->count();
             if($checkTransactionInShift > 0){
-                return response()->json(['message' => "Selesaikan orderan terlebih dahulu untuk tutup kasir"], 200);
+                return response()->json(['status' => 'gagal', 'message' => "Selesaikan orderan terlebih dahulu untuk tutup kasir"], 409);
             }
 
             $transactions = Transaction::where('shift_id', $shift->id)->get();

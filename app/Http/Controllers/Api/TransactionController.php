@@ -302,18 +302,20 @@ class TransactionController extends Controller
                 $dateNow = Carbon::now()->format('Y-m-d');
                 $dateTimeNow = Carbon::now();
                 // $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
+                $checkShiftOpen = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                // ->where('date', $dateNow)
+                // ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
+                if($checkShiftOpen == NULL){
+                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
+                }
                 $shift = Shift::where('user_id', auth()->user()->id)
                 ->where('warehouse_id', auth()->user()->warehouse_id)
                 ->orderBy('id', 'desc')
                 ->first();
 
                 if (!$shift || $shift->is_closed) {
-                    // Jika tidak ada shift yang terbuka atau shift sebelumnya sudah ditutup, buat shift baru
-                    $shift = new Shift();
-                    $shift->user_id = auth()->user()->id;
-                    $shift->warehouse_id = auth()->user()->warehouse_id;
-                    $shift->save();
-
                     // Reset nomor antrian ke 1
                     $sequence_number = 1;
                 } else {
@@ -330,19 +332,12 @@ class TransactionController extends Controller
                         $sequence_number = 1;
                     }
                 }
-                $checkShiftOpen = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                // ->where('date', $dateNow)
-                // ->where('user_id', auth()->user()->id)
-                ->where('is_closed', 0)
-                ->first();
-                if($checkShiftOpen == NULL){
-                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
-                }
+
                 // Insert ke table transaction (step 1 : buat transaksi)
                 $transaction = Transaction::create([
                     'warehouse_id' => auth()->user()->warehouse_id,
                     'shift_id' => $checkShiftOpen->id,
-                    'sequence_number' => $sequence_number + 1,
+                    'sequence_number' => $sequence_number,
                     'order_type_id' => $request->order_type_id,
                     'category_order' => $request->category_order,
                     'user_id' => auth()->user()->id,

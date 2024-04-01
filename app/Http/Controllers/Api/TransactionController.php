@@ -301,25 +301,43 @@ class TransactionController extends Controller
                 $change_money = $request->paid_amount - $total_amount;
                 $dateNow = Carbon::now()->format('Y-m-d');
                 $dateTimeNow = Carbon::now();
-                $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
-                if ($transactionCheck < 1) {
-                    $sequence_number = 0;
-                } else {
-                    $sequence_number = Transaction::where('date', $dateNow)->orderBy('id', 'DESC')->first()->sequence_number;
-                }
-                $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                // $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
+                $checkShiftOpen = Shift::where('warehouse_id', auth()->user()->warehouse_id)
                 // ->where('date', $dateNow)
                 // ->where('user_id', auth()->user()->id)
                 ->where('is_closed', 0)
                 ->first();
-                if($shift == NULL){
+                if($checkShiftOpen == NULL){
                     return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
                 }
+                $shift = Shift::where('user_id', auth()->user()->id)
+                ->where('warehouse_id', auth()->user()->warehouse_id)
+                ->orderBy('id', 'desc')
+                ->first();
+
+                if (!$shift || $shift->is_closed) {
+                    // Reset nomor antrian ke 1
+                    $sequence_number = 1;
+                } else {
+                    // Jika shift terbuka, cek apakah ada transaksi dalam shift tersebut
+                    $lastTransaction = Transaction::where('shift_id', $shift->id)
+                        ->orderBy('sequence_number', 'desc')
+                        ->first();
+
+                    if ($lastTransaction) {
+                        // Jika ada transaksi, nomor antrian mengikuti nomor antrian transaksi terakhir
+                        $sequence_number = $lastTransaction->sequence_number + 1;
+                    } else {
+                        // Jika tidak ada transaksi, nomor antrian dimulai dari 1
+                        $sequence_number = 1;
+                    }
+                }
+
                 // Insert ke table transaction (step 1 : buat transaksi)
                 $transaction = Transaction::create([
                     'warehouse_id' => auth()->user()->warehouse_id,
-                    'shift_id' => $shift->id,
-                    'sequence_number' => $sequence_number + 1,
+                    'shift_id' => $checkShiftOpen->id,
+                    'sequence_number' => $sequence_number,
                     'order_type_id' => $request->order_type_id,
                     'category_order' => $request->category_order,
                     'user_id' => auth()->user()->id,

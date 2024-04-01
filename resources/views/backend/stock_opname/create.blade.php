@@ -51,7 +51,7 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label for="notes">Catatan</strong> </label>
-                                        <input type="text" name="notes" class="form-control" id="notes" aria-describedby="notes" required>
+                                        <input type="text" name="notes" class="form-control" id="notes" aria-describedby="notes">
                                     </div>
                                 </div>
                             </div>
@@ -69,7 +69,7 @@
                                         </select>
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" name="qty[]" class="form-control" placeholder="Stok Aktual">
+                                        <input type="number" name="qty[]" required class="form-control" placeholder="Stok Aktual">
                                     </div>
                                     <div class="col-md-2">
                                         <a href="javascript:void(0);" class="addCF btn btn-warning add_more"><i class="fa fa-plus"></i></a>

@@ -95,6 +95,11 @@ class ShiftController extends Controller
                 return response()->json(['message' => "Belum Ada Kasir Buka"], 200);
             }
 
+            $checkTransactionInShift = Transaction::where('shift_id', $shift->id)->whereNull('paid_amount')->whereNull('payment_method')->count();
+            if($checkTransactionInShift > 0){
+                return response()->json(['message' => "Selesaikan orderan terlebih dahulu untuk tutup kasir"], 200);
+            }
+
             $transactions = Transaction::where('shift_id', $shift->id)->get();
             // $expenses = StockPurchase::where('shift_id', $shift->id)->get();
             $expenses = Expense::where('shift_id', $shift->id)->with('expenseCategory')->get();

@@ -224,11 +224,16 @@ class TransactionController extends Controller
     public function notPaid()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
-
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
         $transactions = Transaction::with('order_type', 'transaction_details.product')
             ->where('warehouse_id', auth()->user()->warehouse_id)
-            ->whereDate('date', $dateNow)
+            // ->whereDate('date', $dateNow)
+            ->where('shift_id', $shift->id)
             ->whereNull('paid_amount')
+            ->whereNull('payment_method')
             ->orderByDesc('id')
             ->get();
 

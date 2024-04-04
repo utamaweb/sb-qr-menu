@@ -14,13 +14,53 @@ use Storage;
 
 class ProductController extends Controller
 {
+    // public function index() {
+    //     $products = Product::get()->map(function ($item) {
+    //                             $item->image = $item->image ? url('storage/product_images/'.$item->image) : "";
+    //                             return $item;
+    //                         });
+    //     return response()->json($products, 200);
+    // }
     public function index() {
-        $products = Product::get()->map(function ($item) {
-                                $item->image = $item->image ? url('storage/product_images/'.$item->image) : "";
-                                return $item;
-                            });
-        return response()->json($products, 200);
-    }
+        $warehouseId = auth()->user()->warehouse_id;
+        $products = Product::get()->map(function ($product) use($warehouseId) {
+        $ingredients = $product->ingredient()->get();
+
+        // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
+        $ingredientStocks = [];
+        foreach ($ingredients as $ingredient) {
+            $lastStock = Stock::where('ingredient_id', $ingredient->id)
+                ->where('warehouse_id', $warehouseId)
+                ->first();
+
+            if ($lastStock) {
+                $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
+            } else {
+                $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
+            }
+        }
+
+        // Cek jika $ingredientStocks tidak kosong sebelum menggunakan min()
+        if (!empty($ingredientStocks)) {
+            // Ambil stok terkecil dari semua bahan baku
+            $smallestStock = min($ingredientStocks);
+        } else {
+            // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
+            $smallestStock = 0;
+        }
+
+        unset($product['qty']);
+        // Tambahkan qty terkecil ke dalam produk
+        $product->qty = $smallestStock;
+
+        $product->image = $product->image ? url('storage/product_images/'.$product->image) : "";
+
+        return $product;
+    });
+
+    return response()->json($products, 200);
+}
+
 
     public function productByWarehouse() {
         $warehouseId = auth()->user()->warehouse_id;

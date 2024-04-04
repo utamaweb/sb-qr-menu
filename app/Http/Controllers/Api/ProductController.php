@@ -87,7 +87,13 @@ class ProductController extends Controller
                 }
 
                 // Ambil stok terkecil dari semua bahan baku
-                $smallestStock = min($ingredientStocks);
+                if (!empty($ingredientStocks)) {
+                    // Ambil stok terkecil dari semua bahan baku
+                    $smallestStock = min($ingredientStocks);
+                } else {
+                    // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
+                    $smallestStock = 0;
+                }
 
                 // Tambahkan qty terkecil ke dalam produk
                 unset($product['qty']);

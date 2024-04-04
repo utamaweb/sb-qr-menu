@@ -18,7 +18,7 @@
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
         @can('tambah-pembelianstok')
-        <a href="{{route('pembelian-stok.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Pembelian Stok</a>&nbsp;
+        <a href="{{route('pembelian-stok.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Stok</a>&nbsp;
         @endcan
     </div>
     <div class="table-responsive">

@@ -30,6 +30,10 @@ class ShiftController extends Controller
             ->orderBy('id', 'DESC')
             ->first();
             // return $checkShift->shift_number;
+            $roleName = auth()->user()->getRoleNames()[0];
+            if($roleName != 'kasir'){
+                return response()->json(['status' => "gagal", 'message' => "Buka kasir harus dilakukan dengan role kasir."], 200);
+            }
 
             $shiftNumber = 1;
             if($checkShift && $checkShift->shift_number < 3){

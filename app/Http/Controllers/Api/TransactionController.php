@@ -315,8 +315,8 @@ class TransactionController extends Controller
                 if($checkShiftOpen == NULL){
                     return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
                 }
-                $shift = Shift::where('user_id', auth()->user()->id)
-                ->where('warehouse_id', auth()->user()->warehouse_id)
+                $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                    // where('user_id', auth()->user()->id)
                 ->orderBy('id', 'desc')
                 ->first();
 

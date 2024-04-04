@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Stock;
 use App\Models\Product_Warehouse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -27,12 +28,39 @@ class ProductController extends Controller
         $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
             ->where('product_warehouse.warehouse_id', $warehouseId)
             ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
-            ->map(function ($item) {
-                $item->image = $item->image ? url('storage/product_images/'.$item->image) : "";
-                return $item;
+            ->map(function ($product) use ($warehouseId) {
+                // Ambil bahan baku yang terkait dengan produk
+                $ingredients = $product->ingredient()->get();
+
+                // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
+                $ingredientStocks = [];
+                foreach ($ingredients as $ingredient) {
+                    $lastStock = Stock::where('ingredient_id', $ingredient->id)
+                        ->where('warehouse_id', $warehouseId)
+                        ->first();
+
+                    if ($lastStock) {
+                        $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
+                    } else {
+                        $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
+                    }
+                }
+
+                // Ambil stok terkecil dari semua bahan baku
+                $smallestStock = min($ingredientStocks);
+
+                // Tambahkan qty terkecil ke dalam produk
+                unset($product['qty']);
+                $product->qty = $smallestStock;
+
+                $product->image = $product->image ? url('storage/product_images/'.$product->image) : "";
+
+                return $product;
             });
+
         return response()->json($products, 200);
     }
+
 
     public function store(Request $request)
     {

@@ -239,6 +239,17 @@ class ShiftController extends Controller
         }
     }
 
+    public function closable() {
+        $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
+        $transactions = Transaction::where('shift_id', $checkShift->id)->whereNull('payment_method')->whereNull('paid_amount')->count();
+
+        if($transactions > 0){
+            return response()->json(['status' => False,'message' => "Tidak bisa tutup kasir, terdapat orderan yang masih tersedia."], 200);
+        } else {
+            return response()->json(['status' => True, 'message' => "Kasir bisa ditutup."], 200);
+        }
+    }
+
     public function latest() {
         $latestShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
 

@@ -40,7 +40,7 @@ class StockPurchaseController extends Controller
         }
         $dateNow = Carbon::now()->format('Y-m-d');
         $roleName = auth()->user()->getRoleNames()[0];
-        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('date', $dateNow)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
         if($roleName == 'Superadmin'){
             $shift = Shift::where('date', $dateNow)->where('is_closed', 0)->first();
         }

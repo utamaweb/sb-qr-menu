@@ -33,9 +33,10 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::put('products/{id}', [ProductController::class, 'update']);
     Route::delete('products/{id}', [ProductController::class, 'destroy']);
 
-    // Get Stock of Ingredients
+    // Stock & Ingredients
     Route::get('ingredients', [StockController::class, 'getAllIngredients']);
     Route::get('stocks', [StockController::class, 'getAllStocks']);
+    Route::post('stocks/add', [StockController::class, 'add']);
     Route::get('stock-warehouse', [StockController::class, 'getStockByWarehouse']);
     Route::get('ingredient-sold', [StockController::class, 'getIngredientSold']);
 
@@ -51,6 +52,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('users/{username}', [UserController::class, 'getUserByUsername']);
     Route::put('users', [UserController::class, 'update']);
 
+    // Transaction
     Route::get('transaction/history/online', [TransactionController::class, 'online']);
     Route::get('transaction/history/offline', [TransactionController::class, 'offline']);
     Route::post('transaction/online', [TransactionController::class, 'storeOnline']);
@@ -61,13 +63,12 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('transaction/{id}', [TransactionController::class, 'detail']);
     Route::post('transaction', [TransactionController::class, 'store']);
 
-
+    // Shift / Close Cashier
     Route::post('shift/open', [ShiftController::class, 'open']);
     Route::post('close_cashier/close', [ShiftController::class, 'close']);
     Route::get('shift/check', [ShiftController::class, 'checkCashier']);
     Route::get('shift/latest', [ShiftController::class, 'latest']);
     Route::get('shift/closable', [ShiftController::class, 'closable']);
-
 });
 
 Route::controller(DemoAutoUpdateController::class)->group(function () {

@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PrinterController;
 use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StockController;
+use App\Http\Controllers\Api\ExpenseController;
 
 /*
 |--------------------------------------------------------------------------
@@ -39,6 +40,10 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::post('stocks/add', [StockController::class, 'add']);
     Route::get('stock-warehouse', [StockController::class, 'getStockByWarehouse']);
     Route::get('ingredient-sold', [StockController::class, 'getIngredientSold']);
+
+    // Expense
+    Route::post('expense/add', [ExpenseController::class, 'add']);
+    Route::get('expense/category', [ExpenseController::class, 'category']);
 
 
     // Printer CRUD API

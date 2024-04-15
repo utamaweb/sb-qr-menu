@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CloseCashier;
+use App\Models\Expense;
+use App\Models\StockPurchase;
 use App\Models\CloseCashierProductSold;
 use Auth;
 use DB;
@@ -21,7 +23,11 @@ class CloseCashierController extends Controller
     public function show($id) {
         $closeCashier = CloseCashier::find($id);
         $closeCashierProductSolds = CloseCashierProductSold::where('close_cashier_id', $id)->get();
-        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds'));
+        $expenses = Expense::where('shift_id', $closeCashier->shift_id)->get();
+        $sumExpense = Expense::where('shift_id', $closeCashier->shift_id)->sum('amount');
+        $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
+        $sumStockPurchase = StockPurchase::where('shift_id', $closeCashier->shift_id)->sum('total_price');
+        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase'));
     }
 
 }

@@ -27,6 +27,7 @@
                                     <div class="form-group">
                                         <label>Cabang *</strong> </label>
                                         <div class="input-group">
+                                            @if($roleName == "Superadmin")
                                             <select name="warehouse_id" required class="form-control selectpicker" id="warehouse_id">
                                                 <option value="">Pilih Cabang</option>
                                                 @foreach($warehouses as $warehouse)
@@ -37,6 +38,10 @@
                                                 @endif
                                                 @endforeach
                                             </select>
+                                            @else
+                                            <input type="hidden" readonly name="warehouse_id" value="{{auth()->user()->warehouse->id}}" class="form-control">
+                                            <input type="text" readonly name="warehouse_name" value="{{auth()->user()->warehouse->name}}"  class="form-control">
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

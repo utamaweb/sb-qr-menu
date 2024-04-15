@@ -27,7 +27,7 @@
                         <hr>
                         <div class="row">
                             <div class="col-md-12">
-                                <h2>Rp. {{$closeCashier->total_money}}</h2>
+                                <h2>@currency($closeCashier->total_income)</h2>
                                 <p>Total Penerimaan</p>
                             </div>
                         </div>
@@ -37,18 +37,121 @@
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body">
-                                <h4>Rincian Pembayaran Pelanggan</h4>
+                                <h4>Detail Form Tutup Kasir</h4>
                                 <hr>
                                 <div class="row">
                                     <div class="col-md-6">
-                                        Total Penerimaan Kasir <br><br>
-                                        Total Penerimaan QRIS<br><br>
-                                        Total Penerimaan <br>
+                                        Nama <br><br>
+                                        Shift <br><br>
+                                        Hari / Tanggal <br><br>
+                                        Modal <br><br>
+                                        Pembayaran Tunai <br>
                                     </div>
                                     <div class="col-md-6 text-right">
-                                        {{$closeCashier->total_cash}} <br><br>
-                                        {{$closeCashier->total_non_cash}} <br><br>
-                                        {{$closeCashier->total_money}}
+                                        {{$closeCashier->shift->user->name}} <br><br>
+                                        {{$closeCashier->shift->shift_number}} <br><br>
+                                        {{ \Carbon\Carbon::createFromFormat('Y-m-d', $closeCashier->date)->isoFormat('DD MMMM YYYY') }} <br><br>
+                                        @currency($closeCashier->initial_balance) <br><br>
+                                        @currency($closeCashier->total_cash) <br><br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Non Tunai</h4>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        Omset GOFOOD <br><br>
+                                        Omset GRABFOOD <br><br>
+                                        Omset SHOPEEFOOD <br><br>
+                                        Omset QRIS <br><br>
+                                        Omset TRANSFER <br><br>
+                                        Total Non Tunai <br>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        @currency($closeCashier->gofood_omzet) <br><br>
+                                        @currency($closeCashier->grabfood_omzet) <br><br>
+                                        @currency($closeCashier->shopeefood_omzet) <br><br>
+                                        @currency($closeCashier->qris_omzet) <br><br>
+                                        @currency($closeCashier->transfer_omzet) <br><br>
+                                        @currency($closeCashier->total_non_cash) <br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Cash Omset</h4>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        Pembayaran Tunai (Omset Aplikasi) - Total Non Tunai <br>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        @currency($closeCashier->total_cash - $closeCashier->total_non_cash) <br><br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Pengeluaran</h4>
+                                <hr>
+                                <div class="row">
+                                    @foreach($expenses as $expense)
+                                    <div class="col-md-6">
+                                        {{$expense->expenseCategory->name}} <br>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        @currency($expense->amount) <br>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        ------------------------------------------------------------------------------
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        Total Pengeluaran <br><br>
+                                        Total Pembelian Stok <br><br>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        @currency($sumExpense)<br><br>
+                                        @currency($sumStockPurchase)<br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4>Hasil Akhir</h4>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        Cash Omset - Total Pengeluaran <br><br>
+                                        Uang Tunai Di Laci <br><br>
+                                        Selisih <br>
+                                    </div>
+                                    <div class="col-md-6 text-right">
+                                        @currency($closeCashier->total_cash - $sumExpense - $sumStockPurchase) <br><br>
+                                        @currency($closeCashier->cash_in_drawer) <br><br>
+                                        @currency($closeCashier->different) <br><br>
                                     </div>
                                 </div>
                             </div>

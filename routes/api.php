@@ -44,6 +44,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     // Expense
     Route::post('expense/add', [ExpenseController::class, 'add']);
     Route::get('expense/category', [ExpenseController::class, 'category']);
+    Route::get('expense/', [ExpenseController::class, 'getExpense']);
 
 
     // Printer CRUD API

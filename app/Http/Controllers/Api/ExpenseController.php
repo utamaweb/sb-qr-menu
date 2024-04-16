@@ -17,6 +17,20 @@ class ExpenseController extends Controller
         return response()->json($expense_category, 200);
     }
 
+    public function getExpense() {
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
+        $expenses = Expense::where('shift_id', $shift->id)->get()->map(function ($item){
+            $item->warehouse_name = $item->warehouse->name;
+            $item->expense_category_name = $item->expenseCategory->name;
+            $item->created_by = $item->user->name;
+            return $item;
+        });
+        return response()->json($expenses, 200);
+    }
+
     public function add(Request $request) {
         $data = $request->all();
         $validator = Validator::make($data, [

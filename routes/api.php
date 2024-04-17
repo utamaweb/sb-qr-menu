@@ -43,6 +43,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
 
     // Expense
     Route::post('expense/add', [ExpenseController::class, 'add']);
+    Route::put('expense/edit/{id}', [ExpenseController::class, 'edit']);
     Route::get('expense/category', [ExpenseController::class, 'category']);
     Route::get('expense/', [ExpenseController::class, 'getExpense']);
 

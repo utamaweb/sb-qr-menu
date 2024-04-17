@@ -108,6 +108,61 @@ class StockPurchaseController extends Controller
         return redirect()->route('pembelian-stok.index')->with('message', 'Data berhasil ditambahkan');
     }
 
+
+    public function edit($id) {
+        $stockPurchase = StockPurchase::find($id);
+        $stockPurchaseIngredients = StockPurchaseIngredient::where('stock_purchase_id', $id)->get();
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $ingredients = Ingredient::get();
+        $roleName = auth()->user()->getRoleNames()[0];
+        $warehouses = Warehouse::get();
+        return view('backend.stock_purchase.edit', compact('stockPurchase','stockPurchaseIngredients', 'dateNow','ingredients', 'roleName', 'warehouses'));
+    }
+
+    public function update(Request $request, $id)
+{
+    if(count($request->notes) < 1){
+        return redirect()->route('pembelian-stok.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
+    }
+    $dateNow = Carbon::now()->format('Y-m-d');
+    $roleName = auth()->user()->getRoleNames()[0];
+    $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+    if($roleName == 'Superadmin'){
+        $shift = Shift::where('date', $dateNow)->where('is_closed', 0)->first();
+    }
+    // if($shift == NULL){
+    //     return redirect()->route('pembelian-stok.index')->with('not_permitted', 'Belum ada kasir yang dibuka');
+    // }
+    $totalQty = 0;
+    $totalSubtotal = 0;
+    // return $totalQty;
+
+    // Iterate over each item in the request and update/create
+    foreach ($request->qty as $item => $v) {
+        $data = [
+            'warehouse_id' => $request->warehouse_id,
+            'ingredient_id' => $request->ingredient_id[$item],
+            'qty' => $request->qty[$item],
+            'subtotal' => $request->subtotal[$item],
+            'notes' => $request->notes[$item],
+        ];
+
+        // Update or create StockPurchaseIngredient
+        StockPurchaseIngredient::updateOrCreate(
+            ['id' => $item], // Use the ID if available
+            $data // Data to update/create
+        );
+
+        $totalQty += $request->qty[$item]; // Sum total qty
+        $totalSubtotal += $request->subtotal[$item]; // Sum total subtotal
+    }
+
+    // You can use these totals as needed
+
+    return redirect()->route('pembelian-stok.index')->with('message', 'Data berhasil ditambahkan');
+}
+
+
     public function show($id) {
         $warehouses = Warehouse::get();
         $dateNow = Carbon::now()->format('Y-m-d');

@@ -44,16 +44,30 @@ class StockController extends Controller
         // Ambil data dari database
         $stocks = StockPurchase::where('shift_id', $shift->id)->get()->map(function ($item){
             $filteredData = [
+                'id' => $item->id,
                 'outlet' => $item->warehouse->name,
                 'date' => $item->date,
-                'total_qty' => $item->total_qty,
-                'total_price' => $item->total_price,
+                'total_qty' => (int) $item->total_qty,
+                'total_price' => (int) $item->total_price,
                 'created_by' => $item->user->name
             ];
             return $filteredData;
         });
 
         return response()->json($stocks, 200);
+    }
+
+    public function getDetailStockHistory($id) {
+        $response = StockPurchase::find($id);
+        $response['outlet'] = $response->warehouse->name;
+        $response['created_by'] = $response->user->name;
+        $response['details'] = StockPurchaseIngredient::where('stock_purchase_id', $response->id)->get()->map(function ($item){
+            $item->ingredient_name = $item->ingredient->name;
+            unset($item->ingredient);
+            return $item;
+        });
+        unset($response['warehouse'], $response['user']);
+        return response()->json($response, 200);
     }
 
 

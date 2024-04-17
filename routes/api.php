@@ -37,6 +37,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     // Stock & Ingredients
     Route::get('ingredients', [StockController::class, 'getAllIngredients']);
     Route::get('stocks', [StockController::class, 'getAllStocks']);
+    Route::get('stock-history', [StockController::class, 'getStockHistory']);
     Route::post('stocks/add', [StockController::class, 'add']);
     Route::get('stock-warehouse', [StockController::class, 'getStockByWarehouse']);
     Route::get('warehouse-ingredients', [StockController::class, 'getWarehouseIngredients']);

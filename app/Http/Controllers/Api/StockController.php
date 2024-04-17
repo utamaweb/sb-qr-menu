@@ -35,6 +35,28 @@ class StockController extends Controller
         return response()->json($stockByWarehouse, 200);
     }
 
+    public function getStockHistory() {
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
+
+        // Ambil data dari database
+        $stocks = StockPurchase::where('shift_id', $shift->id)->get()->map(function ($item){
+            $filteredData = [
+                'outlet' => $item->warehouse->name,
+                'date' => $item->date,
+                'total_qty' => $item->total_qty,
+                'total_price' => $item->total_price,
+                'created_by' => $item->user->name
+            ];
+            return $filteredData;
+        });
+
+        return response()->json($stocks, 200);
+    }
+
+
     public function getWarehouseIngredients() {
         $warehouseId = auth()->user()->warehouse_id;
         $warehouseIngredients = Stock::where('warehouse_id', $warehouseId)->with('ingredient')->get();

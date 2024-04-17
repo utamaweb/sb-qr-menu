@@ -27,6 +27,7 @@ class ExpenseController extends Controller
                 'id' => $item->id,
                 'outlet' => $item->warehouse->name,
                 'date' => $item->created_at->format('d-m-Y H:i:s'),
+                'expense_category_id' => $item->expense_category_id,
                 'expense_category' => $item->expenseCategory->name,
                 'qty' => (int) $item->qty,
                 'total_price' => (int) $item->amount,

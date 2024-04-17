@@ -35,6 +35,22 @@ class StockController extends Controller
         return response()->json($stockByWarehouse, 200);
     }
 
+    public function getWarehouseIngredients() {
+        $warehouseId = auth()->user()->warehouse_id;
+        $warehouseIngredients = Stock::where('warehouse_id', $warehouseId)->with('ingredient')->get();
+
+        // Ambil hanya data yang diperlukan
+        $outletName = auth()->user()->warehouse->name;
+        $ingredients = $warehouseIngredients->pluck('ingredient');
+
+        $response = [
+            'outlet' => $outletName,
+            'ingredients_in_outlet' => $ingredients
+        ];
+
+        return response()->json($response, 200);
+    }
+
     public function getIngredientSold() {
         $dateNow = Carbon::now()->format('Y-m-d');
         $roleName = auth()->user()->getRoleNames()[0];

@@ -50,7 +50,7 @@
                                     <label for="example-text-input" class="col-md-1 col-form-label">Bahan Baku</label>
 
                                     <div class="col-md-2">
-                                        <input type="text" name="ingredient_id[]" value="{{$detail->ingredient->name}}" readonly class="form-control">
+                                        <input type="text" name="ingredient_id[]" value="{{$detail->ingredient->id}}" readonly class="form-control">
                                         <input type="hidden" name="stock_purchase_ingredient_id[]" value="{{$detail->id}}" readonly class="form-control">
                                     </div>
                                     <div class="col-md-2">

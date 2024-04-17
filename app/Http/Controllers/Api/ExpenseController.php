@@ -22,12 +22,20 @@ class ExpenseController extends Controller
                 ->where('user_id', auth()->user()->id)
                 ->where('is_closed', 0)
                 ->first();
-        $expenses = Expense::where('shift_id', $shift->id)->get()->map(function ($item){
-            $item->warehouse_name = $item->warehouse->name;
-            $item->expense_category_name = $item->expenseCategory->name;
-            $item->created_by = $item->user->name;
-            return $item;
+        $expenses['data'] = Expense::where('shift_id', $shift->id)->get()->map(function ($item){
+            $filteredData = [
+                'id' => $item->id,
+                'outlet' => $item->warehouse->name,
+                'date' => $item->created_at->format('d-m-Y H:i:s'),
+                'expense_category' => $item->expenseCategory->name,
+                'qty' => (int) $item->qty,
+                'total_price' => (int) $item->amount,
+                'created_by' => $item->user->name,
+                'notes' => $item->note
+            ];
+            return $filteredData;
         });
+        $expenses['total_expense'] = $expenses['data']->sum('total_price');
         return response()->json($expenses, 200);
     }
 

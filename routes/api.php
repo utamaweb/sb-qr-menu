@@ -40,6 +40,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('stock-history', [StockController::class, 'getStockHistory']);
     Route::get('stock-history/{id}', [StockController::class, 'getDetailStockHistory']);
     Route::post('stocks/add', [StockController::class, 'add']);
+    Route::put('stocks/edit/{id}', [StockController::class, 'edit']);
     Route::get('stock-warehouse', [StockController::class, 'getStockByWarehouse']);
     Route::get('warehouse-ingredients', [StockController::class, 'getWarehouseIngredients']);
     Route::get('ingredient-sold', [StockController::class, 'getIngredientSold']);

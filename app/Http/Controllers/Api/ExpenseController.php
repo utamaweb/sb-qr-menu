@@ -39,6 +39,22 @@ class ExpenseController extends Controller
         return response()->json($expenses, 200);
     }
 
+    public function show($id) {
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
+        $expense = Expense::find($id);
+        // unset($expense);
+        $response['id'] = $expense->id;
+        $response['expense_category'] = $expense->expenseCategory->name;
+        $response['qty'] = $expense->qty;
+        $response['total_price'] = $expense->amount;
+        $response['note'] = $expense->note;
+        $response['date'] = $expense->created_at->format('d-m-Y');
+        return response()->json($response, 200);
+    }
+
     public function add(Request $request) {
         $data = $request->all();
         $validator = Validator::make($data, [

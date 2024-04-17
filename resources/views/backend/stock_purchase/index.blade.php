@@ -45,8 +45,9 @@
                     <td>{{ $stockPurchase->warehouse->name}}</td>
                     <td>
                         <div class="row">
+                        <a href="{{route('pembelian-stok.edit', $stockPurchase->id)}}" class="btn btn-link"><i class="dripicons-pencil"></i> Edit</a>
                         <a href="{{route('pembelian-stok.show', $stockPurchase->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
-                            </div>
+                        </div>
                     </td>
                 </tr>
                 @endforeach

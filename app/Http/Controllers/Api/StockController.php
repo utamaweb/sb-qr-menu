@@ -68,7 +68,7 @@ class StockController extends Controller
             $filteredData = [
                 'id' => $item->id,
                 'outlet' => $item->warehouse->name,
-                'date' => $item->date,
+                'date' => $item->created_at->format('d-m-Y H:i:s'),
                 'total_qty' => (int) $item->total_qty,
                 'total_price' => (int) $item->total_price,
                 'created_by' => $item->user->name,

@@ -14,12 +14,17 @@ class StockPurchase extends Model
     {
         return $this->belongsTo('App\Models\Warehouse');
     }
-    public function sfhit()
+    public function shift()
     {
         return $this->belongsTo('App\Models\Shift');
     }
     public function user()
     {
         return $this->belongsTo('App\Models\User');
+    }
+
+    public function stockPurchaseIngredients()
+    {
+        return $this->hasMany('App\Models\StockPurchaseIngredient');
     }
 }

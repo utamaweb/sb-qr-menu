@@ -75,6 +75,7 @@ class StockController extends Controller
                 'details' => $item->stockPurchaseIngredients->map(function ($detail) {
                     return [
                         'id' => $detail->id,
+                        'ingredient_id' => $detail->ingredient->id,
                         'ingredient_name' => $detail->ingredient->name,
                         'qty' => $detail->qty,
                         'price' => $detail->subtotal / $detail->qty,

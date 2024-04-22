@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Category;
+use App\Models\CategoryParent;
 use App\Models\Product;
 use DB;
 use Auth;
@@ -23,7 +24,8 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::get();
-        return view('backend.category.create', compact('categories'));
+        $categoryParents = CategoryParent::get();
+        return view('backend.category.create', compact('categories','categoryParents'));
     }
 
 
@@ -50,6 +52,7 @@ class CategoryController extends Controller
         }
         $icon = $request->icon;
         $lims_category_data['name'] = $request->name;
+        $lims_category_data['category_parent_id'] = $request->category_parent_id;
         $lims_category_data['is_active'] = true;
 
         DB::table('categories')->insert($lims_category_data);
@@ -75,6 +78,7 @@ class CategoryController extends Controller
         $lims_category_data = Category::find($id);
         $lims_category_data->update([
             'name' => $request->name,
+            'category_parent_id' => $request->category_parent_id
         ]);
 
         return redirect()->back()->with('message', 'Category updated successfully');

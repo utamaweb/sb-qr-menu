@@ -27,6 +27,7 @@
                 <tr>
                     <th class="text-center">#</th>
                     <th>Nama Kategori</th>
+                    <th>Parent</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
@@ -35,6 +36,7 @@
                 <tr data-id="{{$category->id}}">
                     <td class="text-center">{{++$key}}</td>
                     <td>{{ $category->name }}</td>
+                    <td>{{ $category->category_parent->name }}</td>
                     <td>
                         @can('ubah-kategori')
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$category->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
@@ -55,6 +57,14 @@
                                         <div class="form-group">
                                             <label>Nama Kategori *</label>
                                             <input type="text" value="{{$category->name}}" name="name" required class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Kategori Parent *</label>
+                                            <select name="category_parent_id" class="form-control">
+                                                @foreach($categoryParents as $parent)
+                                                <option value="{{$parent->id}}" {{$parent->id == $category->category_parent_id ? 'selected' : ''}}>{{$parent->name}}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         </div>
                                         <input type="submit" value="Submit" class="btn btn-primary">
@@ -95,6 +105,14 @@
                     <div class="form-group">
                         <label>Nama Kategori *</label>
                         <input type="text" name="name" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori Parent *</label>
+                        <select name="category_parent_id" class="form-control">
+                            @foreach($categoryParents as $parent)
+                            <option value="{{$parent->id}}">{{$parent->name}}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <input type="submit" value="Submit" class="btn btn-primary">
             </form>

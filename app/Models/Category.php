@@ -10,7 +10,7 @@ class Category extends Model
 
         "name", 'image',
         "is_active",
-        // "parent_id",
+        "category_parent_id",
         // "is_sync_disable",
         // "woocommerce_category_id"
     ];
@@ -18,5 +18,10 @@ class Category extends Model
     public function product()
     {
     	return $this->hasMany('App\Models\Product');
+    }
+
+    public function category_parent()
+    {
+        return $this->belongsTo(CategoryParent::class);
     }
 }

@@ -54,6 +54,8 @@ class ProductController extends Controller
         $product->qty = $smallestStock;
 
         $product->image = $product->image ? url('storage/product_images/'.$product->image) : "";
+        $product->category_parent_id = $product->category->category_parent->id;
+        $product->category_parent_name = $product->category->category_parent->name;
 
         return $product;
     });

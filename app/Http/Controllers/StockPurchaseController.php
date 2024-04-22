@@ -42,7 +42,7 @@ class StockPurchaseController extends Controller
         $roleName = auth()->user()->getRoleNames()[0];
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
         if($roleName == 'Superadmin'){
-            $shift = Shift::where('date', $dateNow)->where('is_closed', 0)->first();
+            $shift = Shift::where('is_closed', 0)->first();
         }
         if($shift == NULL){
             return redirect()->route('pembelian-stok.index')->with('not_permitted', 'Belum ada kasir yang dibuka');

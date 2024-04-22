@@ -168,6 +168,10 @@ class StockController extends Controller
                 'shift_id' => $shift->id,
             ]);
             foreach($request->ingredients as $item){
+                if($item['qty'] < 1){
+                    DB::rollback();
+                    return response()->json(['message' => "Jumlah Kuantitas Harus Diisi Minimal 1."], 200);
+                }
                 StockPurchaseIngredient::create([
                     'stock_purchase_id' => $stockPurchase->id,
                     'ingredient_id' => $item['ingredient_id'],

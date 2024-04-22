@@ -38,9 +38,8 @@ class UserController extends Controller
             $lims_role_list = Roles::get();
             // $lims_biller_list = Biller::where('is_active', true)->get();
             $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            $lims_customer_group_list = CustomerGroup::where('is_active', true)->get();
             $numberOfUserAccount = User::where('is_active', true)->count();
-            return view('backend.user.create', compact('lims_role_list', 'lims_warehouse_list', 'lims_customer_group_list', 'numberOfUserAccount'));
+            return view('backend.user.create', compact('lims_role_list', 'lims_warehouse_list', 'numberOfUserAccount'));
     }
 
     public function generatePassword()

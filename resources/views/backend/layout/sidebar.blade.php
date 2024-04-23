@@ -123,6 +123,7 @@
    @canany(['lihat-tipepesanan', 'tambah-tipepesanan', 'ubah-tipepesanan', 'hapus-tipepesanan'])
     <li id="order-type"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
     @endcanany
+    <li id="order-type"><a href="{{route('business.index')}}"> <i class="dripicons-view-thumb"></i><span>Bisnis</span></a></li>
     @canany(['lihat-bahanbaku', 'tambah-bahanbaku', 'ubah-bahanbaku', 'hapus-bahanbaku'])
     <li id="ingredient"><a  href="{{route('bahan-baku.ingredient')}}"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
     <li id="stok"><a  href="{{route('bahan-baku.index')}}"> <i class="dripicons-view-thumb"></i><span>Daftar Stok</span></a></li>

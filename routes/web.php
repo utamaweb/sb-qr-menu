@@ -62,6 +62,7 @@ use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TransferController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderTypeController;
@@ -141,6 +142,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
 
+        Route::resource('business', BusinessController::class);
         Route::resource('unit', UnitController::class);
         Route::controller(UnitController::class)->group(function () {
             Route::post('importunit', 'importUnit')->name('unit.import');

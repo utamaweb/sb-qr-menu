@@ -120,6 +120,7 @@
       </ul>
    </li>
    @endif --}}
+   <li id="product-warehouse"><a href="{{route('produk-outlet.index')}}"> <i class="dripicons-view-thumb"></i><span>Produk Outlet</span></a></li>
    @canany(['lihat-tipepesanan', 'tambah-tipepesanan', 'ubah-tipepesanan', 'hapus-tipepesanan'])
     <li id="order-type"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
     @endcanany

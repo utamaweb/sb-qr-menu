@@ -205,6 +205,9 @@ class ShiftController extends Controller
 
             if ($request->stocks) {
                 foreach ($request->stocks as $stock) {
+                    Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
+                        'last_stock' => $stock['stock']
+                    ]);
                     $ingredientStock = Stock::where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
                     $ingredientName = str_replace(' ', '_', $ingredientStock->ingredient->name);
                     $realStock = $ingredientName . '_real';

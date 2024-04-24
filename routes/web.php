@@ -1,54 +1,23 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountsController;
-use App\Http\Controllers\AddonInstallController;
 use App\Http\Controllers\AdjustmentController;
-use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\BillerController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\ClientAutoUpdateController;
-use App\Http\Controllers\CouponController;
-use App\Http\Controllers\CurrencyController;
-use App\Http\Controllers\CustomerController;
-use App\Http\Controllers\CustomerGroupController;
-use App\Http\Controllers\CustomFieldController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DeliveryController;
-use App\Http\Controllers\DepartmentController;
-use App\Http\Controllers\DeveloperSectionController;
-use App\Http\Controllers\DiscountController;
-use App\Http\Controllers\DiscountPlanController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\GiftCardController;
-use App\Http\Controllers\CourierController;
-use App\Http\Controllers\HolidayController;
+use App\Http\Controllers\ProductWarehouseController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\StockPurchaseController;
-use App\Http\Controllers\LanguageController;
-use App\Http\Controllers\MoneyTransferController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
-use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\ReturnPurchaseController;
@@ -58,10 +27,9 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TableController;
-use App\Http\Controllers\TaxController;
-use App\Http\Controllers\TransferController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\UnitController;
+use App\Http\Controllers\BusinessController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderTypeController;
@@ -107,6 +75,7 @@ Route::group(['prefix' => 'admin'], function () {
 
 
         // Need to check again
+        Route::resource('produk-outlet',ProductWarehouseController::class);
         Route::resource('produk',ProductController::class)->except([ 'show']);
         Route::controller(ProductController::class)->group(function () {
             Route::post('products/product-data', 'productData');
@@ -141,6 +110,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
 
+        Route::resource('business', BusinessController::class);
         Route::resource('unit', UnitController::class);
         Route::controller(UnitController::class)->group(function () {
             Route::post('importunit', 'importUnit')->name('unit.import');

@@ -63,8 +63,8 @@ class UserController extends Controller
         $message = 'User created successfully';
         $data['password'] = bcrypt($data['password']);
         $data['phone'] = $data['phone_number'];
-        $roleName = Role::find($request->role_id)->pluck('name');
-        User::create($data)->assignRole($roleName);;
+        $roleName = Role::find($request->role_id)->name;
+        User::create($data)->assignRole($roleName);
         return redirect('admin/user')->with('message1', $message);
     }
 
@@ -96,7 +96,9 @@ class UserController extends Controller
         if(!empty($request['password']))
             $input['password'] = bcrypt($request['password']);
         $lims_user_data = User::find($id);
+        $roleName = Role::find($request->role_id)->name;
         $lims_user_data->update($input);
+        $lims_user_data->syncRoles($request->role_id);
 
         cache()->forget('user_role');
         return redirect('admin/user')->with('message2', 'Data updated successfullly');

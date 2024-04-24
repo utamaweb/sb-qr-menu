@@ -1,8 +1,11 @@
 <ul id="side-main-menu" class="side-menu list-unstyled">
    {{-- DASHBOARD --}}
-   <li id="dashboard"><a href="{{route('admin.dashboard')}}"> <i
-      class="dripicons-meter"></i><span>Beranda</span></a></li>
+   <li id="dashboard"><a href="{{route('admin.dashboard')}}"> <i class="dripicons-meter"></i><span>Beranda</span></a></li>
 
+   @if(auth()->user()->hasRole('Superadmin'))
+   <li id="dashboard"><a href="{{route('role.index')}}"> <i class="dripicons-meter"></i><span>Role</span></a></li>
+   <li id="dashboard"><a href="{{route('user.index')}}"> <i class="dripicons-meter"></i><span>User</span></a></li>
+   @endif
    {{-- PENGELUARAN --}}
    <li>
       <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>

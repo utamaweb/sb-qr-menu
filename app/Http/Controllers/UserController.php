@@ -62,10 +62,29 @@ class UserController extends Controller
 
         $data = $request->all();
         $message = 'User created successfully';
-        $data['password'] = bcrypt($data['password']);
-        $data['phone'] = $data['phone_number'];
         $roleName = Role::find($request->role_id)->name;
-        User::create($data)->assignRole($roleName);
+
+        $user = new User;
+        $user->name = $request->name;
+        $user->username = $request->username;
+        $user->email = $request->email;
+        $user->password = bcrypt($request->password);
+        $user->email = $request->email;
+        $user->role_id = $request->role_id;
+        $user->phone = $request->phone_number;
+        if($request->role_id == 1){
+            $user->warehouse_id = NULL;
+            $user->business_id = NULL;
+        } elseif($request->role_id == 2){
+            $user->warehouse_id = NULL;
+            $user->business_id = $request->business_id;
+        } else{
+            $user->warehouse_id = $request->warehouse_id;
+            $user->business_id = NULL;
+        }
+        $user->save();
+
+        $user->assignRole($roleName);
         return redirect('admin/user')->with('message1', $message);
     }
 
@@ -94,22 +113,34 @@ class UserController extends Controller
 
         $input = $request->except('password');
         if(!isset($input['is_active']))
-            $input['is_active'] = false;
-        if(!empty($request['password']))
-            $input['password'] = bcrypt($request['password']);
-        $lims_user_data = User::find($id);
-        $roleName = Role::find($request->role_id)->name;
-        $lims_user_data->update($input);
-        $lims_user_data->syncRoles($request->role_id);
+            $active = false;
+        $user = User::find($id);
+        $user->name = $request->name;
+        $user->username = $request->username;
+        $user->email = $request->email;
+        if($request->password){
+            $user->password = bcrypt($request->password);
+        }
+        if(!$request->is_active){
+            $user->is_active = false;
+        }
+        $user->email = $request->email;
+        $user->role_id = $request->role_id;
+        $user->phone = $request->phone;
+        if($request->role_id == 1){
+            $user->warehouse_id = NULL;
+            $user->business_id = NULL;
+        } elseif($request->role_id == 2){
+            $user->warehouse_id = NULL;
+            $user->business_id = $request->business_id;
+        } else{
+            $user->warehouse_id = $request->warehouse_id;
+            $user->business_id = NULL;
+        }
+        $user->save();
+        $user->syncRoles($request->role_id);
 
-        cache()->forget('user_role');
         return redirect('admin/user')->with('message2', 'Data updated successfullly');
-    }
-
-    public function superadminProfile($id)
-    {
-        $lims_user_data = User::find($id);
-        return view('landlord.profile', compact('lims_user_data'));
     }
 
     public function profile($id)

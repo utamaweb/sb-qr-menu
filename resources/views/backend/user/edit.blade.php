@@ -62,27 +62,24 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    @if(auth()->user()->hasRole('Superadmin'))
-                                    <div class="form-group">
-                                        <label><strong>Bisnis *</strong></label>
-                                        <select name="business_id" required class="selectpicker form-control" data-live-search="true"
-                                            data-live-search-style="begins" title="Pilih Bisnis...">
-                                            @foreach($business as $bisnis)
-                                            <option value="{{$bisnis->id}}" {{$user->business_id == $bisnis->id ? 'selected' : ''}}>{{$bisnis->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    @elseif(auth()->user()->hasRole('Admin Bisnis'))
-                                    <div class="form-group">
-                                        <label><strong>Outlet *</strong></label>
-                                        <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
-                                            data-live-search-style="begins" title="Pilih outlet...">
-                                            @foreach($lims_warehouse_list as $warehouse)
-                                            <option value="{{$warehouse->id}}" {{$user->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{$warehouse->name}}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    @endif
+                                <div class="form-group bisnis-select" @if(!$user->hasRole('Admin Bisnis')) style="display: none;" @endif>
+                                    <label><strong>Bisnis *</strong></label>
+                                    <select name="business_id" required class="selectpicker form-control" data-live-search="true"
+                                        data-live-search-style="begins" title="Pilih Bisnis...">
+                                        @foreach($business as $bisnis)
+                                        <option value="{{$bisnis->id}}" {{$bisnis->id == $user->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group warehouse-select" @if(!$user->hasRole(['Admin Outlet', 'Kasir', 'Customer'])) style="display: none;" @endif>
+                                    <label><strong>Outlet *</strong></label>
+                                    <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
+                                        data-live-search-style="begins" title="Pilih outlet...">
+                                        @foreach($lims_warehouse_list as $warehouse)
+                                        <option value="{{$warehouse->id}}" {{$warehouse->id == $user->warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
                                     <div class="form-group">
                                         <label><strong>{{trans('file.Role')}} *</strong></label>
                                         <input type="hidden" name="role_id_hidden" value="{{$user->role_id}}">
@@ -118,6 +115,31 @@
 
 @push('scripts')
 <script type="text/javascript">
+
+document.querySelector('select[name="role_id"]').addEventListener('change', function() {
+        var selectedRole = this.value;
+        console.log(selectedRole);
+
+        // Sembunyikan semua opsi
+        // document.querySelectorAll('.form-group').forEach(function(group) {
+        //     group.style.display = 'none';
+        // });
+
+        // Tampilkan opsi yang sesuai dengan peran yang dipilih
+        if (selectedRole == 1) {
+            // Tampilkan hanya opsi bisnis
+            document.querySelector('.bisnis-select').style.display = 'none';
+            document.querySelector('.warehouse-select').style.display = 'none';
+        } else if (selectedRole == 2) {
+            // Tampilkan hanya opsi outlet
+            document.querySelector('.bisnis-select').style.display = 'block';
+            document.querySelector('.warehouse-select').style.display = 'none';
+        } else {
+            // Tampilkan kedua opsi (bisnis dan outlet)
+            document.querySelector('.bisnis-select').style.display = 'none';
+            document.querySelector('.warehouse-select').style.display = 'block';
+        }
+    });
 $("ul#outlet").siblings('a').attr('aria-expanded','true');
     $("ul#outlet").addClass("show");
     $("ul#outlet #user-list-menu").addClass("active");

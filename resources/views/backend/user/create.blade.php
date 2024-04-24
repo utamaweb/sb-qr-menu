@@ -63,13 +63,31 @@
                                 </div>
                             </div>
                             <div class="col-md-6">
-                                @if(auth()->user()->hasRole('Superadmin'))
                                 <div class="form-group">
+                                    <label><strong>{{trans('file.Role')}} *</strong></label>
+                                    <select name="role_id" required class="selectpicker form-control role"
+                                        data-live-search="true" data-live-search-style="begins" title="Pilih Role...">
+                                        @foreach($lims_role_list as $role)
+                                        <option value="{{$role->id}}">{{$role->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @if(auth()->user()->hasRole('Superadmin'))
+                                <div class="form-group bisnis-select" style="display: none;">
                                     <label><strong>Bisnis *</strong></label>
                                     <select name="business_id" required class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih Bisnis...">
                                         @foreach($business as $bisnis)
                                         <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group warehouse-select" style="display: none;">
+                                    <label><strong>Outlet *</strong></label>
+                                    <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
+                                        data-live-search-style="begins" title="Pilih outlet...">
+                                        @foreach($lims_warehouse_list as $warehouse)
+                                        <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -84,15 +102,6 @@
                                     </select>
                                 </div>
                                 @endif
-                                <div class="form-group">
-                                    <label><strong>{{trans('file.Role')}} *</strong></label>
-                                    <select name="role_id" required class="selectpicker form-control"
-                                        data-live-search="true" data-live-search-style="begins" title="Pilih Role...">
-                                        @foreach($lims_role_list as $role)
-                                        <option value="{{$role->id}}">{{$role->name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
                                 <div class="form-group">
                                     <label><strong>Nomor HP *</strong></label>
                                     <input type="text" name="phone_number" required class="form-control">
@@ -125,6 +134,31 @@
 
 @push('scripts')
 <script type="text/javascript">
+// Mendengarkan perubahan pada elemen role_id
+document.querySelector('select[name="role_id"]').addEventListener('change', function() {
+        var selectedRole = this.value;
+        console.log(selectedRole);
+
+        // Sembunyikan semua opsi
+        // document.querySelectorAll('.form-group').forEach(function(group) {
+        //     group.style.display = 'none';
+        // });
+
+        // Tampilkan opsi yang sesuai dengan peran yang dipilih
+        if (selectedRole == 1) {
+            // Tampilkan hanya opsi bisnis
+            document.querySelector('.bisnis-select').style.display = 'none';
+            document.querySelector('.warehouse-select').style.display = 'none';
+        } else if (selectedRole == 2) {
+            // Tampilkan hanya opsi outlet
+            document.querySelector('.bisnis-select').style.display = 'block';
+            document.querySelector('.warehouse-select').style.display = 'none';
+        } else {
+            // Tampilkan kedua opsi (bisnis dan outlet)
+            document.querySelector('.bisnis-select').style.display = 'none';
+            document.querySelector('.warehouse-select').style.display = 'block';
+        }
+    });
 
 $("ul#outlet").siblings('a').attr('aria-expanded','true');
     $("ul#outlet").addClass("show");

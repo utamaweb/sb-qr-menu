@@ -27,6 +27,7 @@
                 <tr>
                     <th>#</th>
                     <th>Nama</th>
+                    <th>Username</th>
                     <th>Email</th>
                     <th>No. Telp</th>
                     <th>Hak Akses</th>
@@ -39,6 +40,7 @@
                 <tr data-id="{{$user->id}}">
                     <td>{{++$key}}</td>
                     <td>{{ $user->name }}</td>
+                    <td>{{ $user->username }}</td>
                     <td>{{ $user->email}}</td>
                     <td>{{ $user->phone}}</td>
                     <?php $role = DB::table('roles')->find($user->role_id);?>
@@ -86,7 +88,8 @@
 <script type="text/javascript">
     $("ul#outlet").siblings('a').attr('aria-expanded','true');
     $("ul#outlet").addClass("show");
-    $("ul#outlet #user-list-menu").addClass("active");
+    $("ul#outlet #user").addClass("active");
+    $("#user").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

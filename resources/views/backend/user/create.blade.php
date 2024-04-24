@@ -19,11 +19,20 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label><strong>Username *</strong> </label>
+                                    <label><strong>Nama *</strong> </label>
                                     <input type="text" name="name" required class="form-control">
                                     @if($errors->has('name'))
                                     <small>
                                         <strong>{{ $errors->first('name') }}</strong>
+                                    </small>
+                                    @endif
+                                </div>
+                                <div class="form-group">
+                                    <label><strong>Username *</strong> </label>
+                                    <input type="text" name="username" required class="form-control">
+                                    @if($errors->has('username'))
+                                    <small>
+                                        <strong>{{ $errors->first('username') }}</strong>
                                     </small>
                                     @endif
                                 </div>
@@ -52,22 +61,19 @@
                                     </small>
                                     @endif
                                 </div>
-                                <div class="customer-section">
-                                    <div class="form-group">
-                                        <label><strong>{{trans('file.Address')}} *</strong></label>
-                                        <input type="text" name="address" class="form-control customer-input">
-                                    </div>
-                                    <div class="form-group">
-                                        <label><strong>{{trans('file.State')}}</strong></label>
-                                        <input type="text" name="state" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label><strong>{{trans('file.Country')}}</strong></label>
-                                        <input type="text" name="country" class="form-control">
-                                    </div>
-                                </div>
                             </div>
                             <div class="col-md-6">
+                                @if(auth()->user()->hasRole('Superadmin'))
+                                <div class="form-group">
+                                    <label><strong>Bisnis *</strong></label>
+                                    <select name="business_id" required class="selectpicker form-control" data-live-search="true"
+                                        data-live-search-style="begins" title="Pilih Bisnis...">
+                                        @foreach($business as $bisnis)
+                                        <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @elseif(auth()->user()->hasRole('Admin Bisnis'))
                                 <div class="form-group">
                                     <label><strong>Outlet *</strong></label>
                                     <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
@@ -77,6 +83,7 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                @endif
                                 <div class="form-group">
                                     <label><strong>{{trans('file.Role')}} *</strong></label>
                                     <select name="role_id" required class="selectpicker form-control"

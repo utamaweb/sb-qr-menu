@@ -1,21 +1,35 @@
 <ul id="side-main-menu" class="side-menu list-unstyled">
-   {{-- DASHBOARD --}}
-   <li id="dashboard"><a href="{{route('admin.dashboard')}}"> <i
-      class="dripicons-meter"></i><span>Beranda</span></a></li>
 
-   {{-- PENGELUARAN --}}
-   <li>
-      <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
-      <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
-        @if(auth()->user()->hasRole('Superadmin'))
-         <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
-         </li>
-         @endif
-         <li id="exp-list-menu"><a href="{{route('pengeluaran.index')}}">Daftar Pengeluaran</a></li>
-      </ul>
-   </li>
+    <li id="dashboard"><a href="{{route('admin.dashboard')}}"> <i class="dripicons-meter"></i><span>Beranda</span></a></li>
 
-   @can('lihat-laporan')
+    {{-- Menu Superadmin --}}
+    @if(auth()->user()->hasRole('Superadmin'))
+    <li id="role"><a href="{{route('role.index')}}"> <i class="dripicons-user-group"></i><span>Role</span></a></li>
+    <li id="user"><a href="{{route('user.index')}}"> <i class="dripicons-user"></i><span>User</span></a></li>
+    <li id="bisnis"><a href="{{route('business.index')}}"> <i class="dripicons-user-id"></i><span>Bisnis</span></a></li>
+    <li id="outlet"><a href="{{route('outlet.index')}}"> <i class="dripicons-store"></i><span>Outlet</span></a></li>
+    <li id="outlet"><a href="#"> <i class="dripicons-tags"></i><span>Harga(comingsoon)</span></a></li>
+    <li id="outlet"><a href="#"> <i class="dripicons-shopping-bag"></i><span>Transaksi(comingsoon)</span></a></li>
+    <li id="setting"><a href="{{route('setting.general')}}"> <i class="dripicons-gear"></i><span>Pengaturan</span></a></li>
+
+    {{-- Menu Admin Bisnis --}}
+    @elseif(auth()->user()->hasRole('Admin Bisnis'))
+    <li id="kategori"><a href="{{route('category.index')}}"> <i class="dripicons-user-id"></i><span>Kategori</span></a></li>
+    <li id="produk"><a href="{{route('product.index')}}"> <i class="dripicons-user-id"></i><span>Produk</span></a></li>
+    <li id="unit"><a href="{{route('unit.index')}}"> <i class="dripicons-user-id"></i><span>Unit</span></a></li>
+    <li id="tipe-pesanan"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-user-id"></i><span>Tipe Pesanan</span></a></li>
+    <li id="bahan-baku"><a href="{{route('bahan-baku.ingredient')}}"> <i class="dripicons-user-id"></i><span>Bahan Baku</span></a></li>
+    <li id="user"><a href="{{route('user.index')}}"> <i class="dripicons-user"></i><span>User</span></a></li>
+    <li id="outlet"><a href="{{route('outlet.index')}}"> <i class="dripicons-store"></i><span>Outlet</span></a></li>
+
+    {{-- Menu Admin Outlet --}}
+    @elseif(auth()->user()->hasRole('Admin Outlet'))
+    <li id="produk-outlet"><a href="{{route('produk-outlet.index')}}"> <i class="dripicons-user-id"></i><span>Produk Outlet</span></a></li>
+    <li id="daftar-stok"><a href="{{route('bahan-baku.index')}}"> <i class="dripicons-user-id"></i><span>Daftar Stok</span></a></li>
+    <li id="daftar-stok"><a href="{{route('pembelian-stok.index')}}"> <i class="dripicons-user-id"></i><span>Tambah Stok</span></a></li>
+    <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stok Opname</span></a></li>
+    <li id="list-transaction"><a href="{{route('report.listTransaction')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a></li>
+    @can('lihat-laporan')
    <li>
       <a href="#report" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-document-remove"></i><span>Laporan</span></a>
@@ -79,98 +93,22 @@
     <li id="list-transaction"><a href="{{route('report.listTransaction')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a></li>
     @endcan
 
-   <hr>
-
-   {{-- PRODUK --}}
-   <li>
-    <a ><h3>Kelola Produk</h3></a>
-   </li>
-
-   @canany(['lihat-kategori', 'tambah-kategori', 'ubah-kategori', 'hapus-kategori', 'lihat-produk', 'tambah-produk', 'ubah-produk', 'hapus-produk'])
-   <li>
-      <a href="#product" aria-expanded="false" data-toggle="collapse"> <i
-         class="dripicons-list"></i><span>Produk</span><span></a>
-      <ul id="product" class="collapse list-unstyled " style="border-radius: 10px;">
-        @canany(['lihat-kategori', 'tambah-kategori', 'ubah-kategori', 'hapus-kategori'])
-         <li id="category-menu"><a href="{{route('kategori.index')}}">Kategori</a></li>
-        @endcanany
-        @canany(['lihat-produk', 'tambah-produk', 'ubah-produk', 'hapus-produk'])
-         <li id="product-list-menu"><a href="{{route('produk.index')}}">Daftar Produk</a>
-         </li>
-        @endcanany
-         @canany(['lihat-unit', 'tambah-unit', 'ubah-unit', 'hapus-unit'])
-         <li id="unit-menu"><a href="{{route('unit.index')}}">Unit</a></li>
-        @endcanany
-      </ul>
-   </li>
-   @endcanany
-   <li id="product-warehouse"><a href="{{route('produk-outlet.index')}}"> <i class="dripicons-view-thumb"></i><span>Produk Outlet</span></a></li>
-   @canany(['lihat-tipepesanan', 'tambah-tipepesanan', 'ubah-tipepesanan', 'hapus-tipepesanan'])
-    <li id="order-type"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-view-thumb"></i><span>Tipe Pesanan</span></a></li>
-    @endcanany
-    <li id="order-type"><a href="{{route('business.index')}}"> <i class="dripicons-view-thumb"></i><span>Bisnis</span></a></li>
-    @canany(['lihat-bahanbaku', 'tambah-bahanbaku', 'ubah-bahanbaku', 'hapus-bahanbaku'])
-    <li id="ingredient"><a  href="{{route('bahan-baku.ingredient')}}"> <i class="dripicons-view-thumb"></i><span>Bahan Baku</span></a></li>
-    <li id="stok"><a  href="{{route('bahan-baku.index')}}"> <i class="dripicons-view-thumb"></i><span>Daftar Stok</span></a></li>
-    @endcanany
-    @canany(['lihat-pembelianstok', 'tambah-pembelianstok', 'ubah-pembelianstok', 'hapus-pembelianstok'])
-    <li id="stock-purchase"><a  href="{{route('pembelian-stok.index')}}"> <i class="dripicons-view-thumb"></i><span>Tambah Stok</span></a></li>
-    @endcanany
-    @canany(['lihat-stokopname', 'tambah-stokopname', 'ubah-stokopname', 'hapus-stokopname'])
-    <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stok Opname</span></a></li>
-    @endcanany
-    {{-- <li>
-        <a href="#bahan-baku" aria-expanded="false" data-toggle="collapse"> <i
-                class="dripicons-list"></i><span>Bahan Baku</span><span></a>
-        <ul id="bahan-baku" class="collapse list-unstyled " style="border-radius: 10px;">
-            <li id="bahan-baku"><a href="{{route('bahan_baku.index')}}">Bahan Baku</a></li>
-            <li id="kategori-bahan-baku"><a href="{{route('category.index')}}">Kategori Bahan Baku</a></li>
-        </ul>
-    </li> --}}
-
-   <hr>
-
-   {{-- KELOLA TOKO --}}
     <li>
-        <a>
-            <h3>Kelola Toko</h3>
-        </a>
-    </li>
-    @canany(['lihat-role', 'tambah-role', 'ubah-role', 'hapus-role','lihat-user', 'tambah-user', 'ubah-user', 'hapus-user','lihat-warehouse', 'tambah-warehouse', 'ubah-warehouse', 'hapus-warehouse'])
-   <li>
-      <a href="#outlet" aria-expanded="false" data-toggle="collapse"> <i
-         class="dripicons-home"></i><span>Outlet</span></a>
-      <ul id="outlet" class="collapse list-unstyled " style="border-radius: 10px;">
-        @canany(['lihat-role', 'tambah-role', 'ubah-role', 'hapus-role'])
-         <li id="role-menu"><a href="{{route('role.index')}}">Role</a></li>
-         @endcanany
-         @canany(['lihat-user', 'tambah-user', 'ubah-user', 'hapus-user'])
-         <li id="user-list-menu"><a href="{{route('user.index')}}">User</a></li>
-         @endcanany
-         @canany(['lihat-warehouse', 'tambah-warehouse', 'ubah-warehouse', 'hapus-warehouse'])
-        <li id="warehouse-menu"><a href="{{route('outlet.index')}}">Outlet</a></li>
-        @endcanany
-        {{-- <li id="shift-menu"><a href="{{route('shift.index')}}">Shift</a></li> --}}
-        {{-- <li id="table-menu"><a href="{{route('tables.index')}}">Meja</a></li>
-         @if($customer_index_permission_active)
-         <li id="customer-list-menu"><a href="{{route('customer.index')}}">Customer</a></li>
-         @endif
-        @if($customer_group_permission_active)
-        <li id="customer-group-menu"><a href="{{route('customer_group.index')}}">Group Customer</a></li>
-        @endif --}}
-      </ul>
-   </li>
-   @endcanany
+        <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
+        <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
+          @if(auth()->user()->hasRole('Superadmin'))
+           <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
+           </li>
+           @endif
+           <li id="exp-list-menu"><a href="{{route('pengeluaran.index')}}">Daftar Pengeluaran</a></li>
+        </ul>
+     </li>
+     <li id="user"><a href="{{route('user.index')}}"> <i class="dripicons-user"></i><span>User</span></a></li>
 
-   @canany(['lihat-setting', 'tambah-setting', 'ubah-setting', 'hapus-setting'])
-   {{-- <li>
-      <a href="#setting" aria-expanded="false" data-toggle="collapse"> <i
-         class="dripicons-gear"></i><span>{{trans('file.settings')}}</span></a>
-      <ul id="setting" class="collapse list-unstyled " style="border-radius: 10px;">
-         <li id="general-setting-menu"><a href="{{route('setting.general')}}">{{trans('file.General Setting')}}</a></li>
-         <li id="pos-setting-menu"><a href="{{route('setting.pos')}}">POS {{trans('file.settings')}}</a></li>
-      </ul>
-   </li> --}}
-   <li id="general-setting-menu"><a  href="{{route('setting.general')}}"> <i class="dripicons-gear"></i><span>Pengaturan</span></a></li>
-   @endcanany
+    {{-- Menu Kasir --}}
+    @else
+
+
+    @endif
+
 </ul>

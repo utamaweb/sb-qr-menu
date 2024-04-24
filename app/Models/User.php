@@ -13,7 +13,7 @@ class User extends Authenticatable implements JWTSubject
     use HasApiTokens, Notifiable, HasRoles;
     protected $guard_name = 'web';
     protected $fillable = [
-        'name', 'email', 'password',"phone","company_name", "role_id", "biller_id", "warehouse_id", "is_active", "is_deleted"
+        'name', 'username', 'email', 'password',"phone","company_name", "role_id", "biller_id", "warehouse_id", 'business_id', "is_active", "is_deleted"
     ];
 
     protected $hidden = [

@@ -75,7 +75,7 @@
                                 @if(auth()->user()->hasRole('Superadmin'))
                                 <div class="form-group bisnis-select" style="display: none;">
                                     <label><strong>Bisnis *</strong></label>
-                                    <select name="business_id" required class="selectpicker form-control" data-live-search="true"
+                                    <select name="business_id" class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih Bisnis...">
                                         @foreach($business as $bisnis)
                                         <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="form-group warehouse-select" style="display: none;">
                                     <label><strong>Outlet *</strong></label>
-                                    <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
+                                    <select name="warehouse_id" class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih outlet...">
                                         @foreach($lims_warehouse_list as $warehouse)
                                         <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>

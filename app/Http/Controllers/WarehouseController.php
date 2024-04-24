@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Warehouse;
+use App\Models\Business;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Keygen;
@@ -18,7 +19,8 @@ class WarehouseController extends Controller
     {
         $lims_warehouse_all = Warehouse::where('is_active', true)->get();
         $numberOfWarehouse = Warehouse::where('is_active', true)->count();
-        return view('backend.warehouse.create', compact('lims_warehouse_all', 'numberOfWarehouse'));
+        $business = Business::get();
+        return view('backend.warehouse.create', compact('lims_warehouse_all', 'numberOfWarehouse','business'));
     }
 
     public function store(Request $request)
@@ -35,9 +37,10 @@ class WarehouseController extends Controller
             'is_active' => 1,
             // 'logo' => $imageName,
             'address' => $request->address,
+            'business_id' => $request->business_id,
         ]);
         $this->cacheForget('warehouse_list');
-        return redirect()->back()->with('message', 'Data inserted successfully');
+        return redirect()->back()->with('message', 'Data Berhasil Ditambahkan');
     }
 
     public function edit($id)
@@ -64,10 +67,11 @@ class WarehouseController extends Controller
         $lims_warehouse_data->update([
             'name' => $request->name,
             'address' => $request->address,
+            'business_id' => $request->business_id,
             'logo' => $imageName,
         ]);
         $this->cacheForget('warehouse_list');
-        return redirect()->back()->with('message', 'Data updated successfully');
+        return redirect()->back()->with('message', 'Data Berhasil Diubah');
     }
 
     public function importWarehouse(Request $request)
@@ -129,7 +133,7 @@ class WarehouseController extends Controller
         $lims_warehouse_data = Warehouse::find($id);
         $lims_warehouse_data->delete();
         $this->cacheForget('warehouse_list');
-        return redirect()->back()->with('not_permitted', 'Data deleted successfully');
+        return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 
     public function warehouseAll()

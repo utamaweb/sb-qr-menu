@@ -64,7 +64,7 @@
                                 <div class="col-md-6">
                                 <div class="form-group bisnis-select" @if(!$user->hasRole('Admin Bisnis')) style="display: none;" @endif>
                                     <label><strong>Bisnis *</strong></label>
-                                    <select name="business_id" required class="selectpicker form-control" data-live-search="true"
+                                    <select name="business_id" class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih Bisnis...">
                                         @foreach($business as $bisnis)
                                         <option value="{{$bisnis->id}}" {{$bisnis->id == $user->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
@@ -73,7 +73,7 @@
                                 </div>
                                 <div class="form-group warehouse-select" @if(!$user->hasRole(['Admin Outlet', 'Kasir', 'Customer'])) style="display: none;" @endif>
                                     <label><strong>Outlet *</strong></label>
-                                    <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
+                                    <select name="warehouse_id" class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih outlet...">
                                         @foreach($lims_warehouse_list as $warehouse)
                                         <option value="{{$warehouse->id}}" {{$warehouse->id == $user->warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>

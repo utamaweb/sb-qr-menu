@@ -102,35 +102,35 @@ class ProductController extends Controller
         }
         $roleName = auth()->user()->getRoleNames()[0];
 
-        if(isset($data['is_diffPrice'])) {
-            $productInsert->update(['is_diffPrice' => 1]);
-            foreach ($data['diff_price'] as $key => $diff_price) {
-                if($diff_price) {
-                    Product_Warehouse::create([
-                        "product_id" => $productInsert->id,
-                        "warehouse_id" => $data["warehouse_id"][$key],
-                        "price" => $diff_price
-                    ]);
-                }
-            }
-        } else {
-            if($roleName == 'Kasir'){
-                Product_Warehouse::create([
-                    'product_id' => $productInsert->id,
-                    'warehouse_id' => auth()->user()->warehouse_id,
-                    'price' => $request->price
-                ]);
-            } else {
-                $warehouses = Warehouse::get();
-                foreach ($warehouses as $key => $warehouse) {
-                    Product_Warehouse::create([
-                        "product_id" => $productInsert->id,
-                        "warehouse_id" => $warehouse->id,
-                        "price" => $request->price
-                    ]);
-                }
-            }
-        }
+        // if(isset($data['is_diffPrice'])) {
+        //     $productInsert->update(['is_diffPrice' => 1]);
+        //     foreach ($data['diff_price'] as $key => $diff_price) {
+        //         if($diff_price) {
+        //             Product_Warehouse::create([
+        //                 "product_id" => $productInsert->id,
+        //                 "warehouse_id" => $data["warehouse_id"][$key],
+        //                 "price" => $diff_price
+        //             ]);
+        //         }
+        //     }
+        // } else {
+        //     if($roleName == 'Kasir'){
+        //         Product_Warehouse::create([
+        //             'product_id' => $productInsert->id,
+        //             'warehouse_id' => auth()->user()->warehouse_id,
+        //             'price' => $request->price
+        //         ]);
+        //     } else {
+        //         $warehouses = Warehouse::get();
+        //         foreach ($warehouses as $key => $warehouse) {
+        //             Product_Warehouse::create([
+        //                 "product_id" => $productInsert->id,
+        //                 "warehouse_id" => $warehouse->id,
+        //                 "price" => $request->price
+        //             ]);
+        //         }
+        //     }
+        // }
         // $this->cacheForget('product_list');
         // $this->cacheForget('product_list_with_variant');
         return redirect()->route('produk.index')->with('message', 'Data inserted successfully');
@@ -181,35 +181,35 @@ class ProductController extends Controller
 
         $roleName = auth()->user()->getRoleNames()[0];
 
-        if(isset($data['is_diffPrice'])) {
-            $editProduct->update(['is_diffPrice' => 1]);
-            foreach ($data['diff_price'] as $key => $diff_price) {
-                if($diff_price) {
-                    Product_Warehouse::where('product_id', $id)->where('warehouse_id', $data['warehouse_id'][$key])->update([
-                        "product_id" => $id,
-                        "warehouse_id" => $data["warehouse_id"][$key],
-                        "price" => $diff_price
-                    ]);
-                }
-            }
-        } else {
-            if($roleName == 'Kasir'){
-                Product_Warehouse::where('product_id', $id)->where('warehouse_id', auth()->user()->warehouse_id)->update([
-                    'product_id' => $editProduct->id,
-                    'warehouse_id' => auth()->user()->warehouse_id,
-                    'price' => $request->price
-                ]);
-            } else {
-                $warehouses = Warehouse::get();
-                foreach ($warehouses as $key => $warehouse) {
-                    Product_Warehouse::where('product_id', $id)->where('warehouse_id', $warehouse->id)->update([
-                        "product_id" => $editProduct->id,
-                        "warehouse_id" => $warehouse->id,
-                        "price" => $request->price
-                    ]);
-                }
-            }
-        }
+        // if(isset($data['is_diffPrice'])) {
+        //     $editProduct->update(['is_diffPrice' => 1]);
+        //     foreach ($data['diff_price'] as $key => $diff_price) {
+        //         if($diff_price) {
+        //             Product_Warehouse::where('product_id', $id)->where('warehouse_id', $data['warehouse_id'][$key])->update([
+        //                 "product_id" => $id,
+        //                 "warehouse_id" => $data["warehouse_id"][$key],
+        //                 "price" => $diff_price
+        //             ]);
+        //         }
+        //     }
+        // } else {
+        //     if($roleName == 'Kasir'){
+        //         Product_Warehouse::where('product_id', $id)->where('warehouse_id', auth()->user()->warehouse_id)->update([
+        //             'product_id' => $editProduct->id,
+        //             'warehouse_id' => auth()->user()->warehouse_id,
+        //             'price' => $request->price
+        //         ]);
+        //     } else {
+        //         $warehouses = Warehouse::get();
+        //         foreach ($warehouses as $key => $warehouse) {
+        //             Product_Warehouse::where('product_id', $id)->where('warehouse_id', $warehouse->id)->update([
+        //                 "product_id" => $editProduct->id,
+        //                 "warehouse_id" => $warehouse->id,
+        //                 "price" => $request->price
+        //             ]);
+        //         }
+        //     }
+        // }
 
         $this->cacheForget('product_list');
         // \Session::flash('edit_message', 'Product updated successfully');

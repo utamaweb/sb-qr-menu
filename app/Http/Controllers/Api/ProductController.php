@@ -23,7 +23,11 @@ class ProductController extends Controller
     // }
     public function index() {
         $warehouseId = auth()->user()->warehouse_id;
-        $products = Product::get()->map(function ($product) use($warehouseId) {
+        // $products = Product::get()->map(function ($product) use($warehouseId) {
+        $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
+            ->where('product_warehouse.warehouse_id', $warehouseId)
+            ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
+            ->map(function ($product) use ($warehouseId) {
         $ingredients = $product->ingredient()->get();
 
         // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu

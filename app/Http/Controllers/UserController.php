@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Roles;
 use App\Models\Biller;
 use App\Models\Warehouse;
+use App\Models\Business;
 use App\Models\CustomerGroup;
 use App\Models\Customer;
 use DB;
@@ -35,11 +36,11 @@ class UserController extends Controller
     public function create()
     {
         $role = Role::find(Auth::user()->role_id);
-            $lims_role_list = Roles::get();
-            // $lims_biller_list = Biller::where('is_active', true)->get();
-            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            $numberOfUserAccount = User::where('is_active', true)->count();
-            return view('backend.user.create', compact('lims_role_list', 'lims_warehouse_list', 'numberOfUserAccount'));
+        $lims_role_list = Roles::get();
+        $business = Business::get();
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $numberOfUserAccount = User::where('is_active', true)->count();
+        return view('backend.user.create', compact('lims_role_list', 'lims_warehouse_list', 'numberOfUserAccount','business'));
     }
 
     public function generatePassword()
@@ -71,11 +72,12 @@ class UserController extends Controller
     public function edit($id)
     {
         $role = Role::find(Auth::user()->role_id);
-            $lims_user_data = User::find($id);
-            $lims_role_list = Roles::get();
-            // $lims_biller_list = Biller::where('is_active', true)->get();
-            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-            return view('backend.user.edit', compact('lims_user_data', 'lims_role_list', 'lims_warehouse_list'));
+        $business = Business::get();
+        $user = User::find($id);
+        $lims_role_list = Roles::get();
+        // $lims_biller_list = Biller::where('is_active', true)->get();
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        return view('backend.user.edit', compact('user', 'lims_role_list', 'lims_warehouse_list', 'business'));
     }
 
     public function update(Request $request, $id)

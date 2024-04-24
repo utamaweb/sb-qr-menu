@@ -13,15 +13,24 @@
                     </div>
                     <div class="card-body">
                         <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                        {!! Form::open(['route' => ['user.update', $lims_user_data->id], 'method' => 'put', 'files' => true]) !!}
+                        {!! Form::open(['route' => ['user.update', $user->id], 'method' => 'put', 'files' => true]) !!}
                             <div class="row">
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label><strong>Username *</strong> </label>
-                                        <input type="text" name="name" required class="form-control" value="{{$lims_user_data->name}}">
+                                        <label><strong>Nama *</strong> </label>
+                                        <input type="text" name="name" required class="form-control" value="{{$user->name}}">
                                         @if($errors->has('name'))
                                        <span>
                                            <strong>{{ $errors->first('name') }}</strong>
+                                        </span>
+                                        @endif
+                                    </div>
+                                    <div class="form-group">
+                                        <label><strong>Username *</strong> </label>
+                                        <input type="text" name="username" required class="form-control" value="{{$user->username}}">
+                                        @if($errors->has('username'))
+                                       <span>
+                                           <strong>{{ $errors->first('username') }}</strong>
                                         </span>
                                         @endif
                                     </div>
@@ -36,7 +45,7 @@
                                     </div>
                                     <div class="form-group mt-3">
                                         <label><strong>{{trans('file.Email')}} *</strong></label>
-                                        <input type="email" name="email" placeholder="example@example.com" required class="form-control" value="{{$lims_user_data->email}}">
+                                        <input type="email" name="email" placeholder="example@example.com" required class="form-control" value="{{$user->email}}">
                                         @if($errors->has('email'))
                                        <span>
                                            <strong>{{ $errors->first('email') }}</strong>
@@ -44,7 +53,7 @@
                                         @endif
                                     </div>
                                     <div class="form-group">
-                                        @if($lims_user_data->is_active)
+                                        @if($user->is_active)
                                         <input class="mt-2" type="checkbox" name="is_active" value="1" checked>
                                         @else
                                         <input class="mt-2" type="checkbox" name="is_active" value="1">
@@ -53,19 +62,30 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    @if(auth()->user()->hasRole('Superadmin'))
                                     <div class="form-group">
-                                        <label><strong>Outlet *</strong></label>
-                                        <input type="hidden" name="warehouse_id_hidden" value="{{$lims_user_data->warehouse_id}}">
-                                        <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
-                                            title="Pilih outlet...">
-                                            @foreach($lims_warehouse_list as $warehouse)
-                                            <option value="{{$warehouse->id}}" {{$warehouse->id == $lims_user_data->warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                        <label><strong>Bisnis *</strong></label>
+                                        <select name="business_id" required class="selectpicker form-control" data-live-search="true"
+                                            data-live-search-style="begins" title="Pilih Bisnis...">
+                                            @foreach($business as $bisnis)
+                                            <option value="{{$bisnis->id}}" {{$user->business_id == $bisnis->id ? 'selected' : ''}}>{{$bisnis->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
+                                    @elseif(auth()->user()->hasRole('Admin Bisnis'))
+                                    <div class="form-group">
+                                        <label><strong>Outlet *</strong></label>
+                                        <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
+                                            data-live-search-style="begins" title="Pilih outlet...">
+                                            @foreach($lims_warehouse_list as $warehouse)
+                                            <option value="{{$warehouse->id}}" {{$user->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @endif
                                     <div class="form-group">
                                         <label><strong>{{trans('file.Role')}} *</strong></label>
-                                        <input type="hidden" name="role_id_hidden" value="{{$lims_user_data->role_id}}">
+                                        <input type="hidden" name="role_id_hidden" value="{{$user->role_id}}">
                                         <select name="role_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Role...">
                                           @foreach($lims_role_list as $role)
                                               <option value="{{$role->id}}">{{$role->name}}</option>
@@ -74,7 +94,7 @@
                                     </div>
                                     <div class="form-group mt-3">
                                         <label><strong>Nomor HP *</strong></label>
-                                        <input type="text" name="phone" required class="form-control" value="{{$lims_user_data->phone}}">
+                                        <input type="text" name="phone" required class="form-control" value="{{$user->phone}}">
                                     </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">

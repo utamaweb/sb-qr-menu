@@ -224,6 +224,7 @@ class ShiftController extends Controller
                 }
             }
             $closeCashier['stocks'] = $stocks;
+            $closeCashier['warehouse_name'] = $shift->warehouse->name;
 
             DB::commit();
             return response()->json($closeCashier, 200);

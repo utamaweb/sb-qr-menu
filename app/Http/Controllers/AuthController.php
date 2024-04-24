@@ -29,7 +29,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credential = $request->only('name', 'password');
+        $credential = $request->only('username', 'password');
 
         if (Auth::guard('web')->attempt($credential)) {
             return redirect()->route('admin.dashboard');

@@ -55,7 +55,7 @@
                     <form method="POST" action="{{ route('admin.auth.login') }}" id="login-form">
                         @csrf
                         <div class="form-group-material">
-                            <input id="login-username" autofocus type="text" name="name" required class="input-material" value="" placeholder="Username">
+                            <input id="login-username" autofocus type="text" name="username" required class="input-material" value="" placeholder="Username">
                             @if(session()->has('error'))
                             <p>
                                 <strong>{{ session()->get('error') }}</strong>

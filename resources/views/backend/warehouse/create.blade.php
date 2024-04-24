@@ -27,6 +27,7 @@
                 <tr>
                     <th>#</th>
                     <th>Nama Outlet</th>
+                    <th>Bisnis</th>
                     <th>Alamat</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
@@ -36,6 +37,7 @@
                 <tr data-id="{{$warehouse->id}}">
                     <td>{{++$key}}</td>
                     <td>{{ $warehouse->name }}</td>
+                    <td>{{ $warehouse->business->name }}</td>
                     <td>{{ $warehouse->address }}</td>
                     <td>
                         @can('ubah-warehouse')
@@ -57,6 +59,15 @@
                                         <div class="form-group">
                                             <label>Nama Outlet *</label>
                                             <input type="text" value="{{$warehouse->name}}" name="name" required class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Nama Bisnis *</label>
+                                            <select name="business_id" class="form-control">
+                                                <option value="">---Pilih Bisnis---</option>
+                                                @foreach($business as $bisnis)
+                                                <option value="{{$bisnis->id}}" {{$bisnis->id == $warehouse->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
+                                                @endforeach
+                                            </select>
                                         </div>
                                         <div class="form-group">
                                             <label>Alamat *</label>
@@ -101,6 +112,15 @@
                     <div class="form-group">
                         <label>Nama Outlet *</label>
                         <input type="text" name="name" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Bisnis *</label>
+                        <select name="business_id" class="form-control">
+                            <option value="">---Pilih Bisnis---</option>
+                            @foreach($business as $bisnis)
+                            <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
+                            @endforeach
+                        </select>
                     </div>
                     <div class="form-group">
                         <label>Alamat *</label>

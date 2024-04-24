@@ -14,8 +14,8 @@
 
     {{-- Menu Admin Bisnis --}}
     @elseif(auth()->user()->hasRole('Admin Bisnis'))
-    <li id="kategori"><a href="{{route('category.index')}}"> <i class="dripicons-user-id"></i><span>Kategori</span></a></li>
-    <li id="produk"><a href="{{route('product.index')}}"> <i class="dripicons-user-id"></i><span>Produk</span></a></li>
+    <li id="kategori"><a href="{{route('kategori.index')}}"> <i class="dripicons-user-id"></i><span>Kategori</span></a></li>
+    <li id="produk"><a href="{{route('produk.index')}}"> <i class="dripicons-user-id"></i><span>Produk</span></a></li>
     <li id="unit"><a href="{{route('unit.index')}}"> <i class="dripicons-user-id"></i><span>Unit</span></a></li>
     <li id="tipe-pesanan"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-user-id"></i><span>Tipe Pesanan</span></a></li>
     <li id="bahan-baku"><a href="{{route('bahan-baku.ingredient')}}"> <i class="dripicons-user-id"></i><span>Bahan Baku</span></a></li>

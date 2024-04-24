@@ -9,91 +9,36 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>Tambah User</h4>
+                        <h4>Tambah Produk Outlet</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
                             <small>Inputan yang ditandai dengan * wajib diisi.</small>
                         </p>
-                        {!! Form::open(['route' => 'user.store', 'method' => 'post', 'files' => true]) !!}
+                        {!! Form::open(['route' => 'produk-outlet.store', 'method' => 'post', 'files' => true]) !!}
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <div class="form-group">
-                                    <label><strong>Username *</strong> </label>
-                                    <input type="text" name="name" required class="form-control">
-                                    @if($errors->has('name'))
-                                    <small>
-                                        <strong>{{ $errors->first('name') }}</strong>
-                                    </small>
-                                    @endif
+                                    <label><strong>Produk *</strong></label>
+                                    <select name="product_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
+                                        title="Pilih outlet...">
+                                        @foreach($products as $product)
+                                        <option value="{{$product->id}}">{{$product->name}}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                                <div class="form-group">
-                                    <label><strong>{{trans('file.Password')}} *</strong> </label>
-                                    <div class="input-group">
-                                        <input type="password" name="password" required class="form-control">
-                                        <div class="input-group-append">
-                                            <button id="genbutton" type="button"
-                                                class="btn btn-default">{{trans('file.Generate')}}</button>
-                                        </div>
-                                        @if($errors->has('password'))
-                                        <small>
-                                            <strong>{{ $errors->first('password') }}</strong>
-                                        </small>
-                                        @endif
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label><strong>{{trans('file.Email')}} *</strong></label>
-                                    <input type="email" name="email" placeholder="example@example.com" required
-                                        class="form-control">
-                                    @if($errors->has('email'))
-                                    <small>
-                                        <strong class="text-danger">{{ $errors->first('email') }}</strong>
-                                    </small>
-                                    @endif
-                                </div>
-                                <div class="customer-section">
-                                    <div class="form-group">
-                                        <label><strong>{{trans('file.Address')}} *</strong></label>
-                                        <input type="text" name="address" class="form-control customer-input">
-                                    </div>
-                                    <div class="form-group">
-                                        <label><strong>{{trans('file.State')}}</strong></label>
-                                        <input type="text" name="state" class="form-control">
-                                    </div>
-                                    <div class="form-group">
-                                        <label><strong>{{trans('file.Country')}}</strong></label>
-                                        <input type="text" name="country" class="form-control">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
                                 <div class="form-group">
                                     <label><strong>Outlet *</strong></label>
-                                    <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
-                                        data-live-search-style="begins" title="Pilih outlet...">
-                                        @foreach($lims_warehouse_list as $warehouse)
+                                    <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
+                                        title="Pilih outlet...">
+                                        @foreach($warehouses as $warehouse)
                                         <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label><strong>{{trans('file.Role')}} *</strong></label>
-                                    <select name="role_id" required class="selectpicker form-control"
-                                        data-live-search="true" data-live-search-style="begins" title="Pilih Role...">
-                                        @foreach($lims_role_list as $role)
-                                        <option value="{{$role->id}}">{{$role->name}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label><strong>Nomor HP *</strong></label>
-                                    <input type="text" name="phone_number" required class="form-control">
-                                    @if($errors->has('phone_number'))
-                                    <small>
-                                        <strong>{{ $errors->first('phone_number') }}</strong>
-                                    </small>
-                                    @endif
+                                <div class="form-group mt-3">
+                                    <label><strong>Harga *</strong></label>
+                                    <input type="number" name="price" required class="form-control">
                                 </div>
                             </div>
                             <div class="col-md-12 d-flex justify-content-end">
@@ -101,8 +46,7 @@
                                     <a href="{{ url()->previous() }}" class="btn btn-outline-primary">Kembali</a>
                                 </div>
                                 <div class="form-group mt-3">
-                                    <input type="submit" value="{{trans('file.submit')}}" id="submit-btn"
-                                        class="btn btn-primary">
+                                    <input type="submit" value="{{trans('file.submit')}}" id="submit-btn" class="btn btn-primary">
                                 </div>
                             </div>
                         </div>
@@ -140,7 +84,7 @@ $("ul#outlet").siblings('a').attr('aria-expanded','true');
             success: function(data) {
                 if(data['number_of_user_account'] > 0 && data['number_of_user_account'] <= numberOfUserAccount) {
                     localStorage.setItem("message", "You don't have permission to create another user account as you already exceed the limit! Subscribe to another package if you wants more!");
-                    location.href = "{{route('user.index')}}";
+                    location.href = "{{route('produk-outlet.index')}}";
                 }
             }
         });

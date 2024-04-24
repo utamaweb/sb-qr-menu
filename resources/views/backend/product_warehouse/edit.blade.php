@@ -15,66 +15,28 @@
                         <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                         {!! Form::open(['route' => ['produk-outlet.update', $productWarehouse->id], 'method' => 'put', 'files' => true]) !!}
                             <div class="row">
-                                <div class="col-md-6">
+                                <div class="col-md-12">
                                     <div class="form-group">
                                         <label><strong>Produk *</strong></label>
                                         <select name="product_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
                                             title="Pilih outlet...">
-                                            @foreach($warehouses as $warehouse)
-                                            <option value="{{$warehouse->id}}" {{$warehouse->id == $productWarehouse->product_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                            @foreach($products as $product)
+                                            <option value="{{$product->id}}" {{$product->id == $productWarehouse->product_id ? 'selected' : ''}}>{{$product->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label><strong>Ganti Password (Kosongkan bila tidak)</strong> </label>
-                                        <div class="input-group">
-                                            <input type="password" name="password" class="form-control">
-                                            <div class="input-group-append">
-                                                <button id="genbutton" type="button" class="btn btn-default">{{trans('file.Generate')}}</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group mt-3">
-                                        <label><strong>{{trans('file.Email')}} *</strong></label>
-                                        <input type="email" name="email" placeholder="example@example.com" required class="form-control" value="{{$productWarehouse->email}}">
-                                        @if($errors->has('email'))
-                                       <span>
-                                           <strong>{{ $errors->first('email') }}</strong>
-                                        </span>
-                                        @endif
-                                    </div>
-                                    <div class="form-group">
-                                        @if($productWarehouse->is_active)
-                                        <input class="mt-2" type="checkbox" name="is_active" value="1" checked>
-                                        @else
-                                        <input class="mt-2" type="checkbox" name="is_active" value="1">
-                                        @endif
-                                        <label class="mt-2"><strong>{{trans('file.Active')}}</strong></label>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group">
                                         <label><strong>Outlet *</strong></label>
-                                        <input type="hidden" name="warehouse_id_hidden" value="{{$productWarehouse->warehouse_id}}">
                                         <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
                                             title="Pilih outlet...">
-                                            @foreach($lims_warehouse_list as $warehouse)
+                                            @foreach($warehouses as $warehouse)
                                             <option value="{{$warehouse->id}}" {{$warehouse->id == $productWarehouse->warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group">
-                                        <label><strong>{{trans('file.Role')}} *</strong></label>
-                                        <input type="hidden" name="role_id_hidden" value="{{$productWarehouse->role_id}}">
-                                        <select name="role_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Role...">
-                                          @foreach($lims_role_list as $role)
-                                              <option value="{{$role->id}}">{{$role->name}}</option>
-                                          @endforeach
-                                        </select>
-                                    </div>
                                     <div class="form-group mt-3">
-                                        <label><strong>Nomor HP *</strong></label>
-                                        <input type="text" name="phone" required class="form-control" value="{{$productWarehouse->phone}}">
+                                        <label><strong>Harga *</strong></label>
+                                        <input type="number" name="price" required class="form-control" value="{{$productWarehouse->price}}">
                                     </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">

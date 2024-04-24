@@ -45,7 +45,7 @@ class ProductWarehouseController extends Controller
         $productWarehouse = Product_Warehouse::find($id);
         $warehouses = Warehouse::get();
         $products = Product::get();
-        return view('backend.product_warehouse.create', compact('productWarehouse', 'warehouses', 'products'));
+        return view('backend.product_warehouse.edit', compact('productWarehouse', 'warehouses', 'products'));
     }
 
     public function update(Request $request, $id)

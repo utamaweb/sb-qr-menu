@@ -27,8 +27,16 @@ class UserController extends Controller
 
     public function index()
     {
-        $lims_user_list = User::get();
-        // menghitung jumlah user
+        if(auth()->user()->hasRole('Superadmin')){
+            $lims_user_list = User::get();
+        } elseif(auth()->user()->hasRole('Admin Bisnis')){
+            $outlet = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+            $lims_user_list = User::where('business_id', auth()->user()->business_id)->orWhereIn('warehouse_id', $outlet)->get();
+        } else{
+            $business = Business::where('id', auth()->user()->warehouse->business_id)->get();
+            $lims_warehouse_all = Warehouse::where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+        }
+
         $numberOfUserAccount = User::where('is_active', true)->count();
         return view('backend.user.index', compact('lims_user_list', 'numberOfUserAccount'));
     }
@@ -36,7 +44,14 @@ class UserController extends Controller
     public function create()
     {
         $role = Role::find(Auth::user()->role_id);
-        $lims_role_list = Roles::get();
+        $lims_role_list = Roles::where('id', '>=', auth()->user()->role_id)->get();
+        // if(auth()->user()->hasRole('Superadmin')){
+        //     $lims_role_list = Roles::get();
+        // } elseif(auth()->user()->hasRole('Admin Bisnis')){
+        //     $lims_role_list = Roles::where('name', '!=', 'Superadmin')->get();
+        // } else{
+        //     $lims_role_list = Roles::where('name', '!=', ['Superadmin', 'Admin Bisnis'])->get();
+        // }
         $business = Business::get();
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         $numberOfUserAccount = User::where('is_active', true)->count();

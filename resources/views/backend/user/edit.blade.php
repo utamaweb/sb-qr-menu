@@ -38,9 +38,6 @@
                                         <label><strong>Ganti Password (Kosongkan bila tidak)</strong> </label>
                                         <div class="input-group">
                                             <input type="password" name="password" class="form-control">
-                                            <div class="input-group-append">
-                                                <button id="genbutton" type="button" class="btn btn-default">{{trans('file.Generate')}}</button>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="form-group mt-3">
@@ -62,6 +59,15 @@
                                     </div>
                                 </div>
                                 <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label><strong>{{trans('file.Role')}} *</strong></label>
+                                        <input type="hidden" name="role_id_hidden" value="{{$user->role_id}}">
+                                        <select name="role_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Role...">
+                                          @foreach($lims_role_list as $role)
+                                              <option value="{{$role->id}}" {{$role->id == $user->role_id ? 'selected' : ''}}>{{$role->name}}</option>
+                                          @endforeach
+                                        </select>
+                                    </div>
                                 <div class="form-group bisnis-select" @if(!$user->hasRole('Admin Bisnis')) style="display: none;" @endif>
                                     <label><strong>Bisnis *</strong></label>
                                     <select name="business_id" class="selectpicker form-control" data-live-search="true"
@@ -80,15 +86,6 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                    <div class="form-group">
-                                        <label><strong>{{trans('file.Role')}} *</strong></label>
-                                        <input type="hidden" name="role_id_hidden" value="{{$user->role_id}}">
-                                        <select name="role_id" required class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="Select Role...">
-                                          @foreach($lims_role_list as $role)
-                                              <option value="{{$role->id}}">{{$role->name}}</option>
-                                          @endforeach
-                                        </select>
-                                    </div>
                                     <div class="form-group mt-3">
                                         <label><strong>Nomor HP *</strong></label>
                                         <input type="text" name="phone" required class="form-control" value="{{$user->phone}}">
@@ -144,36 +141,6 @@ $("ul#outlet").siblings('a').attr('aria-expanded','true');
     $("ul#outlet").addClass("show");
     $("ul#outlet #user-list-menu").addClass("active");
 
-    $("ul#people").siblings('a').attr('aria-expanded','true');
-    $("ul#people").addClass("show");
-    $('#biller-id').hide();
-    $('#warehouseId').hide();
-
-
-
-    $('select[name=role_id]').val($("input[name='role_id_hidden']").val());
-    if($('select[name=role_id]').val() > 2){
-        $('#warehouseId').show();
-        $('select[name=warehouse_id]').val($("input[name='warehouse_id_hidden']").val());
-        $('#biller-id').show();
-        $('select[name=biller_id]').val($("input[name='biller_id_hidden']").val());
-    }
-    $('.selectpicker').selectpicker('refresh');
-
-    $('select[name="role_id"]').on('change', function() {
-        if($(this).val() > 2){
-            $('select[name="warehouse_id"]').prop('required',true);
-            $('select[name="biller_id"]').prop('required',true);
-            $('#biller-id').show();
-            $('#warehouseId').show();
-        }
-        else{
-            $('select[name="warehouse_id"]').prop('required',false);
-            $('select[name="biller_id"]').prop('required',false);
-            $('#biller-id').hide();
-            $('#warehouseId').hide();
-        }
-    });
 
     $('#genbutton').on("click", function(){
       $.get('../genpass', function(data){

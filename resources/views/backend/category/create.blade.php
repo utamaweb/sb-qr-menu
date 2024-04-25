@@ -127,10 +127,10 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#product").siblings('a').attr('aria-expanded','true');
-    $("ul#product").addClass("show");
-    $("ul#product #category-menu").addClass("active");
-
+    // $("ul#product").siblings('a').attr('aria-expanded','true');
+    // $("ul#product").addClass("show");
+    // $("ul#product #category-menu").addClass("active");
+    $("#kategori").addClass("active");
     var category_id = [];
 
     $.ajaxSetup({

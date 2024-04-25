@@ -20,14 +20,18 @@ class StockPurchaseController extends Controller
      */
     public function index()
     {
-        $stockPurchases = StockPurchase::get();
-        $ingredients = Ingredient::get();
-        return view('backend.stock_purchase.index', compact('stockPurchases', 'ingredients'));
+        if(auth()->user()->hasRole(['Superadmin', 'Admin Bisnis'])){
+            $stockPurchases = StockPurchase::get();
+        } else {
+            $stockPurchases = StockPurchase::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        }
+        return view('backend.stock_purchase.index', compact('stockPurchases'));
     }
 
     public function create() {
         $dateNow = Carbon::now()->format('Y-m-d');
-        $ingredients = Ingredient::get();
+        $warehouse = Warehouse::find(auth()->user()->warehouse_id);
+        $ingredients = Ingredient::where('business_id', $warehouse->business_id)->get();
         $roleName = auth()->user()->getRoleNames()[0];
         $warehouses = Warehouse::get();
         return view('backend.stock_purchase.create', compact('dateNow','ingredients', 'roleName', 'warehouses'));
@@ -113,7 +117,8 @@ class StockPurchaseController extends Controller
         $stockPurchase = StockPurchase::find($id);
         $stockPurchaseIngredients = StockPurchaseIngredient::where('stock_purchase_id', $id)->get();
         $dateNow = Carbon::now()->format('Y-m-d');
-        $ingredients = Ingredient::get();
+        $warehouse = Warehouse::find(auth()->user()->warehouse_id);
+        $ingredients = Ingredient::where('business_id', $warehouse->business_id)->get();
         $roleName = auth()->user()->getRoleNames()[0];
         $warehouses = Warehouse::get();
         return view('backend.stock_purchase.edit', compact('stockPurchase','stockPurchaseIngredients', 'dateNow','ingredients', 'roleName', 'warehouses'));

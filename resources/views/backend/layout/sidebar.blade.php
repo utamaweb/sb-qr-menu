@@ -18,32 +18,32 @@
     <li id="produk"><a href="{{route('produk.index')}}"> <i class="dripicons-user-id"></i><span>Produk</span></a></li>
     <li id="unit"><a href="{{route('unit.index')}}"> <i class="dripicons-user-id"></i><span>Unit</span></a></li>
     <li id="tipe-pesanan"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-user-id"></i><span>Tipe Pesanan</span></a></li>
-    <li id="bahan-baku"><a href="{{route('bahan-baku.ingredient')}}"> <i class="dripicons-user-id"></i><span>Bahan Baku</span></a></li>
+    <li id="bahan-baku"><a href="{{route('bahan-baku.index')}}"> <i class="dripicons-user-id"></i><span>Bahan Baku</span></a></li>
     <li id="user"><a href="{{route('user.index')}}"> <i class="dripicons-user"></i><span>User</span></a></li>
     <li id="outlet"><a href="{{route('outlet.index')}}"> <i class="dripicons-store"></i><span>Outlet</span></a></li>
 
     {{-- Menu Admin Outlet --}}
     @elseif(auth()->user()->hasRole('Admin Outlet'))
     <li id="produk-outlet"><a href="{{route('produk-outlet.index')}}"> <i class="dripicons-user-id"></i><span>Produk Outlet</span></a></li>
-    <li id="daftar-stok"><a href="{{route('bahan-baku.index')}}"> <i class="dripicons-user-id"></i><span>Daftar Stok</span></a></li>
-    <li id="daftar-stok"><a href="{{route('pembelian-stok.index')}}"> <i class="dripicons-user-id"></i><span>Tambah Stok</span></a></li>
+    <li id="daftar-stok"><a href="{{route('stok.index')}}"> <i class="dripicons-user-id"></i><span>Daftar Stok</span></a></li>
+    <li id="tambah-stok"><a href="{{route('pembelian-stok.index')}}"> <i class="dripicons-user-id"></i><span>Tambah Stok</span></a></li>
     <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stok Opname</span></a></li>
     <li id="list-transaction"><a href="{{route('report.listTransaction')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a></li>
-    @can('lihat-laporan')
    <li>
       <a href="#report" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-document-remove"></i><span>Laporan</span></a>
       <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
         <li id="laporan-tutup-kasir"><a  href="{{route('close-cashier.index')}}">Laporan Tutup Kasir</a></li>
+        <li id="laporan-transaksi-produk"><a  href="{{route('report.product')}}">Laporan Transaksi Produk</a></li>
 
-         <li id="product-report-menu">
-            {!! Form::open(['route' => 'report.product', 'method' => 'get', 'id' => 'product-report-form']) !!}
+         {{-- <li id="product-report-menu"> --}}
+             {{-- <a id="report-link" href="{{route('report.product')}}">Laporan Transaksi Produk</a> --}}
+            {{-- {!! Form::open(['route' => 'report.product', 'method' => 'get', 'id' => 'product-report-form']) !!}
             <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
             <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <input type="hidden" name="warehouse_id" value="0" />
-            <a id="report-link" href="">Laporan Transaksi Produk</a>
-            {!! Form::close() !!}
-         </li>
+            <input type="hidden" name="warehouse_id" value="0" /> --}}
+            {{-- {!! Form::close() !!} --}}
+         {{-- </li> --}}
 
          <li id="profit-loss-report-menu">
             {!! Form::open(['route' => 'report.profitLoss', 'method' => 'post', 'id' =>
@@ -84,19 +84,17 @@
             {!! Form::close() !!}
          </li>
 
-         <li id="warehouse-report-menu">
-            <a id="warehouse-report-link" href="">Laporan Cabang</a>
-         </li>
+         {{-- <li id="warehouse-report-menu">
+            <a id="warehouse-report-link" href="{{route('report.warehouse')}}">Laporan Cabang</a>
+         </li> --}}
 
       </ul>
     </li>
-    <li id="list-transaction"><a href="{{route('report.listTransaction')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a></li>
-    @endcan
 
     <li>
         <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
         <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
-          @if(auth()->user()->hasRole('Superadmin'))
+          @if(auth()->user()->hasRole(['Superadmin', 'Admin Bisnis', 'Admin Outlet']))
            <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
            </li>
            @endif

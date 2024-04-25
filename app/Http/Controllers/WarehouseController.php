@@ -17,9 +17,17 @@ class WarehouseController extends Controller
     use CacheForget;
     public function index()
     {
-        $lims_warehouse_all = Warehouse::where('is_active', true)->get();
+        if(auth()->user()->hasRole('Superadmin')){
+            $lims_warehouse_all = Warehouse::where('is_active', true)->get();
+            $business = Business::get();
+        } elseif(auth()->user()->hasRole('Admin Bisnis')){
+            $business = Business::where('id', auth()->user()->business_id)->get();
+            $lims_warehouse_all = Warehouse::where('is_active', true)->where('business_id', auth()->user()->business_id)->get();
+        } else{
+            $business = Business::where('id', auth()->user()->warehouse->business_id)->get();
+            $lims_warehouse_all = Warehouse::where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+        }
         $numberOfWarehouse = Warehouse::where('is_active', true)->count();
-        $business = Business::get();
         return view('backend.warehouse.create', compact('lims_warehouse_all', 'numberOfWarehouse','business'));
     }
 

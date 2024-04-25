@@ -19,16 +19,21 @@ class StockOpnameController extends Controller
     use CacheForget;
     public function index()
     {
-        $stockOpnames = StockOpname::get();
+        if(auth()->user()->hasRole('Superadmin')){
+            $stockOpnames = StockOpname::get();
+        } else {
+            $stockOpnames = StockOpname::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        }
         $stockOpnameDetails = StockOpnameDetail::get();
-        $ingredients = Ingredient::get();
-        return view('backend.stock_opname.index', compact('stockOpnames', 'ingredients','stockOpnameDetails'));
+
+        return view('backend.stock_opname.index', compact('stockOpnames','stockOpnameDetails'));
     }
 
     public function create() {
-        $ingredients = Ingredient::get();
-        $roleName = auth()->user()->getRoleNames()[0];
         $warehouses = Warehouse::get();
+        $warehouse = Warehouse::find(auth()->user()->warehouse_id);
+        $ingredients = Ingredient::where('business_id', $warehouse->business_id)->get();
+        $roleName = auth()->user()->getRoleNames()[0];
         return view('backend.stock_opname.create', compact('ingredients', 'roleName', 'warehouses'));
     }
 

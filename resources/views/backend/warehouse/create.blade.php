@@ -62,12 +62,16 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Nama Bisnis *</label>
+                                            @if(auth()->user()->hasRole('Superadmin'))
                                             <select name="business_id" class="form-control">
                                                 <option value="">---Pilih Bisnis---</option>
                                                 @foreach($business as $bisnis)
                                                 <option value="{{$bisnis->id}}" {{$bisnis->id == $warehouse->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
                                                 @endforeach
                                             </select>
+                                            @elseif(auth()->user()->hasRole('Admin Bisnis'))
+                                            <input type="text" readonly name="business_id" class="form-control" value="{{auth()->user()->business->name}}">
+                                            @endif
                                         </div>
                                         <div class="form-group">
                                             <label>Alamat *</label>
@@ -115,12 +119,16 @@
                     </div>
                     <div class="form-group">
                         <label>Nama Bisnis *</label>
+                        @if(auth()->user()->hasRole('Superadmin'))
                         <select name="business_id" class="form-control">
                             <option value="">---Pilih Bisnis---</option>
                             @foreach($business as $bisnis)
                             <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
                             @endforeach
                         </select>
+                        @elseif(auth()->user()->hasRole('Admin Bisnis'))
+                        <input type="text" readonly class="form-control" name="business_id" value="{{auth()->user()->business->name}}">
+                        @endif
                     </div>
                     <div class="form-group">
                         <label>Alamat *</label>
@@ -170,10 +178,10 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("ul#outlet").siblings('a').attr('aria-expanded','true');
-    $("ul#outlet").addClass("show");
-    $("ul#outlet #warehouse-menu").addClass("active");
-
+    // $("ul#outlet").siblings('a').attr('aria-expanded','true');
+    // $("ul#outlet").addClass("show");
+    // $("ul#outlet #warehouse-menu").addClass("active");
+    $("#outlet").addClass("active");
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
 

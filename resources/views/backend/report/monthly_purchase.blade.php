@@ -3,15 +3,15 @@
 	<div class="container-fluid">
 		<div class="card">
 			<div class="card-body">
-				{{ Form::open(['route' => ['report.monthlyPurchaseByWarehouse', $year], 'method' => 'post', 'id' => 'report-form']) }}
-				<input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}">
+				{{-- {{ Form::open(['route' => ['report.monthlyPurchaseByWarehouse', $year], 'method' => 'post', 'id' => 'report-form']) }} --}}
+				{{-- <input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}"> --}}
 				<h4 class="text-center">{{trans('file.Monthly Purchase Report')}} &nbsp;&nbsp;
-				<select class="selectpicker" id="warehouse_id" name="warehouse_id">
+				{{-- <select class="selectpicker" id="warehouse_id" name="warehouse_id">
 					<option value="0">Semua Cabang</option>
 					@foreach($lims_warehouse_list as $warehouse)
 					<option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
 					@endforeach
-				</select>
+				</select> --}}
 				</h4>
 				<div class="table-responsive mt-4">
 					<table class="table table-bordered" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">

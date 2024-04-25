@@ -42,9 +42,15 @@ class ProductController extends Controller
     public function index()
     {
         $roleName = auth()->user()->getRoleNames()[0];
-        $products = Product::get();
-        if($roleName == 'Kasir'){
-            $products = Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        // $products = Product::get();
+        // if($roleName == 'Kasir'){
+        //     $products = Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        // }
+
+        if(auth()->user()->hasRole('Superadmin')){
+            $products = Product::get();
+        } elseif(auth()->user()->hasRole('Admin Bisnis')){
+            $products = Product::where('business_id', auth()->user()->business_id)->get();
         }
         $numberOfProduct = DB::table('products')->where('is_active', true)->count();
         return view('backend.product.index', compact('numberOfProduct', 'products','roleName'));
@@ -54,7 +60,7 @@ class ProductController extends Controller
     {
         $roleName = auth()->user()->getRoleNames()[0];
        $lims_category_list = Category::where('is_active', true)->get();
-       $ingredients = Ingredient::get();
+       $ingredients = Ingredient::where('business_id', auth()->user()->business_id)->get();
        $lims_unit_list = Unit::where('is_active', true)->get();
        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
        $numberOfProduct = Product::where('is_active', true)->count();
@@ -93,6 +99,7 @@ class ProductController extends Controller
             'code' => $request->code,
             'category_id' => $request->category_id,
             'unit_id' => $request->unit_id,
+            'business_id' => auth()->user()->business_id,
             'product_details' => $request->product_details,
             'price' => $request->price,
             'image' => $imageName,
@@ -139,7 +146,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $lims_category_list = Category::where('is_active', true)->get();
-        $ingredients = Ingredient::get();
+        $ingredients = Ingredient::where('business_id', auth()->user()->business_id)->get();
         $product_warehouses = Product_Warehouse::where('product_id', $id)->get();
         $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
         $lims_unit_list = Unit::where('is_active', true)->get();

@@ -182,7 +182,7 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("#ingredient").addClass("active");
+    $("#bahan-baku").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;

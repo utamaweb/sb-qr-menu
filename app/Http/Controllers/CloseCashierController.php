@@ -16,7 +16,12 @@ class CloseCashierController extends Controller
     use CacheForget;
     public function index()
     {
-        $closeCashiers = CloseCashier::get();
+        $warehouseId = auth()->user()->warehouse_id;
+
+        // Ambil data close_cashiers yang memiliki warehouse_id sesuai dengan pengguna yang login
+        $closeCashiers = CloseCashier::whereHas('shift', function ($query) use ($warehouseId) {
+            $query->where('warehouse_id', $warehouseId);
+        })->orderBy('id', 'DESC')->get();
         return view('backend.close_cashier.index', compact('closeCashiers'));
     }
 

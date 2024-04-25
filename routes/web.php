@@ -16,6 +16,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\IngredientController;
 use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\StockPurchaseController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
@@ -166,8 +167,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('ingredient/deletebyselection', 'deleteBySelection');
             Route::post('ingredient/ingredient-data', 'ingredientData');
         });
-        Route::get('ingredient', [IngredientController::class, 'ingredient'])->name('bahan-baku.ingredient');
         Route::resource('bahan-baku', IngredientController::class);
+        Route::resource('stok', StockController::class);
         Route::resource('stock-opname', StockOpnameController::class);
         Route::resource('close-cashier', CloseCashierController::class);
         Route::put('stock-opname-detail/{id}', [StockOpnameController::class,'updateDetail'])->name('updateDetailStockOpname');
@@ -182,46 +183,6 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('shift/shift-data', 'shiftData');
         });
         Route::resource('shift', ShiftController::class);
-
-
-        Route::resource('tables', TableController::class);
-
-
-        Route::controller(TaxController::class)->group(function () {
-            Route::post('importtax', 'importTax')->name('tax.import');
-            Route::post('tax/deletebyselection', 'deleteBySelection');
-            Route::get('tax/lims_tax_search', 'limsTaxSearch')->name('tax.search');
-        });
-        Route::resource('tax', TaxController::class);
-
-
-        Route::controller(CustomerGroupController::class)->group(function () {
-            Route::post('importcustomer_group', 'importCustomerGroup')->name('customer_group.import');
-            Route::post('customer_group/deletebyselection', 'deleteBySelection');
-            Route::get('customer_group/lims_customer_group_search', 'limsCustomerGroupSearch')->name('customer_group.search');
-            Route::get('customer_group/all', 'customerGroupAll')->name('customer_group.all');
-        });
-        Route::resource('customer_group', CustomerGroupController::class);
-
-
-        Route::resource('discount-plans', DiscountPlanController::class);
-        Route::resource('discounts', DiscountController::class);
-        Route::get('discounts/product-search/{code}', [DiscountController::class,'productSearch']);
-
-
-        Route::controller(CustomerController::class)->group(function () {
-            Route::post('importcustomer', 'importCustomer')->name('customer.import');
-            Route::get('customer/getDeposit/{id}', 'getDeposit');
-            Route::post('customer/add_deposit', 'addDeposit')->name('customer.addDeposit');
-            Route::post('customer/update_deposit', 'updateDeposit')->name('customer.updateDeposit');
-            Route::post('customer/deleteDeposit', 'deleteDeposit')->name('customer.deleteDeposit');
-            Route::post('customer/deletebyselection', 'deleteBySelection');
-            Route::get('customer/lims_customer_search', 'limsCustomerSearch')->name('customer.search');
-            Route::post('customers/clear-due', 'clearDue')->name('customer.clearDue');
-            Route::get('customers/all', 'customersAll')->name('customer.all');
-        });
-        Route::resource('customer', CustomerController::class)->except('show');
-
 
         Route::controller(SaleController::class)->group(function () {
             Route::post('sales/sale-data', 'saleData');

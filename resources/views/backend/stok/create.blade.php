@@ -2,6 +2,7 @@
 
 <section>
     <div class="container-fluid">
+
     @if($errors->has('name'))
     <div class="alert alert-danger alert-dismissible text-center">
         <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
@@ -16,54 +17,45 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
-    {{-- @can('tambah-user') --}}
-        <a href="{{route('produk-outlet.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Produk Outlet</a>
-            {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
-    {{-- @endcan --}}
-        </div>
+        {{-- @can('tambah-bahanbaku')
+        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>&nbsp;
+        @endcan --}}
+    </div>
     <div class="table-responsive">
         <table id="ingredient-table" class="table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Produk</th>
+                    <th class="text-center">#</th>
+                    <th>Nama Bahan Baku</th>
                     <th>Outlet</th>
-                    <th>Harga</th>
+                    {{-- <th>Stok Awal</th> --}}
+                    <th>Stok Masuk</th>
+                    <th>Stok Terjual</th>
+                    <th>Stok Akhir</th>
+                    <th>Unit</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($productWarehouses as $key=>$productWarehouse)
-                <tr data-id="{{$productWarehouse->id}}">
-                    <td>{{++$key}}</td>
-                    <td>{{ $productWarehouse->product->name }}</td>
-                    <td>{{ $productWarehouse->warehouse->name}}</td>
-                    <td>@currency($productWarehouse->price)</td>
+                @foreach($lims_ingredient_all as $key=>$ingredient)
+                <tr data-id="{{$ingredient->id}}">
+                    <td class="text-center">{{++$key}}</td>
+                    <td>{{ $ingredient->ingredient->name }}</td>
+                    <td>{{ $ingredient->warehouse->name }}</td>
+                    {{-- <td>{{ $ingredient->first_stock }}</td> --}}
+                    <td>{{ $ingredient->stock_in }}</td>
+                    <td>{{ $ingredient->stock_used }}</td>
+                    <td>{{ $ingredient->last_stock }}</td>
+                    <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
                     <td>
-                        {{-- @canany(['ubah-user', 'hapus-user']) --}}
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
-                                <span class="caret"></span>
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
-                                @can('ubah-user')
-                                <li>
-                                	<a href="{{ route('produk-outlet.edit', $productWarehouse->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
-                                </li>
-                                @endcan
-                                <li class="divider"></li>
-                                @can('hapus-user')
-                                {{ Form::open(['route' => ['produk-outlet.destroy', $productWarehouse->id], 'method' => 'DELETE'] ) }}
-                                <li>
+                        <div class="row">
+                        @can('hapus-bahanbaku')
+                        {{ Form::open(['route' => ['stok.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                </li>
                                 {{ Form::close() }}
-                                @endcan
-                            </ul>
-                        </div>
-                        {{-- @endcanany --}}
+                        @endcan
                     </td>
+                </div>
                 </tr>
                 @endforeach
             </tbody>
@@ -71,121 +63,20 @@
     </div>
 </section>
 
+
+
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
-    // $("ul#outlet").siblings('a').attr('aria-expanded','true');
-    // $("ul#outlet").addClass("show");
-    // $("ul#outlet #user-list-menu").addClass("active");
-    $("#produk-outlet").addClass("active");
-    var ingredient_id = [];
-    var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $(document).ready(function() {
-    $(document).on('click', '.open-EditUnitDialog', function() {
-        var url = "ingredient/"
-        var id = $(this).data('id').toString();
-        url = url.concat(id).concat("/edit");
-
-        $.get(url, function(data) {
-            $("input[name='name']").val(data['name']);
-            $("input[name='first_stock']").val(data['first_stock']);
-            $("input[name='unit_id']").val(data['unit_id']);
-            $("input[name='operation_value']").val(data['operation_value']);
-            $("input[name='ingredient_id']").val(data['id']);
-            $("#base_unit_edit").val(data['base_unit']);
-            if(data['base_unit']!=null)
-            {
-                $(".operator").show();
-                $(".operation_value").show();
-            }
-            else
-            {
-                $(".operator").hide();
-                $(".operation_value").hide();
-            }
-            $('.selectpicker').selectpicker('refresh');
-
-        });
-    });
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $( "#select_all" ).on( "change", function() {
-        if ($(this).is(':checked')) {
-            $("tbody input[type='checkbox']").prop('checked', true);
-        }
-        else {
-            $("tbody input[type='checkbox']").prop('checked', false);
-        }
-    });
-
-    $("#export").on("click", function(e){
-        e.preventDefault();
-        var unit = [];
-        $(':checkbox:checked').each(function(i){
-          unit[i] = $(this).val();
-        });
-        $.ajax({
-           type:'POST',
-           url:'/exportunit',
-           data:{
-
-                unitArray: unit
-            },
-           success:function(data){
-            alert('Exported to CSV file successfully! Click Ok to download file');
-            window.location.href = data;
-           }
-        });
-    });
-
-    $('.open-CreateUnitDialog').on('click', function() {
-        $(".operator").hide();
-        $(".operation_value").hide();
-
-    });
-
-    $('#base_unit_create').on('change', function() {
-        if($(this).val()){
-            $("#createModal .operator").show();
-            $("#createModal .operation_value").show();
-        }
-        else{
-            $("#createModal .operator").hide();
-            $("#createModal .operation_value").hide();
-        }
-    });
-
-    $('#base_unit_edit').on('change', function() {
-        if($(this).val()){
-            $("#editModal .operator").show();
-            $("#editModal .operation_value").show();
-        }
-        else{
-            $("#editModal .operator").hide();
-            $("#editModal .operation_value").hide();
-        }
-    });
-});
+    $("#daftar-stok").addClass("active");
 
     $('#ingredient-table').DataTable( {
         "order": [],
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
              "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  'Cari',
+            "search":  '{{trans("file.Search")}}',
             'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
@@ -251,6 +142,7 @@
             //     text: '<i title="delete" class="dripicons-cross"></i>',
             //     className: 'buttons-delete',
             //     action: function ( e, dt, node, config ) {
+            //         if(user_verified == '1') {
             //             ingredient_id.length = 0;
             //             $(':checkbox:checked').each(function(i){
             //                 if(i){
@@ -272,6 +164,9 @@
             //             }
             //             else if(!ingredient_id.length)
             //                 alert('No unit is selected!');
+            //         }
+            //         else
+            //             alert('This feature is disable for demo!');
             //     }
             // },
             {

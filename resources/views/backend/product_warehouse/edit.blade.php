@@ -27,12 +27,17 @@
                                     </div>
                                     <div class="form-group">
                                         <label><strong>Outlet *</strong></label>
+                                        @if(auth()->user()->hasRole('Superadmin'))
                                         <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
                                             title="Pilih outlet...">
                                             @foreach($warehouses as $warehouse)
                                             <option value="{{$warehouse->id}}" {{$warehouse->id == $productWarehouse->warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
                                             @endforeach
                                         </select>
+                                        @else
+                                        <input type="hidden" readonly name="warehouse_id" value="{{auth()->user()->warehouse_id}}" class="form-control">
+                                        <input type="text" readonly name="warehouse_name" value="{{auth()->user()->warehouse->name}}" class="form-control">
+                                        @endif
                                     </div>
                                     <div class="form-group mt-3">
                                         <label><strong>Harga *</strong></label>
@@ -61,45 +66,11 @@
 @push('scripts')
 <script type="text/javascript">
 $("ul#outlet").siblings('a').attr('aria-expanded','true');
-    $("ul#outlet").addClass("show");
-    $("ul#outlet #user-list-menu").addClass("active");
+    // $("ul#outlet").addClass("show");
+    // $("ul#outlet #user-list-menu").addClass("active");
+    $("#produk-outlet").addClass("active");
 
-    $("ul#people").siblings('a').attr('aria-expanded','true');
-    $("ul#people").addClass("show");
-    $('#biller-id').hide();
-    $('#warehouseId').hide();
-
-
-
-    $('select[name=role_id]').val($("input[name='role_id_hidden']").val());
-    if($('select[name=role_id]').val() > 2){
-        $('#warehouseId').show();
-        $('select[name=warehouse_id]').val($("input[name='warehouse_id_hidden']").val());
-        $('#biller-id').show();
-        $('select[name=biller_id]').val($("input[name='biller_id_hidden']").val());
-    }
     $('.selectpicker').selectpicker('refresh');
-
-    $('select[name="role_id"]').on('change', function() {
-        if($(this).val() > 2){
-            $('select[name="warehouse_id"]').prop('required',true);
-            $('select[name="biller_id"]').prop('required',true);
-            $('#biller-id').show();
-            $('#warehouseId').show();
-        }
-        else{
-            $('select[name="warehouse_id"]').prop('required',false);
-            $('select[name="biller_id"]').prop('required',false);
-            $('#biller-id').hide();
-            $('#warehouseId').hide();
-        }
-    });
-
-    $('#genbutton').on("click", function(){
-      $.get('../genpass', function(data){
-        $("input[name='password']").val(data);
-      });
-    });
 
 </script>
 @endpush

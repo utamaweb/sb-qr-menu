@@ -3,24 +3,24 @@
 	<div class="container-fluid">
 		<div class="card">
 			<div class="card-body">
-				{{ Form::open(['route' => ['report.monthlySaleByWarehouse', $year], 'method' => 'post', 'id' => 'report-form']) }}
-				<input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}">
+				{{-- {{ Form::open(['route' => ['report.monthlySaleByWarehouse', $year], 'method' => 'post', 'id' => 'report-form']) }}
+				<input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}"> --}}
 				<h4 class="text-center">{{trans('file.Monthly Sale Report')}} &nbsp;&nbsp;
-				<select class="selectpicker" id="warehouse_id" name="warehouse_id">
+				{{-- <select class="selectpicker" id="warehouse_id" name="warehouse_id">
 					<option value="0">Semua Cabang</option>
 					@foreach($lims_warehouse_list as $warehouse)
 					<option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
 					@endforeach
 				</select>
 				</h4>
-				{{ Form::close() }}
+				{{ Form::close() }} --}}
 				<div class="table-responsive mt-4">
 					<table class="table table-bordered" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
 						<thead>
 							<tr>
-								<th><a href="{{url('report/monthly_sale/'.($year-1))}}"><i class="fa fa-arrow-left"></i> {{trans('file.Previous')}}</a></th>
+								<th><a href="{{url('admin/report/monthly_sale/'.($year-1))}}"><i class="fa fa-arrow-left"></i> {{trans('file.Previous')}}</a></th>
 						    	<th colspan="10" class="text-center">{{$year}}</th>
-						    	<th><a href="{{url('report/monthly_sale/'.($year+1))}}">{{trans('file.Next')}} <i class="fa fa-arrow-right"></i></a></th>
+						    	<th><a href="{{url('admin/report/monthly_sale/'.($year+1))}}">{{trans('file.Next')}} <i class="fa fa-arrow-right"></i></a></th>
 						    </tr>
 						</thead>
 					    <tbody>

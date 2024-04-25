@@ -40,10 +40,6 @@
                                     <label><strong>{{trans('file.Password')}} *</strong> </label>
                                     <div class="input-group">
                                         <input type="password" name="password" required class="form-control">
-                                        <div class="input-group-append">
-                                            <button id="genbutton" type="button"
-                                                class="btn btn-default">{{trans('file.Generate')}}</button>
-                                        </div>
                                         @if($errors->has('password'))
                                         <small>
                                             <strong>{{ $errors->first('password') }}</strong>
@@ -92,7 +88,16 @@
                                     </select>
                                 </div>
                                 @elseif(auth()->user()->hasRole('Admin Bisnis'))
-                                <div class="form-group">
+                                <div class="form-group bisnis-select" style="display: none;">
+                                    <label><strong>Bisnis *</strong></label>
+                                    <select name="business_id" class="selectpicker form-control" data-live-search="true"
+                                        data-live-search-style="begins" title="Pilih Bisnis...">
+                                        @foreach($business as $bisnis)
+                                        <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group warehouse-select">
                                     <label><strong>Outlet *</strong></label>
                                     <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih outlet...">

@@ -12,7 +12,15 @@ class StockController extends Controller
      */
     public function index()
     {
-        //
+        if(auth()->user()->hasRole('Superadmin')){
+            $lims_ingredient_all = Stock::get();
+        } elseif(auth()->user()->hasRole('Admin Bisnis')) {
+            $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+            $lims_ingredient_all = Stock::whereIn('warehouse_id', $warehouse_id)->get();
+        } else{
+            $lims_ingredient_all = Stock::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        }
+        return view('backend.stok.create', compact('lims_ingredient_all'));
     }
 
     /**
@@ -58,8 +66,9 @@ class StockController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Stock $stock)
+    public function destroy($id)
     {
-        //
+        $lims_order_type_data = Stock::find($id)->delete();
+        return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 }

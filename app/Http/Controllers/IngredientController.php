@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Ingredient;
 use App\Models\Unit;
 use App\Models\Stock;
+use App\Models\Warehouse;
 use Illuminate\Validation\Rule;
 use Keygen;
 use Auth;
@@ -17,14 +18,10 @@ class IngredientController extends Controller
     use CacheForget;
     public function index()
     {
-        // $lims_ingredient_all = Ingredient::get();
-        $lims_ingredient_all = Stock::get();
-        $roleName = auth()->user()->getRoleNames()[0];
-        if($roleName == 'Kasir'){
-            $lims_ingredient_all = Stock::where('warehouse_id', auth()->user()->warehouse_id)->get();
-        }
+        $lims_ingredient_all = Ingredient::where('business_id', auth()->user()->business_id)->get();
+        // $lims_ingredient_all = Stock::get();
         $units = Unit::get();
-        return view('backend.ingredient.create', compact('lims_ingredient_all', 'units'));
+        return view('backend.bahan_baku.create', compact('lims_ingredient_all', 'units'));
     }
 
     public function ingredient()

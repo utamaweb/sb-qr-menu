@@ -929,37 +929,6 @@
 
       });
 
-      $("a#customer-report-link").click(function(e){
-        e.preventDefault();
-        $('#loader').css('display','block');
-        $.ajax({
-          url: "{{route('customer.all')}}",
-          type: 'GET',
-          dataType: 'json',
-          success: function(data) {
-            $('#customer_modal_id').html(data);
-            $('.selectpicker').selectpicker('refresh');
-            $('#loader').css('display','none');
-            $('#customer-modal').modal();
-          }
-        });
-      });
-
-      $("a#customer-group-report-link").click(function(e){
-        e.preventDefault();
-        $('#loader').css('display','block');
-        $.ajax({
-          url: "{{route('customer_group.all')}}",
-          type: 'GET',
-          dataType: 'json',
-          success: function(data) {
-            $('#customer_group_modal_id').html(data);
-            $('.selectpicker').selectpicker('refresh');
-            $('#loader').css('display','none');
-            $('#customer-group-modal').modal();
-          }
-        });
-      });
 
       $("a#supplier-report-link").click(function(e){
         e.preventDefault();

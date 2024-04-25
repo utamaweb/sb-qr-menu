@@ -18,15 +18,15 @@
     <li id="produk"><a href="{{route('produk.index')}}"> <i class="dripicons-user-id"></i><span>Produk</span></a></li>
     <li id="unit"><a href="{{route('unit.index')}}"> <i class="dripicons-user-id"></i><span>Unit</span></a></li>
     <li id="tipe-pesanan"><a href="{{route('tipe-pesanan.index')}}"> <i class="dripicons-user-id"></i><span>Tipe Pesanan</span></a></li>
-    <li id="bahan-baku"><a href="{{route('bahan-baku.ingredient')}}"> <i class="dripicons-user-id"></i><span>Bahan Baku</span></a></li>
+    <li id="bahan-baku"><a href="{{route('bahan-baku.index')}}"> <i class="dripicons-user-id"></i><span>Bahan Baku</span></a></li>
     <li id="user"><a href="{{route('user.index')}}"> <i class="dripicons-user"></i><span>User</span></a></li>
     <li id="outlet"><a href="{{route('outlet.index')}}"> <i class="dripicons-store"></i><span>Outlet</span></a></li>
 
     {{-- Menu Admin Outlet --}}
     @elseif(auth()->user()->hasRole('Admin Outlet'))
     <li id="produk-outlet"><a href="{{route('produk-outlet.index')}}"> <i class="dripicons-user-id"></i><span>Produk Outlet</span></a></li>
-    <li id="daftar-stok"><a href="{{route('bahan-baku.index')}}"> <i class="dripicons-user-id"></i><span>Daftar Stok</span></a></li>
-    <li id="daftar-stok"><a href="{{route('pembelian-stok.index')}}"> <i class="dripicons-user-id"></i><span>Tambah Stok</span></a></li>
+    <li id="daftar-stok"><a href="{{route('stok.index')}}"> <i class="dripicons-user-id"></i><span>Daftar Stok</span></a></li>
+    <li id="tambah-stok"><a href="{{route('pembelian-stok.index')}}"> <i class="dripicons-user-id"></i><span>Tambah Stok</span></a></li>
     <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stok Opname</span></a></li>
     <li id="list-transaction"><a href="{{route('report.listTransaction')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a></li>
     @can('lihat-laporan')

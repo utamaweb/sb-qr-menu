@@ -337,23 +337,24 @@ class ReportController extends Controller
         $role = Role::find(Auth::user()->role_id);
         $start = strtotime($year .'-01-01');
         $end = strtotime($year .'-12-31');
+        $warehouse_id = auth()->user()->warehouse_id;
         while($start <= $end)
         {
             $start_date = $year . '-'. date('m', $start).'-'.'01';
             $end_date = $year . '-'. date('m', $start).'-'.'31';
 
-            $temp_order_qty = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
+            $temp_order_qty = Transaction::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
             $total_qty[] = number_format((float)$temp_order_qty, config('decimal'), '.', '');
 
-            $total_paid_amount = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
+            $total_paid_amount = Transaction::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
             $total_paid[] = number_format((float)$total_paid_amount, config('decimal'), '.', '');
 
-            $temp_total = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
+            $temp_total = Transaction::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
             $total_amount[] = number_format((float)$temp_total, config('decimal'), '.', '');
             $start = strtotime("+1 month", $start);
         }
         $lims_warehouse_list = Warehouse::where('is_active',true)->get();
-        $warehouse_id = 0;
+        // $warehouse_id = 0;
         return view('backend.report.monthly_sale', compact('year', 'total_qty', 'total_paid', 'total_amount','lims_warehouse_list', 'warehouse_id'));
     }
 

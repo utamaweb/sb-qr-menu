@@ -150,14 +150,14 @@ class ProductController extends Controller
         $product_warehouses = Product_Warehouse::where('product_id', $id)->get();
         $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
         $lims_unit_list = Unit::where('is_active', true)->get();
-        $lims_product_data = Product::where('id', $id)->first();
-        if($lims_product_data->variant_option) {
-            $lims_product_data->variant_option = json_decode($lims_product_data->variant_option);
-            $lims_product_data->variant_value = json_decode($lims_product_data->variant_value);
+        $product = Product::where('id', $id)->first();
+        if($product->variant_option) {
+            $product->variant_option = json_decode($product->variant_option);
+            $product->variant_value = json_decode($product->variant_value);
         }
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         $noOfVariantValue = 0;
-        return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'lims_product_data', 'lims_warehouse_list', 'noOfVariantValue','ingredients','ingredientProducts', 'product_warehouses'));
+        return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'product', 'lims_warehouse_list', 'noOfVariantValue','ingredients','ingredientProducts', 'product_warehouses'));
     }
 
     public function update(Request $request, $id)

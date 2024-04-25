@@ -196,6 +196,7 @@ class ReportController extends Controller
         $role = Role::find(Auth::user()->role_id);
         $start = 1;
         $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
+        $warehouse_id = auth()->user()->warehouse_id;
         while($start <= $number_of_day)
         {
             if($start < 10)
@@ -208,7 +209,7 @@ class ReportController extends Controller
                 'SUM(total_amount) AS total_amount'
             );
             // $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $sale_data = Transaction::where('date', $date)->selectRaw(implode(',', $query1))->get();
+            $sale_data = Transaction::where('warehouse_id', $warehouse_id)->where('date', $date)->selectRaw(implode(',', $query1))->get();
             $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
             $total_qty[$start] = $sale_data[0]->total_qty;
             $total_amount[$start] = $sale_data[0]->total_amount;

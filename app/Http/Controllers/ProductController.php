@@ -60,7 +60,7 @@ class ProductController extends Controller
     {
         $roleName = auth()->user()->getRoleNames()[0];
        $lims_category_list = Category::where('is_active', true)->get();
-       $ingredients = Ingredient::get();
+       $ingredients = Ingredient::where('business_id', auth()->user()->business_id)->get();
        $lims_unit_list = Unit::where('is_active', true)->get();
        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
        $numberOfProduct = Product::where('is_active', true)->count();
@@ -146,7 +146,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $lims_category_list = Category::where('is_active', true)->get();
-        $ingredients = Ingredient::get();
+        $ingredients = Ingredient::where('business_id', auth()->user()->business_id)->get();
         $product_warehouses = Product_Warehouse::where('product_id', $id)->get();
         $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
         $lims_unit_list = Unit::where('is_active', true)->get();

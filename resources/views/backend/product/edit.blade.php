@@ -159,8 +159,9 @@ function generateRandomCode(length) {
 }
 
 $("ul#product").siblings('a').attr('aria-expanded','true');
-    $("ul#product").addClass("show");
-    $("ul#product #product-list-menu").addClass("active");
+    // $("ul#product").addClass("show");
+    $("#produk").addClass("active");
+    // $("ul#product #product-list-menu").addClass("active");
     var product_id = <?php echo json_encode($lims_product_data->id) ?>;
 
     $('.selectpicker').selectpicker({

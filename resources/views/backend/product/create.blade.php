@@ -1,6 +1,33 @@
 @extends('backend.layout.main')
 @push('css')
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+    img{
+  max-width:180px;
+}
+.input_container {
+  border: 1px solid #e5e5e5;
+}
+
+input[type=file]::file-selector-button {
+  background-color: #fff;
+  color: #000;
+  border: 0px;
+  border-right: 1px solid #e5e5e5;
+  padding: 10px 15px;
+  /* margin-right: 20px; */
+  transition: .5s;
+}
+
+input[type=file]::file-selector-button:hover {
+  background-color: #eee;
+  border: 0px;
+  border-right: 1px solid #e5e5e5;
+}
+/* #blah{
+    margin-left: 100px;
+} */
+</style>
 @endpush
 @section('content')
 <section class="forms">
@@ -9,20 +36,47 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
+    <form action="{{route('produk.store')}}" method="POST" enctype="multipart/form-data">
+        @csrf
         <div class="row">
-            <div class="col-md-12">
+            <div class="col-md-4">
                 <div class="card">
                     <div class="card-header d-flex align-items-center">
-                        <h4>Tambah Produk</h4>
+                        <h4>Gambar Produk</h4>
+                    </div>
+                    <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Gambar Produk</strong> </label> <i
+                                                    class="dripicons-question" data-toggle="tooltip"
+                                                    title="Upload gambar dengan format .jpeg, .jpg, .png, .gif."></i>
+                                                <div class="input_container">
+                                                    <input type="file" class="form-control" name="image" onchange="readURL(this);">
+                                                </div>
+                                                <span class="validation-msg" id="image-error"></span>
+                                                <div class="text-center">
+                                                    <img id="blah" />
+                                                </div>
+                                            </div>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <h4>Data Produk</h4>
                     </div>
                     <div class="card-body">
                         <p class="italic">
                             <small>Inputan yang ditandai dengan * wajib diisi.</small>
                         </p>
-                        <form action="{{route('produk.store')}}" method="POST" enctype="multipart/form-data">
-                            @csrf
                             <div class="row">
-                                <div class="col-12">
+                                <div class="col-md-12">
                                     <div class="row">
                                         <div class="col-md-4">
                                             <div class="form-group">
@@ -78,35 +132,19 @@
                                         </div>
                                         <div class="col-md-4">
                                             <div class="form-group">
-                                                <label>Gambar Produk</strong> </label> <i
-                                                    class="dripicons-question" data-toggle="tooltip"
-                                                    title="Upload gambar dengan format .jpeg, .jpg, .png, .gif."></i>
-                                                {{-- <div id="imageUpload" class="dropzone"></div> --}}
-                                                <input type="file" class="form-control" name="image">
-                                                <span class="validation-msg" id="image-error"></span>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <div class="form-group">
                                                 <label>Harga Produk *</strong> </label>
                                                 <input type="number" name="price" required class="form-control" step="any" value="{{old('price')}}">
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
 
-                            </div>
-                            <div class="row">
-                                <div id="unit" class="col-md-12">
-                                    <div class="row ">
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Detail Produk</label>
                                                 <input name="product_details" class="form-control" rows="3" value="{{old('product_details')}}">
                                             </div>
                                         </div>
-                                        <div class="col-md-6">
+                                        <div class="col-md-4">
                                             <label>Bahan Baku</label>
                                             <div class="search-box input-group mb-4">
                                                 {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
@@ -120,8 +158,8 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                    </div>
-                                    </div>
+                                        </div>
+                                </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">
@@ -132,10 +170,11 @@
                                             class="btn btn-primary">
                                     </div>
                                 </div>
-                        </form>
                     </div>
+                </form>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </section>
@@ -146,7 +185,18 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script type="text/javascript">
+     function readURL(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
 
+                reader.onload = function (e) {
+                    $('#blah')
+                        .attr('src', e.target.result);
+                };
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
 $(document).ready(function() {
     $('#genbutton').click(function() {
         var randomCode = generateRandomCode(8); // Panggil fungsi untuk menghasilkan 8 angka acak

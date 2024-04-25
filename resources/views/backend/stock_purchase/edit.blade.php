@@ -50,20 +50,26 @@
                                     <label for="example-text-input" class="col-md-1 col-form-label">Bahan Baku</label>
 
                                     <div class="col-md-2">
-                                        <input type="text" name="ingredient_id[]" value="{{$detail->ingredient->id}}" readonly class="form-control">
+                                        <input type="text" value="{{$detail->ingredient->name}}" readonly class="form-control">
+                                        <input type="hidden" name="ingredient_id[]" value="{{$detail->ingredient->id}}" readonly class="form-control">
                                         <input type="hidden" name="stock_purchase_ingredient_id[]" value="{{$detail->id}}" readonly class="form-control">
+                                        <small class="text-danger">Bahan Baku</small>
                                     </div>
                                     <div class="col-md-2">
                                         <input type="number" placeholder="Qty" name="qty[]"" min="1" class="form-control quantity" value="{{$detail->qty}}" readonly>
+                                        <small class="text-danger">Qty</small>
                                     </div>
                                     <div class="col-md-2">
                                         <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan" value="{{$detail->subtotal / $detail->qty}}">
+                                        <small class="text-danger">Harga Satuan</small>
                                     </div>
                                     <div class="col-md-2">
                                         <input type="number" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal" value="{{$detail->subtotal}}">
+                                        <small class="text-danger">Subtotal</small>
                                     </div>
                                     <div class="col-md-2">
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control" readonly value="{{$detail->notes}}">
+                                        <small class="text-danger">Catatan</small>
                                     </div>
 
                                     {{-- <div class="col-md-2">
@@ -94,7 +100,7 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    $("#stock-purchase").addClass("active");
+    $("#tambah-stok").addClass("active");
     $(document).ready(function() {
         var maxAppend = 0;
         $("#add_more").click(function() {

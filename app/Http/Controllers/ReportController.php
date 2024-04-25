@@ -822,47 +822,23 @@ class ReportController extends Controller
 
     }
 
-    public function listTransaction(Request $request)
+    public function listTransaction()
     {
-        $data = $request->all();
         $start_date = Carbon::now()->format('Y-m-d');;
         $end_date = Carbon::now()->format('Y-m-d');;
-        $warehouse_id = 1;
 
-        if ($warehouse_id == 0) {
-            $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-                ->whereBetween('transactions.date', [$start_date, $end_date])
-                ->get(['transaction_details.*']);
-        } else {
-            $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-                ->whereBetween('transactions.date', [$start_date, $end_date])
-                ->where('transactions.warehouse_id', $warehouse_id)
-                ->get(['transaction_details.*']);
-        }
 
         $totalQtyPerProduct = [];
         $totalSubtotalPerProduct = [];
-        $products = Product::get();
-        $transactions = Transaction::orderBy('id', 'DESC')->get();
-
-        // $productId = [];
-
-        // foreach ($transaction_details as $item) {
-        //     $productId = $item['product_id'];
-        //     if (isset($totalQtyPerProduct[$productId])) {
-        //         $totalQtyPerProduct[$productId] += $item['qty'];
-        //     } else {
-        //         $totalQtyPerProduct[$productId] = $item['qty'];
-        //     }
-        //     if (isset($totalSubtotalPerProduct[$productId])) {
-        //         $totalSubtotalPerProduct[$productId] += $item['subtotal'];
-        //     } else {
-        //         $totalSubtotalPerProduct[$productId] = $item['subtotal'];
-        //     }
-        // }
-
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        return view('backend.report.list_transaction', compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct', 'products'));
+        if(auth()->user()->hasRole('Superadmin')){
+            $transactions = Transaction::orderBy('id', 'DESC')->get();
+        } elseif(auth()->user()->hasRole('Admin Bisnis')){
+            $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+            $transactions = Transaction::whereIn('warehouse_id', $warehouse_id)->orderBy('id', 'DESC')->get();
+        } else{
+            $transactions = Transaction::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->get();
+        }
+        return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct'));
 
     }
 

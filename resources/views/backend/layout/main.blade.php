@@ -499,38 +499,6 @@
 
 
 
-      <!-- warehouse modal -->
-      <div id="warehouse-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-        <div role="document" class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Warehouse Report')}}</h5>
-                    <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                </div>
-                <div class="modal-body">
-                  <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                    {!! Form::open(['route' => 'report.warehouse', 'method' => 'post']) !!}
-
-                      <div class="form-group">
-                          <label>Cabang *</label>
-                          <select name="warehouse_id" id="warehouse_modal_id" class="selectpicker form-control" required data-live-search="true" id="warehouse-id" data-live-search-style="begins" title="Pilih cabang...">
-
-                          </select>
-                      </div>
-
-                      <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
-                      <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-
-                      <div class="form-group">
-                          <button type="submit" class="btn btn-primary">{{trans('file.submit')}}</button>
-                      </div>
-                    {{ Form::close() }}
-                </div>
-            </div>
-        </div>
-      </div>
-      <!-- end warehouse modal -->
-
       <!-- user modal -->
       <div id="user-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
         <div role="document" class="modal-dialog">
@@ -895,22 +863,6 @@
         $("#payment-report-form").submit();
       });
 
-      $("a#warehouse-report-link").click(function(e){
-        e.preventDefault();
-        $('#loader').css('display','block');
-        $.ajax({
-          url: "{{route('warehouse.all')}}",
-          type: 'GET',
-          dataType: 'json',
-          success: function(data) {
-            $('#warehouse_modal_id').html(data);
-            $('.selectpicker').selectpicker('refresh');
-            $('#loader').css('display','none');
-            $('#warehouse-modal').modal();
-          }
-        });
-
-      });
 
       $("a#user-report-link").click(function(e){
         e.preventDefault();

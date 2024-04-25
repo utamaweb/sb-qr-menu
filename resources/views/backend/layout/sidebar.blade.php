@@ -84,9 +84,9 @@
             {!! Form::close() !!}
          </li>
 
-         <li id="warehouse-report-menu">
-            <a id="warehouse-report-link" href="">Laporan Cabang</a>
-         </li>
+         {{-- <li id="warehouse-report-menu">
+            <a id="warehouse-report-link" href="{{route('report.warehouse')}}">Laporan Cabang</a>
+         </li> --}}
 
       </ul>
     </li>

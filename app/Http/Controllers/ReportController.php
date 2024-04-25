@@ -401,6 +401,7 @@ class ReportController extends Controller
         $role = Role::find(Auth::user()->role_id);
         $start = strtotime($year .'-01-01');
         $end = strtotime($year .'-12-31');
+        $warehouse_id = auth()->user()->warehouse_id;
         while($start <= $end)
         {
             $start_date = $year . '-'. date('m', $start).'-'.'01';
@@ -410,7 +411,7 @@ class ReportController extends Controller
                 'SUM(qty) AS total_qty',
                 'SUM(amount) AS total_amount'
             );
-            $purchase_data = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query1))->get();
+            $purchase_data = Expense::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query1))->get();
 
             $total_qty[$start] = $purchase_data[0]->total_qty;
             $total_amount[$start] = $purchase_data[0]->total_amount;
@@ -1756,8 +1757,9 @@ class ReportController extends Controller
         $data = $request->all();
         $start_date = $data['start_date'];
         $end_date = $data['end_date'];
+        $warehouse_id = auth()->user()->warehouse_id;
 
-        $lims_payment_data = Transaction::where('date', '>=' , $start_date)->where('date', '<=' , $end_date)->get();
+        $lims_payment_data = Transaction::where('warehouse_id', $warehouse_id)->where('date', '>=' , $start_date)->where('date', '<=' , $end_date)->get();
         return view('backend.report.payment_report',compact('lims_payment_data', 'start_date', 'end_date'));
     }
 

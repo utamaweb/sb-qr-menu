@@ -33,8 +33,7 @@ class UserController extends Controller
             $outlet = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
             $lims_user_list = User::where('business_id', auth()->user()->business_id)->orWhereIn('warehouse_id', $outlet)->get();
         } else{
-            $business = Business::where('id', auth()->user()->warehouse->business_id)->get();
-            $lims_warehouse_all = Warehouse::where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+            $lims_user_list = User::where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
         }
 
         $numberOfUserAccount = User::where('is_active', true)->count();

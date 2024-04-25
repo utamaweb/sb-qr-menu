@@ -29,7 +29,6 @@
     <li id="tambah-stok"><a href="{{route('pembelian-stok.index')}}"> <i class="dripicons-user-id"></i><span>Tambah Stok</span></a></li>
     <li id="stock-opname"><a  href="{{route('stock-opname.index')}}"> <i class="dripicons-view-thumb"></i><span>Stok Opname</span></a></li>
     <li id="list-transaction"><a href="{{route('report.listTransaction')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a></li>
-    @can('lihat-laporan')
    <li>
       <a href="#report" aria-expanded="false" data-toggle="collapse"> <i
          class="dripicons-document-remove"></i><span>Laporan</span></a>
@@ -90,13 +89,11 @@
 
       </ul>
     </li>
-    <li id="list-transaction"><a href="{{route('report.listTransaction')}}"> <i class="dripicons-document-remove"></i><span>List Transaksi</span></a></li>
-    @endcan
 
     <li>
         <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
         <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
-          @if(auth()->user()->hasRole('Superadmin'))
+          @if(auth()->user()->hasRole(['Superadmin', 'Admin Bisnis', 'Admin Outlet']))
            <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
            </li>
            @endif

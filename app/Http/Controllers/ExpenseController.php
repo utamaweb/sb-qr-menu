@@ -18,36 +18,19 @@ use Carbon\Carbon;
 class ExpenseController extends Controller
 {
     public function index(Request $request)
-    {
-        // $role = Role::find(Auth::user()->role_id);
-        // if($role->hasPermissionTo('expenses-index')){
-            // $permissions = Role::findByName($role->name)->permissions;
-            // foreach ($permissions as $permission)
-            //     $all_permission[] = $permission->name;
-            // if(empty($all_permission))
-            //     $all_permission[] = 'dummy text';
-
-            if($request->starting_date) {
-                $starting_date = $request->starting_date;
-                $ending_date = $request->ending_date;
-            }
-            else {
-                $starting_date = date('Y-m-01', strtotime('-1 year', strtotime(date('Y-m-d'))));
-                $ending_date = date("Y-m-d");
-            }
-
-            if($request->input('warehouse_id'))
-                $warehouse_id = $request->input('warehouse_id');
-            else
-                $warehouse_id = 0;
-            $lims_expense_category_list = ExpenseCategory::get();
+{
+        $lims_expense_category_list = ExpenseCategory::get();
+        if(auth()->user()->hasRole('Superadmin')){
             $expenses = Expense::get();
-            $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
-            // $lims_account_list = Account::where('is_active', true)->get();
-            return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list', 'starting_date', 'ending_date', 'warehouse_id'));
-        // }
-        // else
-        //     return redirect()->back()->with('not_permitted', 'Sorry! You are not allowed to access this module');
+        } elseif(auth()->user()->hasRole('Admin Bisnis')){
+            $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+            $expenses = Expense::whereIn('warehouse_id', $warehouse_id)->get();
+        } else{
+            $expenses = Expense::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        }
+        $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
+        return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list'));
+
     }
 
 
@@ -96,7 +79,7 @@ class ExpenseController extends Controller
             'name' => $request->name,
             'qty' => $request->qty,
             'expense_category_id' => $request->expense_category_id,
-            'warehouse_id' => $request->warehouse_id,
+            // 'warehouse_id' => $request->warehouse_id,
             'amount' => $request->amount,
             'note' => $request->note,
         ]);

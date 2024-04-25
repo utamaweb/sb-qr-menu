@@ -1,7 +1,7 @@
 <ul id="side-main-menu" class="side-menu list-unstyled">
 
     <li id="dashboard"><a href="{{route('admin.dashboard')}}"> <i class="dripicons-meter"></i><span>Beranda</span></a></li>
-
+{{-- menu --}}
     {{-- Menu Superadmin --}}
     @if(auth()->user()->hasRole('Superadmin'))
     <li id="role"><a href="{{route('role.index')}}"> <i class="dripicons-user-group"></i><span>Role</span></a></li>

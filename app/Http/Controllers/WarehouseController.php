@@ -45,7 +45,7 @@ class WarehouseController extends Controller
             'is_active' => 1,
             // 'logo' => $imageName,
             'address' => $request->address,
-            'business_id' => $request->business_id,
+            'business_id' => auth()->user()->business_id,
         ]);
         $this->cacheForget('warehouse_list');
         return redirect()->back()->with('message', 'Data Berhasil Ditambahkan');
@@ -75,7 +75,6 @@ class WarehouseController extends Controller
         $lims_warehouse_data->update([
             'name' => $request->name,
             'address' => $request->address,
-            'business_id' => $request->business_id,
             'logo' => $imageName,
         ]);
         $this->cacheForget('warehouse_list');

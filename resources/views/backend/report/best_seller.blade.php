@@ -2,7 +2,7 @@
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-md-12">
-			{{ Form::open(['route' => 'report.bestSellerByWarehouse', 'method' => 'post', 'id' => 'report-form']) }}
+			{{-- {{ Form::open(['route' => 'report.bestSellerByWarehouse', 'method' => 'post', 'id' => 'report-form']) }}
 			<input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}">
             <h4 class="text-center mt-3">{{trans('file.Best Seller')}} {{trans('file.From')}} {{$start_month.' - '.date("F Y")}} &nbsp;&nbsp;
             <select class="selectpicker" id="warehouse_id" name="warehouse_id">
@@ -12,7 +12,7 @@
 				@endforeach
 			</select>
             </h4>
-            {{ Form::close() }}
+            {{ Form::close() }} --}}
             <div class="card-body">
             	@php
             		if($general_setting->theme == 'default.css'){

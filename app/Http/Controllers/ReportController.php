@@ -457,33 +457,34 @@ class ReportController extends Controller
     public function bestSeller()
     {
         $role = Role::find(Auth::user()->role_id);
-        $start = strtotime(date("Y-m", strtotime("-2 months")).'-01');
-        $end = strtotime(date("Y").'-'.date("m").'-31');
+        $start = strtotime(date("Y-m", strtotime("-2 months")) . '-01');
+        $end = strtotime(date("Y") . '-' . date("m") . '-31');
+        $warehouse_id = auth()->user()->warehouse_id;
 
-        while($start <= $end)
-        {
-            $start_date = date("Y-m", $start).'-'.'01';
-            $end_date = date("Y-m", $start).'-'.'31';
+        $best_selling_products = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
+            ->select(DB::raw('transaction_details.product_id, sum(transaction_details.qty) as sold_qty'))
+            ->where('transactions.warehouse_id', $warehouse_id)
+            ->whereDate('transactions.created_at', '>=', date('Y-m-d', $start))
+            ->whereDate('transactions.created_at', '<=', date('Y-m-d', $end))
+            ->groupBy('transaction_details.product_id')
+            ->orderByDesc('sold_qty')
+            ->take(1)
+            ->get();
 
-            $best_selling_qty = TransactionDetail::select(DB::raw('product_id, sum(qty) as sold_qty'))->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->groupBy('product_id')->orderBy('sold_qty', 'desc')->take(1)->get();
-            if(!count($best_selling_qty)){
-                $product[] = '';
-                $sold_qty[] = 0;
-            }
-            foreach ($best_selling_qty as $best_seller) {
-                $product_data = Product::find($best_seller->product_id);
-                $product[] = $product_data->name;
-                // $product[] = $product_data->name.': '.$product_data->code;
-                $sold_qty[] = $best_seller->sold_qty;
-            }
-            $start = strtotime("+1 month", $start);
+        $product = [];
+        $sold_qty = [];
+
+        foreach ($best_selling_products as $best_seller) {
+            $product_data = Product::find($best_seller->product_id);
+            $product[] = $product_data->name;
+            $sold_qty[] = $best_seller->sold_qty;
         }
+
         $start_month = date("F Y", strtotime('-2 month'));
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $warehouse_id = 0;
-        //return $product;
         return view('backend.report.best_seller', compact('product', 'sold_qty', 'start_month', 'lims_warehouse_list', 'warehouse_id'));
     }
+
 
     public function bestSellerByWarehouse(Request $request)
     {

@@ -21,18 +21,16 @@
                                 <div class="col-12">
                                     <div class="form-group">
                                         <label>Nama Stok Opname</strong> </label>
-                                        <input type="text" name="name" class="form-control" id="name"
+                                        <input type="text" readonly name="name" class="form-control" id="name"
                                         aria-describedby="name" value="{{$stockOpname->name}}" required>
                                     </div>
                                 </div>
 
                                 <div class="col-12">
                                     <div class="form-group">
-                                        <label>Cabang *</strong> </label>
+                                        <label>Cabang</label>
                                         <div class="input-group">
-                                            <select name="warehouse_id" required disbaled class="form-control selectpicker" id="warehouse_id">
-                                                <option>{{$stockOpname->warehouse->name}}</option>
-                                            </select>
+                                            <input type="text" readonly class="form-control" value="{{$stockOpname->warehouse->name}}">
                                         </div>
                                     </div>
                                 </div>
@@ -51,12 +49,15 @@
                                     <label for="example-text-input" class="col-md-2 col-form-label">Bahan Baku</label>
 
                                     <div class="col-md-6">
-                                        <select name="ingredient_id[]" required class="form-control" disabled>
+                                        {{-- <select name="ingredient_id[]" required class="form-control" disabled>
                                             <option value="">{{$stockOpnameDetail->ingredient->name}}</option>
-                                        </select>
+                                        </select> --}}
+                                        <input type="text" readonly value="{{$stockOpnameDetail->ingredient->name}}" class="form-control">
+                                        <small class="text-danger">Bahan Baku</small>
                                     </div>
                                     <div class="col-md-2">
                                         <input type="number" name="qty[]" class="form-control" placeholder="Stok Aktual" disabled value="{{$stockOpnameDetail->qty}}">
+                                        <small class="text-danger">Qty</small>
                                     </div>
                                 </div>
                             </div>

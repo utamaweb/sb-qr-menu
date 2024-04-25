@@ -34,16 +34,17 @@
                                     <div class="form-group">
                                         <label>Cabang *</strong> </label>
                                         <div class="input-group">
+                                            @if(auth()->user()->hasRole(['Superadmin','Admin Bisnis']))
                                             <select name="warehouse_id" required class="form-control selectpicker" id="warehouse_id">
                                                 <option value="">Pilih Cabang</option>
                                                 @foreach($warehouses as $warehouse)
-                                                @if($roleName == 'Superadmin')
                                                 <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
-                                                @else
-                                                <option value="{{$warehouse->id}}" {{auth()->user()->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{$warehouse->name}}</option>
-                                                @endif
                                                 @endforeach
                                             </select>
+                                            @else
+                                            <input type="hidden" name="warehouse_id" readonly value="{{auth()->user()->warehouse_id}}" class="form-control">
+                                            <input type="text" readonly value="{{auth()->user()->warehouse->name}}" class="form-control">
+                                            @endif
                                         </div>
                                     </div>
                                 </div>

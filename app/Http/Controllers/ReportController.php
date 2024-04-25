@@ -266,6 +266,7 @@ class ReportController extends Controller
         $role = Role::find(Auth::user()->role_id);
         $start = 1;
         $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
+        $warehouse_id = auth()->user()->warehouse_id;
         while($start <= $number_of_day)
         {
             if($start < 10)
@@ -276,7 +277,7 @@ class ReportController extends Controller
                 'SUM(qty) AS total_qty',
                 'SUM(amount) AS total_amount'
             );
-            $purchase_data = Expense::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
+            $purchase_data = Expense::where('warehouse_id', $warehouse_id)->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
             $total_qty[$start] = $purchase_data[0]->total_qty;
             $total_amount[$start] = $purchase_data[0]->total_amount;
             $start++;
@@ -287,7 +288,7 @@ class ReportController extends Controller
         $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
         $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $warehouse_id = 0;
+        // $warehouse_id = 0;
         return view('backend.report.daily_purchase', compact('total_qty','total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
     }
 

@@ -778,9 +778,18 @@ class ReportController extends Controller
     public function productReport(Request $request)
     {
         $data = $request->all();
-        $start_date = $data['start_date'];
-        $end_date = $data['end_date'];
-        $warehouse_id = $data['warehouse_id'];
+        if($data){
+            $start_date = $data['start_date'];
+            $end_date = $data['end_date'];
+        } else{
+            $start_date = Carbon::now()->format('Y-m-d');
+            $end_date = Carbon::now()->format('Y-m-d');
+        }
+        if(auth()->user()->hasRole(['Superadmin', 'Admin Bisnis'])){
+            $warehouse_id = $data['warehouse_id'];
+        } else{
+            $warehouse_id = auth()->user()->warehouse_id;
+        }
 
         if ($warehouse_id == 0) {
             $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
@@ -824,8 +833,8 @@ class ReportController extends Controller
 
     public function listTransaction()
     {
-        $start_date = Carbon::now()->format('Y-m-d');;
-        $end_date = Carbon::now()->format('Y-m-d');;
+        $start_date = Carbon::now()->format('Y-m-d');
+        $end_date = Carbon::now()->format('Y-m-d');
 
 
         $totalQtyPerProduct = [];

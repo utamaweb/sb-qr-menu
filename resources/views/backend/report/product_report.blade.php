@@ -20,6 +20,7 @@
                         </div>
                     </div>
                 </div>
+                @if(auth()->user()->hasRole(['Admin Bisnis', 'Superadmin']))
                 <div class="col-md-4 mt-3">
                     <div class="form-group row">
                         <label class="d-tc mt-2"><strong>{{trans('file.Choose Warehouse')}}</strong> &nbsp;</label>
@@ -33,6 +34,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
                 <div class="col-md-2 mt-3">
                     <div class="form-group">
                         <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>

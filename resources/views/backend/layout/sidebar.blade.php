@@ -34,15 +34,16 @@
          class="dripicons-document-remove"></i><span>Laporan</span></a>
       <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
         <li id="laporan-tutup-kasir"><a  href="{{route('close-cashier.index')}}">Laporan Tutup Kasir</a></li>
+        <li id="laporan-transaksi-produk"><a  href="{{route('report.product')}}">Laporan Transaksi Produk</a></li>
 
-         <li id="product-report-menu">
-            {!! Form::open(['route' => 'report.product', 'method' => 'get', 'id' => 'product-report-form']) !!}
+         {{-- <li id="product-report-menu"> --}}
+             {{-- <a id="report-link" href="{{route('report.product')}}">Laporan Transaksi Produk</a> --}}
+            {{-- {!! Form::open(['route' => 'report.product', 'method' => 'get', 'id' => 'product-report-form']) !!}
             <input type="hidden" name="start_date" value="{{date('Y-m').'-'.'01'}}" />
             <input type="hidden" name="end_date" value="{{date('Y-m-d')}}" />
-            <input type="hidden" name="warehouse_id" value="0" />
-            <a id="report-link" href="">Laporan Transaksi Produk</a>
-            {!! Form::close() !!}
-         </li>
+            <input type="hidden" name="warehouse_id" value="0" /> --}}
+            {{-- {!! Form::close() !!} --}}
+         {{-- </li> --}}
 
          <li id="profit-loss-report-menu">
             {!! Form::open(['route' => 'report.profitLoss', 'method' => 'post', 'id' =>

@@ -44,7 +44,7 @@ Route::fallback(function () {
     return redirect()->route('admin.auth.index');
 });
 
-Route::get('/storage', function () {
+Route::get('/get-storage', function () {
     Artisan::call('storage:link');
 });
 

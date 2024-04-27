@@ -44,6 +44,10 @@ Route::fallback(function () {
     return redirect()->route('admin.auth.index');
 });
 
+Route::get('/storage', function () {
+    Artisan::call('storage:link');
+});
+
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware(['web'])->group(function () {
         Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');

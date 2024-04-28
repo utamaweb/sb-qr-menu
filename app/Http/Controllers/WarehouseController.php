@@ -40,12 +40,17 @@ class WarehouseController extends Controller
         // $image = $request->image;
         // $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
         // $uploadImage = $image->storeAs('public/outlet_logo', $imageName);
+        if(auth()->user()->hasRole('Superadmin')){
+            $business_id = $request->business_id;
+        } else{
+            $business_id = auth()->user()->business_id;
+        }
         $warehouse = Warehouse::create([
             'name' => $request->name,
             'is_active' => 1,
             // 'logo' => $imageName,
             'address' => $request->address,
-            'business_id' => auth()->user()->business_id,
+            'business_id' => $request->business_id
         ]);
         $this->cacheForget('warehouse_list');
         return redirect()->back()->with('message', 'Data Berhasil Ditambahkan');
@@ -75,7 +80,8 @@ class WarehouseController extends Controller
         $lims_warehouse_data->update([
             'name' => $request->name,
             'address' => $request->address,
-            'logo' => $imageName,
+            'business_id' => $request->business_id,
+            // 'logo' => $imageName,
         ]);
         $this->cacheForget('warehouse_list');
         return redirect()->back()->with('message', 'Data Berhasil Diubah');

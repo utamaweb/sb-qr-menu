@@ -70,7 +70,8 @@
                                                 @endforeach
                                             </select>
                                             @elseif(auth()->user()->hasRole('Admin Bisnis'))
-                                            <input type="text" readonly name="business_id" class="form-control" value="{{auth()->user()->business->name}}">
+                                            <input type="hidden" readonly name="business_id" class="form-control" value="{{$warehouse->business->id}}">
+                                            <input type="text" readonly name="business_name" class="form-control" value="{{$warehouse->business->name}}">
                                             @endif
                                         </div>
                                         <div class="form-group">
@@ -127,7 +128,8 @@
                             @endforeach
                         </select>
                         @elseif(auth()->user()->hasRole('Admin Bisnis'))
-                        <input type="text" readonly class="form-control" name="business_id" value="{{auth()->user()->business->name}}">
+                        <input type="text" readonly class="form-control" name="business_name" value="{{auth()->user()->business->name}}">
+                        <input type="hidden" readonly class="form-control" name="business_id" value="{{auth()->user()->business->id}}">
                         @endif
                     </div>
                     <div class="form-group">
@@ -140,38 +142,6 @@
         {{ Form::close() }}
     </div>
 </div>
-</div>
-
-<div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => 'outlet.import', 'method' => 'post', 'files' => true]) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-            <p>{{trans('file.The correct column order is')}} (name*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{trans('file.Upload CSV File')}} *</label>
-                        {{Form::file('file', array('class' => 'form-control','required'))}}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label> {{trans('file.Sample File')}}</label>
-                        <a href="sample_file/warehouse.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
-                    </div>
-                </div>
-            </div>
-            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-        </div>
-        {{ Form::close() }}
-      </div>
-    </div>
 </div>
 
 @endsection

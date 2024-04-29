@@ -336,7 +336,7 @@ class TransactionController extends Controller
                 } else {
                     // Jika shift terbuka, cek apakah ada transaksi dalam shift tersebut
                     $lastTransaction = Transaction::where('shift_id', $shift->id)
-                        ->orderBy('sequence_number', 'desc')
+                        // ->orderBy('sequence_number', 'desc')
                         ->first();
 
                     if ($lastTransaction) {

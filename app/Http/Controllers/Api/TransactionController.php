@@ -327,7 +327,7 @@ class TransactionController extends Controller
                 }
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
                 ->where('is_closed', 0)
-                ->orderBy('id', 'desc')
+                // ->orderBy('id', 'desc')
                 ->first();
 
                 if (!$shift) {

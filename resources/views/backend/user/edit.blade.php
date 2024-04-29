@@ -68,30 +68,48 @@
                                           @endforeach
                                         </select>
                                     </div>
-                                <div class="form-group bisnis-select" @if(!$user->hasRole('Admin Bisnis')) style="display: none;" @endif>
-                                    <label><strong>Bisnis *</strong></label>
-                                    @if($user->hasRole('Superadmin'))
-                                    <select name="business_id" class="selectpicker form-control" data-live-search="true"
-                                        data-live-search-style="begins" title="Pilih Bisnis...">
-                                        @foreach($business as $bisnis)
-                                        <option value="{{$bisnis->id}}" {{$bisnis->id == $user->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
-                                        @endforeach
-                                    </select>
-                                    @else
-                                    <input type="text" name="business_name" readonly class="form-control" value="{{auth()->user()->business->name}}">
-                                    <input type="hidden" name="business_id" readonly class="form-control" value="{{auth()->user()->business_id}}">
-
-                                    @endif
-                                </div>
-                                <div class="form-group warehouse-select" @if(!$user->hasRole(['Admin Outlet', 'Kasir', 'Customer'])) style="display: none;" @endif>
-                                    <label><strong>Outlet *</strong></label>
-                                    <select name="warehouse_id" class="selectpicker form-control" data-live-search="true"
+                                    @if(auth()->user()->hasRole('Superadmin'))
+                                    <div class="form-group bisnis-select" style="display: none;">
+                                        <label><strong>Bisnis *</strong></label>
+                                        <select name="business_id" class="selectpicker form-control" data-live-search="true"
+                                            data-live-search-style="begins" title="Pilih Bisnis...">
+                                            @foreach($business as $bisnis)
+                                            <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="form-group warehouse-select" style="display: none;">
+                                        <label><strong>Outlet *</strong></label>
+                                        <select name="warehouse_id" class="selectpicker form-control" data-live-search="true"
+                                            data-live-search-style="begins" title="Pilih outlet...">
+                                            @foreach($lims_warehouse_list as $warehouse)
+                                            <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @elseif(auth()->user()->hasRole('Admin Bisnis'))
+                                    <div class="form-group bisnis-select" style="display: none;">
+                                        <label><strong>Bisnis *</strong></label>
+                                        <input type="text" readonly value="{{auth()->user()->business->name}}" name="business_name" class="form-control">
+                                        <input type="hidden" value="{{auth()->user()->business_id}}" name="business_id" class="form-control">
+                                    </div>
+                                    <div class="form-group warehouse-select" @if($user->hasRole('Admin Bisnis')) style="display:none;" @endif>
+                                        <label><strong>Outlet *</strong></label>
+                                        <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih outlet...">
                                         @foreach($lims_warehouse_list as $warehouse)
-                                        <option value="{{$warehouse->id}}" {{$warehouse->id == $user->warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                        <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
                                         @endforeach
-                                    </select>
-                                </div>
+                                        </select>
+                                    </div>
+                                    @else
+                                    <div class="form-group warehouse-select">
+                                        <label><strong>Outlet *</strong></label>
+                                        <input type="text" name="warehouse_name" value="{{auth()->user()->warehouse->name}}" class="form-control" readonly>
+                                        <input type="hidden" name="warehouse_id" value="{{auth()->user()->warehouse_id}}" class="form-control" readonly>
+                                    </div>
+                                    @endif
+
                                     <div class="form-group mt-3">
                                         <label><strong>Nomor HP *</strong></label>
                                         <input type="text" name="phone" required class="form-control" value="{{$user->phone}}">
@@ -121,7 +139,6 @@
 
 document.querySelector('select[name="role_id"]').addEventListener('change', function() {
         var selectedRole = this.value;
-        console.log(selectedRole);
 
         // Sembunyikan semua opsi
         // document.querySelectorAll('.form-group').forEach(function(group) {
@@ -144,9 +161,9 @@ document.querySelector('select[name="role_id"]').addEventListener('change', func
         }
     });
 $("ul#outlet").siblings('a').attr('aria-expanded','true');
-    $("ul#outlet").addClass("show");
-    $("ul#outlet #user-list-menu").addClass("active");
-
+    // $("ul#outlet").addClass("show");
+    // $("ul#outlet #user-list-menu").addClass("active");
+    $("#user").addClass("active");
 
     $('#genbutton').on("click", function(){
       $.get('../genpass', function(data){

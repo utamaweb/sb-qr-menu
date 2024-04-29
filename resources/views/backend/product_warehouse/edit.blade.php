@@ -18,10 +18,10 @@
                                 <div class="col-md-12">
                                     <div class="form-group">
                                         <label><strong>Produk *</strong></label>
-                                        <select name="product_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
-                                            title="Pilih outlet...">
+                                        <select id="product-select" name="product_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins"
+                                            title="Pilih produk...">
                                             @foreach($products as $product)
-                                            <option value="{{$product->id}}" {{$product->id == $productWarehouse->product_id ? 'selected' : ''}}>{{$product->name}}</option>
+                                            <option value="{{$product->id}}" data-price="{{$product->price}}" {{$product->id == $productWarehouse->product_id ? 'selected' : ''}}>{{$product->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -41,7 +41,7 @@
                                     </div>
                                     <div class="form-group mt-3">
                                         <label><strong>Harga *</strong></label>
-                                        <input type="number" name="price" required class="form-control" value="{{$productWarehouse->price}}">
+                                        <input type="number" id="product-price" name="price" required class="form-control" value="{{$productWarehouse->price}}">
                                     </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
@@ -65,6 +65,15 @@
 
 @push('scripts')
 <script type="text/javascript">
+$('#product-select').change(function(){
+        // Mengambil harga produk yang dipilih
+        var selectedPrice = $(this).find(':selected').data('price');
+        console.log(selectedPrice);
+        // Setel nilai input text harga sesuai dengan harga produk yang dipilih
+        $('#product-price').val(selectedPrice);
+    });
+
+
 $("ul#outlet").siblings('a').attr('aria-expanded','true');
     // $("ul#outlet").addClass("show");
     // $("ul#outlet #user-list-menu").addClass("active");

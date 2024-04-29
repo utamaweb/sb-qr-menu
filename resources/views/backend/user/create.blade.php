@@ -96,11 +96,17 @@
                                 <div class="form-group warehouse-select" style="display:none;">
                                     <label><strong>Outlet *</strong></label>
                                     <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
-                                        data-live-search-style="begins" title="Pilih outlet...">
-                                        @foreach($lims_warehouse_list as $warehouse)
-                                        <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
-                                        @endforeach
+                                    data-live-search-style="begins" title="Pilih outlet...">
+                                    @foreach($lims_warehouse_list as $warehouse)
+                                    <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                    @endforeach
                                     </select>
+                                </div>
+                                @else
+                                <div class="form-group warehouse-select">
+                                    <label><strong>Outlet *</strong></label>
+                                    <input type="text" name="warehouse_name" value="{{auth()->user()->warehouse->name}}" class="form-control" readonly>
+                                    <input type="hidden" name="warehouse_id" value="{{auth()->user()->warehouse_id}}" class="form-control" readonly>
                                 </div>
                                 @endif
                                 <div class="form-group">
@@ -162,8 +168,9 @@ document.querySelector('select[name="role_id"]').addEventListener('change', func
     });
 
 $("ul#outlet").siblings('a').attr('aria-expanded','true');
-    $("ul#outlet").addClass("show");
-    $("ul#outlet #user-list-menu").addClass("active");
+    // $("ul#outlet").addClass("show");
+    // $("ul#outlet #user-list-menu").addClass("active");
+    $("#user").addClass("active");
 
     $('#warehouseId').hide();
     $('#biller-id').hide();

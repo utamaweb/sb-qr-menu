@@ -52,7 +52,10 @@ class UserController extends Controller
         //     $lims_role_list = Roles::where('name', '!=', ['Superadmin', 'Admin Bisnis'])->get();
         // }
         $business = Business::get();
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $lims_warehouse_list = Warehouse::where('business_id', auth()->user()->business_id)->where('is_active', true)->get();
+        if(auth()->user()->hasRole('Superadmin')){
+            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        }
         $numberOfUserAccount = User::where('is_active', true)->count();
         return view('backend.user.create', compact('lims_role_list', 'lims_warehouse_list', 'numberOfUserAccount','business'));
     }
@@ -109,7 +112,10 @@ class UserController extends Controller
         $user = User::find($id);
         $lims_role_list = Roles::where('id', '>=', auth()->user()->role_id)->get();
         // $lims_biller_list = Biller::where('is_active', true)->get();
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $lims_warehouse_list = Warehouse::where('business_id', auth()->user()->business_id)->where('is_active', true)->get();
+        if(auth()->user()->hasRole('Superadmin')){
+            $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        }
         return view('backend.user.edit', compact('user', 'lims_role_list', 'lims_warehouse_list', 'business'));
     }
 

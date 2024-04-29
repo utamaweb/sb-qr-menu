@@ -116,10 +116,10 @@ class ShiftController extends Controller
 
             foreach ($transactions as $transaction) {
                 if ($transaction['payment_method'] === 'Tunai') {
-                    $totalCash += $transaction['paid_amount'];
+                    $totalCash += $transaction['total_amount'];
                 }
                 if ($transaction['payment_method'] !== 'Tunai') {
-                    $totalNonCash += $transaction['paid_amount'];
+                    $totalNonCash += $transaction['total_amount'];
                 }
                 $totalProductSales += $transaction['total_qty'];
                 $transactionDetails = TransactionDetail::where('transaction_id', $transaction->id)->get();

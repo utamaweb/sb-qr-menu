@@ -90,14 +90,10 @@
                                 @elseif(auth()->user()->hasRole('Admin Bisnis'))
                                 <div class="form-group bisnis-select" style="display: none;">
                                     <label><strong>Bisnis *</strong></label>
-                                    <select name="business_id" class="selectpicker form-control" data-live-search="true"
-                                        data-live-search-style="begins" title="Pilih Bisnis...">
-                                        @foreach($business as $bisnis)
-                                        <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
-                                        @endforeach
-                                    </select>
+                                    <input type="text" readonly value="{{auth()->user()->business->name}}" name="business_name" class="form-control">
+                                    <input type="hidden" value="{{auth()->user()->business_id}}" name="business_id" class="form-control">
                                 </div>
-                                <div class="form-group warehouse-select">
+                                <div class="form-group warehouse-select" style="display:none;">
                                     <label><strong>Outlet *</strong></label>
                                     <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih outlet...">

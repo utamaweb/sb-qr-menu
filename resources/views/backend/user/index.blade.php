@@ -31,6 +31,7 @@
                     <th>Email</th>
                     <th>No. Telp</th>
                     <th>Hak Akses</th>
+                    <th>Outlet / Bisnis</th>
                     <th>Status</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
@@ -45,6 +46,13 @@
                     <td>{{ $user->phone}}</td>
                     <?php $role = DB::table('roles')->find($user->role_id);?>
                     <td>{{ $role->name }}</td>
+                    @if($user->hasRole('Superadmin'))
+                    <td></td>
+                    @elseif($user->hasRole('Admin Bisnis'))
+                    <td>{{$user->business->name}}</td>
+                    @else
+                    <td>{{$user->warehouse->name}}</td>
+                    @endif
                     @if($user->is_active)
                     <td><div class="badge badge-success">Aktif</div></td>
                     @else

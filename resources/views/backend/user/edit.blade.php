@@ -69,21 +69,21 @@
                                         </select>
                                     </div>
                                     @if(auth()->user()->hasRole('Superadmin'))
-                                    <div class="form-group bisnis-select" style="display: none;">
+                                    <div class="form-group bisnis-select" @if($user->hasRole(['Superadmin'])) style="display:none;" @endif>
                                         <label><strong>Bisnis *</strong></label>
                                         <select name="business_id" class="selectpicker form-control" data-live-search="true"
                                             data-live-search-style="begins" title="Pilih Bisnis...">
                                             @foreach($business as $bisnis)
-                                            <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
+                                            <option value="{{$bisnis->id}}" @if(!$user->hasRole('Superadmin')) {{$user->business_id == $bisnis->id ? 'selected' : ''}} @endif>{{$bisnis->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="form-group warehouse-select" style="display: none;">
+                                    <div class="form-group warehouse-select" @if($user->hasRole(['Admin Bisnis', 'Superadmin'])) style="display:none;" @endif>
                                         <label><strong>Outlet *</strong></label>
                                         <select name="warehouse_id" class="selectpicker form-control" data-live-search="true"
                                             data-live-search-style="begins" title="Pilih outlet...">
                                             @foreach($lims_warehouse_list as $warehouse)
-                                            <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                            <option value="{{$warehouse->id}}" @if(!$user->hasRole('Admin Bisnis')) {{$user->warehouse_id == $warehouse->id ? 'selected' : ''}} @endif>{{$warehouse->name}}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -98,7 +98,7 @@
                                         <select name="warehouse_id" required class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih outlet...">
                                         @foreach($lims_warehouse_list as $warehouse)
-                                        <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                        <option value="{{$warehouse->id}}" @if(!$user->hasRole('Admin Bisnis')) {{$user->warehouse_id == $warehouse->id ? 'selected' : ''}} @endif>{{$warehouse->name}}</option>
                                         @endforeach
                                         </select>
                                     </div>

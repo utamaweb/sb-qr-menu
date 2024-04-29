@@ -75,7 +75,7 @@ class UserController extends Controller
         ]);
 
         $data = $request->all();
-        $message = 'User created successfully';
+        $message = 'Data berhasil ditambah';
         $roleName = Role::find($request->role_id)->name;
 
         $user = new User;
@@ -99,7 +99,7 @@ class UserController extends Controller
         $user->save();
 
         $user->assignRole($roleName);
-        return redirect('admin/user')->with('message1', $message);
+        return redirect('admin/user')->with('message', $message);
     }
 
     public function edit($id)
@@ -107,7 +107,7 @@ class UserController extends Controller
         $role = Role::find(Auth::user()->role_id);
         $business = Business::get();
         $user = User::find($id);
-        $lims_role_list = Roles::get();
+        $lims_role_list = Roles::where('id', '>=', auth()->user()->role_id)->get();
         // $lims_biller_list = Biller::where('is_active', true)->get();
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         return view('backend.user.edit', compact('user', 'lims_role_list', 'lims_warehouse_list', 'business'));
@@ -154,7 +154,7 @@ class UserController extends Controller
         $user->save();
         $user->syncRoles($request->role_id);
 
-        return redirect('admin/user')->with('message2', 'Data updated successfullly');
+        return redirect('admin/user')->with('message', 'Data Berhasil Diubah');
     }
 
     public function profile($id)
@@ -168,7 +168,7 @@ class UserController extends Controller
         $input = $request->all();
         $lims_user_data = User::find($id);
         $lims_user_data->update($input);
-        return redirect()->back()->with('message3', 'Data updated successfullly');
+        return redirect()->back()->with('message3', 'Data Berhasil Diubah');
     }
 
     public function changePassword(Request $request, $id)
@@ -209,7 +209,7 @@ class UserController extends Controller
             return redirect('/login');
         }
         else
-            return redirect('admin/user')->with('message3', 'Data deleted successfullly');
+            return redirect('admin/user')->with('not_permitted', 'Data berhasil dihapus');
     }
 
     public function notificationUsers()

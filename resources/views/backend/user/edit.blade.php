@@ -70,12 +70,18 @@
                                     </div>
                                 <div class="form-group bisnis-select" @if(!$user->hasRole('Admin Bisnis')) style="display: none;" @endif>
                                     <label><strong>Bisnis *</strong></label>
+                                    @if($user->hasRole('Superadmin'))
                                     <select name="business_id" class="selectpicker form-control" data-live-search="true"
                                         data-live-search-style="begins" title="Pilih Bisnis...">
                                         @foreach($business as $bisnis)
                                         <option value="{{$bisnis->id}}" {{$bisnis->id == $user->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
                                         @endforeach
                                     </select>
+                                    @else
+                                    <input type="text" name="business_name" readonly class="form-control" value="{{auth()->user()->business->name}}">
+                                    <input type="hidden" name="business_id" readonly class="form-control" value="{{auth()->user()->business_id}}">
+
+                                    @endif
                                 </div>
                                 <div class="form-group warehouse-select" @if(!$user->hasRole(['Admin Outlet', 'Kasir', 'Customer'])) style="display: none;" @endif>
                                     <label><strong>Outlet *</strong></label>

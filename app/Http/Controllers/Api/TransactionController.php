@@ -132,8 +132,13 @@ class TransactionController extends Controller
     public function online()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
 
         $transactions = Transaction::with('order_type', 'transaction_details.product')
+            ->where('shift_id', $shift->id)
             ->where('warehouse_id', auth()->user()->warehouse_id)
             ->where('category_order', 'ONLINE')
             ->whereDate('date', $dateNow)
@@ -178,8 +183,13 @@ class TransactionController extends Controller
     public function offline()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
 
         $transactions = Transaction::with('order_type', 'transaction_details.product')
+            ->where('shift_id', $shift->id)
             ->where('warehouse_id', auth()->user()->warehouse_id)
             ->where('category_order', 'OFFLINE')
             ->whereDate('date', $dateNow)

@@ -168,7 +168,7 @@ class ShiftController extends Controller
             $grabfood_omzet = $transaction->where('payment_method', 'GRABFOOD')->sum('total_amount');
             $shopeefood_omzet = $transaction->where('payment_method', 'SHOPEEFOOD')->sum('total_amount');
             $qris_omzet = $transaction->where('payment_method', 'QRIS')->sum('total_amount');
-            $transfer_omzet = $transaction->where('payment_method', 'TRANSFER')->sum('total_amount');
+            $transfer_omzet = $transaction->where('payment_method', 'Transfer')->sum('total_amount');
             // $closeCashier = CloseCashier::find($shift->id);
             // $closeCashier->update([
             $closeCashierCheck = CloseCashier::where('shift_id', $shift->id)->where('is_closed', 1)->first();

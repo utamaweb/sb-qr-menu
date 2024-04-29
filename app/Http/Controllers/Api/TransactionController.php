@@ -326,11 +326,11 @@ class TransactionController extends Controller
                     return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
                 }
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                    // where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
                 ->orderBy('id', 'desc')
                 ->first();
 
-                if (!$shift || $shift->is_closed) {
+                if (!$shift) {
                     // Reset nomor antrian ke 1
                     $sequence_number = 1;
                 } else {

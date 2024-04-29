@@ -17,7 +17,9 @@ use Illuminate\Support\Facades\DB;
 class StockController extends Controller
 {
     public function getAllIngredients() {
-        $ingredients = Ingredient::with('unit')->get();
+        $warehouse_id = auth()->user()->warehouse_id;
+        $warehouse = Warehouse::find($warehouse_id);
+        $ingredients = Ingredient::where('business_id', $warehouse->business_id)->with('unit')->get();
         return response()->json($ingredients, 200);
     }
 

@@ -23,7 +23,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::get();
+        $categories = Category::where('business_id', auth()->user()->business_id)->get();
         $categoryParents = CategoryParent::get();
         return view('backend.category.create', compact('categories','categoryParents'));
     }
@@ -52,12 +52,13 @@ class CategoryController extends Controller
         }
         $icon = $request->icon;
         $lims_category_data['name'] = $request->name;
+        $lims_category_data['business_id'] = auth()->user()->business_id;
         $lims_category_data['category_parent_id'] = $request->category_parent_id;
         $lims_category_data['is_active'] = true;
 
         DB::table('categories')->insert($lims_category_data);
         $this->cacheForget('category_list');
-        return redirect()->back()->with('message', 'Category inserted successfully');
+        return redirect()->back()->with('message', 'Kategori Berhasil Ditambah');
     }
 
     public function edit($id)
@@ -81,7 +82,7 @@ class CategoryController extends Controller
             'category_parent_id' => $request->category_parent_id
         ]);
 
-        return redirect()->back()->with('message', 'Category updated successfully');
+        return redirect()->back()->with('message', 'Kategori Berhasil Diubah');
     }
 
     public function import(Request $request)
@@ -162,6 +163,6 @@ class CategoryController extends Controller
 
         $lims_category_data->delete();
         $this->cacheForget('category_list');
-        return redirect()->back()->with('not_permitted', 'Category deleted successfully');
+        return redirect()->back()->with('not_permitted', 'Kategori Berhasil Dihapus');
     }
 }

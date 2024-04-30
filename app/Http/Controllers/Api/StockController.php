@@ -18,9 +18,11 @@ use Illuminate\Support\Facades\DB;
 class StockController extends Controller
 {
     public function getAllIngredients() {
-        $warehouse_id = auth()->user()->warehouse_id;
-        $warehouse = Warehouse::find($warehouse_id);
-        $ingredients = Ingredient::where('business_id', $warehouse->business_id)->with('unit')->get();
+        // $warehouse_id = auth()->user()->warehouse_id;
+        // $warehouse = Warehouse::find($warehouse_id);
+        // $ingredients = Ingredient::where('business_id', $warehouse->business_id)->with('unit')->get();
+        $ingredient_ids = Stock::where('warehouse_id', auth()->user()->warehouse_id)->pluck('ingredient_id');
+        $ingredients = Ingredient::whereIn('id', $ingredient_ids)->get();
         return response()->json($ingredients, 200);
     }
 

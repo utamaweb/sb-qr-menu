@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class ExpenseController extends Controller
 {
     public function category() {
-        $expense_category = ExpenseCategory::get();
+        $expense_category = ExpenseCategory::where('warehouse_id', auth()->warehouse_id)->get();
         return response()->json($expense_category, 200);
     }
 

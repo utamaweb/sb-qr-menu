@@ -19,7 +19,7 @@ class ExpenseController extends Controller
 {
     public function index(Request $request)
 {
-        $lims_expense_category_list = ExpenseCategory::get();
+        $lims_expense_category_list = ExpenseCategory::where('warehouse_id', auth()->user()->warehouse_id)->get();
         if(auth()->user()->hasRole('Superadmin')){
             $expenses = Expense::get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){

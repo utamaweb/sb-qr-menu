@@ -12,7 +12,7 @@ class ExpenseCategoryController extends Controller
 {
     public function index()
     {
-        $lims_expense_category_all = ExpenseCategory::get();
+        $lims_expense_category_all = ExpenseCategory::where('warehouse_id', auth()->user()->warehouse_id)->get();
         return view('backend.expense_category.index', compact('lims_expense_category_all'));
     }
 
@@ -34,8 +34,11 @@ class ExpenseCategoryController extends Controller
         ]);
 
         $data = $request->all();
-        ExpenseCategory::create($data);
-        return redirect()->back()->with('message', 'Data inserted successfully');
+        ExpenseCategory::create([
+            'name' => $request->name,
+            'warehouse_id' => auth()->user()->warehouse_id
+        ]);
+        return redirect()->back()->with('message', 'Data berhasil ditambahkan');
     }
 
     public function show($id)
@@ -59,8 +62,10 @@ class ExpenseCategoryController extends Controller
 
         $data = $request->all();
         $lims_expense_category_data = ExpenseCategory::find($id);
-        $lims_expense_category_data->update($data);
-        return redirect()->back()->with('message', 'Data updated successfully');
+        $lims_expense_category_data->update([
+            'name' => $request->name,
+        ]);
+        return redirect()->back()->with('message', 'Data berhasil diubah');
     }
 
     public function import(Request $request)
@@ -115,7 +120,7 @@ class ExpenseCategoryController extends Controller
     {
         $lims_expense_category_data = ExpenseCategory::find($id);
         $lims_expense_category_data->delete();
-        return redirect()->back()->with('not_permitted', 'Data deleted successfully');
+        return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 
     public function expenseCategoriesAll()

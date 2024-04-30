@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class ExpenseCategory extends Model
 {
     protected $fillable =[
-        "code", "name", "is_active"
+        "code", "name", "is_active", "warehouse_id"
     ];
 
     public function expense() {

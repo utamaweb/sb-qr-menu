@@ -138,9 +138,10 @@
 @push('scripts')
 <script type="text/javascript">
 
-    $("ul#outlet").siblings('a').attr('aria-expanded','true');
-    $("ul#outlet").addClass("show");
-    $("ul#outlet #role-menu").addClass("active");
+    // $("ul#outlet").siblings('a').attr('aria-expanded','true');
+    // $("ul#outlet").addClass("show");
+    // $("ul#outlet #role-menu").addClass("active");
+    $("#role").addClass("active");
 
 	 function confirmDelete() {
         if (confirm("Are you sure want to delete?")) {

@@ -5,31 +5,18 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Keygen\Keygen;
-use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Warehouse;
-use App\Models\Tax;
-use App\Models\Supplier;
 use App\Models\Product;
-use App\Models\ProductBatch;
 use App\Models\Product_Warehouse;
-use App\Models\Product_Supplier;
-use App\Models\CustomField;
 use App\Models\Ingredient;
 use Auth;
-use DNS1D;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
 use DB;
-use App\Models\Variant;
 use App\Models\IngredientProducts;
-use App\Models\ProductVariant;
-use App\Models\Purchase;
-use App\Models\ProductPurchase;
-use App\Models\Payment;
-use App\Traits\TenantInfo;
 use App\Traits\CacheForget;
 use Intervention\Image\Facades\Image;
 use File;
@@ -37,23 +24,16 @@ use File;
 class ProductController extends Controller
 {
     use CacheForget;
-    use TenantInfo;
 
     public function index()
     {
         $roleName = auth()->user()->getRoleNames()[0];
-        // $products = Product::get();
-        // if($roleName == 'Kasir'){
-        //     $products = Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->get();
-        // }
-
         if(auth()->user()->hasRole('Superadmin')){
             $products = Product::get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
             $products = Product::where('business_id', auth()->user()->business_id)->get();
         }
-        $numberOfProduct = DB::table('products')->where('is_active', true)->count();
-        return view('backend.product.index', compact('numberOfProduct', 'products','roleName'));
+        return view('backend.product.index', compact('products','roleName'));
     }
 
     public function create()

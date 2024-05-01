@@ -83,9 +83,4 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('shift/closable', [ShiftController::class, 'closable']);
 });
 
-Route::controller(DemoAutoUpdateController::class)->group(function () {
-    Route::get('fetch-data-general', 'fetchDataGeneral')->name('fetch-data-general');
-    Route::get('fetch-data-upgrade', 'fetchDataForAutoUpgrade')->name('data-read');
-    Route::get('fetch-data-bugs', 'fetchDataForBugs')->name('fetch-data-bugs');
-});
 

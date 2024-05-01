@@ -55,7 +55,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
     });
 
-    Route::get('/documentation', [HomeController::class, 'documentation']);
 
     Route::group(['middleware' => 'auth:web'], function() {
         Route::controller(HomeController::class)->group(function () {
@@ -68,13 +67,6 @@ Route::group(['prefix' => 'admin'], function () {
         Route::controller(HomeController::class)->group(function () {
             Route::get('/', 'index');
             Route::get('/dashboard', 'dashboard')->name('admin.dashboard');
-
-            Route::get('/recent-sale', 'recentSale');
-            Route::get('/recent-purchase', 'recentPurchase');
-            Route::get('/recent-quotation', 'recentQuotation');
-            Route::get('/recent-payment', 'recentPayment');
-            Route::get('/dashboard-filter/{start_date}/{end_date}', 'dashboardFilter');
-            Route::get('addon-list', 'addonList');
             Route::get('my-transactions/{year}/{month}', 'myTransaction');
         });
 
@@ -86,27 +78,12 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('products/product-data', 'productData');
             Route::get('products/gencode', 'generateCode');
             Route::get('products/search', 'search');
-            Route::get('products/saleunit/{id}', 'saleUnit');
-            Route::get('products/getdata/{id}/{variant_id}', 'getData');
             Route::get('products/product_warehouse/{id}', 'productWarehouseData');
-            Route::get('products/print_barcode','printBarcode')->name('product.printBarcode');
-            Route::get('products/lims_product_search', 'limsProductSearch')->name('product.search');
             Route::post('products/deletebyselection', 'deleteBySelection');
-            Route::post('products/update', 'updateProduct');
-            Route::get('products/variant-data/{id}','variantData');
-            Route::get('products/history', 'history')->name('products.history');
-            Route::post('products/sale-history-data', 'saleHistoryData');
-            Route::post('products/purchase-history-data', 'purchaseHistoryData');
-            Route::post('products/sale-return-history-data', 'saleReturnHistoryData');
-            Route::post('products/purchase-return-history-data', 'purchaseReturnHistoryData');
 
             Route::post('importproduct', 'importProduct')->name('product.import');
             Route::post('exportproduct', 'exportProduct')->name('product.export');
-            Route::get('check-batch-availability/{product_id}/{batch_no}/{warehouse_id}', 'checkBatchAvailability');
         });
-
-
-        Route::get('language_switch/{locale}', [LanguageController::class, 'switchLanguage']);
 
         Route::resource('role',RoleController::class);
         Route::controller(RoleController::class)->group(function () {
@@ -124,30 +101,12 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
 
-        Route::controller(CategoryController::class)->group(function () {
-            Route::post('category/import', 'import')->name('category.import');
-            Route::post('category/deletebyselection', 'deleteBySelection');
-            Route::post('category/category-data', 'categoryData');
-        });
+        // Route::controller(CategoryController::class)->group(function () {
+        //     Route::post('category/import', 'import')->name('category.import');
+        //     Route::post('category/deletebyselection', 'deleteBySelection');
+        //     Route::post('category/category-data', 'categoryData');
+        // });
         Route::resource('kategori', CategoryController::class);
-
-
-        Route::controller(BrandController::class)->group(function () {
-            Route::post('importbrand', 'importBrand')->name('brand.import');
-            Route::post('brand/deletebyselection', 'deleteBySelection');
-            Route::get('brand/lims_brand_search', 'limsBrandSearch')->name('brand.search');
-        });
-        Route::resource('brand', BrandController::class);
-
-
-        Route::controller(SupplierController::class)->group(function () {
-            Route::post('importsupplier', 'importSupplier')->name('supplier.import');
-            Route::post('supplier/deletebyselection', 'deleteBySelection');
-            Route::post('suppliers/clear-due', 'clearDue')->name('supplier.clearDue');
-            Route::get('suppliers/all', 'suppliersAll')->name('supplier.all');
-        });
-        Route::resource('supplier', SupplierController::class)->except('show');
-
 
         Route::controller(WarehouseController::class)->group(function () {
             Route::post('importwarehouse', 'importWarehouse')->name('outlet.import');
@@ -187,120 +146,6 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('shift/shift-data', 'shiftData');
         });
         Route::resource('shift', ShiftController::class);
-
-        Route::controller(SaleController::class)->group(function () {
-            Route::post('sales/sale-data', 'saleData');
-            Route::post('sales/sendmail', 'sendMail')->name('sale.sendmail');
-            Route::get('sales/sale_by_csv', 'saleByCsv');
-            Route::get('sales/product_sale/{id}', 'productSaleData');
-            Route::post('importsale', 'importSale')->name('sale.import');
-            Route::get('pos', 'posSale')->name('sale.pos');
-            Route::get('sales/lims_sale_search', 'limsSaleSearch')->name('sale.search');
-            Route::get('sales/lims_product_search', 'limsProductSearch')->name('product_sale.search');
-            Route::get('sales/getcustomergroup/{id}', 'getCustomerGroup')->name('sale.getcustomergroup');
-            Route::get('sales/getproduct/{id}', 'getProduct')->name('sale.getproduct');
-            Route::get('sales/getproduct/{category_id}/{brand_id}', 'getProductByFilter');
-            Route::get('sales/getfeatured', 'getFeatured');
-            Route::get('sales/get_gift_card', 'getGiftCard');
-            Route::get('sales/paypalSuccess', 'paypalSuccess');
-            Route::get('sales/paypalPaymentSuccess/{id}', 'paypalPaymentSuccess');
-            Route::get('sales/gen_invoice/{id}', 'genInvoice')->name('sale.invoice');
-            Route::post('sales/add_payment', 'addPayment')->name('sale.add-payment');
-            Route::get('sales/getpayment/{id}', 'getPayment')->name('sale.get-payment');
-            Route::post('sales/updatepayment', 'updatePayment')->name('sale.update-payment');
-            Route::post('sales/deletepayment', 'deletePayment')->name('sale.delete-payment');
-            Route::get('sales/{id}/create', 'createSale')->name('sale.draft');
-            Route::post('sales/deletebyselection', 'deleteBySelection');
-            Route::get('sales/print-last-reciept', 'printLastReciept')->name('sales.printLastReciept');
-            Route::get('sales/today-sale', 'todaySale');
-            Route::get('sales/today-profit/{warehouse_id}', 'todayProfit');
-            Route::get('sales/check-discount', 'checkDiscount');
-        });
-        Route::resource('sales', SaleController::class);
-
-
-        Route::controller(DeliveryController::class)->group(function () {
-            Route::prefix('delivery')->group(function () {
-                Route::get('/', 'index')->name('delivery.index');
-                Route::get('product_delivery/{id}','productDeliveryData');
-                Route::get('create/{id}', 'create');
-                Route::post('store', 'store')->name('delivery.store');
-                Route::post('sendmail', 'sendMail')->name('delivery.sendMail');
-                Route::get('{id}/edit', 'edit');
-                Route::post('update', 'update')->name('delivery.update');
-                Route::post('deletebyselection', 'deleteBySelection');
-                Route::post('delete/{id}', 'delete')->name('delivery.delete');
-            });
-        });
-
-
-        Route::controller(PurchaseController::class)->group(function () {
-            Route::prefix('purchases')->group(function () {
-                Route::post('purchase-data', 'purchaseData')->name('purchases.data');
-                Route::get('product_purchase/{id}', 'productPurchaseData');
-                Route::get('lims_product_search', 'limsProductSearch')->name('product_purchase.search');
-                Route::post('add_payment', 'addPayment')->name('purchase.add-payment');
-                Route::get('getpayment/{id}', 'getPayment')->name('purchase.get-payment');
-                Route::post('updatepayment', 'updatePayment')->name('purchase.update-payment');
-                Route::post('deletepayment', 'deletePayment')->name('purchase.delete-payment');
-                Route::get('purchase_by_csv', 'purchaseByCsv');
-                Route::post('deletebyselection', 'deleteBySelection');
-            });
-            Route::post('importpurchase', 'importPurchase')->name('purchase.import');
-        });
-        Route::resource('purchases', PurchaseController::class);
-
-
-
-        Route::controller(TransferController::class)->group(function () {
-            Route::prefix('transfers')->group(function () {
-                Route::post('transfer-data', 'transferData')->name('transfers.data');
-                Route::get('product_transfer/{id}', 'productTransferData');
-                Route::get('transfer_by_csv', 'transferByCsv');
-                Route::get('getproduct/{id}', 'getProduct')->name('transfer.getproduct');
-                Route::get('lims_product_search', 'limsProductSearch')->name('product_transfer.search');
-                Route::post('deletebyselection', 'deleteBySelection');
-            });
-            Route::post('importtransfer', 'importTransfer')->name('transfer.import');
-        });
-        Route::resource('transfers', TransferController::class);
-
-
-
-        Route::controller(AdjustmentController::class)->group(function () {
-            Route::get('qty_adjustment/getproduct/{id}', 'getProduct')->name('adjustment.getproduct');
-            Route::get('qty_adjustment/lims_product_search', 'limsProductSearch')->name('product_adjustment.search');
-            Route::post('qty_adjustment/deletebyselection', 'deleteBySelection');
-        });
-        Route::resource('qty_adjustment', AdjustmentController::class);
-
-
-        Route::controller(ReturnController::class)->group(function () {
-            Route::prefix('return-sale')->group(function () {
-                Route::post('return-data', 'returnData');
-                Route::get('getcustomergroup/{id}', 'getCustomerGroup')->name('return-sale.getcustomergroup');
-                Route::post('sendmail', 'sendMail')->name('return-sale.sendmail');
-                Route::get('getproduct/{id}', 'getProduct')->name('return-sale.getproduct');
-                Route::get('lims_product_search', 'limsProductSearch')->name('product_return-sale.search');
-                Route::get('product_return/{id}', 'productReturnData');
-                Route::post('deletebyselection', 'deleteBySelection');
-            });
-        });
-        Route::resource('return-sale', ReturnController::class);
-
-
-        Route::controller(ReturnPurchaseController::class)->group(function () {
-            Route::prefix('return-purchase')->group(function () {
-                Route::post('return-data', 'returnData');
-                Route::get('getcustomergroup/{id}', 'getCustomerGroup')->name('return-purchase.getcustomergroup');
-                Route::post('sendmail', 'sendMail')->name('return-purchase.sendmail');
-                Route::get('getproduct/{id}', 'getProduct')->name('return-purchase.getproduct');
-                Route::get('lims_product_search', 'limsProductSearch')->name('product_return-purchase.search');
-                Route::get('product_return/{id}', 'productReturnData');
-                Route::post('deletebyselection', 'deleteBySelection');
-            });
-        });
-        Route::resource('return-purchase', ReturnPurchaseController::class);
 
 
         Route::controller(ReportController::class)->group(function () {
@@ -416,58 +261,6 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('expenses/deletebyselection', 'deleteBySelection');
         });
         Route::resource('pengeluaran', ExpenseController::class);
-
-        Route::controller(CouponController::class)->group(function () {
-            Route::get('coupons/gencode', 'generateCode');
-            Route::post('coupons/deletebyselection', 'deleteBySelection');
-        });
-        Route::resource('coupons', CouponController::class);
-
-        Route::resource('money-transfers', MoneyTransferController::class);
-
-
-        //HRM routes
-        Route::post('departments/deletebyselection', [DepartmentController::class,'deleteBySelection']);
-        Route::resource('departments', DepartmentController::class);
-
-
-        Route::post('employees/deletebyselection', [EmployeeController::class, 'deleteBySelection']);
-        Route::resource('employees', EmployeeController::class);
-
-        Route::controller(StockCountController::class)->group(function () {
-            Route::post('stock-count/finalize', 'finalize')->name('stock-count.finalize');
-            Route::get('stock-count/stockdif/{id}', 'stockDif');
-            Route::get('stock-count/{id}/qty_adjustment', 'qtyAdjustment')->name('stock-count.adjustment');
-        });
-        Route::resource('stock-count', StockCountController::class);
-
-
-        Route::controller(CashRegisterController::class)->group(function () {
-            Route::prefix('cash-register')->group(function () {
-                Route::get('/', 'index')->name('cashRegister.index');
-                Route::get('check-availability/{warehouse_id}', 'checkAvailability')->name('cashRegister.checkAvailability');
-                Route::post('store', 'store')->name('cashRegister.store');
-                Route::get('getDetails/{id}', 'getDetails');
-                Route::get('showDetails/{warehouse_id}', 'showDetails');
-                Route::post('close', 'close')->name('cashRegister.close');
-            });
-        });
-
-
-        Route::controller(NotificationController::class)->group(function () {
-            Route::prefix('notifications')->group(function () {
-                Route::get('/', 'index')->name('notifications.index');
-                Route::post('store', 'store')->name('notifications.store');
-                Route::get('mark-as-read', 'markAsRead');
-            });
-        });
-
-
-        Route::resource('currency', CurrencyController::class);
-
-        Route::resource('custom-fields', CustomFieldController::class);
-
-        Route::post('woocommerce-install', [AddonInstallController::class,'woocommerceInstall'])->name('woocommerce.install');
     });
 });
 

@@ -3,11 +3,6 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Sale;
-use App\Models\Returns;
-use App\Models\ReturnPurchase;
-use App\Models\ProductPurchase;
-use App\Models\Purchase;
 use App\Models\Expense;
 use App\Models\Transaction;
 use App\Models\StockPurchase;
@@ -17,8 +12,6 @@ use App\Models\Business;
 use App\Models\Warehouse;
 use App\Models\Account;
 use App\Models\User;
-use App\Models\Product_Sale;
-use App\Models\Customer;
 use App\Models\Product_Warehouse;
 use App\Models\Unit;
 use Cache;
@@ -50,14 +43,6 @@ class HomeController extends Controller
         $start_date = date("Y").'-'.date("m").'-'.'01';
         $end_date = date("Y").'-'.date("m").'-'.date('t', mktime(0, 0, 0, date("m"), 1, date("Y")));
         $yearly_sale_amount = [];
-
-        $product_sale_data = Product_Sale::join('sales', 'product_sales.sale_id', '=', 'sales.id')
-                            ->select(DB::raw('product_sales.product_id, product_sales.product_batch_id, product_sales.sale_unit_id, sum(product_sales.qty) as sold_qty, sum(product_sales.return_qty) as return_qty, sum(product_sales.total) as sold_amount'))
-                            ->whereDate('sales.created_at', '>=' , $start_date)
-                            ->whereDate('sales.created_at', '<=' , $end_date)
-                            ->groupBy('product_sales.product_id', 'product_sales.product_batch_id')
-                            ->get();
-        $product_cost = $this->calculateAverageCOGS($product_sale_data);
         // Elemen Paling Atas di dashboard
         $countBusiness = Business::count();
         $countAdminBisnis = User::where('role_id', 2)->count();
@@ -127,7 +112,7 @@ class HomeController extends Controller
         if(auth()->user()->hasRole('Admin Bisnis')){
             return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet', 'countProduct', 'countIngredient'));
         } else {
-            return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet'));
+            return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month'));
 
         }
     }

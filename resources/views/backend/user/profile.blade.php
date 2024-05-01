@@ -48,10 +48,10 @@
                                     <label>{{trans('file.Phone Number')}} *</strong> </label>
                                     <input type="text" name="phone" value="{{$lims_user_data->phone}}" required class="form-control" />
                                 </div>
-                                <div class="form-group">
+                                {{-- <div class="form-group">
                                     <label>{{trans('file.Company Name')}}</strong> </label>
                                     <input type="text" name="company_name" value="{{$lims_user_data->company_name}}" class="form-control" />
-                                </div>
+                                </div> --}}
                                 <div class="form-group">
                                     <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
                                 </div>

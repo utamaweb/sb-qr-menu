@@ -399,104 +399,6 @@
         </div>
       </footer>
 
-      <!-- notification modal -->
-      <div id="notification-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-        <div role="document" class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 id="exampleModalLabel" class="modal-title">{{trans('file.Send Notification')}}</h5>
-                    <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                </div>
-                <div class="modal-body">
-                  <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                    {!! Form::open(['route' => 'notifications.store', 'method' => 'post', 'files'=> true]) !!}
-                      <div class="row">
-
-                          <div class="col-md-4 form-group">
-                                <input type="hidden" name="sender_id" value="{{\Auth::id()}}">
-                              <label>{{trans('file.User')}} *</label>
-                              <select id="receiver_id" name="receiver_id" class="selectpicker form-control" required data-live-search="true" data-live-search-style="begins" title="Select user...">
-
-                              </select>
-                          </div>
-                          <div class="col-md-4 form-group">
-                                <label>{{trans('file.Reminder Date')}}</label>
-                                <input type="text" name="reminder_date" class="form-control date" value="{{date('d-m-Y')}}">
-                          </div>
-                          <div class="col-md-4 form-group">
-                                <label>{{trans('file.Attach Document')}}</label>
-                                <input type="file" name="document" class="form-control">
-                          </div>
-                          <div class="col-md-12 form-group">
-                              <label>{{trans('file.Message')}} *</label>
-                              <textarea rows="5" name="message" class="form-control" required></textarea>
-                          </div>
-                      </div>
-                      <div class="form-group">
-                          <button type="submit" class="btn btn-primary">{{trans('file.submit')}}</button>
-                      </div>
-                    {{ Form::close() }}
-                </div>
-            </div>
-        </div>
-      </div>
-      <!-- end notification modal -->
-
-
-      <!-- sale return modal -->
-      <div id="add-sale-return" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-          <div role="document" class="modal-dialog">
-            <div class="modal-content">
-              {!! Form::open(['route' => 'return-sale.create', 'method' => 'get']) !!}
-              <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Add Sale Return</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-              </div>
-              <div class="modal-body">
-                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                 <div class="row">
-                      <div class="col-md-6">
-                          <div class="form-group">
-                              <label>{{trans('file.Sale Reference')}} *</label>
-                              <input type="text" name="reference_no" class="form-control">
-                          </div>
-                      </div>
-                 </div>
-                  {{Form::submit('Submit', ['class' => 'btn btn-primary'])}}
-              </div>
-              {!! Form::close() !!}
-            </div>
-          </div>
-      </div>
-      <!-- end sale return modal -->
-
-      <!-- purchase return modal -->
-      <div id="add-purchase-return" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-          <div role="document" class="modal-dialog">
-            <div class="modal-content">
-              {!! Form::open(['route' => 'return-purchase.create', 'method' => 'get']) !!}
-              <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Add Purchase Return</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-              </div>
-              <div class="modal-body">
-                <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-                 <div class="row">
-                      <div class="col-md-6">
-                          <div class="form-group">
-                              <label>{{trans('file.Purchase Reference')}} *</label>
-                              <input type="text" name="reference_no" class="form-control">
-                          </div>
-                      </div>
-                 </div>
-                  {{Form::submit('Submit', ['class' => 'btn btn-primary'])}}
-              </div>
-              {!! Form::close() !!}
-            </div>
-          </div>
-      </div>
-      <!-- end purchase return modal -->
-
 
 
       <!-- user modal -->
@@ -881,23 +783,6 @@
 
       });
 
-
-      $("a#supplier-report-link").click(function(e){
-        e.preventDefault();
-        $('#loader').css('display','block');
-        $.ajax({
-          url: "{{route('supplier.all')}}",
-          type: 'GET',
-          dataType: 'json',
-          success: function(data) {
-            $('#supplier_modal_id').html(data);
-            $('.selectpicker').selectpicker('refresh');
-            $('#loader').css('display','none');
-            $('#supplier-modal').modal();
-          }
-        });
-
-      });
 
       $("a#due-report-link").click(function(e){
         e.preventDefault();

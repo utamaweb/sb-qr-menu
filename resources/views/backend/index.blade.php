@@ -27,15 +27,6 @@
       @endphp
       <div class="row">
         <div class="container-fluid">
-          @if(\Auth::user()->role_id <= 2 && isset($_COOKIE['login_now']) && $_COOKIE['login_now'])
-            <div id="update-alert-section" class="{{ $alertVersionUpgradeEnable===true ? null : 'd-none' }} alert alert-primary alert-dismissible fade show" role="alert">
-                <p id="announce" class="{{ $alertVersionUpgradeEnable===true ? null : 'd-none' }}"><strong>Hurray !!!</strong> A new version {{config('auto_update.VERSION')}} <span id="newVersionNo"></span> has been released. Please <i><b><a href="{{route('new-release')}}">Click here</a></b></i> to check upgrade details.</p>
-                <button type="button" id="closeButtonUpgrade" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <?php setcookie('login_now', 0, time() + (86400 * 1), "/");?>
-          @endif
           <div class="col-md-12">
             <div class="brand-text float-left mt-4">
                 <h3>{{trans('file.welcome')}} <span>{{Auth::user()->name}}</span></h3>
@@ -49,6 +40,106 @@
           </div>
         </div>
       </div>
+      @if(auth()->user()->hasRole('Superadmin'))
+      <section class="dashboard-counts">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 form-group">
+              <div class="row">
+                <!-- Count item widget-->
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-graph-bar" style="color: #733686"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countBusiness}}</div>
+                        <div class="name"><strong style="color: #733686">Total Bisnis</strong></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-graph-bar" style="color: #365186"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countWarehouse}}</div>
+                        <div class="name"><strong style="color: #365186">Total Outlet</strong></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-graph-bar" style="color: #e9801e"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countAdminBisnis}}</div>
+                        <div class="name"><strong style="color: #e9801e">Total Admin Bisnis</strong></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-graph-bar" style="color: #62e91e"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countAdminOutlet}}</div>
+                        <div class="name"><strong style="color: #62e91e">Total Admin Outlet</strong></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      @endif
+
+      @if(auth()->user()->hasRole('Admin Bisnis'))
+      <section class="dashboard-counts">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-12 form-group">
+              <div class="row">
+                <!-- Count item widget-->
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-graph-bar" style="color: #733686"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countProduct}}</div>
+                        <div class="name"><strong style="color: #733686">Total Produk</strong></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-graph-bar" style="color: #365186"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countWarehouse}}</div>
+                        <div class="name"><strong style="color: #365186">Total Outlet</strong></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-graph-bar" style="color: #e9801e"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countIngredient}}</div>
+                        <div class="name"><strong style="color: #e9801e">Total Bahan Baku</strong></div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-graph-bar" style="color: #62e91e"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countAdminOutlet}}</div>
+                        <div class="name"><strong style="color: #62e91e">Total Admin Outlet</strong></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      @endif
+      @if(auth()->user()->hasRole('Admin Outlet'))
       <!-- Counts Section -->
       <section class="dashboard-counts">
         <div class="container-fluid">
@@ -121,192 +212,8 @@
             </div>
           </div>
         </div>
-
-        {{-- <div class="container-fluid">
-          <div class="row">
-            @php
-              $yearly_report = $role_has_permissions_list->where('name', 'yearly_report')->first();
-            @endphp
-            @if($yearly_report)
-            <div class="col-md-12">
-              <div class="card">
-                <div class="card-header d-flex align-items-center">
-                  <h4>{{trans('file.yearly report')}}</h4>
-                </div>
-                <div class="card-body">
-                  <canvas id="saleChart" data-sale_chart_value = "{{json_encode($yearly_sale_amount)}}" data-purchase_chart_value = "{{json_encode($yearly_purchase_amount)}}" data-label1="{{trans('file.Purchased Amount')}}" data-label2="{{trans('file.Sold Amount')}}"></canvas>
-                </div>
-              </div>
-            </div>
-            @endif
-            <div class="col-md-7">
-              <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>{{trans('file.Recent Transaction')}}</h4>
-                  <div class="right-column">
-                    <div class="badge badge-primary">{{trans('file.latest')}} 5</div>
-                  </div>
-                </div>
-                <ul class="nav nav-tabs" role="tablist">
-                  <li class="nav-item">
-                    <a class="nav-link active" href="#sale-latest" role="tab" data-toggle="tab">{{trans('file.Sale')}}</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#purchase-latest" role="tab" data-toggle="tab">{{trans('file.Purchase')}}</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#quotation-latest" role="tab" data-toggle="tab">{{trans('file.Quotation')}}</a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link" href="#payment-latest" role="tab" data-toggle="tab">{{trans('file.Payment')}}</a>
-                  </li>
-                </ul>
-
-                <div class="tab-content">
-                  <div role="tabpanel" class="tab-pane fade show active" id="sale-latest">
-                      <div class="table-responsive">
-                        <table id="recent-sale" class="table">
-                          <thead>
-                            <tr>
-                              <th>{{trans('file.date')}}</th>
-                              <th>{{trans('file.reference')}}</th>
-                              <th>{{trans('file.customer')}}</th>
-                              <th>{{trans('file.status')}}</th>
-                              <th>{{trans('file.grand total')}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-
-                          </tbody>
-                        </table>
-                      </div>
-                  </div>
-                  <div role="tabpanel" class="tab-pane fade" id="purchase-latest">
-                      <div class="table-responsive">
-                        <table id="recent-purchase" class="table">
-                          <thead>
-                            <tr>
-                              <th>{{trans('file.date')}}</th>
-                              <th>{{trans('file.reference')}}</th>
-                              <th>{{trans('file.Supplier')}}</th>
-                              <th>{{trans('file.status')}}</th>
-                              <th>{{trans('file.grand total')}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-
-                          </tbody>
-                        </table>
-                      </div>
-                  </div>
-                  <div role="tabpanel" class="tab-pane fade" id="quotation-latest">
-                      <div class="table-responsive">
-                        <table id="recent-quotation" class="table">
-                          <thead>
-                            <tr>
-                              <th>{{trans('file.date')}}</th>
-                              <th>{{trans('file.reference')}}</th>
-                              <th>{{trans('file.customer')}}</th>
-                              <th>{{trans('file.status')}}</th>
-                              <th>{{trans('file.grand total')}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
-                  </div>
-                  <div role="tabpanel" class="tab-pane fade" id="payment-latest">
-                      <div class="table-responsive">
-                        <table id="recent-payment" class="table">
-                          <thead>
-                            <tr>
-                              <th>{{trans('file.date')}}</th>
-                              <th>{{trans('file.reference')}}</th>
-                              <th>{{trans('file.Amount')}}</th>
-                              <th>{{trans('file.Paid By')}}</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                          </tbody>
-                        </table>
-                      </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-5">
-              <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>{{trans('file.Best Seller').' '.date('F')}}</h4>
-                  <div class="right-column">
-                    <div class="badge badge-primary">{{trans('file.top')}} 5</div>
-                  </div>
-                </div>
-                <div class="table-responsive">
-                    <table id="monthly-best-selling-qty" class="table">
-                      <thead>
-                        <tr>
-                          <th>{{trans('file.Product Details')}}</th>
-                          <th>{{trans('file.qty')}}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-
-                      </tbody>
-                    </table>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>{{trans('file.Best Seller').' '.date('Y'). '('.trans('file.qty').')'}}</h4>
-                  <div class="right-column">
-                    <div class="badge badge-primary">{{trans('file.top')}} 5</div>
-                  </div>
-                </div>
-                <div class="table-responsive">
-                    <table id="yearly-best-selling-qty" class="table">
-                      <thead>
-                        <tr>
-                          <th>{{trans('file.Product Details')}}</th>
-                          <th>{{trans('file.qty')}}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-
-                      </tbody>
-                    </table>
-                  </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                  <h4>{{trans('file.Best Seller').' '.date('Y') . '('.trans('file.price').')'}}</h4>
-                  <div class="right-column">
-                    <div class="badge badge-primary">{{trans('file.top')}} 5</div>
-                  </div>
-                </div>
-                <div class="table-responsive">
-                    <table id="yearly-best-selling-price" class="table">
-                      <thead>
-                        <tr>
-                          <th>{{trans('file.Product Details')}}</th>
-                          <th>{{trans('file.grand total')}}</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-
-                      </tbody>
-                    </table>
-                  </div>
-              </div>
-            </div>
-          </div>
-        </div> --}}
       </section>
+      @endif
 
 
 @endsection

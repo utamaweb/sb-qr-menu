@@ -11,13 +11,14 @@ use App\Models\Purchase;
 use App\Models\Expense;
 use App\Models\Transaction;
 use App\Models\StockPurchase;
-use App\Models\Quotation;
-use App\Models\Payment;
+use App\Models\Ingredient;
+use App\Models\Product;
+use App\Models\Business;
+use App\Models\Warehouse;
 use App\Models\Account;
+use App\Models\User;
 use App\Models\Product_Sale;
 use App\Models\Customer;
-use App\Models\Product;
-use App\Models\RewardPointSetting;
 use App\Models\Product_Warehouse;
 use App\Models\Unit;
 use Cache;
@@ -44,64 +45,8 @@ class HomeController extends Controller
         return redirect('dashboard');
     }
 
-    public function documentation()
-    {
-        $general_setting =  Cache::remember('general_setting', 60*60*24*365, function () {
-            return DB::table('general_settings')->latest()->first();
-        });
-        return view('backend.documentation', compact('general_setting'));
-    }
-
-    public function addonList()
-    {
-        return view('backend.addonlist');
-    }
-
     public function dashboard()
     {
-        /*$headers = array(
-            "Authorization: Bearer kRHXREZr1SmBu32lSZ26GB6VlyKhjWLpDOB",
-            "Content-Type: application/json",
-            "cache-control: no-cache"
-        );
-        $params = [
-            "sender" => "SEWI PAY",
-            "content" => "Hello akdjohnson",
-            "dlrUrl" => "",
-            "recipients" => ["2250709134185"]
-        ];
-        $params = json_encode($params);
-        $url = "https://api.smscloud.ci/v1/campaigns";
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, TRUE);
-        curl_setopt($curl, CURLOPT_POST, TRUE);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $params);
-        $resp = curl_exec($curl);
-        curl_close($curl);
-        return dd($resp);*/
-        //return \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'));
-        //making strict mode false for this query
-        config()->set('database.connections.mysql.strict', false);
-        DB::reconnect();
-        if(Auth::user()->role_id == 5) {
-            $customer = Customer::select('id', 'points')->where('user_id', Auth::id())->first();
-            $lims_sale_data = Sale::with('warehouse')->where('customer_id', $customer->id)->orderBy('created_at', 'desc')->get();
-            $lims_payment_data = DB::table('payments')
-                           ->join('sales', 'payments.sale_id', '=', 'sales.id')
-                           ->where('customer_id', $customer->id)
-                           ->select('payments.*', 'sales.reference_no as sale_reference')
-                           ->orderBy('payments.created_at', 'desc')
-                           ->get();
-            $lims_quotation_data = Quotation::with('biller', 'customer', 'supplier', 'user')->orderBy('id', 'desc')->where('customer_id', $customer->id)->orderBy('created_at', 'desc')->get();
-
-            $lims_return_data = Returns::with('warehouse', 'customer', 'biller')->where('customer_id', $customer->id)->orderBy('created_at', 'desc')->get();
-            $lims_reward_point_setting_data = RewardPointSetting::select('per_point_amount')->latest()->first();
-            return view('backend.customer_index', compact('customer', 'lims_sale_data', 'lims_payment_data', 'lims_quotation_data', 'lims_return_data', 'lims_reward_point_setting_data'));
-        }
-
         $start_date = date("Y").'-'.date("m").'-'.'01';
         $end_date = date("Y").'-'.date("m").'-'.date('t', mktime(0, 0, 0, date("m"), 1, date("Y")));
         $yearly_sale_amount = [];
@@ -113,27 +58,30 @@ class HomeController extends Controller
                             ->groupBy('product_sales.product_id', 'product_sales.product_batch_id')
                             ->get();
         $product_cost = $this->calculateAverageCOGS($product_sale_data);
-        // $revenue = Sale::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('grand_total - shipping_cost'));
         // Elemen Paling Atas di dashboard
+        $countBusiness = Business::count();
+        $countAdminBisnis = User::where('role_id', 2)->count();
+        if(auth()->user()->hasRole('Superadmin')){
+            $countAdminOutlet = User::where('role_id', 3)->count();
+            $countWarehouse = Warehouse::count();
+        } elseif(auth()->user()->hasRole('Admin Bisnis')){
+            $business_id = auth()->user()->business_id;
+            $warehouses = Warehouse::where('business_id', $business_id)->pluck('id');
+            $countAdminOutlet = User::where('role_id', 3)->whereIn('warehouse_id', $warehouses)->count();
+            $countWarehouse = Warehouse::where('business_id', $business_id)->count();
+            $countProduct = Product::where('business_id', $business_id)->count();
+            $countIngredient = Ingredient::where('business_id', $business_id)->count();
+        }
         if(auth()->user()->warehouse_id == NULL){
             $revenue = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
-            // $return = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-            // $purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $purchase_return = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
-            // $revenue = $revenue - $return;
-            // $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-
             $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
             $expense = $expense + $stockPurchase;
             $profit = $revenue - $expense;
         } else {
             $revenue = Transaction::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
-            // $return = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-            // $purchase_return = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $purchase_return = Transaction::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
-            // $revenue = $revenue - $return;
-            // $purchase = Purchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
             $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
             $expense = $expense + $stockPurchase;
@@ -153,20 +101,10 @@ class HomeController extends Controller
                 $end_date = date("Y-m", $start).'-'.date('t', mktime(0, 0, 0, date("m", $start), 1, date("Y", $start)));
 
                 $recieved_amount = DB::table('transactions')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
-                // $recieved_amount = DB::table('payments')->whereNotNull('sale_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
-                // $sent_amount = DB::table('payments')->whereNotNull('purchase_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $sent_amount = DB::table('expenses')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
-                // $return_amount = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-                // $purchase_return_amount = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
                 $expense_amount = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
-                // $payroll_amount = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
-
-                // $sent_amount = $sent_amount + $return_amount + $expense_amount + $stockPurchase;
                 $sent_amount = $sent_amount + $expense_amount + $stockPurchase;
-                // $sent_amount = $sent_amount + $return_amount + $expense_amount + $payroll_amount;
-
-                // $payment_recieved[] = number_format((float)($recieved_amount + $purchase_return_amount), config('decimal'), '.', '');
                 $payment_recieved[] = number_format((float)($recieved_amount), config('decimal'), '.', '');
                 $payment_sent[] = number_format((float)$sent_amount, config('decimal'), '.', '');
                 $month[] = date("F", strtotime($start_date));
@@ -174,21 +112,11 @@ class HomeController extends Controller
             } else {
                 $start_date = date("Y-m", $start).'-'.'01';
                 $end_date = date("Y-m", $start).'-'.date('t', mktime(0, 0, 0, date("m", $start), 1, date("Y", $start)));
-
                 $recieved_amount = DB::table('transactions')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', auth()->user()->warehouse_id)->sum('total_amount');
-                // $recieved_amount = DB::table('payments')->whereNotNull('sale_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
-                // $sent_amount = DB::table('payments')->whereNotNull('purchase_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $sent_amount = DB::table('expenses')->where('warehouse_id', auth()->user()->warehouse_id)->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
-                // $return_amount = Returns::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-                // $purchase_return_amount = ReturnPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
                 $expense_amount = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
-                // $payroll_amount = Payroll::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
-
                 $sent_amount = $sent_amount + $expense_amount + $stockPurchase;
-                // $sent_amount = $sent_amount + $return_amount + $expense_amount + $payroll_amount;
-
-                // $payment_recieved[] = number_format((float)($recieved_amount + $purchase_return_amount), config('decimal'), '.', '');
                 $payment_recieved[] = number_format((float)($recieved_amount), config('decimal'), '.', '');
                 $payment_sent[] = number_format((float)$sent_amount, config('decimal'), '.', '');
                 $month[] = date("F", strtotime($start_date));
@@ -196,20 +124,12 @@ class HomeController extends Controller
             }
         }
         // end arus uang
+        if(auth()->user()->hasRole('Admin Bisnis')){
+            return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet', 'countProduct', 'countIngredient'));
+        } else {
+            return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet'));
 
-        //making strict mode true for this query
-        config()->set('database.connections.mysql.strict', true);
-        DB::reconnect();
-        //fetching data for auto updates
-        if(Auth::user()->role_id <= 2 && isset($_COOKIE['login_now']) && $_COOKIE['login_now']) {
-            $autoUpdateData = $this->general();
-            $alertBugEnable =  $autoUpdateData['alertBugEnable'];
-            $alertVersionUpgradeEnable = $autoUpdateData['alertVersionUpgradeEnable'];
         }
-        else {
-            $autoUpdateData = $alertBugEnable = $alertVersionUpgradeEnable = '';
-        }
-        return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'alertBugEnable','alertVersionUpgradeEnable'));
     }
 
     public function yearlyBestSellingPrice()

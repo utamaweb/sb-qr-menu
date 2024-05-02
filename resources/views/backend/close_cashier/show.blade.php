@@ -151,7 +151,7 @@
                                     <div class="col-md-6 text-right">
                                         @currency($closeCashier->total_cash - $sumExpense - $sumStockPurchase) <br><br>
                                         @currency($closeCashier->cash_in_drawer) <br><br>
-                                        @currency($closeCashier->different) <br><br>
+                                        @currency($closeCashier->difference) <br><br>
                                     </div>
                                 </div>
                             </div>

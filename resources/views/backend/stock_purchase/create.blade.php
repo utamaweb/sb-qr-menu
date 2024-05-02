@@ -72,10 +72,12 @@
                                         <input type="number" placeholder="Qty" name="qty[]"" min="1" class="form-control quantity">
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan">
+                                        <input placeholder="Harga Satuan" class="form-control harga-satuan">
+                                        <input type="hidden" name="price[]" class="harga-satuan-real">
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal">
+                                        <input placeholder="Subtotal" readonly class="form-control subtotal">
+                                        <input type="hidden" name="subtotal[]" class="subtotal-real">
                                     </div>
                                     <div class="col-md-2">
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control">
@@ -111,6 +113,44 @@
     $("#tambah-stok").addClass("active");
     $(document).ready(function() {
         var maxAppend = 0;
+
+        // Set harga satuan to use number format
+        $('.harga-satuan').keyup(function(event) {
+
+            // skip for arrow keys
+            if(event.which >= 37 && event.which <= 40) return;
+
+            // format number
+            $(this).val(function(index, value){
+            return value
+            .replace(/\D/g, "")
+                .replace(/([0-9])([0-9]{2})$/, '$1.$2')
+                .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ",")
+            ;
+            });
+            $(this).siblings('.field__value').val($(this).val().replace(/,/g, ''))
+
+            // set .harga-satuan-real value
+            $('.harga-satuan-real').val(parseInt($('.harga-satuan').val().replace(/,/g, '')));
+
+            // Set #subtotal value
+            var qty = $('.quantity').val();
+            var hargaSatuan = $('.harga-satuan-real').val();
+            var subtotal = hargaSatuan * qty;
+            $('.subtotal-real').val(subtotal);
+            $('.subtotal').val(subtotal.toLocaleString());
+
+            // // format number
+            // $('.subtotal').val($('#subtotal').val()
+            // .replace(/\D/g, "")
+            //     .replace(/([0-9])([0-9]{2})$/, '$1.$2')
+            //     .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ",")
+            // ;
+            // });
+            // $('.subtotal').siblings('.field__value').val($(this).val().replace(/,/g, ''))
+        });
+
+
         $("#add_more").click(function() {
             if (maxAppend >= 9)
             {
@@ -152,11 +192,12 @@
         });
 
         function calculateSubtotal(row) {
-        var hargaSatuan = $(row).find('.harga-satuan').val();
+        var hargaSatuan = $('.harga-satuan-real').val();
         var qty = $(row).find('.quantity').val();
         var subtotal = hargaSatuan * qty;
-        $(row).find('.subtotal').val(subtotal); // Assuming 2 decimal places
-    }
+        // $(row).find('.subtotal-real').val(subtotal); // Assuming 2 decimal places
+
+        }
 
     $('#add_new').on('click', '.add_more', function() {
         var add_new = $('<div class="form-group row">\n\

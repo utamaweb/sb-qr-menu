@@ -70,7 +70,7 @@
                     </td>
                     @endif
 
-                    <td>{{ $product->price }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
+                    <td>{{ number_format($product->price) }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
                     <td>
                         @can('ubah-produk')
                         <a href={{route('produk.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> Edit</a>

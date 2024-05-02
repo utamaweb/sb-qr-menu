@@ -109,8 +109,10 @@ class HomeController extends Controller
             }
         }
         // end arus uang
-        if(auth()->user()->hasRole(['Admin Bisnis', 'Superadmin'])){
+        if(auth()->user()->hasRole('Admin Bisnis')){
             return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet', 'countProduct', 'countIngredient'));
+        } elseif(auth()->user()->hasRole('Superadmin')){
+            return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet'));
         } else {
             return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month'));
 

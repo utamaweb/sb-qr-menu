@@ -16,7 +16,7 @@ class ExpenseController extends Controller
 {
     public function category() {
         $warehouse = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-        $business_id = $warehouse->id;
+        $business_id = $warehouse->business_id;
         $expense_category = ExpenseCategory::where('business_id', $business_id)->get();
         return response()->json($expense_category, 200);
     }

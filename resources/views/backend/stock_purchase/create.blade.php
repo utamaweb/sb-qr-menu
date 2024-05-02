@@ -69,15 +69,13 @@
                                         </select>
                                     </div>
                                     <div class="col-md-1">
-                                        <input type="number" placeholder="Qty" name="qty[]"" min="1" class="form-control quantity">
+                                        <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity">
                                     </div>
                                     <div class="col-md-2">
-                                        <input placeholder="Harga Satuan" class="form-control harga-satuan">
-                                        <input type="hidden" name="price[]" class="harga-satuan-real">
+                                        <input type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan input-number" oninput="changeValue(this)">
                                     </div>
                                     <div class="col-md-2">
-                                        <input placeholder="Subtotal" readonly class="form-control subtotal">
-                                        <input type="hidden" name="subtotal[]" class="subtotal-real">
+                                        <input type="text" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal input-number">
                                     </div>
                                     <div class="col-md-2">
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control">
@@ -111,45 +109,34 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $("#tambah-stok").addClass("active");
+
+    // Function to change input value to formattedNumber
+    function changeValue(input) {
+        var value = formatNumber(input.value);
+        input.value = value;
+    }
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
+
+
     $(document).ready(function() {
         var maxAppend = 0;
 
-        // Set harga satuan to use number format
-        $('.harga-satuan').keyup(function(event) {
 
-            // skip for arrow keys
-            if(event.which >= 37 && event.which <= 40) return;
-
-            // format number
-            $(this).val(function(index, value){
-            return value
-            .replace(/\D/g, "")
-                .replace(/([0-9])([0-9]{0})$/, '$1$2')
-                .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ",")
-            ;
-            });
-            $(this).siblings('.field__value').val($(this).val().replace(/,/g, ''))
-
-            // set .harga-satuan-real value
-            $('.harga-satuan-real').val(parseInt($('.harga-satuan').val().replace(/,/g, '')));
-
-            // Set #subtotal value
-            var qty = $('.quantity').val();
-            var hargaSatuan = $('.harga-satuan-real').val();
-            var subtotal = hargaSatuan * qty;
-            $('.subtotal-real').val(subtotal);
-            $('.subtotal').val(subtotal.toLocaleString());
-
-            // // format number
-            // $('.subtotal').val($('#subtotal').val()
-            // .replace(/\D/g, "")
-            //     .replace(/([0-9])([0-9]{2})$/, '$1.$2')
-            //     .replace(/\B(?=(\d{3})+(?!\d)\.?)/g, ",")
-            // ;
-            // });
-            // $('.subtotal').siblings('.field__value').val($(this).val().replace(/,/g, ''))
-        });
-
+        // $('.input-number').on('input', function() {
+        //     var value = this.value;
+        //     // Update the input field value with the formatted number
+        //     this.value = formatNumber(this.value);
+        // });
 
         $("#add_more").click(function() {
             if (maxAppend >= 9)
@@ -170,10 +157,10 @@
                                         <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
-                                        <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan">\n\
+                                        <input type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan input-number" oninput="changeValue(this)">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
-                                        <input type="number" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal">\n\
+                                        <input type="text" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal input-number">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control">\n\
@@ -192,12 +179,11 @@
         });
 
         function calculateSubtotal(row) {
-        var hargaSatuan = $('.harga-satuan-real').val();
+        var hargaSatuan = parseFloat($(row).find('.harga-satuan').val().replace(/,/g, ""));
         var qty = $(row).find('.quantity').val();
         var subtotal = hargaSatuan * qty;
-        // $(row).find('.subtotal-real').val(subtotal); // Assuming 2 decimal places
-
-        }
+        $(row).find('.subtotal').val(formatNumber(subtotal)); // Assuming 2 decimal places
+    }
 
     $('#add_new').on('click', '.add_more', function() {
         var add_new = $('<div class="form-group row">\n\
@@ -214,10 +200,10 @@
                                         <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
-                                        <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan">\n\
+                                        <input type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan input-number" oninput="changeValue(this)">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
-                                        <input type="number" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal">\n\
+                                        <input type="text" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal input-number">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
                                         <input type="text" placeholder="Catatan" name="notes[]" class="form-control">\n\

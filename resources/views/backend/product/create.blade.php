@@ -133,7 +133,7 @@ input[type=file]::file-selector-button:hover {
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Harga Produk *</strong> </label>
-                                                <input type="number" name="price" required class="form-control" step="any" value="{{old('price')}}">
+                                                <input type="text" name="price" required class="form-control" step="any" value="{{old('price')}}" oninput="changeValue(this)">
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>
@@ -185,6 +185,24 @@ input[type=file]::file-selector-button:hover {
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
 <script type="text/javascript">
+
+    // Function to change input value to formattedNumber
+    function changeValue(input) {
+        var value = formatNumber(input.value);
+        input.value = value;
+    }
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
+
      function readURL(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();

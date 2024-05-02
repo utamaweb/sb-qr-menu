@@ -28,29 +28,29 @@ class ProductController extends Controller
     public function index()
     {
         $roleName = auth()->user()->getRoleNames()[0];
-        if(auth()->user()->hasRole('Superadmin')){
+        if (auth()->user()->hasRole('Superadmin')) {
             $products = Product::get();
-        } elseif(auth()->user()->hasRole('Admin Bisnis')){
+        } elseif (auth()->user()->hasRole('Admin Bisnis')) {
             $products = Product::where('business_id', auth()->user()->business_id)->get();
         }
-        return view('backend.product.index', compact('products','roleName'));
+        return view('backend.product.index', compact('products', 'roleName'));
     }
 
     public function create()
     {
         $roleName = auth()->user()->getRoleNames()[0];
-       $lims_category_list = Category::where('business_id', auth()->user()->business_id)->where('is_active', true)->get();
-       $ingredients = Ingredient::where('business_id', auth()->user()->business_id)->get();
-       $lims_unit_list = Unit::where('is_active', true)->get();
-       $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-       $numberOfProduct = Product::where('is_active', true)->count();
-       return view('backend.product.create',compact('lims_category_list', 'lims_unit_list', 'lims_warehouse_list', 'numberOfProduct', 'ingredients','roleName'));
+        $lims_category_list = Category::where('business_id', auth()->user()->business_id)->where('is_active', true)->get();
+        $ingredients = Ingredient::where('business_id', auth()->user()->business_id)->get();
+        $lims_unit_list = Unit::where('is_active', true)->get();
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        $numberOfProduct = Product::where('is_active', true)->count();
+        return view('backend.product.create', compact('lims_category_list', 'lims_unit_list', 'lims_warehouse_list', 'numberOfProduct', 'ingredients', 'roleName'));
     }
 
     public function store(Request $request)
     {
         $isCodeExists = Product::where('code', $request->code)->first();
-        if($isCodeExists){
+        if ($isCodeExists) {
             return redirect()->back()->with('not_permitted', 'Maaf, Kode Produk Tersebut Sudah Digunakan, Gunakan Kode Lain.');
         }
         $data = $request->except('image', 'file');
@@ -68,8 +68,8 @@ class ProductController extends Controller
 
         $image = $request->image;
         $imageName = 'default-img.png';
-        if($image){
-            $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+        if ($image) {
+            $imageName = Str::slug($request->name) . '-' . Str::random(10) . '.' . $image->extension();
             $uploadImage = $image->storeAs('public/product_images', $imageName);
         }
         $productInsert = Product::create([
@@ -81,7 +81,7 @@ class ProductController extends Controller
             'unit_id' => $request->unit_id,
             'business_id' => auth()->user()->business_id,
             'product_details' => $request->product_details,
-            'price' => $request->price,
+            'price' => intVal(str_replace(',', '', $request->price)),
             'image' => $imageName,
         ]);
         if (isset($request->ingredients)) {
@@ -131,22 +131,22 @@ class ProductController extends Controller
         $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
         $lims_unit_list = Unit::where('is_active', true)->get();
         $product = Product::where('id', $id)->first();
-        if($product->variant_option) {
+        if ($product->variant_option) {
             $product->variant_option = json_decode($product->variant_option);
             $product->variant_value = json_decode($product->variant_value);
         }
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         $noOfVariantValue = 0;
-        return view('backend.product.edit',compact('lims_category_list', 'lims_unit_list', 'product', 'lims_warehouse_list', 'noOfVariantValue','ingredients','ingredientProducts', 'product_warehouses'));
+        return view('backend.product.edit', compact('lims_category_list', 'lims_unit_list', 'product', 'lims_warehouse_list', 'noOfVariantValue', 'ingredients', 'ingredientProducts', 'product_warehouses'));
     }
 
     public function update(Request $request, $id)
     {
         $image = $request->image;
         $productFind = Product::findOrFail($id);
-        if($image){
+        if ($image) {
             $this->fileDelete('storage/product_images/', $productFind->image);
-            $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+            $imageName = Str::slug($request->name) . '-' . Str::random(10) . '.' . $image->extension();
             $uploadImage = $image->storeAs('public/product_images', $imageName);
         } else {
             $imageName = $productFind->image;
@@ -224,13 +224,13 @@ class ProductController extends Controller
 
     public function saleUnit($id)
     {
-        $unit = Unit::where("base_unit", $id)->orWhere('id', $id)->pluck('unit_name','id');
+        $unit = Unit::where("base_unit", $id)->orWhere('id', $id)->pluck('unit_name', 'id');
         return json_encode($unit);
     }
 
     public function getData($id, $variant_id)
     {
-        if($variant_id) {
+        if ($variant_id) {
             $data = Product::join('product_variants', 'products.id', 'product_variants.product_id')
                 ->select('products.name', 'product_variants.item_code')
                 ->where([
@@ -238,8 +238,7 @@ class ProductController extends Controller
                     ['product_variants.variant_id', $variant_id]
                 ])->first();
             $data->code = $data->item_code;
-        }
-        else
+        } else
             $data = Product::select('name', 'code')->find($id);
         return $data;
     }
@@ -251,10 +250,10 @@ class ProductController extends Controller
         $product_code = explode("(", $request['data']);
         $product_code[0] = rtrim($product_code[0], " ");
         $lims_product_data = Product::where([
-            ['code', $product_code[0] ],
+            ['code', $product_code[0]],
             ['is_active', true]
         ])->first();
-        if(!$lims_product_data) {
+        if (!$lims_product_data) {
             $lims_product_data = Product::join('product_variants', 'products.id', 'product_variants.product_id')
                 ->select('products.*', 'product_variants.item_code', 'product_variants.variant_id', 'product_variants.additional_price')
                 ->where('product_variants.item_code', $product_code[0])
@@ -262,13 +261,12 @@ class ProductController extends Controller
 
             $variant_id = $lims_product_data->variant_id;
             $additional_price = $lims_product_data->additional_price;
-        }
-        else {
+        } else {
             $variant_id = '';
             $additional_price = 0;
         }
         $product[] = $lims_product_data->name;
-        if($lims_product_data->is_variant)
+        if ($lims_product_data->is_variant)
             $product[] = $lims_product_data->item_code;
         else
             $product[] = $lims_product_data->code;
@@ -292,7 +290,7 @@ class ProductController extends Controller
             $lims_product_data->is_active = false;
             $lims_product_data->save();
 
-            if($lims_product_data->image) {
+            if ($lims_product_data->image) {
                 $images = explode(",", $lims_product_data->image);
                 foreach ($images as $image) {
                     $this->fileDelete('images/product/', $image);
@@ -307,7 +305,7 @@ class ProductController extends Controller
     public function destroy($id)
     {
         $lims_product_data = Product::findOrFail($id);
-        if($lims_product_data->image != 'zummXD2dvAtI.png') {
+        if ($lims_product_data->image != 'zummXD2dvAtI.png') {
             $this->fileDelete('storage/product_images/', $lims_product_data->image);
         }
         IngredientProducts::where('product_id', $lims_product_data->id)->delete();

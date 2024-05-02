@@ -20,7 +20,7 @@ class StockPurchaseController extends Controller
      */
     public function index()
     {
-        if(auth()->user()->hasRole(['Superadmin', 'Admin Bisnis'])){
+        if (auth()->user()->hasRole(['Superadmin', 'Admin Bisnis'])) {
             $stockPurchases = StockPurchase::get();
         } else {
             $stockPurchases = StockPurchase::where('warehouse_id', auth()->user()->warehouse_id)->get();
@@ -28,33 +28,35 @@ class StockPurchaseController extends Controller
         return view('backend.stock_purchase.index', compact('stockPurchases'));
     }
 
-    public function create() {
+    public function create()
+    {
         $dateNow = Carbon::now()->format('Y-m-d');
         $warehouse = Warehouse::find(auth()->user()->warehouse_id);
         $ingredients = Ingredient::where('business_id', $warehouse->business_id)->get();
         $roleName = auth()->user()->getRoleNames()[0];
         $warehouses = Warehouse::get();
-        return view('backend.stock_purchase.create', compact('dateNow','ingredients', 'roleName', 'warehouses'));
+        return view('backend.stock_purchase.create', compact('dateNow', 'ingredients', 'roleName', 'warehouses'));
     }
 
     public function store(Request $request)
     {
-        if($request->notes < 1){
+        if ($request->notes < 1) {
             return redirect()->route('pembelian-stok.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
         }
         $dateNow = Carbon::now()->format('Y-m-d');
         $roleName = auth()->user()->getRoleNames()[0];
         // $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
-        if($roleName == 'Superadmin'){
+        if ($roleName == 'Superadmin') {
             $shift = Shift::where('is_closed', 0)->first();
         }
-        if($shift == NULL){
+        if ($shift == NULL) {
             return redirect()->route('pembelian-stok.index')->with('not_permitted', 'Belum ada kasir yang dibuka');
         }
         $qtyInt = array_map('intval', $request->qty);
         $totalQty = array_sum($qtyInt);
-        $subtotalInt = array_map('intval', $request->subtotal);
+        // $subtotalInt = array_map('intval', $request->subtotal);
+        $subtotalInt = array_map('intval', str_replace(',', '', $request->subtotal)); // Remove comma in subtotal items (check needed)
         $totalSubtotal = array_sum($subtotalInt);
         // return $totalQty;
         $this->validate($request, [
@@ -81,7 +83,7 @@ class StockPurchaseController extends Controller
             StockPurchaseIngredient::create($data);
             $qtyToInt = (int)$request->qty[$item];
             $checkStock = Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->count();
-            if($checkStock < 1){
+            if ($checkStock < 1) {
                 Stock::create([
                     'warehouse_id' => $request->warehouse_id,
                     'ingredient_id' => $request->ingredient_id[$item],
@@ -114,7 +116,8 @@ class StockPurchaseController extends Controller
     }
 
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $stockPurchase = StockPurchase::find($id);
         $stockPurchaseIngredients = StockPurchaseIngredient::where('stock_purchase_id', $id)->get();
         $dateNow = Carbon::now()->format('Y-m-d');
@@ -122,18 +125,18 @@ class StockPurchaseController extends Controller
         $ingredients = Ingredient::where('business_id', $warehouse->business_id)->get();
         $roleName = auth()->user()->getRoleNames()[0];
         $warehouses = Warehouse::get();
-        return view('backend.stock_purchase.edit', compact('stockPurchase','stockPurchaseIngredients', 'dateNow','ingredients', 'roleName', 'warehouses'));
+        return view('backend.stock_purchase.edit', compact('stockPurchase', 'stockPurchaseIngredients', 'dateNow', 'ingredients', 'roleName', 'warehouses'));
     }
 
     public function update(Request $request, $id)
     {
-        if(count($request->notes) < 1){
+        if (count($request->notes) < 1) {
             return redirect()->route('pembelian-stok.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
         }
         $dateNow = Carbon::now()->format('Y-m-d');
         $roleName = auth()->user()->getRoleNames()[0];
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
-        if($roleName == 'Superadmin'){
+        if ($roleName == 'Superadmin') {
             $shift = Shift::where('date', $dateNow)->where('is_closed', 0)->first();
         }
         $totalQty = 0;
@@ -162,14 +165,15 @@ class StockPurchaseController extends Controller
     }
 
 
-    public function show($id) {
+    public function show($id)
+    {
         $warehouses = Warehouse::get();
         $dateNow = Carbon::now()->format('Y-m-d');
         $roleName = auth()->user()->getRoleNames()[0];
         $ingredients = Ingredient::get();
         $stockPurchase = StockPurchase::find($id);
         $stockPurchaseDetails = StockPurchaseIngredient::whereStockPurchaseId($id)->get();
-        return view('backend.stock_purchase.show', compact('ingredients','dateNow','roleName','warehouses','stockPurchase','stockPurchaseDetails'));
+        return view('backend.stock_purchase.show', compact('ingredients', 'dateNow', 'roleName', 'warehouses', 'stockPurchase', 'stockPurchaseDetails'));
     }
 
     public function updateDetail(Request $request, $id)

@@ -130,7 +130,7 @@ input[type=file]::file-selector-button:hover {
                                             <div class="col-md-4">
                                                 <div class="form-group">
                                                     <label>Harga Produk *</strong> </label>
-                                                    <input type="number" name="price" required class="form-control" step="any" value="{{$product->price}}">
+                                                    <input type="text" name="price" required class="form-control" step="any" value="{{$product->price}}" oninput="changeValue(this)">
                                                     <span class="validation-msg"></span>
                                                 </div>
                                             </div>
@@ -180,6 +180,24 @@ input[type=file]::file-selector-button:hover {
 
 @push('scripts')
 <script type="text/javascript">
+
+    // Function to change input value to formattedNumber
+    function changeValue(input) {
+        var value = formatNumber(input.value);
+        input.value = value;
+    }
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
+
     function readURL(input) {
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
@@ -193,6 +211,10 @@ input[type=file]::file-selector-button:hover {
             }
         }
 $(document).ready(function() {
+
+    // Set price input to use formatNumber
+    var priceInput = $('input[name="price"]');
+    priceInput.val(formatNumber(priceInput.val()));
 
     $('#genbutton').click(function() {
         var randomCode = generateRandomCode(8); // Panggil fungsi untuk menghasilkan 8 angka acak

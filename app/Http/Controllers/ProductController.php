@@ -159,7 +159,7 @@ class ProductController extends Controller
             'category_id' => $request->category_id,
             'unit_id' => $request->unit_id,
             'product_details' => $request->product_details,
-            'price' => $request->price,
+            'price' => intVal(str_replace(',', '', $request->price)),
             'image' => $imageName,
         ]);
         if (isset($request->ingredients)) {

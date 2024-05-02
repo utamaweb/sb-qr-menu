@@ -43,7 +43,7 @@
                                 </div>
                                 <div class="form-group mt-3">
                                     <label><strong>Harga *</strong></label>
-                                    <input type="number" id="product-price" name="price" required class="form-control">
+                                    <input type="text" id="product-price" name="price" required class="form-control" oninput="changeValue(this)">
                                 </div>
                             </div>
                             <div class="col-md-12 d-flex justify-content-end">
@@ -67,11 +67,29 @@
 
 @push('scripts')
 <script type="text/javascript">
+
+    // Function to change input value to formattedNumber
+    function changeValue(input) {
+        var value = formatNumber(input.value);
+        input.value = value;
+    }
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
+
 $('#product-select').change(function(){
         // Mengambil harga produk yang dipilih
         var selectedPrice = $(this).find(':selected').data('price');
         // Setel nilai input text harga sesuai dengan harga produk yang dipilih
-        $('#product-price').val(selectedPrice);
+        $('#product-price').val(formatNumber(selectedPrice));
     });
 
 $("ul#outlet").siblings('a').attr('aria-expanded','true');

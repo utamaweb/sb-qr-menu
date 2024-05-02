@@ -22,10 +22,10 @@ class ProductWarehouseController extends Controller
     {
         $warehouse_id = auth()->user()->warehouse_id;
         $warehouse = Warehouse::find($warehouse_id);
-        if(auth()->user()->hasRole('Superadmin')){
+        if (auth()->user()->hasRole('Superadmin')) {
             $warehouses = Warehouse::get();
             $products = Product::get();
-        } else{
+        } else {
             $warehouses = Warehouse::where('id', $warehouse_id)->get();
             $products = Product::where('business_id', $warehouse->business_id)->get();
         }
@@ -42,7 +42,7 @@ class ProductWarehouseController extends Controller
         Product_Warehouse::create([
             'product_id' => $request->product_id,
             'warehouse_id' => $request->warehouse_id,
-            'price' => $request->price,
+            'price' => intVal(str_replace(',', '', $request->price)),
         ]);
         return redirect()->route('produk-outlet.index')->with('message', 'Data berhasil ditambahkan');
     }
@@ -52,10 +52,10 @@ class ProductWarehouseController extends Controller
         $warehouse_id = auth()->user()->warehouse_id;
         $warehouse = Warehouse::find($warehouse_id);
         $productWarehouse = Product_Warehouse::find($id);
-        if(auth()->user()->hasRole('Superadmin')){
+        if (auth()->user()->hasRole('Superadmin')) {
             $warehouses = Warehouse::get();
             $products = Product::get();
-        } else{
+        } else {
             $warehouses = Warehouse::where('id', $warehouse_id)->get();
             $products = Product::where('business_id', $warehouse->business_id)->get();
         }
@@ -72,7 +72,7 @@ class ProductWarehouseController extends Controller
         Product_Warehouse::find($id)->update([
             'product_id' => $request->product_id,
             'warehouse_id' => $request->warehouse_id,
-            'price' => $request->price,
+            'price' => intVal(str_replace(',', '', $request->price)),
         ]);
         return redirect()->route('produk-outlet.index')->with('message', 'Data berhasil diubah');
     }

@@ -27,6 +27,7 @@
                 <tr>
                     <th>#</th>
                     <th>Nama Pengeluaran</th>
+                    <th>Bisnis</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
@@ -35,6 +36,7 @@
                 <tr data-id="{{$expense_category->id}}">
                     <td>{{++$key}}</td>
                     <td>{{ $expense_category->name }}</td>
+                    <td>{{ $expense_category->business->name }}</td>
                     <td>
                         @can('ubah-pengeluaran')
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense_category->id}}"><i class="dripicons-document-edit"></i> Ubah</button>

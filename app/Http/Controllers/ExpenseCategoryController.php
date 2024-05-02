@@ -12,7 +12,7 @@ class ExpenseCategoryController extends Controller
 {
     public function index()
     {
-        $lims_expense_category_all = ExpenseCategory::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        $lims_expense_category_all = ExpenseCategory::where('business_id', auth()->user()->business_id)->get();
         return view('backend.expense_category.index', compact('lims_expense_category_all'));
     }
 
@@ -36,7 +36,7 @@ class ExpenseCategoryController extends Controller
         $data = $request->all();
         ExpenseCategory::create([
             'name' => $request->name,
-            'warehouse_id' => auth()->user()->warehouse_id
+            'business_id' => auth()->user()->business_id
         ]);
         return redirect()->back()->with('message', 'Data berhasil ditambahkan');
     }

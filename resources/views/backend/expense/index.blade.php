@@ -30,7 +30,7 @@
                     <th>Pengeluaran</th>
                     <th>Kuantitas</th>
                     <th>Total</th>
-                    <th>Cabang</th>
+                    <th>Outlet</th>
                     <th>Dibuat | Waktu</th>
                     @if(auth()->user()->hasRole('Kasir'))
                     <th class="not-exported">Aksi</th>

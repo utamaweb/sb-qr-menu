@@ -24,10 +24,8 @@
     <li>
         <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
         <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
-          @if(auth()->user()->hasRole(['Superadmin', 'Admin Bisnis', 'Admin Outlet']))
            <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
            </li>
-           @endif
            <li id="exp-list-menu"><a href="{{route('pengeluaran.index')}}">Daftar Pengeluaran</a></li>
         </ul>
      </li>
@@ -100,6 +98,12 @@
 
       </ul>
     </li>
+    <li>
+        <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
+        <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
+           <li id="exp-list-menu"><a href="{{route('pengeluaran.index')}}">Daftar Pengeluaran</a></li>
+        </ul>
+     </li>
      <li id="user"><a href="{{route('user.index')}}"> <i class="dripicons-user"></i><span>User</span></a></li>
 
     {{-- Menu Kasir --}}

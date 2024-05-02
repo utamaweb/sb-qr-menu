@@ -36,6 +36,7 @@ class ExpenseCategoryController extends Controller
         $data = $request->all();
         ExpenseCategory::create([
             'name' => $request->name,
+            'unit_price' => $request->unit_price,
             'business_id' => auth()->user()->business_id
         ]);
         return redirect()->back()->with('message', 'Data berhasil ditambahkan');
@@ -64,6 +65,7 @@ class ExpenseCategoryController extends Controller
         $lims_expense_category_data = ExpenseCategory::find($id);
         $lims_expense_category_data->update([
             'name' => $request->name,
+            'unit_price' => $request->unit_price,
         ]);
         return redirect()->back()->with('message', 'Data berhasil diubah');
     }

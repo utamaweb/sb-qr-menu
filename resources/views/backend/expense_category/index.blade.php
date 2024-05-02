@@ -27,6 +27,7 @@
                 <tr>
                     <th>#</th>
                     <th>Nama Pengeluaran</th>
+                    <th>Harga Satuan</th>
                     <th>Bisnis</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
@@ -36,6 +37,7 @@
                 <tr data-id="{{$expense_category->id}}">
                     <td>{{++$key}}</td>
                     <td>{{ $expense_category->name }}</td>
+                    <td>@currency($expense_category->unit_price)</td>
                     <td>{{ $expense_category->business->name }}</td>
                     <td>
                         @can('ubah-pengeluaran')
@@ -57,6 +59,10 @@
                                         <div class="form-group">
                                             <label>Nama Nama Pengeluaran *</label>
                                             <input type="text" value="{{$expense_category->name}}" name="name" required class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Harga Satuan *</label>
+                                            <input type="number" value="{{$expense_category->unit_price}}" name="unit_price" required class="form-control">
                                         </div>
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
                                         </div>
@@ -96,6 +102,10 @@
                     <div class="form-group">
                         <label>Nama Pengeluaran *</label>
                         <input type="text" name="name" required class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Harga Satuan *</label>
+                        <input type="number" name="unit_price" required class="form-control">
                     </div>
                     <input type="submit" value="Submit" class="btn btn-primary">
             </form>

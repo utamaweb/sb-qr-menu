@@ -143,7 +143,7 @@ class StockPurchaseController extends Controller
         $totalSubtotal = 0;
         $qtyInt = array_map('intval', $request->qty);
         $totalQty = array_sum($qtyInt);
-        $subtotalInt = array_map('intval', $request->subtotal);
+        $subtotalInt = array_map('intval', str_replace(',', '', $request->subtotal));
         $totalSubtotal = array_sum($subtotalInt);
 
         StockPurchase::find($id)->update(['total_price' => $totalSubtotal]);

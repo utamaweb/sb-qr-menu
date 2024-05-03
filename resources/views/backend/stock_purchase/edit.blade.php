@@ -60,11 +60,11 @@
                                         <small class="text-danger">Qty</small>
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan" value="{{$detail->subtotal / $detail->qty}}">
+                                        <input type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan" value="{{$detail->subtotal / $detail->qty}}" oninput=(changeValue(this))>
                                         <small class="text-danger">Harga Satuan</small>
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal" value="{{$detail->subtotal}}">
+                                        <input type="text" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal" value="{{$detail->subtotal}}">
                                         <small class="text-danger">Subtotal</small>
                                     </div>
                                     <div class="col-md-2">
@@ -101,8 +101,31 @@
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
     $("#tambah-stok").addClass("active");
+
+    // Function to change input value to formattedNumber
+    function changeValue(input) {
+        var value = formatNumber(input.value);
+        input.value = value;
+    }
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
+
     $(document).ready(function() {
         var maxAppend = 0;
+
+        // Set price input to use formatNumber
+        var inputPrice = $("input.harga-satuan");
+        inputPrice.val(formatNumber(inputPrice.val()));
+
         $("#add_more").click(function() {
             if (maxAppend >= 9)
             {
@@ -144,10 +167,10 @@
         });
 
         function calculateSubtotal(row) {
-        var hargaSatuan = $(row).find('.harga-satuan').val();
+        var hargaSatuan = parseFloat($(row).find('.harga-satuan').val().replace(/,/g, ""));
         var qty = $(row).find('.quantity').val();
         var subtotal = hargaSatuan * qty;
-        $(row).find('.subtotal').val(subtotal); // Assuming 2 decimal places
+        $(row).find('.subtotal').val(formatNumber(subtotal)); // Assuming 2 decimal places
     }
 
     $('#add_new').on('click', '.add_more', function() {

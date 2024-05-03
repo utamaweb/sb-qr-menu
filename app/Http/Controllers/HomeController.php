@@ -115,7 +115,6 @@ class HomeController extends Controller
             return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet'));
         } else {
             return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month'));
-
         }
     }
 

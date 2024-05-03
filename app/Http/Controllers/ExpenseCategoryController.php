@@ -12,7 +12,7 @@ class ExpenseCategoryController extends Controller
 {
     public function index()
     {
-        $lims_expense_category_all = ExpenseCategory::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        $lims_expense_category_all = ExpenseCategory::where('business_id', auth()->user()->business_id)->get();
         return view('backend.expense_category.index', compact('lims_expense_category_all'));
     }
 
@@ -31,15 +31,14 @@ class ExpenseCategoryController extends Controller
     {
         $this->validate($request, [
             'name' => 'max:255',
-            'price' => 'max:255|nullable'
         ]);
 
         $data = $request->all();
         $price = intVal(str_replace(',', '', $request->price));
         ExpenseCategory::create([
             'name' => $request->name,
-            'price' => $price,
-            'warehouse_id' => auth()->user()->warehouse_id
+            'unit_price' => $request->unit_price,
+            'business_id' => auth()->user()->business_id
         ]);
 
         return redirect()->back()->with('message', 'Data berhasil ditambahkan');
@@ -62,14 +61,13 @@ class ExpenseCategoryController extends Controller
             'name' => [
                 'max:255',
             ],
-            'price' => 'nullable'
         ]);
 
         $data = $request->all();
         $lims_expense_category_data = ExpenseCategory::find($id);
         $lims_expense_category_data->update([
             'name' => $request->name,
-            'price' => intVal(str_replace(',', '', $request->price)),
+            'unit_price' => $request->unit_price,
         ]);
         return redirect()->back()->with('message', 'Data berhasil diubah');
     }

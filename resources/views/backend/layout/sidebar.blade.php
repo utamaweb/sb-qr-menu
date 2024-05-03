@@ -21,6 +21,14 @@
     <li id="bahan-baku"><a href="{{route('bahan-baku.index')}}"> <i class="dripicons-user-id"></i><span>Bahan Baku</span></a></li>
     <li id="user"><a href="{{route('user.index')}}"> <i class="dripicons-user"></i><span>User</span></a></li>
     <li id="outlet"><a href="{{route('outlet.index')}}"> <i class="dripicons-store"></i><span>Outlet</span></a></li>
+    <li>
+        <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
+        <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
+           <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
+           </li>
+           <li id="exp-list-menu"><a href="{{route('pengeluaran.index')}}">Daftar Pengeluaran</a></li>
+        </ul>
+     </li>
 
     {{-- Menu Admin Outlet --}}
     @elseif(auth()->user()->hasRole('Admin Outlet'))
@@ -90,14 +98,9 @@
 
       </ul>
     </li>
-
     <li>
         <a href="#expense" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-wallet"></i><span>Biaya Pengeluaran</span></a>
         <ul id="expense" class="collapse list-unstyled " style="border-radius: 10px;">
-          @if(auth()->user()->hasRole(['Superadmin', 'Admin Bisnis', 'Admin Outlet']))
-           <li id="exp-cat-menu"><a href="{{route('nama-pengeluaran.index')}}">Nama Pengeluaran</a>
-           </li>
-           @endif
            <li id="exp-list-menu"><a href="{{route('pengeluaran.index')}}">Daftar Pengeluaran</a></li>
         </ul>
      </li>

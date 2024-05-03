@@ -27,7 +27,8 @@
                 <tr>
                     <th>#</th>
                     <th>Nama Pengeluaran</th>
-                    <th>Harga</th>
+                    <th>Harga Satuan</th>
+                    <th>Bisnis</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
@@ -36,7 +37,8 @@
                 <tr data-id="{{$expense_category->id}}">
                     <td>{{++$key}}</td>
                     <td>{{ $expense_category->name }}</td>
-                    <td>Rp. {{ ($expense_category->price != NULL) ? number_Format($expense_category->price, 0, '', '.') : '0' }}</td>
+                    <td>@currency($expense_category->unit_price)</td>
+                    <td>{{ $expense_category->business->name }}</td>
                     <td>
                         @can('ubah-pengeluaran')
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense_category->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
@@ -58,17 +60,10 @@
                                             <label>Nama Nama Pengeluaran *</label>
                                             <input type="text" value="{{$expense_category->name}}" name="name" required class="form-control">
                                         </div>
-
-                                        {{-- input price --}}
                                         <div class="form-group">
-                                            <label for="price">Harga</label>
-                                            <div class="input-group">
-                                                <span class="input-group-text">Rp.</span>
-                                                <input type="text" name="price" id="price" class="form-control price-input-edit" oninput="changeValue(this)" value="{{ ($expense_category->price != NULL) ? $expense_category->price : '0' }}">
-                                            </div>
+                                            <label>Harga Satuan *</label>
+                                            <input type="text" value="{{$expense_category->unit_price}}" name="unit_price" required class="form-control price-input-edit" oninput="changeValue(this)">
                                         </div>
-                                        {{-- end of input price --}}
-
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
                                         </div>
                                         <input type="submit" value="Submit" class="btn btn-primary">
@@ -108,16 +103,10 @@
                         <label>Nama Pengeluaran *</label>
                         <input type="text" name="name" required class="form-control">
                     </div>
-
-                    {{-- price input --}}
                     <div class="form-group">
-                        <label for="price">Harga</label>
-                        <div class="input-group">
-                            <span class="input-group-text">Rp.</span>
-                            <input type="text" name="price" id="price" class="form-control" oninput="changeValue(this)">
-                        </div>
+                        <label>Harga Satuan *</label>
+                        <input type="text" name="unit_price" required class="form-control" oninput="changeValue(this)">
                     </div>
-                    {{-- end of price input --}}
                     <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>

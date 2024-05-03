@@ -14,4 +14,8 @@ class Business extends Model
     {
     	return $this->hasMany('App\Models\Warehouse');
     }
+    public function expenseCategory()
+    {
+    	return $this->hasMany('App\Models\ExpenseCategory');
+    }
 }

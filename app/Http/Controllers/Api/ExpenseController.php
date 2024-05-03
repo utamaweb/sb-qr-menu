@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ExpenseCategory;
 use App\Models\Expense;
+use App\Models\Warehouse;
+use App\Models\Business;
 use App\Models\Shift;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +15,9 @@ use Illuminate\Support\Facades\DB;
 class ExpenseController extends Controller
 {
     public function category() {
-        $expense_category = ExpenseCategory::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        $warehouse = Warehouse::where('id', auth()->user()->warehouse_id)->first();
+        $business_id = $warehouse->business_id;
+        $expense_category = ExpenseCategory::where('business_id', $business_id)->get();
         return response()->json($expense_category, 200);
     }
 

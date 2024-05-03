@@ -43,7 +43,10 @@
                                 </div>
                                 <div class="form-group mt-3">
                                     <label><strong>Harga *</strong></label>
-                                    <input type="text" id="product-price" name="price" required class="form-control" oninput="changeValue(this)">
+                                    <div class="input-group">
+                                        <span class="input-group-text">Rp.</span>
+                                        <input type="text" id="product-price" name="price" required class="form-control" oninput="changeValue(this)">
+                                    </div>
                                 </div>
                             </div>
                             <div class="col-md-12 d-flex justify-content-end">

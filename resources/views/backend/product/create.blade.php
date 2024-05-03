@@ -133,7 +133,10 @@ input[type=file]::file-selector-button:hover {
                                         <div class="col-md-4">
                                             <div class="form-group">
                                                 <label>Harga Produk *</strong> </label>
-                                                <input type="text" name="price" required class="form-control" step="any" value="{{old('price')}}" oninput="changeValue(this)">
+                                                <div class="input-group">
+                                                    <span class="input-group-text">Rp.</span>
+                                                    <input type="text" name="price" required class="form-control" step="any" value="{{old('price')}}" oninput="changeValue(this)">
+                                                </div>
                                                 <span class="validation-msg"></span>
                                             </div>
                                         </div>

@@ -31,11 +31,13 @@ class ExpenseCategoryController extends Controller
     {
         $this->validate($request, [
             'name' => 'max:255',
+            'price' => 'nullable'
         ]);
 
         $data = $request->all();
         ExpenseCategory::create([
             'name' => $request->name,
+            'price' => intVal(str_replace(',', '', $request->price)),
             'warehouse_id' => auth()->user()->warehouse_id
         ]);
         return redirect()->back()->with('message', 'Data berhasil ditambahkan');
@@ -57,13 +59,15 @@ class ExpenseCategoryController extends Controller
         $this->validate($request, [
             'name' => [
                 'max:255',
-            ]
+            ],
+            'price' => 'nullable'
         ]);
 
         $data = $request->all();
         $lims_expense_category_data = ExpenseCategory::find($id);
         $lims_expense_category_data->update([
             'name' => $request->name,
+            'price' => intVal(str_replace(',', '', $request->price)),
         ]);
         return redirect()->back()->with('message', 'Data berhasil diubah');
     }
@@ -71,36 +75,35 @@ class ExpenseCategoryController extends Controller
     public function import(Request $request)
     {
         //get file
-        $upload=$request->file('file');
+        $upload = $request->file('file');
         $ext = pathinfo($upload->getClientOriginalName(), PATHINFO_EXTENSION);
-        if($ext != 'csv')
+        if ($ext != 'csv')
             return redirect()->back()->with('not_permitted', 'Please upload a CSV file');
         $filename =  $upload->getClientOriginalName();
-        $filePath=$upload->getRealPath();
+        $filePath = $upload->getRealPath();
         //open and read
-        $file=fopen($filePath, 'r');
-        $header= fgetcsv($file);
-        $escapedHeader=[];
+        $file = fopen($filePath, 'r');
+        $header = fgetcsv($file);
+        $escapedHeader = [];
         //validate
         foreach ($header as $key => $value) {
-            $lheader=strtolower($value);
-            $escapedItem=preg_replace('/[^a-z]/', '', $lheader);
+            $lheader = strtolower($value);
+            $escapedItem = preg_replace('/[^a-z]/', '', $lheader);
             array_push($escapedHeader, $escapedItem);
         }
         //looping through othe columns
-        while($columns=fgetcsv($file))
-        {
-            if($columns[0]=="")
+        while ($columns = fgetcsv($file)) {
+            if ($columns[0] == "")
                 continue;
             foreach ($columns as $key => $value) {
-                $value=preg_replace('/\D/','',$value);
+                $value = preg_replace('/\D/', '', $value);
             }
-           $data= array_combine($escapedHeader, $columns);
-           $expense_category = ExpenseCategory::firstOrNew(['code' => $data['code'], 'is_active' => true ]);
-           $expense_category->code = $data['code'];
-           $expense_category->name = $data['name'];
-           $expense_category->is_active = true;
-           $expense_category->save();
+            $data = array_combine($escapedHeader, $columns);
+            $expense_category = ExpenseCategory::firstOrNew(['code' => $data['code'], 'is_active' => true]);
+            $expense_category->code = $data['code'];
+            $expense_category->name = $data['name'];
+            $expense_category->is_active = true;
+            $expense_category->save();
         }
         return redirect()->back()->with('message', 'ExpenseCategory imported successfully');
     }
@@ -127,8 +130,8 @@ class ExpenseCategoryController extends Controller
     {
         $lims_expense_category_list = DB::table('expense_categories')->where('is_active', true)->get();
         $html = '';
-        foreach($lims_expense_category_list as $expense_category){
-            $html .='<option value="'.$expense_category->id.'">'.$expense_category->name . ' (' . $expense_category->code. ')'.'</option>';
+        foreach ($lims_expense_category_list as $expense_category) {
+            $html .= '<option value="' . $expense_category->id . '">' . $expense_category->name . ' (' . $expense_category->code . ')' . '</option>';
         }
 
         return response()->json($html);

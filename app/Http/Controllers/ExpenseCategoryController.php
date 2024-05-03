@@ -34,10 +34,10 @@ class ExpenseCategoryController extends Controller
         ]);
 
         $data = $request->all();
-        $price = intVal(str_replace(',', '', $request->price));
+        $unit_price = intVal(str_replace(',', '', $request->unit_price));
         ExpenseCategory::create([
             'name' => $request->name,
-            'unit_price' => $request->unit_price,
+            'unit_price' => $unit_price,
             'business_id' => auth()->user()->business_id
         ]);
 
@@ -64,10 +64,11 @@ class ExpenseCategoryController extends Controller
         ]);
 
         $data = $request->all();
+        $unit_price = intVal(str_replace(',', '', $request->unit_price));
         $lims_expense_category_data = ExpenseCategory::find($id);
         $lims_expense_category_data->update([
             'name' => $request->name,
-            'unit_price' => $request->unit_price,
+            'unit_price' => $unit_price,
         ]);
         return redirect()->back()->with('message', 'Data berhasil diubah');
     }

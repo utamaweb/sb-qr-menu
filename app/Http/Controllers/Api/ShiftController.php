@@ -24,32 +24,26 @@ class ShiftController extends Controller
 
         try {
             $dateNow = Carbon::now()->format('Y-m-d');
-            $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-            // ->where('date', $dateNow)
-            // ->where('warehouse_id', auth()->user()->warehouse_id)
-            ->orderBy('id', 'DESC')
-            ->first();
-            // return $checkShift->shift_number;
+            $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
             $roleName = auth()->user()->getRoleNames()[0];
             if($roleName != 'Kasir'){
                 return response()->json(['status' => "gagal", 'message' => "Buka kasir harus dilakukan dengan role kasir."], 200);
             }
-
+            // untuk nomor shift (1,2,3)
             $shiftNumber = 1;
             if($checkShift && $checkShift->shift_number < 3){
                 $shiftNumber = $checkShift->shift_number + 1;
             }
+            // check kasir sudah buka atau belum
             $checkUserShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-            // ->where('date', $dateNow)
-            // ->where('warehouse_id', auth()->user()->warehouse_id)
-            ->where('user_id', auth()->user()->id)
-            ->where('is_closed', 0)
-            ->orderBy('id', 'DESC')
-            ->first();
+                ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->orderBy('id', 'DESC')
+                ->first();
             if($checkUserShift){
                 return response()->json(['message' => "Kasir dengan user : " . $checkUserShift->user->name . " sudah dibuka sebelumnya."], 200);
             }
-
+            // insert data ke table shift
             $shiftOpen = Shift::create([
                 'shift_number' => $shiftNumber,
                 'date' => Carbon::now()->format('Y-m-d'),
@@ -58,21 +52,22 @@ class ShiftController extends Controller
                 'user_id' => auth()->user()->id,
                 'warehouse_id' => auth()->user()->warehouse_id,
             ]);
+            // insert stock ke table stocks per shift
             if($request->stocks){
                 foreach ($request->stocks as $stock) {
-                    Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
+                    // Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
+                    //     'last_stock' => $stock['stock']
+                    // ]);
+                    Stock::create([
+                        'shift_id' => $shiftOpen->id,
+                        'ingredient_id' => $stock['ingredient_id'],
+                        'warehouse_id' => auth()->user()->warehouse_id,
+                        'first_stock' => $stock['stock'],
                         'last_stock' => $stock['stock']
                     ]);
                     // $transaction->transaction_details()->create($detail);
                 }
             }
-            // $shiftOpen = CloseCashier::create([
-            //     'date' => Carbon::now()->format('Y-m-d'),
-            //     'open_time' => Carbon::now()->format('Y-m-d H:i:s'),
-            //     'user_id' => auth()->user()->id,
-            //     'warehouse_id' => auth()->user()->warehouse_id,
-            //     'initial_balance' => $request->initial_balance,
-            // ]);
             DB::commit();
             return response()->json($shiftOpen, 200);
         } catch (\Throwable $th) {
@@ -85,12 +80,9 @@ class ShiftController extends Controller
         DB::beginTransaction();
 
         try {
-            // $transaction_details = TransactionDetail::where('transaction_id', [1,2])->get();
-            // return $transaction_details;
-
             $dateNow = Carbon::now()->format('Y-m-d');
+            // Cari shift yang open sesuai dengan kasir login
             $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                // ->where('date', $dateNow)
                 ->where('user_id', auth()->user()->id)
                 ->where('is_closed', 0)
                 ->with('user')
@@ -98,14 +90,18 @@ class ShiftController extends Controller
             if($shift == NULL){
                 return response()->json(['message' => "Belum Ada Kasir Buka"], 200);
             }
-
+            // check apakah kasir sudah tutup atau belum
+            $closeCashierCheck = CloseCashier::where('shift_id', $shift->id)->where('is_closed', 1)->first();
+            if($closeCashierCheck){
+                return response()->json(['message' => 'Cashier Already Closed Before This'], 200);
+            }
+            // check apakah ada orderan belum selesai
             $checkTransactionInShift = Transaction::where('shift_id', $shift->id)->whereNull('paid_amount')->whereNull('payment_method')->count();
             if($checkTransactionInShift > 0){
                 return response()->json(['status' => 'gagal', 'message' => "Selesaikan orderan terlebih dahulu untuk tutup kasir"], 409);
             }
-
+            // get transaksi sesuai shift
             $transactions = Transaction::where('shift_id', $shift->id)->get();
-            // $expenses = StockPurchase::where('shift_id', $shift->id)->get();
             $expenses = Expense::where('shift_id', $shift->id)->with('expenseCategory')->get();
 
             $totalExpense = 0;
@@ -113,7 +109,7 @@ class ShiftController extends Controller
             $totalNonCash = 0;
             $totalProductSales = 0;
             $totalQtyPerProduct = [];
-
+            // perhitungan total transaksi tunai & non tunai
             foreach ($transactions as $transaction) {
                 if ($transaction['payment_method'] === 'Tunai') {
                     $totalCash += $transaction['total_amount'];
@@ -156,25 +152,20 @@ class ShiftController extends Controller
             // Menghitung total money (gabungan total pendapatan tunai & QRIS)
             $totalMoney = $totalCash + $totalNonCash;
             // Update Shift Setelah tutup kasir
-
             $shift->update([
                 'end_time' => Carbon::now()->format('Y-m-d H:i:s'),
                 'closing_balance' => $request->cash_in_drawer,
                 'total_transaction' => $totalMoney,
                 'is_closed' => 1
             ]);
+            // total omset per tipe pembayaran
             $transaction = Transaction::where('shift_id', $shift->id)->get();
             $gofood_omzet = $transaction->where('payment_method', 'GOFOOD')->sum('total_amount');
             $grabfood_omzet = $transaction->where('payment_method', 'GRABFOOD')->sum('total_amount');
             $shopeefood_omzet = $transaction->where('payment_method', 'SHOPEEFOOD')->sum('total_amount');
             $qris_omzet = $transaction->where('payment_method', 'QRIS')->sum('total_amount');
             $transfer_omzet = $transaction->where('payment_method', 'Transfer')->sum('total_amount');
-            // $closeCashier = CloseCashier::find($shift->id);
-            // $closeCashier->update([
-            $closeCashierCheck = CloseCashier::where('shift_id', $shift->id)->where('is_closed', 1)->first();
-            if($closeCashierCheck){
-                return response()->json(['message' => 'Cashier Already Closed Before This'], 200);
-            }
+
             $closeCashier = CloseCashier::create([
                 'shift_id' => $shift->id,
                 'date' => $shift->date,
@@ -205,13 +196,15 @@ class ShiftController extends Controller
 
             if ($request->stocks) {
                 foreach ($request->stocks as $stock) {
-                    $ingredientStock = Stock::where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
-                    $ingredientName = str_replace(' ', '_', $ingredientStock->ingredient->name);
-                    $realStock = $ingredientName . '_real';
+                    // $ingredientStock = Stock::where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                    $ingredientStock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
 
                     $stockData = [
                         'ingredient_id' => $stock['ingredient_id'],
                         'ingredient_name' => $ingredientStock->ingredient->name,
+                        'first_stock' => $ingredientStock->first_stock,
+                        'used_stock' => $ingredientStock->used_stock,
+                        'stock_in' => $ingredientStock->stock_in,
                         'stock_real' => $ingredientStock->last_stock,
                         'stock_input' => $stock['stock'],
                         'difference_stock' => $ingredientStock->last_stock - $stock['stock'],

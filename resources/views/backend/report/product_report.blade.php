@@ -68,7 +68,7 @@
                     <td>{{$productInfo->category->name}}</td>
                     @endif
                     <td>@currency($totalSubtotal)</td>
-                    <td>{{$totalQty}}</td>
+                    <td>{{number_format($totalQty, 0, '', '.')}}</td>
                 </tr>
                 @empty
                 <p>No users</p>

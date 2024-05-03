@@ -43,7 +43,7 @@
 						        <td>
 							      	@if($total_qty[$key] > 0)
 							      	<strong>Total Jumlah Order (Qty)</strong><br>
-							      	<span>{{$total_qty[$key]}}</span><br><br>
+							      	<span>{{number_format($total_qty[$key], 0, '', '.')}}</span><br><br>
 							      	@endif
 							      	@if($total_paid[$key] > 0)
 							      	<strong>Total Penerimaan uang</strong><br>

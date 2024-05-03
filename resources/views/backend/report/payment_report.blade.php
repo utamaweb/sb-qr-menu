@@ -46,7 +46,7 @@
                     <td>{{$payment->warehouse->name}}</td>
                     <td>{{$payment->order_type->name}}</td>
                     <td>{{$payment->payment_method}}</td>
-                    <td>Rp. {{number_format($payment->total_amount, 0, '', '.')}}</td>
+                    <td>{{number_format($payment->total_amount, 0, '', ',')}}</td>
                     <td>{{number_format($payment->total_qty, 0, '', '.')}}</td>
                     <td>{{$payment->user->name}}</td>
                 </tr>
@@ -58,8 +58,8 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th>{{number_format(0, $general_setting->decimal, '.', '')}}</th>
-                <th>{{number_format(0, $general_setting->decimal, '.', '')}}<</th>
+                <th>{{number_format(0, $general_setting->decimal, '', ',')}}</th>
+                <th>{{number_format(0, $general_setting->decimal, '', ',')}}</th>
                 <th></th>
             </tfoot>
         </table>
@@ -73,6 +73,17 @@
     $("ul#report").siblings('a').attr('aria-expanded','true');
     $("ul#report").addClass("show");
     $("ul#report li#payment-report-menu").addClass("active");
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
 
     $('#report-table').DataTable( {
         "order": [],
@@ -181,11 +192,11 @@
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
 
-            $( dt_selector.column( 5 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
+            $( dt_selector.column( 5 ).footer() ).html('Rp. ' + dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
         }
         else {
-            $( dt_selector.column( 5 ).footer() ).html(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
+            $( dt_selector.column( 5 ).footer() ).html('Rp. ' + dt_selector.column( 5, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
         }
     }

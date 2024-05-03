@@ -192,11 +192,11 @@
         if (dt_selector.rows( '.selected' ).any() && is_calling_first) {
             var rows = dt_selector.rows( '.selected' ).indexes();
 
-            $( dt_selector.column( 5 ).footer() ).html('Rp. ' + dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
+            $( dt_selector.column( 5 ).footer() ).html('Rp. ' + formatNumber(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}})));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.cells( rows, 6, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
         }
         else {
-            $( dt_selector.column( 5 ).footer() ).html('Rp. ' + dt_selector.column( 5, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
+            $( dt_selector.column( 5 ).footer() ).html('Rp. ' + formatNumber(dt_selector.column( 5, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}})));
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
         }
     }

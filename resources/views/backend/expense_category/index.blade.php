@@ -56,6 +56,17 @@
                                             <label>Nama Nama Pengeluaran *</label>
                                             <input type="text" value="{{$expense_category->name}}" name="name" required class="form-control">
                                         </div>
+
+                                        {{-- input price --}}
+                                        <div class="form-group">
+                                            <label for="price">Harga</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">Rp.</span>
+                                                <input type="text" name="price" id="price" class="form-control price-input-edit" oninput="changeValue(this)">
+                                            </div>
+                                        </div>
+                                        {{-- end of input price --}}
+
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
                                         </div>
                                         <input type="submit" value="Submit" class="btn btn-primary">
@@ -95,6 +106,16 @@
                         <label>Nama Pengeluaran *</label>
                         <input type="text" name="name" required class="form-control">
                     </div>
+
+                    {{-- price input --}}
+                    <div class="form-group">
+                        <label for="price">Harga</label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp.</span>
+                            <input type="text" name="price" id="price" class="form-control" oninput="changeValue(this)">
+                        </div>
+                    </div>
+                    {{-- end of price input --}}
                     <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>
@@ -114,6 +135,23 @@
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
 
+    // Function to change input value to formattedNumber
+    function changeValue(input) {
+        var value = formatNumber(input.value);
+        input.value = value;
+    }
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -121,6 +159,10 @@
     });
 
     $(document).ready(function() {
+
+        // Set edit input price to use formatNumber
+        var priceInputEdit = $('.price-input-edit');
+        priceInputEdit.val(formatNumber(priceInputEdit.val()));
 
     $.ajaxSetup({
         headers: {

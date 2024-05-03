@@ -33,7 +33,7 @@
                     <td>{{$transaction->order_type->name}}</td>
                     <td>{{$transaction->payment_method}} ({{$transaction->category_order}})</td>
                     <td>Rp. {{number_format($transaction->total_amount, 0, '', '.')}}</td>
-                    <td>{{$transaction->total_qty}}</td>
+                    <td>{{number_format($transaction->total_qty, 0, '', '.')}}</td>
                     <td>@if($transaction->paid_amount != NULL)
                         <div class="badge badge-success">Lunas</div>
                         @else

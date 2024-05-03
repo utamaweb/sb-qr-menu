@@ -31,15 +31,17 @@ class ExpenseCategoryController extends Controller
     {
         $this->validate($request, [
             'name' => 'max:255',
-            'price' => 'nullable'
+            'price' => 'max:255|nullable'
         ]);
 
         $data = $request->all();
+        $price = intVal(str_replace(',', '', $request->price));
         ExpenseCategory::create([
             'name' => $request->name,
-            'price' => intVal(str_replace(',', '', $request->price)),
+            'price' => $price,
             'warehouse_id' => auth()->user()->warehouse_id
         ]);
+
         return redirect()->back()->with('message', 'Data berhasil ditambahkan');
     }
 

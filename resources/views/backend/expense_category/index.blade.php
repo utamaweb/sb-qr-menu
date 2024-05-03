@@ -27,6 +27,7 @@
                 <tr>
                     <th>#</th>
                     <th>Nama Pengeluaran</th>
+                    <th>Harga</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
@@ -35,6 +36,7 @@
                 <tr data-id="{{$expense_category->id}}">
                     <td>{{++$key}}</td>
                     <td>{{ $expense_category->name }}</td>
+                    <td>Rp. {{ ($expense_category->price != NULL) ? number_Format($expense_category->price, 0, '', '.') : '0' }}</td>
                     <td>
                         @can('ubah-pengeluaran')
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense_category->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
@@ -62,7 +64,7 @@
                                             <label for="price">Harga</label>
                                             <div class="input-group">
                                                 <span class="input-group-text">Rp.</span>
-                                                <input type="text" name="price" id="price" class="form-control price-input-edit" oninput="changeValue(this)">
+                                                <input type="text" name="price" id="price" class="form-control price-input-edit" oninput="changeValue(this)" value="{{ ($expense_category->price != NULL) ? $expense_category->price : '0' }}">
                                             </div>
                                         </div>
                                         {{-- end of input price --}}
@@ -161,8 +163,9 @@
     $(document).ready(function() {
 
         // Set edit input price to use formatNumber
-        var priceInputEdit = $('.price-input-edit');
-        priceInputEdit.val(formatNumber(priceInputEdit.val()));
+        $('.price-input-edit').each(function() {
+            $(this).val(formatNumber($(this).val()));
+        })
 
     $.ajaxSetup({
         headers: {

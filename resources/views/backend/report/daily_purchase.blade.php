@@ -49,10 +49,10 @@
 						    					echo '<td><p><strong>'.$i.'</strong></p>';
 
 						    				if($total_qty[$i]){
-						    					echo '<strong>'."Jumlah Produk".'</strong><br><span>'.$total_qty[$i].'</span><br><br>';
+						    					echo '<strong>'."Jumlah Produk".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
 						    				}
 						    				if($total_amount[$i]){
-						    					echo '<strong>'."Total Pengeluaran".'</strong><br><span>'.$total_amount[$i].'</span><br><br>';
+						    					echo '<strong>'."Total Pengeluaran".'</strong><br><span>Rp. '.number_format($total_amount[$i], 0, '', '.').'</span><br><br>';
 						    				}
 						    				echo '</td>';
 						    				$i++;
@@ -64,10 +64,10 @@
 						    					echo '<td><p><strong>'.$i.'</strong></p>';
 
                                             if($total_qty[$i]){
-						    					echo '<strong>'."Jumlah Produk".'</strong><br><span>'.$total_qty[$i].'</span><br><br>';
+						    					echo '<strong>'."Jumlah Produk".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
 						    				}
 						    				if($total_amount[$i]){
-						    					echo '<strong>'."Total Pengeluaran".'</strong><br><span>'.$total_amount[$i].'</span><br><br>';
+						    					echo '<strong>'."Total Pengeluaran".'</strong><br><span>Rp. '.number_format($total_amount[$i], 0, '', '.').'</span><br><br>';
 						    				}
 						    				echo '</td>';
 						    				$flag = 1;

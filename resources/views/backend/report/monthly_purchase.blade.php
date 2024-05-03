@@ -43,12 +43,12 @@
 
                                     @if($total_qty[$key] > 0)
                                     <strong>Total Jumlah Pembelian (Qty)</strong><br>
-                                    <span>{{$total_qty[$key]}}</span><br><br>
+                                    <span>{{number_format($total_qty[$key], 0, '', '.')}}</span><br><br>
                                     @endif
 
                                     @if($total_amount[$key] > 0)
                                     <strong>Total Pembayaran</strong><br>
-                                    <span>{{$total_amount[$key]}}</span><br>
+                                    <span>Rp. {{number_format($total_amount[$key], 0, '', '.')}}</span><br>
                                     @endif
 						        </td>
 						        @endforeach

@@ -47,11 +47,11 @@
 							      	@endif
 							      	@if($total_paid[$key] > 0)
 							      	<strong>Total Penerimaan uang</strong><br>
-							      	<span>{{$total_paid[$key]}}</span><br><br>
+							      	<span>Rp. {{ number_format($total_paid[$key], 0, '', '.') }}</span><br><br>
 							      	@endif
 							      	@if($total_amount[$key] > 0)
 							      	<strong>Total Pembayaran</strong><br>
-							      	<span>{{$total_amount[$key]}}</span><br>
+							      	<span>Rp. {{ number_format($total_amount[$key], 0, '', '.') }}</span><br>
 							      	@endif
 						        </td>
 						        @endforeach

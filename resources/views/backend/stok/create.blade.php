@@ -43,9 +43,9 @@
                     <td>{{ $ingredient->ingredient->name }}</td>
                     <td>{{ $ingredient->warehouse->name }}</td>
                     {{-- <td>{{ $ingredient->first_stock }}</td> --}}
-                    <td>{{ $ingredient->stock_in }}</td>
-                    <td>{{ $ingredient->stock_used }}</td>
-                    <td>{{ $ingredient->last_stock }}</td>
+                    <td>{{ number_format($ingredient->stock_in, 0, '', '.') }}</td>
+                    <td>{{ number_format($ingredient->stock_used, 0, '', '.') }}</td>
+                    <td>{{ number_format($ingredient->last_stock, 0, '', '.') }}</td>
                     <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
                     <td>
                         <div class="row">

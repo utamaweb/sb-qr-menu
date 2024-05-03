@@ -154,6 +154,11 @@
         return formattedNumber;
     }
 
+    // Set edit input price to use formatNumber
+    $('input.price-input-edit').each(function() {
+        $(this).val(formatNumber($(this).val()));
+    })
+
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -162,10 +167,6 @@
 
     $(document).ready(function() {
 
-        // Set edit input price to use formatNumber
-        $('.price-input-edit').each(function() {
-            $(this).val(formatNumber($(this).val()));
-        })
 
     $.ajaxSetup({
         headers: {

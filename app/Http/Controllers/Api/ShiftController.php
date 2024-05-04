@@ -251,9 +251,9 @@ class ShiftController extends Controller
         $latestShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
 
         $stocks = [];
-        $ingredientStock = Stock::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('warehouse_id', auth()->user()->warehouse_id)->get();
         foreach ($ingredientStock as $stock) {
-            $ingredientStock = Stock::where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+            $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
             $ingredientName = str_replace(' ', '_', $ingredientStock->ingredient->name);
 
             $stockData = [

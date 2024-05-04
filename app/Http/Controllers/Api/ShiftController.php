@@ -259,6 +259,9 @@ class ShiftController extends Controller
             $stockData = [
                 'ingredient_id' => $stock['ingredient_id'],
                 'ingredient_name' => $ingredientStock->ingredient->name,
+                'first_stock' => $ingredientStock->first_stock,
+                'used_stock' => $ingredientStock->used_stock,
+                'stock_in' => $ingredientStock->stock_in,
                 'stock' => $ingredientStock->last_stock,
             ];
 

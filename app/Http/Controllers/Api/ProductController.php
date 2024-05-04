@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Stock;
+use App\Models\Shift;
 use App\Models\Product_Warehouse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -28,41 +29,48 @@ class ProductController extends Controller
             ->where('product_warehouse.warehouse_id', $warehouseId)
             ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
             ->map(function ($product) use ($warehouseId) {
-        $ingredients = $product->ingredient()->get();
+                $ingredients = $product->ingredient()->get();
 
-        // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
-        $ingredientStocks = [];
-        foreach ($ingredients as $ingredient) {
-            $lastStock = Stock::where('ingredient_id', $ingredient->id)
-                ->where('warehouse_id', $warehouseId)
-                ->first();
+                // check shift
+                $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                        ->where('is_closed', 0)
+                        ->orderBy('id', 'DESC')
+                        ->first();
 
-            if ($lastStock) {
-                $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
-            } else {
-                $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
-            }
-        }
+                // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
+                $ingredientStocks = [];
+                foreach ($ingredients as $ingredient) {
+                    $lastStock = Stock::where('ingredient_id', $ingredient->id)
+                        ->where('shift_id', $shift->id)
+                        ->where('warehouse_id', $warehouseId)
+                        ->first();
 
-        // Cek jika $ingredientStocks tidak kosong sebelum menggunakan min()
-        if (!empty($ingredientStocks)) {
-            // Ambil stok terkecil dari semua bahan baku
-            $smallestStock = min($ingredientStocks);
-        } else {
-            // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
-            $smallestStock = 0;
-        }
+                    if ($lastStock) {
+                        $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
+                    } else {
+                        $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
+                    }
+                }
 
-        unset($product['qty']);
-        // Tambahkan qty terkecil ke dalam produk
-        $product->qty = $smallestStock;
+                // Cek jika $ingredientStocks tidak kosong sebelum menggunakan min()
+                if (!empty($ingredientStocks)) {
+                    // Ambil stok terkecil dari semua bahan baku
+                    $smallestStock = min($ingredientStocks);
+                } else {
+                    // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
+                    $smallestStock = 0;
+                }
 
-        $product->image = $product->image ? url('storage/product_images/'.$product->image) : "";
-        $product->category_parent_id = $product->category->category_parent->id;
-        $product->category_parent_name = $product->category->category_parent->name;
+                unset($product['qty']);
+                // Tambahkan qty terkecil ke dalam produk
+                $product->qty = $smallestStock;
 
-        return $product;
-    });
+                $product->image = $product->image ? url('storage/product_images/'.$product->image) : "";
+                $product->category_parent_id = $product->category->category_parent->id;
+                $product->category_parent_name = $product->category->category_parent->name;
+
+                return $product;
+        });
 
     return response()->json($products, 200);
 }

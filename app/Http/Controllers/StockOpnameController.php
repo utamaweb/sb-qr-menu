@@ -7,6 +7,7 @@ use App\Models\StockOpname;
 use App\Models\StockOpnameDetail;
 use App\Models\Ingredient;
 use App\Models\Stock;
+use App\Models\Shift;
 use App\Models\Warehouse;
 use Illuminate\Validation\Rule;
 use Keygen;
@@ -43,8 +44,9 @@ class StockOpnameController extends Controller
             'name' => 'required|max:255',
         ]);
         if($request->ingredient_id < 1){
-            return redirect()->route('stock-purchase.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
+            return redirect()->route('stock-opname.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
         }
+        $latestShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
         // Store Table StockOpname
         $stockOpname = StockOpname::create([
             'name' => $request->name,
@@ -58,14 +60,12 @@ class StockOpnameController extends Controller
                 'ingredient_id' => $request->ingredient_id[$item],
                 'qty' => $request->qty[$item],
             );
-            $data2 = array(
-                'last_stock' => $request->qty[$item],
-            );
             StockOpnameDetail::create($data);
-            $checkStock = Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->count();
+            $checkStock = Stock::where('shift_id', $latestShift->id)->where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->count();
             if($checkStock < 1){
                 Stock::create([
                     'warehouse_id' => $request->warehouse_id,
+                    'shift_id' => $latestShift->id,
                     'ingredient_id' => $request->ingredient_id[$item],
                     'first_stock' => $request->qty[$item],
                     'stock_in' => $request->qty[$item],
@@ -73,12 +73,11 @@ class StockOpnameController extends Controller
                 ]);
             } else {
                 $stock = Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->first();
-                Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->update([
+                Stock::where('shift_id', $latestShift->id)->where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->update([
                     // 'stock_in' => $stock->stock_in + $request->qty[$item],
                     'last_stock' => $request->qty[$item],
                 ]);
             }
-            // Ingredient::find($request->ingredient_id[$item])->update($data2);
         }
         return redirect()->route('stock-opname.index')->with('message', 'Data berhasil ditambahkan');
     }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Stock;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class StockController extends Controller
 {
@@ -18,7 +20,14 @@ class StockController extends Controller
             $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
             $lims_ingredient_all = Stock::whereIn('warehouse_id', $warehouse_id)->get();
         } else{
-            $lims_ingredient_all = Stock::where('warehouse_id', auth()->user()->warehouse_id)->get();
+            // $lims_ingredient_all = Stock::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->get();
+            $stocks = DB::table('stocks')
+                ->select('ingredient_id', DB::raw('MAX(id) as max_id'))
+                ->where('warehouse_id', auth()->user()->warehouse_id)
+                ->groupBy('ingredient_id')
+                ->get();
+
+            $lims_ingredient_all = Stock::whereIn('id', $stocks->pluck('max_id'))->get();
         }
         return view('backend.stok.create', compact('lims_ingredient_all'));
     }

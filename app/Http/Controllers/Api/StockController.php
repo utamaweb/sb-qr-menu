@@ -188,13 +188,14 @@ class StockController extends Controller
                 if($checkStock < 1){
                     Stock::create([
                         'warehouse_id' => auth()->user()->warehouse_id,
+                        'shift_id' => $shift->id,
                         'ingredient_id' => $item['ingredient_id'],
                         'stock_in' => $item['qty'],
                         'last_stock' => $item['qty'],
                     ]);
                 } else {
-                    $stock = Stock::where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
-                    Stock::where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->update([
+                    $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                    Stock::where('shift_id', $shift->id)->where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->update([
                         'stock_in' => $stock->stock_in + $item['qty'],
                         'last_stock' => $stock->last_stock + $item['qty'],
                     ]);
@@ -278,6 +279,7 @@ class StockController extends Controller
                 if($checkStock < 1){
                     Stock::create([
                         'warehouse_id' => auth()->user()->warehouse_id,
+                        'shift_id' => $shift->id,
                         'ingredient_id' => $item['ingredient_id'],
                         'stock_in' => $item['qty'],
                         'last_stock' => $item['qty'],

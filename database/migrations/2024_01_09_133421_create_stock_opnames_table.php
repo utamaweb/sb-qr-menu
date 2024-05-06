@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string("name");
             $table->string("notes")->nullable();
-            $table->unsignedBigInteger("warehouse_id");
+            $table->foreignId("warehouse_id")->constrained('warehouse', 'id')->onDelete('cascade');
             $table->timestamps();
         });
     }

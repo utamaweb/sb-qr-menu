@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('close_cashier_product_solds', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('close_cashier_id');
+            $table->foreignId('close_cashier_id')->constrained('close_cashiers', 'id')->onDelete('cascade');
             $table->string('product_name');
             $table->bigInteger('qty');
             $table->timestamps();

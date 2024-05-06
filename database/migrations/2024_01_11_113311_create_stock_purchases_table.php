@@ -16,10 +16,10 @@ return new class extends Migration
             $table->date("date");
             $table->string("total_qty");
             $table->string("total_price")->nullable();
-            $table->unsignedBigInteger('warehouse_id');
+            $table->foreignId('warehouse_id')->constrained('warehouses', 'id')->onDelete('cascade');
             $table->unsignedBigInteger('shift_id')->nullable();
             $table->foreign('shift_id')->references('id')->on('shifts')->onDelete('cascade');
-            $table->unsignedBigInteger('user_id');
+            $table->foreignId('user_id')->constrained('users', 'id')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -21,7 +21,7 @@ return new class extends Migration
             // $table->bigInteger("last_stock")->default(0);
             // $table->bigInteger("max_stock")->default(0);
             $table->unsignedBigInteger('unit_id');
-            $table->foreignId('business_id')->constrained('business', 'id')->onDelete('cascade');
+            $table->foreignId('business_id')->constrained('businesses', 'id')->onDelete('cascade');
             // $table->foreignId('unit_id')->constrained();
             $table->timestamps();
 

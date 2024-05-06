@@ -77,7 +77,7 @@ class StockPurchaseController extends Controller
                 'stock_purchase_id' => $stockPurchase->id,
                 'ingredient_id' => $request->ingredient_id[$item],
                 'qty' => $request->qty[$item],
-                'subtotal' => $request->subtotal[$item],
+                'subtotal' => intVal(str_replace(',', '', $request->subtotal[$item])),
                 'notes' => $request->notes[$item],
             );
             StockPurchaseIngredient::create($data);

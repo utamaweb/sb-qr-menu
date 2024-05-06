@@ -203,7 +203,7 @@ class ShiftController extends Controller
                         'ingredient_id' => $stock['ingredient_id'],
                         'ingredient_name' => $ingredientStock->ingredient->name,
                         'first_stock' => $ingredientStock->first_stock,
-                        'used_stock' => $ingredientStock->used_stock,
+                        'used_stock' => $ingredientStock->stock_used,
                         'stock_in' => $ingredientStock->stock_in,
                         'stock_real' => $ingredientStock->last_stock,
                         'stock_input' => $stock['stock'],
@@ -260,7 +260,7 @@ class ShiftController extends Controller
                 'ingredient_id' => $stock['ingredient_id'],
                 'ingredient_name' => $ingredientStock->ingredient->name,
                 'first_stock' => $ingredientStock->first_stock,
-                'used_stock' => $ingredientStock->used_stock,
+                'used_stock' => $ingredientStock->stock_used,
                 'stock_in' => $ingredientStock->stock_in,
                 'stock' => $ingredientStock->last_stock,
             ];

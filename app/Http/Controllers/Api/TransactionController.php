@@ -400,7 +400,7 @@ class TransactionController extends Controller
                     $ingredients = $product->ingredient;
 
                     foreach ($ingredients as $ingredient) {
-                        $stock = Stock::where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                        $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
                         if (!$stock) {
                             // Handle jika stok belum ada
                             continue;
@@ -605,7 +605,7 @@ class TransactionController extends Controller
                 $ingredients = $product->ingredient;
 
                 foreach ($ingredients as $ingredient) {
-                    $stock = Stock::where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                    $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
                     if (!$stock) {
                         // Handle jika stok belum ada
                         continue;

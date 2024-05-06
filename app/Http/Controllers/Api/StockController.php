@@ -184,7 +184,7 @@ class StockController extends Controller
                     'subtotal' => $item['subtotal']
                 ]);
 
-                $checkStock = Stock::where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->count();
+                $checkStock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->count();
                 if($checkStock < 1){
                     Stock::create([
                         'warehouse_id' => auth()->user()->warehouse_id,
@@ -250,8 +250,8 @@ class StockController extends Controller
                 $detailStockPurchase = StockPurchaseIngredient::where('stock_purchase_id', $id)->get();
                 $totalQtyBefore = $stockPurchase->total_qty;
                 foreach($detailStockPurchase as $detail){
-                    $stock = Stock::where('ingredient_id', $detail->ingredient_id)->where('warehouse_id', $stockPurchase->warehouse_id)->first();
-                    Stock::where('ingredient_id', $detail->ingredient_id)->where('warehouse_id', $stockPurchase->warehouse_id)->update([
+                    $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $detail->ingredient_id)->where('warehouse_id', $stockPurchase->warehouse_id)->first();
+                    Stock::where('shift_id', $shift->id)->where('ingredient_id', $detail->ingredient_id)->where('warehouse_id', $stockPurchase->warehouse_id)->update([
                         'stock_in' => $stock->stock_in - $detail->qty,
                         'last_stock' => $stock->last_stock - $detail->qty
                     ]);
@@ -274,7 +274,7 @@ class StockController extends Controller
                 ]);
 
                 // cek stok
-                $checkStock = Stock::where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->count();
+                $checkStock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->count();
                 // jika tidak ada maka dibuat row baru
                 if($checkStock < 1){
                     Stock::create([
@@ -286,8 +286,8 @@ class StockController extends Controller
                     ]);
                 // jika ada maka update row tsb
                 } else {
-                    $stock = Stock::where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
-                    Stock::where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->update([
+                    $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                    Stock::where('shift_id', $shift->id)->where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->update([
                         'stock_in' => $stock->stock_in + $item['qty'],
                         'last_stock' => $stock->last_stock + $item['qty'],
                     ]);

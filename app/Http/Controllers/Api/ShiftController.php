@@ -211,7 +211,7 @@ class ShiftController extends Controller
                     ];
 
                     $stocks[] = $stockData;
-                    Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
+                    Stock::where('shift_id', $shift->id)->where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
                         'last_stock' => $stock['stock']
                     ]);
                 }

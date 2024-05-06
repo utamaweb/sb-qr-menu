@@ -84,9 +84,9 @@
                                         <tr data-id="{{$stockPurchase->id}}">
                                             <td>{{$loop->iteration}}</td>
                                             <td>{{ $stockPurchase->ingredient->name }}</td>
-                                            <td>{{ $stockPurchase->qty}}</td>
-                                            <td>{{$stockPurchase->subtotal / $stockPurchase->qty}}</td>
-                                            <td>{{ $stockPurchase->subtotal}}</td>
+                                            <td>{{ number_format($stockPurchase->qty, 0, '', '.')}}</td>
+                                            <td>Rp. {{number_format($stockPurchase->subtotal / $stockPurchase->qty, 0, '', '.')}}</td>
+                                            <td>Rp. {{ number_format($stockPurchase->subtotal, 0, '', '.')}}</td>
                                             <td>{{ $stockPurchase->notes ?: '-'}}</td>
                                         </tr>
                                         @endforeach

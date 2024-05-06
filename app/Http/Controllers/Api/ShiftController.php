@@ -185,7 +185,8 @@ class ShiftController extends Controller
                 'total_expense' => $totalExpense,
                 'auto_balance' => $shift->opening_balance + $totalMoney - $totalExpense,
                 'cash_in_drawer' => $request->cash_in_drawer,
-                'difference' => ($shift->opening_balance + $totalMoney - $totalExpense) - $request->cash_in_drawer,
+                // 'difference' => ($shift->opening_balance + $totalMoney - $totalExpense) - $request->cash_in_drawer,
+                'difference' => ($shift->opening_balance + $totalCash - $totalExpense) - $request->cash_in_drawer,
             ]);
             $closeCashier['product_sold'] = $structuredData;
             $closeCashier['expenses'] = $expenses;
@@ -203,7 +204,7 @@ class ShiftController extends Controller
                         'ingredient_id' => $stock['ingredient_id'],
                         'ingredient_name' => $ingredientStock->ingredient->name,
                         'first_stock' => $ingredientStock->first_stock,
-                        'used_stock' => $ingredientStock->used_stock,
+                        'used_stock' => $ingredientStock->stock_used,
                         'stock_in' => $ingredientStock->stock_in,
                         'stock_real' => $ingredientStock->last_stock,
                         'stock_input' => $stock['stock'],
@@ -211,7 +212,7 @@ class ShiftController extends Controller
                     ];
 
                     $stocks[] = $stockData;
-                    Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
+                    Stock::where('shift_id', $shift->id)->where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
                         'last_stock' => $stock['stock']
                     ]);
                 }
@@ -260,7 +261,7 @@ class ShiftController extends Controller
                 'ingredient_id' => $stock['ingredient_id'],
                 'ingredient_name' => $ingredientStock->ingredient->name,
                 'first_stock' => $ingredientStock->first_stock,
-                'used_stock' => $ingredientStock->used_stock,
+                'used_stock' => $ingredientStock->stock_used,
                 'stock_in' => $ingredientStock->stock_in,
                 'stock' => $ingredientStock->last_stock,
             ];

@@ -86,14 +86,15 @@ class StockPurchaseController extends Controller
             if ($checkStock < 1) {
                 Stock::create([
                     'warehouse_id' => $request->warehouse_id,
+                    'shift_id' => $shift->id,
                     'ingredient_id' => $request->ingredient_id[$item],
                     'first_stock' => $request->qty[$item],
                     'stock_in' => $request->qty[$item],
                     'last_stock' => $request->qty[$item],
                 ]);
             } else {
-                $stock = Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->first();
-                Stock::where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->update([
+                $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->first();
+                Stock::where('shift_id', $shift->id)->where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->update([
                     'stock_in' => $stock->stock_in + $request->qty[$item],
                     'last_stock' => $stock->last_stock + $request->qty[$item],
                 ]);

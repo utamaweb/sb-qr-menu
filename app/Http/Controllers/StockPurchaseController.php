@@ -155,7 +155,7 @@ class StockPurchaseController extends Controller
                     'ingredient_id' => $request->ingredient_id[$item],
                     // 'stock_purchase_ingredient_id' => $request->stock_purchase_ingredient_id[$item],
                     'qty' => $request->qty[$item],
-                    'subtotal' => $request->subtotal[$item],
+                    'subtotal' => intVal(str_replace(',', '', $request->subtotal[$item])),
                     'notes' => $request->notes[$item],
                 );
                 StockPurchaseIngredient::where('id', $request->stock_purchase_ingredient_id[$item])->update($data);

@@ -47,7 +47,7 @@
                     <td>{{$payment->order_type->name}}</td>
                     <td>{{$payment->payment_method}}</td>
                     <td>{{number_format($payment->total_amount, 0, '', ',')}}</td>
-                    <td>{{number_format($payment->total_qty, 0, '', '.')}}</td>
+                    <td>{{number_format($payment->total_qty, 0, '', ',')}}</td>
                     <td>{{$payment->user->name}}</td>
                 </tr>
                 @endforeach

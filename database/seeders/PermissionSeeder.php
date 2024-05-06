@@ -31,6 +31,10 @@ class PermissionSeeder extends Seeder
 
         $superadmin = Role::create(['name' => 'Superadmin']);
         $superadmin->givePermissionTo(Permission::all());
+        $adminBisnis = Role::create(['name' => 'Admin Bisnis']);
+        $adminBisnis->givePermissionTo(Permission::all());
+        $adminOutlet = Role::create(['name' => 'Admin Outlet']);
+        $adminOutlet->givePermissionTo(Permission::all());
         $kasir = Role::create(['name' => 'Kasir']);
         $kasir->givePermissionTo(Permission::all());
         $customer = Role::create(['name' => 'Customer']);

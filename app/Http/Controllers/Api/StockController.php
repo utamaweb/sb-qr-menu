@@ -27,8 +27,8 @@ class StockController extends Controller
     }
 
     public function getIngredientForAddStock() {
-        // $warehouse_id = auth()->user()->warehouse_id;
-        // $warehouse = Warehouse::find($warehouse_id);
+        $warehouse_id = auth()->user()->warehouse_id;
+        $warehouse = Warehouse::find($warehouse_id);
         $ingredients = Ingredient::where('business_id', $warehouse->business_id)->with('unit')->get();
         // $ingredient_ids = Stock::where('warehouse_id', auth()->user()->warehouse_id)->pluck('ingredient_id');
         // $ingredients = Ingredient::whereIn('id', $ingredient_ids)->get();

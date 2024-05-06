@@ -93,6 +93,7 @@ class ProductController extends Controller
                 foreach ($ingredients as $ingredient) {
                     $lastStock = Stock::where('ingredient_id', $ingredient->id)
                         ->where('warehouse_id', $warehouseId)
+                        ->where('shift_id', $shift->id)
                         ->first();
 
                     if ($lastStock) {

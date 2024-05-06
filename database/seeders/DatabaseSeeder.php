@@ -16,15 +16,15 @@ class DatabaseSeeder extends Seeder
         $this->call(MenuSeeder::class);
         $this->call(PermissionSeeder::class);
         $this->call(UserTableSeeder::class);
-        $this->call(CategorySeeder::class);
-        $this->call(OutletSeeder::class);
+        // $this->call(CategorySeeder::class);
+        // $this->call(OutletSeeder::class);
         $this->call(OrderTypeSeeder::class);
         $this->call(UnitSeeder::class);
-        $this->call(IngredientSeeder::class);
-        $this->call(ProductSeeder::class);
-        $this->call(IngredientProductsSeeder::class);
+        // $this->call(IngredientSeeder::class);
+        // $this->call(ProductSeeder::class);
+        // $this->call(IngredientProductsSeeder::class);
         $this->call(GeneralSettingSeeder::class);
-        $this->call(ExpenseCategorySeeder::class);
+        // $this->call(ExpenseCategorySeeder::class);
         $this->call(StockSeeder::class);
     }
 }

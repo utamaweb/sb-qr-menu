@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('transaction_details', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('transaction_id');
-            $table->unsignedBigInteger('product_id');
+            $table->foreignId('transaction_id')->constrained('transactions', 'id')->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products', 'id')->onDelete('cascade');
             $table->string('product_name');
             $table->bigInteger('product_price');
             $table->bigInteger('qty');

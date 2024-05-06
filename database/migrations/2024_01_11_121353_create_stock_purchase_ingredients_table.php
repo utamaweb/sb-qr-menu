@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('stock_purchase_ingredients', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('stock_purchase_id');
-            $table->unsignedBigInteger('ingredient_id');
+            $table->foreignId('stock_purchase_id')->constrained('stock_purchases', 'id')->onDelete('cascade');
+            $table->foreignId('ingredient_id')->constrained('ingredients', 'id')->onDelete('cascade');
             $table->string('qty');
             $table->bigInteger('subtotal');
             $table->string('notes')->nullable();

@@ -22,7 +22,8 @@ class ProductController extends Controller
     //                         });
     //     return response()->json($products, 200);
     // }
-    public function index() {
+    public function index()
+    {
         $warehouseId = auth()->user()->warehouse_id;
         // $products = Product::get()->map(function ($product) use($warehouseId) {
         $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
@@ -33,9 +34,9 @@ class ProductController extends Controller
 
                 // check shift
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                        ->where('is_closed', 0)
-                        ->orderBy('id', 'DESC')
-                        ->first();
+                    ->where('is_closed', 0)
+                    ->orderBy('id', 'DESC')
+                    ->first();
 
                 // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
                 $ingredientStocks = [];
@@ -65,18 +66,19 @@ class ProductController extends Controller
                 // Tambahkan qty terkecil ke dalam produk
                 $product->qty = $smallestStock;
 
-                $product->image = $product->image ? url('storage/product_images/'.$product->image) : "";
+                $product->image = $product->image ? url('storage/product_images/' . $product->image) : "";
                 $product->category_parent_id = $product->category->category_parent->id;
                 $product->category_parent_name = $product->category->category_parent->name;
 
                 return $product;
-        });
+            });
 
-    return response()->json($products, 200);
-}
+        return response()->json($products, 200);
+    }
 
 
-    public function productByWarehouse() {
+    public function productByWarehouse()
+    {
         $warehouseId = auth()->user()->warehouse_id;
 
         $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
@@ -113,7 +115,7 @@ class ProductController extends Controller
                 unset($product['qty']);
                 $product->qty = $smallestStock;
 
-                $product->image = $product->image ? url('storage/product_images/'.$product->image) : "";
+                $product->image = $product->image ? url('storage/product_images/' . $product->image) : "";
 
                 return $product;
             });
@@ -145,8 +147,8 @@ class ProductController extends Controller
         try {
             $image = $request->image;
             $imageName = 'default-img.png';
-            if($request->image){
-                $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+            if ($request->image) {
+                $imageName = Str::slug($request->name) . '-' . Str::random(10) . '.' . $image->extension();
                 $uploadImage = $image->storeAs('public/product_images', $imageName);
             }
             $product = Product::create([
@@ -174,18 +176,18 @@ class ProductController extends Controller
     public function detail($id)
     {
         $product = Product::where('id', $id)->first();
-        if ($product == NULL){
+        if ($product == NULL) {
             return response()->json(['message' => 'Data Tidak Ditemukan.'], 404);
         }
-        $product->image = $product->image ? url('storage/product_images/'.$product->image) : "";
+        $product->image = $product->image ? url('storage/product_images/' . $product->image) : "";
         return response()->json($product, 200);
     }
 
     public function getPostByTitle(Request $request, $title)
     {
-        $posts = Post::where('title', 'LIKE', '%'.$title.'%')->with('user')->get();
+        $posts = Post::where('title', 'LIKE', '%' . $title . '%')->with('user')->get();
         $posts->map(function ($item) {
-            $item['user']['avatar_url'] = $item['user']['avatar'] ? "https://storage.googleapis.com/ecocrafters_bucket/".$item['user']['avatar'] : "https://storage.googleapis.com/ecocrafters-api.appspot.com/avatar.png";
+            $item['user']['avatar_url'] = $item['user']['avatar'] ? "https://storage.googleapis.com/ecocrafters_bucket/" . $item['user']['avatar'] : "https://storage.googleapis.com/ecocrafters-api.appspot.com/avatar.png";
 
             return $item;
         });
@@ -216,9 +218,9 @@ class ProductController extends Controller
             $image = $request->image;
             $productFind = Product::findOrFail($id);
             $imageName = $productFind->image;
-            if($image){
+            if ($image) {
                 Storage::delete('public/product_images/' . $productFind->image);
-                $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
+                $imageName = Str::slug($request->name) . '-' . Str::random(10) . '.' . $image->extension();
                 $uploadImage = $image->storeAs('public/product_images', $imageName);
             }
             $product = Product::findOrFail($id);
@@ -259,13 +261,13 @@ class ProductController extends Controller
         return response()->json(['message' => 'Product Succesfully Deleted.'], 200);
     }
 
-    public function handleIngredients(Request $request, Product $product){
-        // $tagsNames = $request->get('tags');
-        $ingredientsNames = explode(',', $request->get('ingredient'));
-        foreach($ingredientsNames as $ingredientName){
-            Ingredient::firstOrCreate(['name' => $ingredientName])->save();
-        }
-        $ingredients = Ingredient::whereIn('name', $ingredientsNames)->get();
-        $post->ingredient()->sync($ingredients);
-    }
+    // public function handleIngredients(Request $request, Product $product){
+    //     // $tagsNames = $request->get('tags');
+    //     $ingredientsNames = explode(',', $request->get('ingredient'));
+    //     foreach($ingredientsNames as $ingredientName){
+    //         Ingredient::firstOrCreate(['name' => $ingredientName])->save();
+    //     }
+    //     $ingredients = Ingredient::whereIn('name', $ingredientsNames)->get();
+    //     $post->ingredient()->sync($ingredients);
+    // }
 }

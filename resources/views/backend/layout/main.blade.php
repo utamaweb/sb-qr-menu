@@ -248,99 +248,32 @@
             {{-- <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> POS</span></a></li> --}}
             @endif
             {{-- <li class="nav-item"><a id="switch-theme" data-toggle="tooltip" title="{{trans('file.Switch Theme')}}"><i class="dripicons-brightness-max"></i></a></li> --}}
-            <li class="nav-item"><a id="btnFullscreen" data-toggle="tooltip" title="{{trans('file.Full Screen')}}"><i class="dripicons-expand"></i></a></li>
-            {{-- @if(\Auth::user()->role_id <= 2)
-                <li class="nav-item"><a href="{{route('cashRegister.index')}}" data-toggle="tooltip" title="{{trans('file.Cash Register List')}}"><i class="dripicons-archive"></i></a></li>
-            @endif --}}
-            {{-- @if($product_qty_alert_active && ($alert_product + $dso_alert_product_no + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count() ) > 0) --}}
-            {{-- @if($product_qty_alert_active && ($alert_product + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count() ) > 0)
-                <li class="nav-item" id="notification-icon">
-                    <a rel="nofollow" data-toggle="tooltip" title="{{__('Notifications')}}" class="nav-link dropdown-item"><i class="dripicons-bell"></i><span class="badge badge-danger notification-number">{{$alert_product + $dso_alert_product_no + \Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d'))->count()}}</span>
-                    </a>
-                    <ul class="right-sidebar">
-                        <li class="notifications">
-                            <a href="{{route('report.qtyAlert')}}" class="btn btn-link"> {{$alert_product}} product exceeds alert quantity</a>
-                        </li>
-                        @if($dso_alert_product_no)
-                        <li class="notifications">
-                            <a href="{{route('report.dailySaleObjective')}}" class="btn btn-link"> {{$dso_alert_product_no}} product could not fulfill daily sale objective</a>
-                        </li>
-                        @endif
-                        @foreach(\Auth::user()->unreadNotifications->where('data.reminder_date', date('Y-m-d')) as $key => $notification)
-                            <li class="notifications">
-                                @if($notification->data['document_name'])
-                                <a target="_blank" href="{{url('public/documents/notification', $notification->data['document_name'])}}" class="btn btn-link">{{ $notification->data['message'] }}</a>
-                                @else
-                                <a href="#" class="btn btn-link">{{ $notification->data['message'] }}</a>
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                </li>
-            @endif --}}
 
-            {{-- <li class="nav-item">
-                    <a rel="nofollow" title="{{trans('file.language')}}" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-web"></i></a>
-                    <ul class="right-sidebar">
-                        <li>
-                        <a href="{{ url('language_switch/en') }}" class="btn btn-link"> English</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/es') }}" class="btn btn-link"> Español</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/ar') }}" class="btn btn-link"> عربى</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/id') }}" class="btn btn-link"> Bahasa</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/ms') }}" class="btn btn-link"> Malay</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/s_chinese') }}" class="btn btn-link">中国人</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/t_chinese') }}" class="btn btn-link">中國人</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/pt_BR') }}" class="btn btn-link"> Portuguese</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/fr') }}" class="btn btn-link"> Français</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/de') }}" class="btn btn-link"> Deutsche</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/hi') }}" class="btn btn-link"> हिंदी</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/vi') }}" class="btn btn-link"> Tiếng Việt</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/ru') }}" class="btn btn-link"> русский</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/bg') }}" class="btn btn-link"> български</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/tr') }}" class="btn btn-link"> Türk</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/it') }}" class="btn btn-link"> Italiano</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/nl') }}" class="btn btn-link"> Nederlands</a>
-                        </li>
-                        <li>
-                        <a href="{{ url('language_switch/lao') }}" class="btn btn-link"> Lao</a>
-                        </li>
-                        <li>
-                          <a href="{{ url('language_switch/swahili') }}" class="btn btn-link"> Swahili</a>
-                        </li>
-                    </ul>
-            </li> --}}
+            @if(auth()->user()->hasRole('Superadmin'))
+            <li class="nav-item"><a data-toggle="modal" data-target="#uploadModal" title="Upload APK"><i class="dripicons-browser-upload"></i></a></li>
+            <!-- Create Modal -->
+            <div id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                <div role="document" class="modal-dialog">
+                    <div class="modal-content">
+                        <form action="{{route('uploadApk')}}" method="POST" enctype="multipart/form-data">
+                            @csrf
+                        <div class="modal-header">
+                            <h5 id="exampleModalLabel" class="modal-title">Upload APK</h5>
+                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                        </div>
+                        <div class="modal-body">
+                                <div class="form-group">
+                                    <label>File APK</label>
+                                    <input type="file" name="apk" required class="form-control" accept=".apk">
+                                </div>
+                                <input type="submit" value="Submit" class="btn btn-primary">
+                    </div>
+                </form>
+                </div>
+            </div>
+            </div>
+            @endif
+            <li class="nav-item"><a id="btnFullscreen" data-toggle="tooltip" title="{{trans('file.Full Screen')}}"><i class="dripicons-expand"></i></a></li>
             <li class="nav-item">
                 <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst(Auth::user()->name)}}</span> <i class="fa fa-angle-down"></i>
                 </a>

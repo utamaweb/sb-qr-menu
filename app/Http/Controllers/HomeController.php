@@ -17,9 +17,12 @@ use App\Models\Unit;
 use Cache;
 use DB;
 use Auth;
+use Storage;
+use Illuminate\Support\Str;
 use Printing;
 use Rawilk\Printing\Contracts\Printer;
 use Spatie\Permission\Models\Role;
+use Carbon\Carbon;
 /*use vendor\autoload;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\Printer;*/
@@ -408,4 +411,18 @@ class HomeController extends Controller
     {
         setcookie('theme', $theme, time() + (86400 * 365), "/");
     }
+
+    public function uploadApk(Request $request)
+    {
+        $dateNow = Carbon::now()->format('Y-m-d');
+        $apk = $request->apk;
+        if ($apk) {
+            Storage::deleteDirectory('public/apk');
+            $apkName = 'sb-pos.' . $apk->getClientOriginalExtension();
+            // $apkName = 'sb-pos' . '-' . $dateNow . '.' . $apk->getClientOriginalExtension();
+            $uploadApk = $apk->storeAs('public/apk', $apkName);
+        }
+        return redirect()->back()->with('message', 'APK Berhasil Diupload');
+    }
+
 }

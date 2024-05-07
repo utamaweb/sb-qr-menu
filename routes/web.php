@@ -48,6 +48,9 @@ Route::get('/get-storage', function () {
     Artisan::call('storage:link');
 });
 
+Route::get('/apk', function (){
+    return Storage::download('public/apk/sb-pos.apk');
+});
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware(['web'])->group(function () {
         Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');
@@ -57,6 +60,7 @@ Route::group(['prefix' => 'admin'], function () {
 
 
     Route::group(['middleware' => 'auth:web'], function() {
+        Route::post('upload-apk', [HomeController::class,'uploadApk'])->name('uploadApk');
         Route::controller(HomeController::class)->group(function () {
             Route::get('home', 'home');
         });

@@ -61,6 +61,9 @@ class ProductController extends Controller
                     // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
                     $smallestStock = 0;
                 }
+                if($product->warehouse_harga != null){
+                    $product->price = $product->warehouse_harga;
+                }
 
                 unset($product['qty']);
                 // Tambahkan qty terkecil ke dalam produk

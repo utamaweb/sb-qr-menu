@@ -15,6 +15,11 @@ class Product extends Model
     	return $this->belongsTo('App\Models\Category');
     }
 
+    public function productWarehouse()
+    {
+    	return $this->hasMany('App\Models\Product_Warehouse');
+    }
+
     public function business()
     {
     	return $this->belongsTo('App\Models\Business');

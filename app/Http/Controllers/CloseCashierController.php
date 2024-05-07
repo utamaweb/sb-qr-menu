@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\CloseCashier;
 use App\Models\Expense;
 use App\Models\StockPurchase;
+use App\Models\Transaction;
 use App\Models\CloseCashierProductSold;
 use Auth;
 use DB;
@@ -32,7 +33,8 @@ class CloseCashierController extends Controller
         $sumExpense = Expense::where('shift_id', $closeCashier->shift_id)->sum('amount');
         $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
         $sumStockPurchase = StockPurchase::where('shift_id', $closeCashier->shift_id)->sum('total_price');
-        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase'));
+        $transactions = Transaction::where('shift_id', $closeCashier->shift_id)->get();
+        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions'));
     }
 
 }

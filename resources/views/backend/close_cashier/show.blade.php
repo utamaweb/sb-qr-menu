@@ -181,6 +181,55 @@
     </div>
 </section>
 
+<section class="forms">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header mt-2">
+                <h3 class="text-center">List Transaksi</h3>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table id="ingredient-table" class="table table-hover" style="width: 100%">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Tanggal | Jam</th>
+                    <th>Outlet</th>
+                    <th>Antrian</th>
+                    <th>Tipe Pesanan</th>
+                    <th>Tipe Pembayaran</th>
+                    <th>Total Tagihan</th>
+                    <th>Jumlah Pesanan</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse ($transactions as $key => $transaction)
+                <tr>
+                    <td>{{$loop->iteration}}</td>
+                    <td>{{$transaction->date}} | {{$transaction->created_at->format('H:i:s')}}</td>
+                    <td>{{$transaction->warehouse->name}}</td>
+                    <td>{{$transaction->sequence_number}}</td>
+                    <td>{{$transaction->order_type->name}}</td>
+                    <td>{{$transaction->payment_method}} ({{$transaction->category_order}})</td>
+                    <td>Rp. {{number_format($transaction->total_amount, 0, '', '.')}}</td>
+                    <td>{{number_format($transaction->total_qty, 0, '', '.')}}</td>
+                    <td>@if($transaction->paid_amount != NULL)
+                        <div class="badge badge-success">Lunas</div>
+                        @else
+                        <div class="badge badge-danger">Belum Lunas</div>
+                        @endif
+                    </td>
+                </tr>
+                @empty
+                <p>No users</p>
+                @endforelse
+            </tbody>
+        </table>
+    </div>
+</section>
+
 @endsection
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -188,5 +237,81 @@
     $("ul#report").siblings('a').attr('aria-expanded','true');
     $("ul#report").addClass("show");
     $("ul#report #laporan-tutup-kasir").addClass("active");
+
+
+    $('#ingredient-table').DataTable( {
+        "order": [],
+        'language': {
+            'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
+             "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
+            "search":  'Cari',
+            'paginate': {
+                    'previous': '<i class="dripicons-chevron-left"></i>',
+                    'next': '<i class="dripicons-chevron-right"></i>'
+            }
+        },
+        'columnDefs': [
+            // {
+            //     "orderable": false,
+            //     'targets': [0, 2]
+            // },
+            // {
+            //     'render': function(data, type, row, meta){
+            //         if(type === 'display'){
+            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+            //         }
+
+            //        return data;
+            //     },
+            //     'checkboxes': {
+            //        'selectRow': true,
+            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
+            //     },
+            //     'targets': [0]
+            // }
+        ],
+        'select': { style: 'multi',  selector: 'td:first-child'},
+        'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        dom: '<"row"lfB>rtip',
+        buttons: [
+            {
+                extend: 'pdf',
+                text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
+                exportOptions: {
+                    columns: ':visible:Not(.not-exported)',
+                    rows: ':visible'
+                },
+            },
+            {
+                extend: 'excel',
+                text: '<i title="export to excel" class="dripicons-document-new"></i>',
+                exportOptions: {
+                    columns: ':visible:Not(.not-exported)',
+                    rows: ':visible'
+                },
+            },
+            {
+                extend: 'csv',
+                text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
+                exportOptions: {
+                    columns: ':visible:Not(.not-exported)',
+                    rows: ':visible'
+                },
+            },
+            {
+                extend: 'print',
+                text: '<i title="print" class="fa fa-print"></i>',
+                exportOptions: {
+                    columns: ':visible:Not(.not-exported)',
+                    rows: ':visible'
+                },
+            },
+            {
+                extend: 'colvis',
+                text: '<i title="column visibility" class="fa fa-eye"></i>',
+                columns: ':gt(0)'
+            },
+        ],
+    } );
 </script>
 @endpush

@@ -248,31 +248,6 @@
             {{-- <li class="nav-item"><a class="btn-pos btn-sm" href="{{route('sale.pos')}}"><i class="dripicons-shopping-bag"></i><span> POS</span></a></li> --}}
             @endif
             {{-- <li class="nav-item"><a id="switch-theme" data-toggle="tooltip" title="{{trans('file.Switch Theme')}}"><i class="dripicons-brightness-max"></i></a></li> --}}
-
-            @if(auth()->user()->hasRole('Superadmin'))
-            <li class="nav-item"><a data-toggle="modal" data-target="#uploadModal" title="Upload APK"><i class="dripicons-browser-upload"></i></a></li>
-            <!-- Create Modal -->
-            <div id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                <div role="document" class="modal-dialog">
-                    <div class="modal-content">
-                        <form action="{{route('uploadApk')}}" method="POST" enctype="multipart/form-data">
-                            @csrf
-                        <div class="modal-header">
-                            <h5 id="exampleModalLabel" class="modal-title">Upload APK</h5>
-                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                        </div>
-                        <div class="modal-body">
-                                <div class="form-group">
-                                    <label>File APK</label>
-                                    <input type="file" name="apk" required class="form-control" accept=".apk">
-                                </div>
-                                <input type="submit" value="Submit" class="btn btn-primary">
-                    </div>
-                </form>
-                </div>
-            </div>
-            </div>
-            @endif
             <li class="nav-item"><a id="btnFullscreen" data-toggle="tooltip" title="{{trans('file.Full Screen')}}"><i class="dripicons-expand"></i></a></li>
             <li class="nav-item">
                 <a rel="nofollow" data-toggle="tooltip" class="nav-link dropdown-item"><i class="dripicons-user"></i> <span>{{ucfirst(Auth::user()->name)}}</span> <i class="fa fa-angle-down"></i>

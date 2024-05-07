@@ -49,7 +49,7 @@ Route::get('/get-storage', function () {
 });
 
 Route::get('/apk', function (){
-    return Storage::download('public/apk/sb-pos.apk');
+    return redirect('https://drive.google.com/drive/folders/1E_jhYwX5jSP0VN3rvH8gE-yUSE7LJ4lw?usp=sharing');
 });
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware(['web'])->group(function () {

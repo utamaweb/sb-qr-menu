@@ -56,7 +56,7 @@
                                         <small class="text-danger">Bahan Baku</small>
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="number" placeholder="Qty" name="qty[]"" min="1" class="form-control quantity" value="{{$detail->qty}}" readonly>
+                                        <input type="number" placeholder="Qty" name="qty[]"" min="1" class="form-control quantity" value="{{$detail->qty}}">
                                         <small class="text-danger">Qty</small>
                                     </div>
                                     <div class="col-md-2">

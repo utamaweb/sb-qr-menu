@@ -136,7 +136,7 @@ class StockPurchaseController extends Controller
         }
         $dateNow = Carbon::now()->format('Y-m-d');
         $roleName = auth()->user()->getRoleNames()[0];
-        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('user_id', auth()->user()->id)->where('is_closed', 0)->first();
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
         if ($roleName == 'Superadmin') {
             $shift = Shift::where('date', $dateNow)->where('is_closed', 0)->first();
         }
@@ -147,10 +147,15 @@ class StockPurchaseController extends Controller
         $subtotalInt = array_map('intval', str_replace(',', '', $request->subtotal));
         $totalSubtotal = array_sum($subtotalInt);
 
-        StockPurchase::find($id)->update(['total_price' => $totalSubtotal]);
-
+        StockPurchase::find($id)->update(['total_price' => $totalSubtotal, 'total_qty' => $totalQty]);
         if (count($request->stock_purchase_ingredient_id) > 0) {
             foreach ($request->stock_purchase_ingredient_id as $item => $v) {
+                $stockPurchaseIngredient = StockPurchaseIngredient::where('id', $request->stock_purchase_ingredient_id[$item])->first();
+                $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                $stock->update([
+                    'stock_in' => $stock->stock_in - $stockPurchaseIngredient->qty,
+                    'last_stock' => $stock->last_stock - $stockPurchaseIngredient->qty,
+                ]);
                 $data = array(
                     'stock_purchase_id' => $id,
                     'ingredient_id' => $request->ingredient_id[$item],
@@ -160,6 +165,10 @@ class StockPurchaseController extends Controller
                     'notes' => $request->notes[$item],
                 );
                 StockPurchaseIngredient::where('id', $request->stock_purchase_ingredient_id[$item])->update($data);
+                Stock::where('shift_id', $shift->id)->where('ingredient_id', $request->ingredient_id[$item])->where('warehouse_id', $request->warehouse_id)->update([
+                    'stock_in' => $stock->stock_in + $request->qty[$item],
+                    'last_stock' => $stock->last_stock + $request->qty[$item],
+                ]);
             }
         }
         return redirect()->route('pembelian-stok.index')->with('message', 'Data berhasil diubah');

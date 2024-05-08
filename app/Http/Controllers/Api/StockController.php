@@ -18,10 +18,13 @@ use Illuminate\Support\Facades\DB;
 class StockController extends Controller
 {
     public function getAllIngredients() {
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+            ->where('is_closed', 0)
+            ->first();
         // $warehouse_id = auth()->user()->warehouse_id;
         // $warehouse = Warehouse::find($warehouse_id);
         // $ingredients = Ingredient::where('business_id', $warehouse->business_id)->with('unit')->get();
-        $ingredient_ids = Stock::where('warehouse_id', auth()->user()->warehouse_id)->pluck('ingredient_id');
+        $ingredient_ids = Stock::where('shift_id', $shift->id)->where('warehouse_id', auth()->user()->warehouse_id)->pluck('ingredient_id');
         $ingredients = Ingredient::whereIn('id', $ingredient_ids)->get();
         return response()->json($ingredients, 200);
     }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Warehouse;
 use App\Models\Business;
+use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
 use Keygen;
@@ -144,6 +145,10 @@ class WarehouseController extends Controller
     public function destroy($id)
     {
         $lims_warehouse_data = Warehouse::find($id);
+        $warehouse_users = User::where('warehouse_id', $lims_warehouse_data->id)->get();
+        foreach ($warehouse_users as $user) {
+            $user->delete();
+        }
         $lims_warehouse_data->delete();
         $this->cacheForget('warehouse_list');
         return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');

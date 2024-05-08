@@ -69,10 +69,10 @@
                                         </select>
                                     </div>
                                     <div class="col-md-1">
-                                        <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity">
+                                        <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity" required>
                                     </div>
                                     <div class="col-md-2">
-                                        <input type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan input-number" oninput="changeValue(this)">
+                                        <input required type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan input-number" oninput="changeValue(this)">
                                     </div>
                                     <div class="col-md-2">
                                         <input type="text" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal input-number">
@@ -154,10 +154,10 @@
                                         </select>\n\
                                     </div>\n\
                                     <div class="col-md-1">\n\
-                                        <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity">\n\
+                                        <input required type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
-                                        <input type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan input-number" oninput="changeValue(this)">\n\
+                                        <input required type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan input-number" oninput="changeValue(this)">\n\
                                     </div>\n\
                                     <div class="col-md-2">\n\
                                         <input type="text" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal input-number">\n\

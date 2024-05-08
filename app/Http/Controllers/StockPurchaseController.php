@@ -131,8 +131,8 @@ class StockPurchaseController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (count($request->notes) < 1) {
-            return redirect()->route('pembelian-stok.create')->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
+        if (!$request->notes || count($request->notes) < 1) {
+            return redirect()->back()->with('not_permitted', 'Bahan Baku Harus Diisi Minimal 1');
         }
         $dateNow = Carbon::now()->format('Y-m-d');
         $roleName = auth()->user()->getRoleNames()[0];

@@ -45,6 +45,37 @@
                             </div>
 
                             <div id="add_new" class="margin">
+                                @if(count($stockPurchaseIngredients) < 1)
+                                <div class="form-group row">
+                                    <label for="example-text-input" class="col-md-1 col-form-label">Bahan Baku</label>
+
+                                    <div class="col-md-2">
+                                        <select name="ingredient_id[]" required class="form-control">
+                                            <option value="">Pilih Bahan Baku</option>
+                                            @foreach($ingredients as $ingredient)
+                                            <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <input type="number" placeholder="Qty" name="qty[]" min="1" class="form-control quantity" required>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input required type="text" placeholder="Harga Satuan" name="price[]" class="form-control harga-satuan input-number" oninput="changeValue(this)">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" placeholder="Subtotal" readonly name="subtotal[]" class="form-control subtotal input-number">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <input type="text" placeholder="Catatan" name="notes[]" class="form-control">
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        <a href="javascript:void(0);" class="addCF btn btn-warning add_more"><i class="fa fa-plus"></i></a>
+                                        <strong><a href="javascript:void(0);" class="remCF btn btn-danger"><i class="fa fa-times"></i></a></strong>
+                                    </div>
+                                </div>
+                                @else
                                 @foreach($stockPurchaseIngredients as $detail)
                                 <div class="form-group row">
                                     <label for="example-text-input" class="col-md-1 col-form-label">Bahan Baku</label>
@@ -78,6 +109,7 @@
                                     </div> --}}
                                 </div>
                                 @endforeach
+                                @endif
                             </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">

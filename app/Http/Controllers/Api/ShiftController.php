@@ -250,25 +250,45 @@ class ShiftController extends Controller
 
     public function latest() {
         $latestShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
+        if(!$latestShift){
+            $stocks = [];
+            $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+            foreach ($ingredientStock as $stock) {
+                $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
 
-        $stocks = [];
-        $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('warehouse_id', auth()->user()->warehouse_id)->get();
-        foreach ($ingredientStock as $stock) {
-            $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
-            $ingredientName = str_replace(' ', '_', $ingredientStock->ingredient->name);
+                $stockData = [
+                    'ingredient_id' => $stock['ingredient_id'],
+                    'ingredient_name' => $ingredientStock->ingredient->name,
+                    'first_stock' => $ingredientStock->first_stock,
+                    'used_stock' => $ingredientStock->stock_used,
+                    'stock_in' => $ingredientStock->stock_in,
+                    'stock' => $ingredientStock->last_stock,
+                ];
 
-            $stockData = [
-                'ingredient_id' => $stock['ingredient_id'],
-                'ingredient_name' => $ingredientStock->ingredient->name,
-                'first_stock' => $ingredientStock->first_stock,
-                'used_stock' => $ingredientStock->stock_used,
-                'stock_in' => $ingredientStock->stock_in,
-                'stock' => $ingredientStock->last_stock,
-            ];
+                $stocks[] = $stockData;
+            }
+            $latestShift['stocks'] = $stocks;
+            return response()->json($latestShift,200);
+        } else{
+            $stocks = [];
+            $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+            foreach ($ingredientStock as $stock) {
+                $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                $ingredientName = str_replace(' ', '_', $ingredientStock->ingredient->name);
 
-            $stocks[] = $stockData;
+                $stockData = [
+                    'ingredient_id' => $stock['ingredient_id'],
+                    'ingredient_name' => $ingredientStock->ingredient->name,
+                    'first_stock' => $ingredientStock->first_stock,
+                    'used_stock' => $ingredientStock->stock_used,
+                    'stock_in' => $ingredientStock->stock_in,
+                    'stock' => $ingredientStock->last_stock,
+                ];
+
+                $stocks[] = $stockData;
+            }
+            $latestShift['stocks'] = $stocks;
+            return response()->json($latestShift,200);
         }
-        $latestShift['stocks'] = $stocks;
-        return response()->json($latestShift,200);
     }
 }

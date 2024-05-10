@@ -76,6 +76,11 @@ class MenuSeeder extends Seeder
                 'updated_at' => Carbon::now(),
             ],
             [
+                "name" => "Ojol", "description" => "Ojol",
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ],
+            [
                 "name" => "User", "description" => "User",
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),

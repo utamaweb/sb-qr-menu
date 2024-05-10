@@ -35,6 +35,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\CloseCashierController;
+use App\Http\Controllers\OjolController;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -265,6 +266,17 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('expenses/deletebyselection', 'deleteBySelection');
         });
         Route::resource('pengeluaran', ExpenseController::class);
+
+        // Route for Ojol
+        Route::controller(OjolController::class)->name('ojol.')->group(function() {
+            Route::get('ojol', 'index')->name('index');
+            Route::get('ojol/create', 'create')->name('create');
+            Route::post('ojol/create', 'store')->name('store');
+            Route::get('ojol/edit/{ojol}', 'edit')->name('edit');
+            Route::put('ojol/edit/{ojol}', 'update')->name('update');
+            Route::delete('ojol/destroy/{ojol}', 'destroy')->name('destroy');
+        });
+
     });
 });
 

@@ -16,6 +16,7 @@
 
     {{-- Menu Admin Bisnis --}}
     @elseif(auth()->user()->hasRole('Admin Bisnis'))
+    <li id="ojol"><a href="{{route('ojol.index')}}"> <i class="dripicons-user-id"></i><span>Ojol</span></a></li>
     <li id="kategori"><a href="{{route('kategori.index')}}"> <i class="dripicons-user-id"></i><span>Kategori</span></a></li>
     <li id="produk"><a href="{{route('produk.index')}}"> <i class="dripicons-user-id"></i><span>Produk</span></a></li>
     <li id="bahan-baku"><a href="{{route('bahan-baku.index')}}"> <i class="dripicons-user-id"></i><span>Bahan Baku</span></a></li>

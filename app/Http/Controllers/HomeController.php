@@ -61,15 +61,15 @@ class HomeController extends Controller
             $countIngredient = Ingredient::where('business_id', $business_id)->count();
         }
         if(auth()->user()->warehouse_id == NULL){
-            $revenue = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
-            $purchase_return = Transaction::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
+            $revenue = Transaction::where('status', 'Lunas')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
+            $purchase_return = Transaction::where('status', 'Lunas')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
             $expense = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
             $expense = $expense + $stockPurchase;
             $profit = $revenue - $expense;
         } else {
-            $revenue = Transaction::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
-            $purchase_return = Transaction::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
+            $revenue = Transaction::where('status', 'Lunas')->whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
+            $purchase_return = Transaction::where('status', 'Lunas')->whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
             $expense = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');
             $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
             $expense = $expense + $stockPurchase;
@@ -88,7 +88,7 @@ class HomeController extends Controller
                 $start_date = date("Y-m", $start).'-'.'01';
                 $end_date = date("Y-m", $start).'-'.date('t', mktime(0, 0, 0, date("m", $start), 1, date("Y", $start)));
 
-                $recieved_amount = DB::table('transactions')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
+                $recieved_amount = DB::table('transactions')->where('status', 'Lunas')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
                 $sent_amount = DB::table('expenses')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
                 $expense_amount = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
@@ -100,7 +100,7 @@ class HomeController extends Controller
             } else {
                 $start_date = date("Y-m", $start).'-'.'01';
                 $end_date = date("Y-m", $start).'-'.date('t', mktime(0, 0, 0, date("m", $start), 1, date("Y", $start)));
-                $recieved_amount = DB::table('transactions')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', auth()->user()->warehouse_id)->sum('total_amount');
+                $recieved_amount = DB::table('transactions')->where('status', 'Lunas')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->where('warehouse_id', auth()->user()->warehouse_id)->sum('total_amount');
                 $sent_amount = DB::table('expenses')->where('warehouse_id', auth()->user()->warehouse_id)->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
                 $expense_amount = Expense::whereDate('created_at', '>=' , $start_date)->where('warehouse_id', auth()->user()->warehouse_id)->whereDate('created_at', '<=' , $end_date)->sum('amount');

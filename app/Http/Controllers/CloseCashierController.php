@@ -33,7 +33,7 @@ class CloseCashierController extends Controller
         $sumExpense = Expense::where('shift_id', $closeCashier->shift_id)->sum('amount');
         $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
         $sumStockPurchase = StockPurchase::where('shift_id', $closeCashier->shift_id)->sum('total_price');
-        $transactions = Transaction::where('shift_id', $closeCashier->shift_id)->get();
+        $transactions = Transaction::where('status', 'Lunas')->where('shift_id', $closeCashier->shift_id)->get();
         return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions'));
     }
 

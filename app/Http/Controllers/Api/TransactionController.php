@@ -105,7 +105,8 @@ class TransactionController extends Controller
                 'payment_method' => $transaction->payment_method,
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
-                'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                // 'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                'status' => $transaction->status,
                 'items' => [],
             ];
 
@@ -156,7 +157,8 @@ class TransactionController extends Controller
                 'payment_method' => $transaction->payment_method,
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
-                'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                // 'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                'status' => $transaction->status,
                 'items' => [],
             ];
 
@@ -207,7 +209,8 @@ class TransactionController extends Controller
                 'payment_method' => $transaction->payment_method,
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
-                'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                // 'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                'status' => $transaction->status,
                 'items' => [],
             ];
 
@@ -257,7 +260,7 @@ class TransactionController extends Controller
                 'payment_method' => $transaction->payment_method,
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
-                'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
+                'status' => $transaction->status,
                 'items' => [],
             ];
 

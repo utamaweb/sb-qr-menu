@@ -245,7 +245,8 @@ class TransactionController extends Controller
             ->where('warehouse_id', auth()->user()->warehouse_id)
             // ->whereDate('date', $dateNow)
             ->where('shift_id', $shift->id)
-            ->whereNull('paid_amount')
+            // ->whereNull('paid_amount')
+            ->where('status', 'Pending')
             ->whereNull('payment_method')
             ->orderByDesc('id')
             ->get();

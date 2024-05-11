@@ -87,24 +87,6 @@
 <script type="text/javascript" src="<?php echo asset('../../vendor/jquery/jquery.min.js') ?>"></script>
 @endif
 <script>
-    @if(config('database.connections.saleprosaas_landlord'))
-    if (localStorage.getItem("message")) {
-        alert(localStorage.getItem("message"));
-        localStorage.removeItem("message");
-    }
-    numberOfUserAccount = < ? php echo json_encode($numberOfUserAccount) ? > ;
-    $.ajax({
-        type: 'GET',
-        async: false,
-        url: '{{route("package.fetchData", $general_setting->package_id)}}',
-        success: function (data) {
-            if (data['number_of_user_account'] > 0 && data['number_of_user_account'] <=
-                numberOfUserAccount) {
-                $(".register-section").addClass('d-none');
-            }
-        }
-    });
-    @endif
 
     //switch theme code
     var theme = < ? php echo json_encode($theme); ? > ;
@@ -119,22 +101,11 @@
         $("input[name='name']").focus().val('admin');
         $("input[name='password']").focus().val('admin');
     });
-
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-            navigator.serviceWorker.register('/salepro/service-worker.js').then(function (registration) {
-                // Registration was successful
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            }, function (err) {
-                // registration failed :(
-                console.log('ServiceWorker registration failed: ', err);
+sole.log('ServiceWorker registration failed: ', err);
             });
         });
     }
-
-    $('.admin-btn').on('click', function () {
-        $("input[name='name']").focus().val('admin');
-        $("input[name='password']").focus().val('admin');
+      $("input[name='password']").focus().val('admin');
     });
 
     $('.staff-btn').on('click', function () {

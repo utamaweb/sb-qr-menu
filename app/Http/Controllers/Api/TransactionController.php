@@ -352,6 +352,7 @@ class TransactionController extends Controller
                     'notes' => $request->notes,
                     'total_amount' => $total_amount,
                     'total_qty' => $total_qty,
+                    'status' => 'Pending',
                     // 'paid_amount' => $request->paid_amount,
                     // 'change_money' => $change_money,
                 ]);
@@ -557,6 +558,7 @@ class TransactionController extends Controller
                 'total_qty' => $total_qty,
                 // 'paid_amount' => $request->paid_amount,
                 'paid_amount' => $total_amount,
+                'status' => 'Lunas',
                 // 'change_money' => $change_money,
             ]);
 

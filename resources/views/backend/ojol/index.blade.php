@@ -19,9 +19,9 @@
                 aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
         @endif
 
-        @can('tambah-ojol')
+        {{-- @can('tambah-ojol') --}}
             <a href="{{ route('ojol.create') }}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Ojol</a>
-        @endcan
+        {{-- @endcan --}}
     </div>
 
     <div class="table-responsive">
@@ -41,15 +41,15 @@
                         <td>{{ $ojol->percent }}%</td>
                         <td>Rp. {{ number_format($ojol->extra_price, 0, '', '.') }}</td>
                         <td>
-                            @can('ubah-ojol')
+                            {{-- @can('ubah-ojol') --}}
                                 <a href="{{ route('ojol.edit', $ojol->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Edit</a>
-                            @endcan
+                            {{-- @endcan --}}
 
-                            @can('hapus-ojol')
+                            {{-- @can('hapus-ojol') --}}
                                 {{ Form::open(['route' => ['ojol.destroy', $ojol->id], 'method' => 'DELETE']) }}
                                     <button type="submit" class="btn btn-link" onclick="return confirm('Hapus data ojol?')"><i class="dripicons-trash"></i> Hapus</button>
                                 {{ Form::close() }}
-                            @endcan
+                            {{-- @endcan --}}
                         </td>
                     </tr>
                 @endforeach

@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\TransactionController;
 use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\ExpenseController;
+use App\Http\Controllers\Api\OjolController;
 
 /*
 |--------------------------------------------------------------------------
@@ -75,6 +76,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('transaction/order-types', [TransactionController::class, 'orderType']);
     Route::get('transaction/{id}', [TransactionController::class, 'detail']);
     Route::post('transaction', [TransactionController::class, 'store']);
+    Route::delete('transaction/{id}/cancel', [TransactionController::class, 'cancel']);
 
     // Shift / Close Cashier
     Route::post('shift/open', [ShiftController::class, 'open']);
@@ -82,6 +84,9 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('shift/check', [ShiftController::class, 'checkCashier']);
     Route::get('shift/latest', [ShiftController::class, 'latest']);
     Route::get('shift/closable', [ShiftController::class, 'closable']);
+
+    // OJOL
+    Route::get('ojol', [OjolController::class, 'index']);
 });
 
 

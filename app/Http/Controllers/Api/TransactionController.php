@@ -675,7 +675,7 @@ class TransactionController extends Controller
                     'status' => 'Batal',
                 ]);
                 DB::commit();
-                return response()->json(['message' => 'Data berhasil dihapus'], 200);
+                return response()->json(['message' => 'Transaksi Berhasil Dibatalkan'], 200);
             } else {
                 return response()->json(['message' => 'Data transaksi tidak ada'], 200);
             }

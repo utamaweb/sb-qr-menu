@@ -209,7 +209,7 @@ class ReportController extends Controller
                 'SUM(total_amount) AS total_amount'
             );
             // $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $sale_data = Transaction::where('warehouse_id', $warehouse_id)->where('date', $date)->selectRaw(implode(',', $query1))->get();
+            $sale_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->where('date', $date)->selectRaw(implode(',', $query1))->get();
             $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
             $total_qty[$start] = $sale_data[0]->total_qty;
             $total_amount[$start] = $sale_data[0]->total_amount;
@@ -244,7 +244,7 @@ class ReportController extends Controller
                 'SUM(total_amount) AS total_amount'
             );
             // $sale_data = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $sale_data = Transaction::where('warehouse_id', $data['warehouse_id'])->where('date', $date)->selectRaw(implode(',', $query1))->get();
+            $sale_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $data['warehouse_id'])->where('date', $date)->selectRaw(implode(',', $query1))->get();
             $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
             $total_qty[$start] = $sale_data[0]->total_qty;
             $total_amount[$start] = $sale_data[0]->total_amount;
@@ -344,13 +344,13 @@ class ReportController extends Controller
             $start_date = $year . '-'. date('m', $start).'-'.'01';
             $end_date = $year . '-'. date('m', $start).'-'.'31';
 
-            $temp_order_qty = Transaction::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
+            $temp_order_qty = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
             $total_qty[] = number_format((float)$temp_order_qty, config('decimal'), '.', '');
 
-            $total_paid_amount = Transaction::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
+            $total_paid_amount = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
             $total_paid[] = number_format((float)$total_paid_amount, config('decimal'), '.', '');
 
-            $temp_total = Transaction::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
+            $temp_total = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
             $total_amount[] = number_format((float)$temp_total, config('decimal'), '.', '');
             $start = strtotime("+1 month", $start);
         }
@@ -1759,7 +1759,7 @@ class ReportController extends Controller
         $end_date = $data['end_date'];
         $warehouse_id = auth()->user()->warehouse_id;
 
-        $lims_payment_data = Transaction::where('warehouse_id', $warehouse_id)->where('date', '>=' , $start_date)->where('date', '<=' , $end_date)->get();
+        $lims_payment_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->where('date', '>=' , $start_date)->where('date', '<=' , $end_date)->get();
         return view('backend.report.payment_report',compact('lims_payment_data', 'start_date', 'end_date'));
     }
 
@@ -1776,7 +1776,7 @@ class ReportController extends Controller
             $end_date = date("Y-m-d");
         }
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $transactions = Transaction::where('warehouse_id', $warehouse_id)->whereBetween('date', [$start_date, $end_date])->get();
+        $transactions = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereBetween('date', [$start_date, $end_date])->get();
         return view('backend.report.warehouse_report',compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list', 'transactions'));
     }
 

@@ -18,4 +18,8 @@ class Business extends Model
     {
     	return $this->hasMany('App\Models\ExpenseCategory');
     }
+
+    public function ojol() {
+        return $this->hasMany('App\Models\Ojol');
+    }
 }

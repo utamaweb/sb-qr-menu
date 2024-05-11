@@ -663,9 +663,12 @@ class TransactionController extends Controller
                         'last_stock' => $stock->last_stock + $detail->qty
                     ]);
                 }
-                $detail->delete();
+                // $detail->delete();
                 }
-                $transaction->delete();
+                // Update status transaksi menjadi batal
+                $transaction->update([
+                    'status' => 'Batal',
+                ]);
                 DB::commit();
                 return response()->json(['message' => 'Data berhasil dihapus'], 200);
             } else {

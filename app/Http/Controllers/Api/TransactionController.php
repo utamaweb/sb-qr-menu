@@ -141,7 +141,7 @@ class TransactionController extends Controller
             ->where('shift_id', $shift->id)
             ->where('warehouse_id', auth()->user()->warehouse_id)
             ->where('category_order', 'ONLINE')
-            ->whereDate('date', $dateNow)
+            // ->whereDate('date', $dateNow)
             ->orderByDesc('id')
             ->get();
 
@@ -192,7 +192,7 @@ class TransactionController extends Controller
             ->where('shift_id', $shift->id)
             ->where('warehouse_id', auth()->user()->warehouse_id)
             ->where('category_order', 'OFFLINE')
-            ->whereDate('date', $dateNow)
+            // ->whereDate('date', $dateNow)
             ->orderByDesc('id')
             ->get();
 

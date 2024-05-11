@@ -96,12 +96,12 @@ class ShiftController extends Controller
                 return response()->json(['message' => 'Cashier Already Closed Before This'], 200);
             }
             // check apakah ada orderan belum selesai
-            $checkTransactionInShift = Transaction::where('shift_id', $shift->id)->whereNull('paid_amount')->whereNull('payment_method')->count();
+            $checkTransactionInShift = Transaction::where('status', 'Pending')->where('shift_id', $shift->id)->whereNull('paid_amount')->whereNull('payment_method')->count();
             if($checkTransactionInShift > 0){
                 return response()->json(['status' => 'gagal', 'message' => "Selesaikan orderan terlebih dahulu untuk tutup kasir"], 409);
             }
             // get transaksi sesuai shift
-            $transactions = Transaction::where('shift_id', $shift->id)->get();
+            $transactions = Transaction::where('status', 'Lunas')->where('shift_id', $shift->id)->get();
             $expenses = Expense::where('shift_id', $shift->id)->with('expenseCategory')->get();
 
             $totalExpense = 0;
@@ -159,7 +159,7 @@ class ShiftController extends Controller
                 'is_closed' => 1
             ]);
             // total omset per tipe pembayaran
-            $transaction = Transaction::where('shift_id', $shift->id)->get();
+            $transaction = Transaction::where('status', 'Lunas')->where('shift_id', $shift->id)->get();
             $gofood_omzet = $transaction->where('payment_method', 'GOFOOD')->sum('total_amount');
             $grabfood_omzet = $transaction->where('payment_method', 'GRABFOOD')->sum('total_amount');
             $shopeefood_omzet = $transaction->where('payment_method', 'SHOPEEFOOD')->sum('total_amount');
@@ -239,7 +239,7 @@ class ShiftController extends Controller
 
     public function closable() {
         $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
-        $transactions = Transaction::where('shift_id', $checkShift->id)->whereNull('payment_method')->whereNull('paid_amount')->count();
+        $transactions = Transaction::where('status', 'Pending')->where('shift_id', $checkShift->id)->whereNull('payment_method')->whereNull('paid_amount')->count();
 
         if($transactions > 0){
             return response()->json(['status' => False,'message' => "Tidak bisa tutup kasir, terdapat orderan yang masih tersedia."], 200);

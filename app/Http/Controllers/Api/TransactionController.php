@@ -130,6 +130,7 @@ class TransactionController extends Controller
 
     }
 
+    // get history online transaction
     public function online()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
@@ -182,6 +183,7 @@ class TransactionController extends Controller
 
     }
 
+    // get history offline transaciton
     public function offline()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
@@ -467,7 +469,8 @@ class TransactionController extends Controller
                 }
                 $transaction->update([
                     'total_amount' => $total_amount,
-                    'total_qty' => $total_qty
+                    'total_qty' => $total_qty,
+                    'status' => 'Lunas'
                 ]);
 
                 $change_money = $request->paid_amount - $transaction->total_amount;

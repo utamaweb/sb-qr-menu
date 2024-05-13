@@ -13,6 +13,7 @@ use App\Models\Shift;
 use App\Models\Stock;
 use App\Models\Expense;
 use App\Models\TransactionDetail;
+use App\Models\OjolCloseCashier;
 use Carbon\Carbon;
 use DB;
 
@@ -159,7 +160,7 @@ class ShiftController extends Controller
                 'is_closed' => 1
             ]);
             // total omset per tipe pembayaran
-            $transaction = Transaction::where('status', 'Lunas')->where('shift_id', $shift->id)->get();
+            $transaction = Transaction::where('status', 'Lunas')->where('shift_id', $shift->id)->get();            
             $gofood_omzet = $transaction->where('payment_method', 'GOFOOD')->sum('total_amount');
             $grabfood_omzet = $transaction->where('payment_method', 'GRABFOOD')->sum('total_amount');
             $shopeefood_omzet = $transaction->where('payment_method', 'SHOPEEFOOD')->sum('total_amount');
@@ -194,6 +195,17 @@ class ShiftController extends Controller
             $closeCashier['result'] = $totalCash - $totalNonCash - $totalExpense;
             $closeCashier['cash_in_drawer_without_opening_balance'] = $request->cash_in_drawer;
             $stocks = [];
+            
+            // OjolCloseCashier data input
+            $ojols = Ojol::where('business_id', '=', auth()->user()->warehouse()->business_id)->get();
+            foreach($ojols as $ojol) {
+                OjolCloseCashier::create([
+                    'ojol_id' => $ojol->id,
+                    'close_cashier_id' => $closeCashier->id,
+                    'omzet' => $transaction->where('payment_method', $ojol->name)->sum('total_amount'),
+                ]);
+            }
+            // End of OjolCloseCashier data input
 
             if ($request->stocks) {
                 foreach ($request->stocks as $stock) {
@@ -219,6 +231,9 @@ class ShiftController extends Controller
             }
             $closeCashier['stocks'] = $stocks;
             $closeCashier['warehouse_name'] = $shift->warehouse->name;
+
+            // Get OjolCloseCashier
+            $closeCashier['ojol_omzet'] = OjolCloseCashier::where('close_cashier_id', '=', $closeCashier->id)->get();
 
             DB::commit();
             return response()->json($closeCashier, 200);

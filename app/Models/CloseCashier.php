@@ -52,4 +52,10 @@ class CloseCashier extends Model
     {
         return $this->hasMany('App\Models\Transaction', 'close_cashier_id');
     }
+
+    // Relation to OjolCloseCashier table
+    public function OjolCloseCashier() {
+        return $this->hasMany('App\Models\OjolCloseCashier', 'close_cashier_id');
+    }
+
 }

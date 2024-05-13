@@ -14,7 +14,7 @@
                     <div class="card-body">
                         <h4>Detail Tutup Kasir - {{$closeCashier->shift->user->name}}</h4>
                         <hr>
-                        <div class="row">
+                        {{-- <div class="row">
                             <div class="col-md-6">
                                 Waktu Buka Kasir <br>
                                 {{$closeCashier->open_time}}
@@ -23,8 +23,31 @@
                                 Waktu Tutup Kasir <br>
                                 {{$closeCashier->close_time}}
                             </div>
+                        </div> --}}
+                        {{-- <hr> --}}
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <table>
+                                    <tr>
+                                        <td>
+                                        Waktu Buka Kasir
+                                    </td>
+                                    <td style="text-align: right;">
+                                        Waktu Tutup Kasir
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        {{$closeCashier->open_time}}
+                                    </td>
+                                    <td style="text-align: right;">
+                                        {{$closeCashier->close_time}}
+                                    </td>
+                                </tr>
+                            </table>
                         </div>
-                        <hr>
+                        </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <h2>@currency($closeCashier->total_income)</h2>

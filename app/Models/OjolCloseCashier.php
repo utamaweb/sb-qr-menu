@@ -2,8 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Ojol;
+use App\Models\CloseCashier;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OjolCloseCashier extends Model
 {
@@ -12,10 +14,10 @@ class OjolCloseCashier extends Model
     protected $fillable = ['ojol_id', 'close_cashier_id', 'omzet'];
 
     public function ojol() {
-        return $this->belongsToMany(Ohol::class);
+        return $this->belongsTo(Ojol::class);
     }
 
     public function closeCashier() {
-        return $this->belongsToMany(CloseCashier::class);
+        return $this->belongsTo(CloseCashier::class);
     }
 }

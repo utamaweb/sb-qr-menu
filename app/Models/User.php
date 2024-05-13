@@ -7,10 +7,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Spatie\Permission\Traits\HasRoles;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, Notifiable, HasRoles;
+    use HasApiTokens, Notifiable, HasRoles, SoftDeletes;
     protected $guard_name = 'web';
     protected $fillable = [
         'name', 'username', 'email', 'password',"phone","company_name", "role_id", "biller_id", "warehouse_id", 'business_id', "is_active", "is_deleted"

@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Transaction extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $fillable =['shift_id','transaction_code', 'sequence_number','warehouse_id','order_type_id','category_order','user_id','payment_method','notes','total_amount','total_qty','paid_amount','change_money','date', 'status'];
 
     public function warehouse()

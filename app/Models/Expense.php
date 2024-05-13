@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Expense extends Model
 {
+    use SoftDeletes;
     protected $fillable =[
        "qty", "expense_category_id", "warehouse_id", "user_id", "amount", "note", "created_at", "shift_id"
     ];

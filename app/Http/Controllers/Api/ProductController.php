@@ -91,54 +91,6 @@ class ProductController extends Controller
 }
 
 
-    public function productByWarehouse()
-    {
-        $warehouseId = auth()->user()->warehouse_id;
-
-        $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
-            ->where('product_warehouse.warehouse_id', $warehouseId)
-            ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
-            ->map(function ($product) use ($warehouseId) {
-                // Ambil bahan baku yang terkait dengan produk
-                $ingredients = $product->ingredient()->get();
-
-                // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
-                $ingredientStocks = [];
-                foreach ($ingredients as $ingredient) {
-                    $lastStock = Stock::where('ingredient_id', $ingredient->id)
-                        ->where('warehouse_id', $warehouseId)
-                        ->where('shift_id', $shift->id)
-                        ->first();
-
-                    if ($lastStock) {
-                        $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
-                    } else {
-                        $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
-                    }
-                }
-
-                // Ambil stok terkecil dari semua bahan baku
-                if (!empty($ingredientStocks)) {
-                    // Ambil stok terkecil dari semua bahan baku
-                    $smallestStock = min($ingredientStocks);
-                } else {
-                    // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
-                    $smallestStock = 0;
-                }
-
-                // Tambahkan qty terkecil ke dalam produk
-                unset($product['qty']);
-                $product->qty = $smallestStock;
-
-                $product->image = $product->image ? url('storage/product_images/' . $product->image) : "";
-
-                return $product;
-            });
-
-        return response()->json($products, 200);
-    }
-
-
     public function store(Request $request)
     {
         $data = $request->all();

@@ -237,6 +237,7 @@ class ShiftController extends Controller
             $closeCashier['warehouse_name'] = $shift->warehouse->name;
 
             // Get OjolCloseCashier
+            $closeCashier['ojols'] = $ojols;
             $closeCashier['ojol_omzet'] = OjolCloseCashier::where('close_cashier_id', '=', $closeCashier->id)->get();
 
             DB::commit();

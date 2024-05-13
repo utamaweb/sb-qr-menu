@@ -68,7 +68,8 @@ class ProductController extends Controller
             }
 
             // Hitung harga untuk setiap ojol
-            $ojols = Ojol::all(); // Ganti dengan model dan query yang sesuai
+            $business_id = Warehouse::where('id', '=', $warehouseId)->first()->business_id;
+            $ojols = Ojol::where('business_id', '=', $business_id)->get(); // Ganti dengan model dan query yang sesuai
             foreach ($ojols as $ojol) {
                 // Hitung harga baru berdasarkan rumus
                 $ojol_price = ceil((((($product->price * $ojol->percent) / 100) + $product->price) + $ojol->extra_price) / 1000) * 1000;

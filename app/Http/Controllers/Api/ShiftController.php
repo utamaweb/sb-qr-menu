@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\CloseCashier;
-use App\Models\CloseCashierProductSold;
-use App\Models\Transaction;
-use App\Models\StockPurchase;
-use App\Models\Product;
+use DB;
+use Carbon\Carbon;
+use App\Models\Ojol;
 use App\Models\Shift;
 use App\Models\Stock;
 use App\Models\Expense;
-use App\Models\TransactionDetail;
+use App\Models\Product;
+use App\Models\Warehouse;
+use App\Models\Transaction;
+use App\Models\CloseCashier;
+use Illuminate\Http\Request;
+use App\Models\StockPurchase;
 use App\Models\OjolCloseCashier;
-use App\Models\Ojol;
-use Carbon\Carbon;
-use DB;
+use App\Models\TransactionDetail;
+use App\Http\Controllers\Controller;
+use App\Models\CloseCashierProductSold;
 
 class ShiftController extends Controller
 {
@@ -198,7 +199,8 @@ class ShiftController extends Controller
             $stocks = [];
             
             // OjolCloseCashier data input
-            $business_id = Warehouse::where('id', '=', auth()->user()->wahrehouse_id)->first()->business_id;
+            
+            $business_id = Warehouse::where('id', '=', auth()->user()->warehouse_id)->first()->business_id;
             $ojols = Ojol::where('business_id', '=', $business_id)->get();
             foreach($ojols as $ojol) {
                 OjolCloseCashier::create([

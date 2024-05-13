@@ -88,11 +88,7 @@
                                             <td style="width: 50%; text-align: right;">@currency($closeCashier->shopeefood_omzet)</td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 50%;">Omset QRIS</td>
-                                            <td style="width: 50%; text-align: right;">@currency($closeCashier->qris_omzet)</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width: 50%;">Omset TRANSFER</td>
+                                            <td style="width: 50%;">Omset QRIS / TRANSFER</td>
                                             <td style="width: 50%; text-align: right;">@currency($closeCashier->transfer_omzet)</td>
                                         </tr>
                                         <tr>
@@ -162,7 +158,8 @@
                                     <tbody>
                                         <tr>
                                             <td style="width: 50%;">Cash Omset - Total Pengeluaran</td>
-                                            <td style="width: 50%; text-align: right;">@currency($closeCashier->total_cash - $sumExpense - $sumStockPurchase)</td>
+                                            {{-- <td style="width: 50%; text-align: right;">@currency($closeCashier->total_cash - $sumExpense - $sumStockPurchase)</td> --}}
+                                            <td style="width: 50%; text-align: right;">@currency($closeCashier->total_cash - $closeCashier->total_non_cash - $closeCashier->sumExpense)</td>
                                         </tr>
                                         <tr>
                                             <td style="width: 50%;">Uang Tunai Di Laci</td>

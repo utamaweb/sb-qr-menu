@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId("stock_opname_id")->constrained('stock_opnames', 'id')->onDelete('cascade');
             $table->foreignId("ingredient_id")->constrained('ingredients', 'id')->onDelete('cascade');
             $table->bigInteger("qty");
+            $table->softDeletes();
             $table->timestamps();
         });
     }

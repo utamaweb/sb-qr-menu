@@ -17,6 +17,7 @@ class CreateExpenseCategoriesTable extends Migration
             $table->id();
             $table->string('name');
             $table->bigInteger('unit_price')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

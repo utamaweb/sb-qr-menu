@@ -30,6 +30,7 @@ return new class extends Migration
             $table->bigInteger('total_qty');
             $table->bigInteger('paid_amount')->nullable();
             $table->bigInteger('change_money')->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

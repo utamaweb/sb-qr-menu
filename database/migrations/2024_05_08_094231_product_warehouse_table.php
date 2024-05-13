@@ -20,6 +20,7 @@ return new class extends Migration
             // $table->foreign('warehouse_id')->references('id')->on('warehouses')->onDelete('cascade');
             $table->foreignId('warehouse_id')->constrained('warehouses', 'id')->onDelete('cascade');
             $table->bigInteger('price')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

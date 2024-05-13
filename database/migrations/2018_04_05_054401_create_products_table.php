@@ -39,6 +39,7 @@ class CreateProductsTable extends Migration
             $table->text('product_details')->nullable();
             $table->boolean('is_active')->nullable();
             $table->boolean('is_diffPrice')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

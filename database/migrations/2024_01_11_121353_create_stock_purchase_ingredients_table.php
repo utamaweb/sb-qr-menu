@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('qty');
             $table->bigInteger('subtotal');
             $table->string('notes')->nullable();
-
+            $table->softDeletes();
             $table->timestamps();
         });
     }

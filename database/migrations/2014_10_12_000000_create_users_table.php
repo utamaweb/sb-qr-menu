@@ -26,6 +26,7 @@ class CreateUsersTable extends Migration
             $table->integer('business_id')->nullable();
             $table->boolean('is_active')->default(1);
             $table->rememberToken();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

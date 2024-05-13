@@ -39,6 +39,7 @@ return new class extends Migration
             $table->bigInteger("calculated_balance")->nullable();
             $table->bigInteger("difference")->nullable();
             $table->boolean("is_closed")->default(0);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

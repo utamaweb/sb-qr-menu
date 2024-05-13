@@ -18,6 +18,7 @@ class CreateUnitsTable extends Migration
             $table->string('unit_code');
             $table->string('unit_name');
             $table->boolean('is_active')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

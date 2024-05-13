@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('businesses', function (Blueprint $table) {
             $table->id();
             $table->string("name");
+            $table->softDeletes();
             $table->timestamps();
         });
     }

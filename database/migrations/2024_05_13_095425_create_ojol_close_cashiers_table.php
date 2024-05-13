@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('ojol_id')->constrained('ojols', 'id')->onDelete('cascade');
             $table->foreignId('close_cashier_id')->constrained('close_cashiers', 'id')->onDelete('cascade');
             $table->bigInteger('omzet');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

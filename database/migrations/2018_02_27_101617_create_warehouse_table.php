@@ -16,6 +16,7 @@ class CreateWarehouseTable extends Migration
             $table->unsignedBigInteger('business_id');
             $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
             $table->boolean('is_active')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

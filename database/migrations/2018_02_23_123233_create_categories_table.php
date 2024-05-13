@@ -20,6 +20,7 @@ class CreateCategoriesTable extends Migration
             $table->foreign('category_parents_id')->references('id')->on('category_parents')->onDelete('cascade');
             $table->foreignId('business_id')->constrained('businesses', 'id')->onDelete('cascade');
             $table->boolean('is_active')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

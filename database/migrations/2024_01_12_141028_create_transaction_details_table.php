@@ -19,6 +19,7 @@ return new class extends Migration
             $table->bigInteger('product_price');
             $table->bigInteger('qty');
             $table->bigInteger('subtotal');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

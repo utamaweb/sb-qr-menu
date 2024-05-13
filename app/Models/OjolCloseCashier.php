@@ -12,10 +12,10 @@ class OjolCloseCashier extends Model
     protected $fillable = ['ojol_id', 'close_cashier_id', 'omzet'];
 
     public function ojol() {
-        return $this->belongsToMany(Ohol::class);
+        return $this->belongsTo(Ojol::class);
     }
 
     public function closeCashier() {
-        return $this->belongsToMany(CloseCashier::class);
+        return $this->belongsTo(CloseCashier::class);
     }
 }

@@ -14,6 +14,7 @@ use App\Models\Stock;
 use App\Models\Expense;
 use App\Models\TransactionDetail;
 use App\Models\OjolCloseCashier;
+use App\Models\Ojol;
 use Carbon\Carbon;
 use DB;
 

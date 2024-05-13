@@ -45,6 +45,7 @@ class CreateSalesTable extends Migration
             $table->integer('cash_register_id')->nullable();
             $table->integer('table_id')->nullable();
             $table->integer('queue')->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }

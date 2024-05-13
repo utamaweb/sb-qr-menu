@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('mac_address')->nullable();
             $table->boolean('is_used')->default(1);
             $table->unsignedBigInteger('warehouse_id');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

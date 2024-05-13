@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('close_cashier_id')->constrained('close_cashiers', 'id')->onDelete('cascade');
             $table->string('product_name');
             $table->bigInteger('qty');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

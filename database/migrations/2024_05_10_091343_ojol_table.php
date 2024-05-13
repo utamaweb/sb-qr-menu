@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('percent')->nullable();
             $table->integer('extra_price')->nullable();
             $table->foreignId('business_id')->constrained('businesses', 'id')->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

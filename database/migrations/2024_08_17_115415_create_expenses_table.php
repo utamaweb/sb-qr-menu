@@ -22,6 +22,7 @@ class CreateExpensesTable extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->unsignedBigInteger('shift_id');
             $table->foreign('shift_id')->references('id')->on('shifts')->onDelete('cascade');
+            $table->softDeletes();
             $table->timestamps();
         });
     }

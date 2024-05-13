@@ -198,7 +198,8 @@ class ShiftController extends Controller
             $stocks = [];
             
             // OjolCloseCashier data input
-            $ojols = Ojol::where('business_id', '=', auth()->user()->warehouse()->business_id)->get();
+            $business_id = Warehouse::where('id', '=', auth()->user()->wahrehouse_id)->first()->business_id;
+            $ojols = Ojol::where('business_id', '=', $business_id)->get();
             foreach($ojols as $ojol) {
                 OjolCloseCashier::create([
                     'ojol_id' => $ojol->id,

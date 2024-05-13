@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Business;
 use App\Models\Transaction;
+use App\Models\OjolCloseCashier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

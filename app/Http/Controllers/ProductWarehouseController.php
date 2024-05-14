@@ -39,12 +39,20 @@ class ProductWarehouseController extends Controller
             'warehouse_id' => 'required',
             'price' => 'required',
         ]);
-        Product_Warehouse::create([
-            'product_id' => $request->product_id,
-            'warehouse_id' => $request->warehouse_id,
-            'price' => intVal(str_replace(',', '', $request->price)),
-        ]);
-        return redirect()->route('produk-outlet.index')->with('message', 'Data berhasil ditambahkan');
+
+        // Check if product is already added
+        $checkProduct = Product_Warehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('product_id', '=', $request->product_id)->get();
+        if(count($checkProduct) > 0) {
+            return redirect()->route('produk-outlet.index')->with('message', 'Produk sudah ditambahkan sebelumnya!');
+        } else {
+            Product_Warehouse::create([
+                'product_id' => $request->product_id,
+                'warehouse_id' => $request->warehouse_id,
+                'price' => intVal(str_replace(',', '', $request->price)),
+            ]);
+            return redirect()->route('produk-outlet.index')->with('message', 'Data berhasil ditambahkan');
+        }
+
     }
 
     public function edit($id)

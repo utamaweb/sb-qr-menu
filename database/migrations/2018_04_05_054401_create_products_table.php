@@ -28,16 +28,10 @@ class CreateProductsTable extends Migration
             $table->double('price')->nullable();
             $table->double('qty')->nullable();
             $table->double('alert_quantity')->nullable();
-            // $table->tinyInteger('promotion')->nullable();
-            // $table->string('promotion_price')->nullable();
-            // $table->date('starting_date')->nullable();
-            // $table->date('last_date')->nullable();
-            // $table->integer('tax_id')->nullable();
-            // $table->integer('tax_method')->nullable();
             $table->longText('image')->nullable();
-            // $table->tinyInteger('featured')->nullable();
             $table->text('product_details')->nullable();
             $table->boolean('is_active')->nullable();
+            $table->boolean('is_have_ingredients')->nullable();
             $table->boolean('is_diffPrice')->nullable();
             $table->softDeletes();
             $table->timestamps();

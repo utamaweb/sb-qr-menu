@@ -272,7 +272,7 @@ class TransactionController extends Controller
                     'transaction_id' => $transaction->id,
                     'product_id' => $detail->product_id,
                     'product_name' => $detail->product->name,
-                    'price' => $detail->product->price,
+                    'price' => $detail->product_price,
                     'qty' => $detail->qty,
                     'subtotal' => $detail->subtotal,
                 ];

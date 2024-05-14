@@ -53,18 +53,6 @@ class ProductController extends Controller
         if ($isCodeExists) {
             return redirect()->back()->with('not_permitted', 'Maaf, Kode Produk Tersebut Sudah Digunakan, Gunakan Kode Lain.');
         }
-        $data = $request->except('image', 'file');
-        $data['name'] = preg_replace('/[\n\r]/', "<br>", htmlspecialchars(trim($data['name'])));
-        // if($data['type'] == 'combo') {
-        //     $data['product_list'] = implode(",", $data['product_id']);
-        //     $data['variant_list'] = implode(",", $data['variant_id']);
-        //     $data['qty_list'] = implode(",", $data['product_qty']);
-        //     $data['price_list'] = implode(",", $data['unit_price']);
-        //     $data['cost'] = $data['unit_id'] = $data['purchase_unit_id'] = $data['sale_unit_id'] = 0;
-        // }
-
-        // $data['product_details'] = str_replace('"', '@', $data['product_details']);
-        $data['is_active'] = true;
 
         $image = $request->image;
         $imageName = 'default-img.png';

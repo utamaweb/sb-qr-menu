@@ -31,7 +31,6 @@ class CreateProductsTable extends Migration
             $table->longText('image')->nullable();
             $table->text('product_details')->nullable();
             $table->boolean('is_active')->nullable();
-            $table->boolean('is_have_ingredients')->nullable();
             $table->boolean('is_diffPrice')->nullable();
             $table->softDeletes();
             $table->timestamps();

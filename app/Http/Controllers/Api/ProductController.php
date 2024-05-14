@@ -9,6 +9,7 @@ use App\Models\Stock;
 use App\Models\Shift;
 use App\Models\Ojol;
 use App\Models\Warehouse;
+use App\Models\IngredientProducts;
 use App\Models\Product_Warehouse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,12 @@ class ProductController extends Controller
         ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
         ->map(function ($product) use ($warehouseId) {
             $ingredients = $product->ingredient()->get();
+            if(count($ingredients) > 0) {
+                $isHaveIngredients = True;
+            } else {
+                $isHaveIngredients = False;
+            }
+            $product->is_have_ingredients = $isHaveIngredients;
 
             // check shift
             $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)

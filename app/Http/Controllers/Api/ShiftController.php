@@ -135,6 +135,7 @@ class ShiftController extends Controller
             foreach ($expenses as $expense) {
                 // $totalExpense += $expense['total_price'];
                 $totalExpense += $expense['amount'];
+                $expense['price'] = $expense->amount / $expense->qty;
             }
             // Menyiapkan struktur data yang diinginkan
             $structuredData = [];
@@ -162,7 +163,7 @@ class ShiftController extends Controller
                 'is_closed' => 1
             ]);
             // total omset per tipe pembayaran
-            $transaction = Transaction::where('status', 'Lunas')->where('shift_id', $shift->id)->get();            
+            $transaction = Transaction::where('status', 'Lunas')->where('shift_id', $shift->id)->get();
             $gofood_omzet = $transaction->where('payment_method', 'GOFOOD')->sum('total_amount');
             $grabfood_omzet = $transaction->where('payment_method', 'GRABFOOD')->sum('total_amount');
             $shopeefood_omzet = $transaction->where('payment_method', 'SHOPEEFOOD')->sum('total_amount');
@@ -197,9 +198,9 @@ class ShiftController extends Controller
             $closeCashier['result'] = $totalCash - $totalNonCash - $totalExpense;
             $closeCashier['cash_in_drawer_without_opening_balance'] = $request->cash_in_drawer;
             $stocks = [];
-            
+
             // OjolCloseCashier data input
-            
+
             $business_id = Warehouse::where('id', '=', auth()->user()->warehouse_id)->first()->business_id;
             $ojols = Ojol::where('business_id', '=', $business_id)->get();
             foreach($ojols as $ojol) {

@@ -294,7 +294,7 @@ class TransactionController extends Controller
     {
         $data = $request->all();
         $validator = Validator::make($data, [
-            'order_type_id' => 'required',
+            // 'order_type_id' => 'required',
             // 'payment_method' => 'required',
             // 'transaction_details' => 'required|array|min:1', // minimal ada satu transaksi_detail
             // 'transaction_details.*.product_id' => 'required|numeric',

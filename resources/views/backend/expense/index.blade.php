@@ -28,6 +28,7 @@
                 <tr>
                     <th>#</th>
                     <th>Pengeluaran</th>
+                    <th>Keterangan</th>
                     <th>Kuantitas</th>
                     <th>Total</th>
                     <th>Outlet</th>
@@ -42,6 +43,7 @@
                 <tr data-id="{{$expense->id}}">
                     <td>{{++$key}}</td>
                     <td>{{ $expense->expenseCategory->name }}</td>
+                    <td>{{ (($expense->note == NULL) ? '-' : $expense->note) }}</td>
                     <td>{{ $expense->qty }}</td>
                     <td>@currency($expense->amount)</td>
                     <td>{{ $expense->warehouse->name }}</td>

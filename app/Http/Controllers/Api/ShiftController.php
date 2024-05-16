@@ -135,7 +135,11 @@ class ShiftController extends Controller
             foreach ($expenses as $expense) {
                 // $totalExpense += $expense['total_price'];
                 $totalExpense += $expense['amount'];
-                $expense['price'] = $expense->amount / $expense->qty;
+                if($expense->qty == 0) {
+                    continue;
+                } else {
+                    $expense['price'] = $expense->amount / $expense->qty;
+                }
             }
             // Menyiapkan struktur data yang diinginkan
             $structuredData = [];

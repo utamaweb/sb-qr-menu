@@ -52,9 +52,9 @@
 						    				if($total_qty[$i]){
 						    					echo '<strong>'."Total Kuantitas".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
 						    				}
-						    				if($total_paid_amount[$i]){
-						    					echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>Rp. '.number_format($total_paid_amount[$i], 0, '', '.').'</span><br><br>';
-						    				}
+						    				// if($total_paid_amount[$i]){
+						    				// 	echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>Rp. '.number_format($total_paid_amount[$i], 0, '', '.').'</span><br><br>';
+						    				// }
 						    				if($total_amount[$i]){
 						    					echo '<strong>'."Total Pendapatan".'</strong><br><span>Rp. '.number_format($total_amount[$i], 0, '', '.').'</span><br><br>';
 						    				}

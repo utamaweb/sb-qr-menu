@@ -138,7 +138,7 @@
                                             <td style="width: 50%; text-align: right;">@currency($sumExpense)</td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 50%;">Total Pembelian Stok</td>
+                                            <td style="width: 50%;">Total Penambahan Stok</td>
                                             <td style="width: 50%; text-align: right;">@currency($sumStockPurchase)</td>
                                         </tr>
                                     </tbody>

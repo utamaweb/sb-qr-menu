@@ -23,7 +23,7 @@ class ExpenseController extends Controller
 
     public function getExpense() {
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                ->where('user_id', auth()->user()->id)
+                // ->where('user_id', auth()->user()->id)
                 ->where('is_closed', 0)
                 ->first();
         $expenses['data'] = Expense::where('shift_id', $shift->id)->get()->map(function ($item){
@@ -76,7 +76,7 @@ class ExpenseController extends Controller
 
         try {
             $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                ->where('user_id', auth()->user()->id)
+                // ->where('user_id', auth()->user()->id)
                 ->where('is_closed', 0)
                 ->first();
             $expense = Expense::create([

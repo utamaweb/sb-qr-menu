@@ -49,7 +49,7 @@ input[type=file]::file-selector-button:hover {
                                                         class="dripicons-question" data-toggle="tooltip"
                                                         title="Upload gambar dengan format .jpeg, .jpg, .png, .gif."></i>
                                                     <div class="input_container">
-                                                        <input type="file" class="form-control" name="image" onchange="readURL(this);">
+                                                        <input type="file" class="form-control" name="image" accept=".jpg, .jpeg, .png" onchange="readURL(this);">
                                                     </div>
                                                     <span class="validation-msg" id="image-error"></span>
                                                     <div class="text-center">

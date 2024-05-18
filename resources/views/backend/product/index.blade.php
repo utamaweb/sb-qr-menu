@@ -42,21 +42,7 @@
                 @foreach($products as $key=>$product)
                 <tr data-id="{{$product->id}}">
                     <td class="text-center">{{++$key}}</td>
-                    @if($roleName == 'Kasir')
-                    <td><img src="{{Storage::url('product_images/'.$product->product->image)}}" alt=""></td>
-                    <td>{{ $product->product->name }}</td>
-                    <td>{{ $product->product->code }}</td>
-                    <td>{{ $product->product->category_name }}</td>
-                    <td>{{ $product->product->unit_name }}</td>
-                    <td>@foreach($product->product->ingredient as $ingredient)
-                        {{$ingredient->name}}
-                        @if( !$loop->last)
-                        ,
-                        @endif
-                        @endforeach
-                    </td>
-                    @else
-                    <td><img src="{{Storage::url('product_images/'.$product->image)}}" alt=""></td>
+                    <td><img src="{{Storage::url('product_images/'.$product->image)}}" loading="lazy"></td>
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->code }}</td>
                     <td>{{ $product->category_name }}</td>
@@ -68,7 +54,6 @@
                         @endif
                         @endforeach
                     </td>
-                    @endif
 
                     <td>Rp. {{ number_format($product->price, 0, ',', '.') }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
                     <td>

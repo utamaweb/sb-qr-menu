@@ -5,11 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Roles;
-use App\Models\Biller;
 use App\Models\Warehouse;
 use App\Models\Business;
-use App\Models\CustomerGroup;
-use App\Models\Customer;
+use App\Models\Shift;
 use DB;
 use Auth;
 use Hash;
@@ -208,8 +206,12 @@ class UserController extends Controller
 
     public function destroy($id)
     {
-        $lims_user_data = User::find($id);
-        $lims_user_data->delete();
+        $user = User::find($id);
+        $checkShift = Shift::where('user_id', $user->id)->where('is_closed', 0)->count();
+        if($checkShift > 0){
+            return redirect('admin/user')->with('not_permitted', 'User tidak bisa dihapus karena terdapat shift yang dibuka oleh user tersebut. Tutup kasir terlebih dahulu menggunakan user tersebut.');
+        }
+        $user->delete();
         if(Auth::id() == $id){
             auth()->logout();
             return redirect('/login');

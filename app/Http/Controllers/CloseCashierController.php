@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\CloseCashier;
 use App\Models\Expense;
+use App\Models\Stock;
 use App\Models\StockPurchase;
 use App\Models\Transaction;
 use App\Models\CloseCashierProductSold;
@@ -27,14 +28,47 @@ class CloseCashierController extends Controller
     }
 
     public function show($id) {
+        // get detail tutup kasir
         $closeCashier = CloseCashier::find($id);
+        // get produk terjual di shift tersebut
         $closeCashierProductSolds = CloseCashierProductSold::where('close_cashier_id', $id)->get();
+        // get pengeluaran shift tersebut
         $expenses = Expense::where('shift_id', $closeCashier->shift_id)->get();
         $sumExpense = Expense::where('shift_id', $closeCashier->shift_id)->sum('amount');
+        // get penambahan stok shift tersebut
         $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
         $sumStockPurchase = StockPurchase::where('shift_id', $closeCashier->shift_id)->sum('total_price');
+        // get transaksi lunas shift tersebut
         $transactions = Transaction::where('status', 'Lunas')->where('shift_id', $closeCashier->shift_id)->get();
-        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions'));
+        // get sisa stok shift tersebut
+        $stocksIngredient = []; // Pastikan untuk menginisialisasi array terlebih dahulu
+
+        $stocksIngredient = []; // Pastikan untuk menginisialisasi array terlebih dahulu
+
+        $stocks = Stock::where('shift_id', $closeCashier->shift_id)->get();
+
+        foreach ($stocks as $stock) {
+            $ingredientStock = Stock::where('shift_id', $closeCashier->shift_id)
+                                    ->where('ingredient_id', $stock['ingredient_id'])
+                                    ->first();
+
+            if ($ingredientStock) {
+                $stockData = [
+                    'ingredient_id' => $stock['ingredient_id'],
+                    'ingredient_name' => $ingredientStock->ingredient->name,
+                    'first_stock' => $ingredientStock->first_stock,
+                    'used_stock' => $ingredientStock->stock_used,
+                    'stock_in' => $ingredientStock->stock_in,
+                    'stock_real' => $ingredientStock->last_stock,
+                    'stock_close_input' => $ingredientStock->stock_close_input,
+                    'difference_stock' => $ingredientStock->difference_stock,
+                ];
+
+                // Konversi $stockData menjadi objek
+                $stocksIngredient[] = (object) $stockData;
+            }
+        }
+        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions', 'stocks', 'stocksIngredient'));
     }
 
 }

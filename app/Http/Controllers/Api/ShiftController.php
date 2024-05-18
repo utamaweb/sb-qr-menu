@@ -233,13 +233,15 @@ class ShiftController extends Controller
                         'used_stock' => $ingredientStock->stock_used,
                         'stock_in' => $ingredientStock->stock_in,
                         'stock_real' => $ingredientStock->last_stock,
-                        'stock_input' => $stock['stock'],
+                        'stock_close_input' => $stock['stock'],
                         'difference_stock' => $ingredientStock->last_stock - $stock['stock'],
                     ];
 
                     $stocks[] = $stockData;
                     Stock::where('shift_id', $shift->id)->where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
-                        'last_stock' => $stock['stock']
+                        // 'last_stock' => $stock['stock'],
+                        'stock_close_input' => $stock['stock'],
+                        'difference_stock' => $stockData['difference_stock'],
                     ]);
                 }
             }
@@ -297,7 +299,8 @@ class ShiftController extends Controller
                 'first_stock' => $ingredientStock->first_stock,
                 'used_stock' => $ingredientStock->stock_used,
                 'stock_in' => $ingredientStock->stock_in,
-                'stock' => $ingredientStock->last_stock,
+                // 'stock' => $ingredientStock->last_stock,
+                'stock' => $ingredientStock->stock_close_input,
             ];
 
             $stocks[] = $stockData;

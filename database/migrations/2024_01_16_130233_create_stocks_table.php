@@ -21,6 +21,8 @@ return new class extends Migration
             $table->bigInteger('stock_in')->default(0);
             $table->bigInteger('stock_used')->default(0);
             $table->bigInteger('last_stock')->default(0);
+            $table->bigInteger('stock_close_input')->default(0);
+            $table->bigInteger('difference_stock')->default(0);
             // $table->bigInteger('id_shift_in'); ?
             $table->softDeletes();
             $table->timestamps();

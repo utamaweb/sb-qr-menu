@@ -10,7 +10,7 @@ class Stock extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $fillable = ['warehouse_id', 'ingredient_id','shift_id', 'first_stock', 'stock_in', 'stock_used','last_stock'];
+    protected $fillable = ['warehouse_id', 'ingredient_id','shift_id', 'first_stock', 'stock_in', 'stock_used','last_stock','stock_close_input','difference_stock'];
 
     public function warehouse()
     {

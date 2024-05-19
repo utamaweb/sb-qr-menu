@@ -193,8 +193,8 @@ class ShiftController extends Controller
                 'total_expense' => $totalExpense,
                 'auto_balance' => $shift->opening_balance + $totalMoney - $totalExpense,
                 'cash_in_drawer' => $request->cash_in_drawer,
-                'difference' => ($totalCash - $totalExpense) + $request->cash_in_drawer
-                // 'difference' => $request->cash_in_drawer - ($totalCash - $totalExpense)
+                'difference' => $request->cash_in_drawer - ($totalCash - $totalExpense)
+                // 'difference' => ($totalCash - $totalExpense) + $request->cash_in_drawer
                 // 'difference' => $request->cash_in_drawer - (($totalCash - $totalNonCash) - $totalExpense)
                 // 'difference' => ($shift->opening_balance + $totalMoney - $totalExpense) - $request->cash_in_drawer,
                 // 'difference' => ($shift->opening_balance + $totalCash - $totalExpense) - $request->cash_in_drawer,

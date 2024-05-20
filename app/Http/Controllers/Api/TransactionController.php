@@ -717,6 +717,9 @@ class TransactionController extends Controller
                 ->where('is_closed', 0)
                 ->orderBy('id', 'DESC')
                 ->first();
+            if(!$shift){
+                return response()->json(['message' => 'Kasir belum buka'], 200);
+            }
 
             // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
             $ingredientStocks = [];

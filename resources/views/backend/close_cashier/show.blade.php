@@ -153,7 +153,7 @@
                                     <tbody>
                                         @foreach($expenses as $expense)
                                         <tr>
-                                            <td style="width: 50%;">{{$expense->expenseCategory->name}}</td>
+                                            <td style="width: 50%;">{{$expense->expenseCategory->name}}{{ (empty($expense->note) ? '' : ' | '.$expense->note) }}</td>
                                             <td style="width: 50%; text-align: right;">@currency($expense->amount)</td>
                                         </tr>
                                         @endforeach

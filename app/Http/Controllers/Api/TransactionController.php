@@ -533,7 +533,7 @@ class TransactionController extends Controller
             ->where('is_closed', 0)
             ->first();
             if($checkShift == NULL){
-                return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
+                return response()->json(['message' => 'Belum Ada Kasir Buka'], 200);
             }
 
             $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
@@ -623,7 +623,7 @@ class TransactionController extends Controller
                     if ($stock->last_stock < $qty) {
                         // Jika stok kurang dari qty, return peringatan
                         DB::rollback();
-                        return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 400);
+                        return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 200);
                     }
 
                     $stock->last_stock -= $qty;

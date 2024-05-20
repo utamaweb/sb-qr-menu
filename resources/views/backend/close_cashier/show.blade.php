@@ -80,23 +80,27 @@
                                             <td style="width: 50%;"><b>{{$stock->ingredient_name}}</b></td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 50%;">Stok Buka</td>
+                                            <td style="width: 50%;">Stok Awal</td>
                                             <td style="width: 50%; text-align: right;">{{$stock->first_stock}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 50%;">Stok Baru</td>
+                                            <td style="width: 50%; text-align: right;">{{$stock->stock_in}}</td>
+                                        </tr>
+                                        <tr>
+                                            <td style="width: 50%;">Total Stok</td>
+                                            <td style="width: 50%; text-align: right;">{{$stock->total_stock}}</td>
                                         </tr>
                                         <tr>
                                             <td style="width: 50%;">Penjualan Stok</td>
                                             <td style="width: 50%; text-align: right;">{{$stock->used_stock}}</td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 50%;">Stok Masuk</td>
-                                            <td style="width: 50%; text-align: right;">{{$stock->stock_in}}</td>
+                                            <td style="width: 50%;">Stok Akhir Sistem</td>
+                                            <td style="width: 50%; text-align: right;">{{$stock->last_system_stock}}</td>
                                         </tr>
                                         <tr>
-                                            <td style="width: 50%;">Total Stok</td>
-                                            <td style="width: 50%; text-align: right;">{{$stock->stock_real}}</td>
-                                        </tr>
-                                        <tr>
-                                            <td style="width: 50%;">Stok Input Saat Tutup Kasir</td>
+                                            <td style="width: 50%;">Stok Akhir Input Karyawan</td>
                                             <td style="width: 50%; text-align: right;">{{$stock->stock_close_input}}</td>
                                         </tr>
                                         <tr>

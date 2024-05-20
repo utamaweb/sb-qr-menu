@@ -57,9 +57,10 @@ class CloseCashierController extends Controller
                     'ingredient_id' => $stock['ingredient_id'],
                     'ingredient_name' => $ingredientStock->ingredient->name,
                     'first_stock' => $ingredientStock->first_stock,
-                    'used_stock' => $ingredientStock->stock_used,
                     'stock_in' => $ingredientStock->stock_in,
-                    'stock_real' => $ingredientStock->last_stock,
+                    'total_stock' => $ingredientStock->stock_in + $ingredientStock->first_stock,
+                    'used_stock' => $ingredientStock->stock_used,
+                    'last_system_stock' => $ingredientStock->last_stock,
                     'stock_close_input' => $ingredientStock->stock_close_input,
                     'difference_stock' => $ingredientStock->difference_stock,
                 ];

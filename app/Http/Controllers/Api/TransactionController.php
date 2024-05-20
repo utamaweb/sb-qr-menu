@@ -416,7 +416,7 @@ class TransactionController extends Controller
                         if ($stock->last_stock < $qty) {
                             // Jika stok kurang dari qty, return peringatan
                             DB::rollback();
-                            return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 400);
+                            return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 200);
                         }
 
                         $stock->last_stock -= $qty;

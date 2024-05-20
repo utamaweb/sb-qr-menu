@@ -26,77 +26,77 @@ class ProductController extends Controller
     //     return response()->json($products, 200);
     // }
     public function index()
-{
-    $warehouseId = auth()->user()->warehouse_id;
-    $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
-        ->where('product_warehouse.warehouse_id', $warehouseId)
-        ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
-        ->map(function ($product) use ($warehouseId) {
-            $ingredients = $product->ingredient()->get();
-            if(count($ingredients) > 0) {
-                $isHaveIngredients = True;
-            } else {
-                $isHaveIngredients = False;
-            }
-            $product->is_have_ingredients = $isHaveIngredients;
+    {
+        $warehouseId = auth()->user()->warehouse_id;
+        $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
+            ->where('product_warehouse.warehouse_id', $warehouseId)
+            ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
+            ->map(function ($product) use ($warehouseId) {
+                $ingredients = $product->ingredient()->get();
+                if(count($ingredients) > 0) {
+                    $isHaveIngredients = True;
+                } else {
+                    $isHaveIngredients = False;
+                }
+                $product->is_have_ingredients = $isHaveIngredients;
 
-            // check shift
-            $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                ->where('is_closed', 0)
-                ->orderBy('id', 'DESC')
-                ->first();
-
-            // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
-            $ingredientStocks = [];
-            foreach ($ingredients as $ingredient) {
-                $lastStock = Stock::where('ingredient_id', $ingredient->id)
-                    ->where('shift_id', $shift->id)
-                    ->where('warehouse_id', $warehouseId)
+                // check shift
+                $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                    ->where('is_closed', 0)
+                    ->orderBy('id', 'DESC')
                     ->first();
 
-                if ($lastStock) {
-                    $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
-                } else {
-                    $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
+                // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
+                $ingredientStocks = [];
+                foreach ($ingredients as $ingredient) {
+                    $lastStock = Stock::where('ingredient_id', $ingredient->id)
+                        ->where('shift_id', $shift->id)
+                        ->where('warehouse_id', $warehouseId)
+                        ->first();
+
+                    if ($lastStock) {
+                        $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
+                    } else {
+                        $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
+                    }
                 }
-            }
 
-            // Cek jika $ingredientStocks tidak kosong sebelum menggunakan min()
-            if (!empty($ingredientStocks)) {
-                // Ambil stok terkecil dari semua bahan baku
-                $smallestStock = min($ingredientStocks);
-            } else {
-                // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
-                $smallestStock = 0;
-            }
+                // Cek jika $ingredientStocks tidak kosong sebelum menggunakan min()
+                if (!empty($ingredientStocks)) {
+                    // Ambil stok terkecil dari semua bahan baku
+                    $smallestStock = min($ingredientStocks);
+                } else {
+                    // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
+                    $smallestStock = 0;
+                }
 
-            if ($product->warehouse_harga != null) {
-                $product->price = $product->warehouse_harga;
-            }
+                if ($product->warehouse_harga != null) {
+                    $product->price = $product->warehouse_harga;
+                }
 
-            // Hitung harga untuk setiap ojol
-            $business_id = Warehouse::where('id', '=', $warehouseId)->first()->business_id;
-            $ojols = Ojol::where('business_id', '=', $business_id)->get(); // Ganti dengan model dan query yang sesuai
-            foreach ($ojols as $ojol) {
-                // Hitung harga baru berdasarkan rumus
-                $ojol_price = ceil((((($product->price * $ojol->percent) / 100) + $product->price) + $ojol->extra_price) / 1000) * 1000;
-                // Simpan harga baru ke dalam data produk
-                $product->{$ojol->name . '_price'} = $ojol_price;
-            }
+                // Hitung harga untuk setiap ojol
+                $business_id = Warehouse::where('id', '=', $warehouseId)->first()->business_id;
+                $ojols = Ojol::where('business_id', '=', $business_id)->get(); // Ganti dengan model dan query yang sesuai
+                foreach ($ojols as $ojol) {
+                    // Hitung harga baru berdasarkan rumus
+                    $ojol_price = ceil((((($product->price * $ojol->percent) / 100) + $product->price) + $ojol->extra_price) / 1000) * 1000;
+                    // Simpan harga baru ke dalam data produk
+                    $product->{$ojol->name . '_price'} = $ojol_price;
+                }
 
-            unset($product['qty']);
-            // Tambahkan qty terkecil ke dalam produk
-            $product->qty = $smallestStock;
+                unset($product['qty']);
+                // Tambahkan qty terkecil ke dalam produk
+                $product->qty = $smallestStock;
 
-            $product->image = $product->image ? url('storage/product_images/' . $product->image) : "";
-            $product->category_parent_id = $product->category->category_parent->id;
-            $product->category_parent_name = $product->category->category_parent->name;
+                $product->image = $product->image ? url('storage/product_images/' . $product->image) : "";
+                $product->category_parent_id = $product->category->category_parent->id;
+                $product->category_parent_name = $product->category->category_parent->name;
 
-            return $product;
-        });
+                return $product;
+            });
 
-    return response()->json($products, 200);
-}
+        return response()->json($products, 200);
+    }
 
 
     public function store(Request $request)

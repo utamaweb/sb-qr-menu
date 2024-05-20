@@ -697,4 +697,60 @@ class TransactionController extends Controller
         $orderTypes = OrderType::get();
         return response()->json($orderTypes, 200);
     }
+
+    public function checkQty(Request $request)
+    {
+        $warehouseId = auth()->user()->warehouse_id;
+        $productId = $request->product_id;
+        // Query untuk mendapatkan produk dan harga dari warehouse
+        $product = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
+            ->where('products.id', $productId)
+            ->where('product_warehouse.warehouse_id', $warehouseId)
+            ->first(['products.*', 'product_warehouse.price AS warehouse_harga']);
+
+        if ($product) {
+            // Mendapatkan bahan baku dari produk
+            $ingredients = $product->ingredient()->get();
+
+            // Check shift
+            $shift = Shift::where('warehouse_id', $warehouseId)
+                ->where('is_closed', 0)
+                ->orderBy('id', 'DESC')
+                ->first();
+
+            // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
+            $ingredientStocks = [];
+            foreach ($ingredients as $ingredient) {
+                $lastStock = Stock::where('ingredient_id', $ingredient->id)
+                    ->where('shift_id', $shift->id)
+                    ->where('warehouse_id', $warehouseId)
+                    ->first();
+
+                if ($lastStock) {
+                    $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
+                } else {
+                    $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
+                }
+            }
+
+            // Cek jika $ingredientStocks tidak kosong sebelum menggunakan min()
+            if (!empty($ingredientStocks)) {
+                // Ambil stok terkecil dari semua bahan baku
+                $smallestStock = min($ingredientStocks);
+            } else {
+                // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
+                $smallestStock = 0;
+            }
+            // Tambahkan qty terkecil ke dalam produk
+            $product->qty = $smallestStock;
+            if($smallestStock < $request->qty){
+                return response()->json(['status' => False, 'message' => "Stok yang tersedia hanya " . $smallestStock], 200);
+            } else{
+                return response()->json(['status' => True,'message' => "Stok Tersedia"], 200);
+            }
+        }
+
+        return response()->json(['message' => 'Product not found'], 404);
+    }
+
 }

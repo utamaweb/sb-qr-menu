@@ -67,6 +67,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::put('users', [UserController::class, 'update']);
 
     // Transaction
+    Route::post('transaction/check-qty', [TransactionController::class, 'checkQty']);
     Route::get('transaction/history/online', [TransactionController::class, 'online']);
     Route::get('transaction/history/offline', [TransactionController::class, 'offline']);
     Route::post('transaction/online', [TransactionController::class, 'storeOnline']);

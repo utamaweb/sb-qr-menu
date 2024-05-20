@@ -755,5 +755,4 @@ class TransactionController extends Controller
 
         return response()->json(['status' => false, 'message' => 'Produk tersebut tidak berada di outlet ini'], 200);
     }
-
 }

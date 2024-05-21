@@ -241,7 +241,7 @@ class ShiftController extends Controller
                         'stock_in' => $ingredientStock->stock_in,
                         'stock_real' => $ingredientStock->last_stock,
                         'stock_close_input' => $stock['stock'],
-                        'difference_stock' => $ingredientStock->last_stock - $stock['stock'],
+                        'difference_stock' => $stock['stock'] - $ingredientStock->last_stock,
                     ];
 
                     $stocks[] = $stockData;

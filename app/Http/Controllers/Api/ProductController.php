@@ -30,6 +30,7 @@ class ProductController extends Controller
         $warehouseId = auth()->user()->warehouse_id;
         $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
             ->where('product_warehouse.warehouse_id', $warehouseId)
+            ->where('product_warehouse.deleted_at', NULL)
             ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
             ->map(function ($product) use ($warehouseId) {
                 $ingredients = $product->ingredient()->get();

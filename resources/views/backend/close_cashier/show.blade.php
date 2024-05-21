@@ -27,7 +27,7 @@
                                 <tr>
                                     <td colspan="2" style="text-align: center;">
                                         <h2>@currency($closeCashier->total_income)</h2>
-                                        <p>Total Penerimaan</p>
+                                        <p>Omset Aplikasi</p>
                                     </td>
                                 </tr>
                             </tbody>

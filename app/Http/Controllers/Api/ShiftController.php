@@ -141,22 +141,10 @@ class ShiftController extends Controller
                     $expense['price'] = $expense->amount / $expense->qty;
                 }
             }
+
             // Menyiapkan struktur data yang diinginkan
             $structuredData = [];
-            foreach ($totalQtyPerProduct as $productId => $totalQty) {
-                $productName = Product::find($productId)->name;
 
-                // Menambahkan struktur data yang diinginkan
-                $structuredData[] = [
-                    'product_name' => $productName,
-                    'qty' => $totalQty,
-                ];
-                CloseCashierProductSold::create([
-                    'close_cashier_id' => $shift->id,
-                    'product_name' => $productName,
-                    'qty' => $totalQty,
-                ]);
-            }
             // Menghitung total money (gabungan total pendapatan tunai & QRIS)
             $totalMoney = $totalCash + $totalNonCash;
             // Update Shift Setelah tutup kasir
@@ -207,6 +195,22 @@ class ShiftController extends Controller
             $closeCashier['result'] = $totalCash - $totalNonCash - $totalExpense;
             $closeCashier['cash_in_drawer_without_opening_balance'] = $request->cash_in_drawer;
             $stocks = [];
+
+            // Melakukan input data CloseCashierProductSold
+            foreach ($totalQtyPerProduct as $productId => $totalQty) {
+                $productName = Product::find($productId)->name;
+
+                // Menambahkan struktur data yang diinginkan
+                $structuredData[] = [
+                    'product_name' => $productName,
+                    'qty' => $totalQty,
+                ];
+                CloseCashierProductSold::create([
+                    'close_cashier_id' => $closeCashier->id,
+                    'product_name' => $productName,
+                    'qty' => $totalQty,
+                ]);
+            }
 
             // OjolCloseCashier data input
 

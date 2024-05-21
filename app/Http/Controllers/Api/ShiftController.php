@@ -196,6 +196,9 @@ class ShiftController extends Controller
             $closeCashier['cash_in_drawer_without_opening_balance'] = $request->cash_in_drawer;
             $stocks = [];
 
+            // Hapus data CloseCashierProductSold dengan id yang sama sebelumnya
+            CloseCashierProductSold::where('close_cashier_id', '=', $closeCashier->id)->delete();
+
             // Melakukan input data CloseCashierProductSold
             foreach ($totalQtyPerProduct as $productId => $totalQty) {
                 $productName = Product::find($productId)->name;

@@ -664,15 +664,15 @@ class TransactionController extends Controller
                 // Update stock sesuai stok sebelum cancel
                 foreach($details as $detail){
                     $product_id = $detail->product_id;
-                $ingredientProducts = IngredientProducts::where('product_id', $product_id)->get();
-                foreach($ingredientProducts as $ingredientProduct){
-                    $stock = Stock::where('ingredient_id', $ingredientProduct->ingredient_id)->where('warehouse_id', $shift->warehouse_id)->where('shift_id', $shift->id)->first();
-                    $stock->update([
-                        'stock_used' => $stock->stock_used + $detail->qty,
-                        'last_stock' => $stock->last_stock + $detail->qty
-                    ]);
-                }
-                // $detail->delete();
+                    $ingredientProducts = IngredientProducts::where('product_id', $product_id)->get();
+                    foreach($ingredientProducts as $ingredientProduct){
+                        $stock = Stock::where('ingredient_id', $ingredientProduct->ingredient_id)->where('warehouse_id', $shift->warehouse_id)->where('shift_id', $shift->id)->first();
+                        $stock->update([
+                            'stock_used' => $stock->stock_used - $detail->qty,
+                            'last_stock' => $stock->last_stock + $detail->qty
+                        ]);
+                    }
+                    // $detail->delete();
                 }
                 // Update status transaksi menjadi batal
                 $transaction->update([

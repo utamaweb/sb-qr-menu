@@ -262,14 +262,18 @@ class StockController extends Controller
             $stockPurchase = StockPurchase::find($id);
             // update data dengan akses data sebelumnya
             if($request->ingredients > 0){
+                // get data detail tambah stok
                 $detailStockPurchase = StockPurchaseIngredient::where('stock_purchase_id', $id)->get();
-                $totalQtyBefore = $stockPurchase->total_qty;
+                // foreach data detail tambah stok
                 foreach($detailStockPurchase as $detail){
+                    // get stok data
                     $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $detail->ingredient_id)->where('warehouse_id', $stockPurchase->warehouse_id)->first();
+                    // update stok dengan mengurangi jumlah qty yang ada pada detail
                     Stock::where('shift_id', $shift->id)->where('ingredient_id', $detail->ingredient_id)->where('warehouse_id', $stockPurchase->warehouse_id)->update([
                         'stock_in' => $stock->stock_in - $detail->qty,
                         'last_stock' => $stock->last_stock - $detail->qty
                     ]);
+                    // hapus data detail tambah stok untuk nantinya ditambahkan data detail baru
                     $detail->delete();
                 }
             }
@@ -302,6 +306,7 @@ class StockController extends Controller
                 // jika ada maka update row tsb
                 } else {
                     $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                    // update stok dengan penambahan, yang sebelumnya dikurangi
                     Stock::where('shift_id', $shift->id)->where('ingredient_id', $item['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->update([
                         'stock_in' => $stock->stock_in + $item['qty'],
                         'last_stock' => $stock->last_stock + $item['qty'],
@@ -309,14 +314,14 @@ class StockController extends Controller
                 }
 
                 // tambah data di table transaction in out
-                TransactionInOut::create([
-                    'warehouse_id' => auth()->user()->warehouse_id,
-                    'ingredient_id' => $item['ingredient_id'],
-                    'qty' => $item['qty'],
-                    'transaction_type' => 'in',
-                    'date' => $dateNow,
-                    'user_id' => auth()->user()->id,
-                ]);
+                // TransactionInOut::create([
+                //     'warehouse_id' => auth()->user()->warehouse_id,
+                //     'ingredient_id' => $item['ingredient_id'],
+                //     'qty' => $item['qty'],
+                //     'transaction_type' => 'in',
+                //     'date' => $dateNow,
+                //     'user_id' => auth()->user()->id,
+                // ]);
 
             }
             DB::commit();

@@ -21,4 +21,8 @@ class Warehouse extends Model
     {
     	return $this->belongsTo('App\Models\Business');
     }
+
+    public function ojolWarehouses() {
+        return $this->hasMany('App\Models\OjolWarehouse');
+    }
 }

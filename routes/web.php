@@ -36,6 +36,7 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\CloseCashierController;
 use App\Http\Controllers\OjolController;
+use App\Http\Controllers\OjolWarehouseController;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -276,6 +277,15 @@ Route::group(['prefix' => 'admin'], function () {
             Route::put('ojol/edit/{ojol}', 'update')->name('update');
             Route::delete('ojol/destroy/{ojol}', 'destroy')->name('destroy');
         });
+
+        // Route for OjolWarehouse
+        Route::controller(OjolWarehouseController::class)->name('ojol-warehouse.')->group(function() {
+            Route::get('ojol_outlet', 'index')->name('index');
+            Route::get('ojol_outlet/form/{ojol}', 'form')->name('form');
+            Route::post('ojol_outlet/form/{ojol}', 'store')->name('store');
+            Route::delete('ojol_outlet/destroy/{ojol}', 'destroy')->name('destroy');
+        });
+
 
     });
 });

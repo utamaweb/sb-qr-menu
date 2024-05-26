@@ -470,20 +470,24 @@ class TransactionController extends Controller
                 $transaction->update([
                     'total_amount' => $total_amount,
                     'total_qty' => $total_qty,
-                    'status' => 'Lunas'
+                    // 'status' => 'Lunas'
                 ]);
 
                 $change_money = $request->paid_amount - $transaction->total_amount;
-                if($transaction->paid_amount < $transaction->total_amount){
+                // if($transaction->paid_amount < $transaction->total_amount){
+
+                // update transaction status, etc lunas
+                if($transaction->status == 'Pending'){
 
                     $transaction->update([
                         'payment_method' => $request->payment_method,
                         'paid_amount' => $request->paid_amount,
                         'change_money' => $request->change_money,
+                        'status' => 'Lunas',
                     ]);
                     DB::commit();
                 } else {
-                    return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 400);
+                    return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 200);
                 }
                 $transaction['details'] = $transactionDetailsWithProducts;
                 return response()->json($transaction, 200);

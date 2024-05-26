@@ -151,8 +151,10 @@ class ProductController extends Controller
             'image' => $imageName,
         ]);
         // if (isset($request->ingredients)) {
-            $editProduct->ingredient()->sync($request->ingredients);
+            // $editProduct->ingredient()->sync($request->ingredients);
         // }
+        $ingredients = $request->input('ingredients', []);
+        $editProduct->ingredient()->sync($ingredients);
 
         $roleName = auth()->user()->getRoleNames()[0];
 

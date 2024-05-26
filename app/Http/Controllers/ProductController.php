@@ -150,9 +150,9 @@ class ProductController extends Controller
             'price' => intVal(str_replace(',', '', $request->price)),
             'image' => $imageName,
         ]);
-        if (isset($request->ingredients)) {
+        // if (isset($request->ingredients)) {
             $editProduct->ingredient()->sync($request->ingredients);
-        }
+        // }
 
         $roleName = auth()->user()->getRoleNames()[0];
 

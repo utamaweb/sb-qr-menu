@@ -8,11 +8,9 @@ use Illuminate\Validation\Rule;
 use Keygen;
 use Auth;
 use DB;
-use App\Traits\CacheForget;
 
 class OrderTypeController extends Controller
 {
-    use CacheForget;
     public function index()
     {
         $orderTypes = OrderType::get();
@@ -28,7 +26,6 @@ class OrderTypeController extends Controller
         ]);
         $input = $request->all();
         OrderType::create($input);
-        $this->cacheForget('order_type_list');
         return redirect()->route('tipe-pesanan.index')->with('message', 'Data berhasil ditambah');
     }
 
@@ -46,7 +43,6 @@ class OrderTypeController extends Controller
         $orderType = OrderType::findOrFail($id)->update([
             'name' => $request->name
         ]);
-        $this->cacheForget('order_type_list');
         return redirect()->route('tipe-pesanan.index')->with('message', 'Data berhasil diubah');
     }
 
@@ -88,7 +84,6 @@ class OrderTypeController extends Controller
            $order_type->is_active = true;
            $order_type->save();
         }
-        $this->cacheForget('order_type_list');
         return redirect()->route('tipe-pesanan.index')->with('message', 'OrderType imported successfully');
     }
 
@@ -100,7 +95,6 @@ class OrderTypeController extends Controller
             $lims_order_type_data->is_active = false;
             $lims_order_type_data->save();
         }
-        $this->cacheForget('order_type_list');
         return 'OrderType deleted successfully!';
     }
 
@@ -108,7 +102,6 @@ class OrderTypeController extends Controller
     {
         $lims_order_type_data = OrderType::find($id);
         $lims_order_type_data->delete();
-        $this->cacheForget('order_type_list');
         return redirect()->route('tipe-pesanan.index')->with('not_permitted', 'Data berhasil dihapus');
     }
 

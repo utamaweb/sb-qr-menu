@@ -22,31 +22,12 @@ use Clickatell\ClickatellException;
 
 class SettingController extends Controller
 {
-    use \App\Traits\CacheForget;
     use \App\Traits\TenantInfo;
 
     public function emptyDatabase()
     {
         if(!env('USER_VERIFIED'))
             return redirect()->back()->with('not_permitted', 'This feature is disable for demo!');
-        //clearing all the cached queries
-        $this->cacheForget('biller_list');
-        $this->cacheForget('brand_list');
-        $this->cacheForget('category_list');
-        $this->cacheForget('coupon_list');
-        $this->cacheForget('customer_list');
-        $this->cacheForget('customer_group_list');
-        $this->cacheForget('product_list');
-        $this->cacheForget('product_list_with_variant');
-        $this->cacheForget('warehouse_list');
-        $this->cacheForget('tax_list');
-        $this->cacheForget('currency');
-        $this->cacheForget('general_setting');
-        $this->cacheForget('pos_setting');
-        $this->cacheForget('user_role');
-        $this->cacheForget('permissions');
-        $this->cacheForget('role_has_permissions');
-        $this->cacheForget('role_has_permissions_list');
 
         $tables = DB::select('SHOW TABLES');
         $str = 'Tables_in_' . env('DB_DATABASE');
@@ -168,7 +149,6 @@ class SettingController extends Controller
             $og_image->move('public/landlord/images/og-image/', $og_image_name);
             $general_setting->og_image = $og_image_name;
         }
-        $this->cacheForget('general_setting');
         $general_setting->save();
         return redirect()->back()->with('message', 'Data updated successfully');
     }

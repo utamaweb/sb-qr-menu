@@ -13,11 +13,9 @@ use Illuminate\Validation\Rule;
 use Keygen;
 use Auth;
 use DB;
-use App\Traits\CacheForget;
 
 class StockOpnameController extends Controller
 {
-    use CacheForget;
     public function index()
     {
         if(auth()->user()->hasRole('Superadmin')){
@@ -106,7 +104,6 @@ class StockOpnameController extends Controller
             $lims_order_type_data = Shift::find($id);
             $lims_order_type_data->delete();
         }
-        // $this->cacheForget('ingredient_list');
         return 'Data berhasil dihapus!';
     }
 
@@ -115,7 +112,6 @@ class StockOpnameController extends Controller
         $stockOpname = StockOpname::find($id);
         $stockOpnameDetails = StockOpnameDetail::whereStockOpnameId($id)->delete();
         $stockOpname->delete();
-        // $this->cacheForget('ingredient_list');
         return redirect()->route('stock-opname.index')->with('not_permitted', 'Data berhasil dihapus');
     }
 }

@@ -45,10 +45,10 @@ class ExpenseController extends Controller
     }
 
     public function show($id) {
-        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                ->where('user_id', auth()->user()->id)
-                ->where('is_closed', 0)
-                ->first();
+        // $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+        //         ->where('user_id', auth()->user()->id)
+        //         ->where('is_closed', 0)
+        //         ->first();
         $expense = Expense::find($id);
         // unset($expense);
         $response['id'] = $expense->id;

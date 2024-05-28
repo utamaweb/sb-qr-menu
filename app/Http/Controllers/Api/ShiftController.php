@@ -289,30 +289,31 @@ class ShiftController extends Controller
 
     public function latest() {
         $latestShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
-        if(!$latestShift){
+        if (!$latestShift) {
             $latestShift = [];
             $latestShift['stocks'] = [];
-            return response()->json($latestShift,200);
+            return response()->json($latestShift, 200);
         }
-        $stocks = [];
-        $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('warehouse_id', auth()->user()->warehouse_id)->get();
-        foreach ($ingredientStock as $stock) {
-            $ingredientStock = Stock::where('shift_id', $latestShift->id)->where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
-            $ingredientName = str_replace(' ', '_', $ingredientStock->ingredient->name);
 
-            $stockData = [
-                'ingredient_id' => $stock['ingredient_id'],
-                'ingredient_name' => $ingredientStock->ingredient->name,
-                'first_stock' => $ingredientStock->first_stock,
-                'used_stock' => $ingredientStock->stock_used,
-                'stock_in' => $ingredientStock->stock_in,
-                // 'stock' => $ingredientStock->last_stock,
-                'stock' => $ingredientStock->stock_close_input,
+        // Eager load the ingredient relationship
+        $ingredientStock = Stock::with('ingredient')
+                                ->where('shift_id', $latestShift->id)
+                                ->where('warehouse_id', auth()->user()->warehouse_id)
+                                ->get();
+
+        $stocks = $ingredientStock->map(function($stock) {
+            return [
+                'ingredient_id' => $stock->ingredient_id,
+                'ingredient_name' => $stock->ingredient->name,
+                'first_stock' => $stock->first_stock,
+                'used_stock' => $stock->stock_used,
+                'stock_in' => $stock->stock_in,
+                'stock' => $stock->stock_close_input,
             ];
+        });
 
-            $stocks[] = $stockData;
-        }
         $latestShift['stocks'] = $stocks;
-        return response()->json($latestShift,200);
+        return response()->json($latestShift, 200);
     }
+
 }

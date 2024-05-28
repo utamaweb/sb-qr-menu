@@ -23,134 +23,34 @@ class TransactionController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function latest()
-    {
-        $transaction = Transaction::where('user_id', auth()->user()->id)->orderBy('id', 'desc')->first();
-        // dari add
-        $dateTimeNow = Carbon::now();
-        $transaction_details = $transaction->transaction_details;
-        // return $transaction_details;
-        $transactionDetailsWithProducts = [];
-            foreach ($transaction_details as $detail) {
-                $productDetail = [
-                    'transaction_id' => $transaction->id,
-                    'product_id' => $detail['product_id'],
-                    'qty' => $detail['qty'],
-                    'subtotal' => $detail['subtotal'],
-                    'product_name' => \App\Models\Product::find($detail['product_id'])->name,
-                ];
-
-                // Menambahkan data detail produk ke array
-                $transactionDetailsWithProducts[] = $productDetail;
-            }
-            $transaction['details'] = $transactionDetailsWithProducts;
-            $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-            $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
-            // $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
-            $transaction['product_count'] = count($transaction_details);
-            $transaction['order_type'] = $transaction->order_type;
-            $transaction['order_type_name'] = $transaction['order_type']['name'];
-            unset($transaction['transaction_details'], $transaction['transaction_code']);
-            return response()->json($transaction, 200);
-    }
-
-    public function detail($id)
-    {
-        $transaction = Transaction::findOrFail($id);
-        // dari add
-        $dateTimeNow = Carbon::now();
-        $transaction_details = $transaction->transaction_details;
-        // return $transaction_details;
-        $transactionDetailsWithProducts = [];
-            foreach ($transaction_details as $detail) {
-                $productDetail = [
-                    'transaction_id' => $transaction->id,
-                    'product_id' => $detail['product_id'],
-                    'qty' => $detail['qty'],
-                    'subtotal' => $detail['subtotal'],
-                    'product_name' => \App\Models\Product::find($detail['product_id'])->name,
-                ];
-
-                // Menambahkan data detail produk ke array
-                $transactionDetailsWithProducts[] = $productDetail;
-            }
-            $transaction['details'] = $transactionDetailsWithProducts;
-            $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-            $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
-            // $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
-            $transaction['product_count'] = count($transaction_details);
-            $transaction['order_type'] = $transaction->order_type;
-            $transaction['order_type_name'] = $transaction['order_type']['name'];
-            unset($transaction['transaction_details'], $transaction['transaction_code']);
-            return response()->json($transaction, 200);
-    }
-
-    public function all()
-    {
-        $dateNow = Carbon::now()->format('Y-m-d');
-
-        $transactions = Transaction::with('order_type', 'transaction_details.product')
-            ->where('warehouse_id', auth()->user()->warehouse_id)
-            ->whereDate('date', $dateNow)
-            ->orderByDesc('id')
-            ->get();
-
-        $formattedTransactions = [];
-
-        foreach ($transactions as $transaction) {
-            $formattedTransaction = [
-                'id' => $transaction->id,
-                'sequence_number' => $transaction->sequence_number,
-                'order_type' => $transaction->order_type->name,
-                'payment_method' => $transaction->payment_method,
-                'total_amount' => $transaction->total_amount,
-                'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
-                // 'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
-                'status' => $transaction->status,
-                'items' => [],
-            ];
-
-            foreach ($transaction->transaction_details as $detail) {
-                $productDetail = [
-                    'transaction_id' => $transaction->id,
-                    'product_id' => $detail->product_id,
-                    'product_name' => $detail->product->name,
-                    'price' => $detail->product->price,
-                    'qty' => $detail->qty,
-                    'subtotal' => $detail->subtotal,
-                ];
-
-                $formattedTransaction['items'][] = $productDetail;
-            }
-
-            $formattedTransactions[] = $formattedTransaction;
-        }
-
-        return response()->json($formattedTransactions, 200);
-
-    }
-
     // get history online transaction
     public function online()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
-        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                ->where('user_id', auth()->user()->id)
-                ->where('is_closed', 0)
-                ->first();
+        $userId = auth()->user()->id;
+        $warehouseId = auth()->user()->warehouse_id;
 
-        $transactions = Transaction::with('order_type', 'transaction_details.product')
-            ->where('shift_id', $shift->id)
-            ->where('warehouse_id', auth()->user()->warehouse_id)
-            ->where('category_order', 'ONLINE')
-            // ->whereDate('date', $dateNow)
-            ->orderByDesc('id')
-            ->get();
+        $shift = Shift::where('warehouse_id', $warehouseId)
+            ->where('user_id', $userId)
+            ->where('is_closed', 0)
+            ->first();
 
-        $formattedTransactions = [];
+        if (!$shift) {
+            return response()->json([], 200);
+        }
 
-        foreach ($transactions as $transaction) {
-            $formattedTransaction = [
+        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function($query) {
+            $query->select('transaction_id', 'product_id', 'product_price', 'qty', 'subtotal')
+                ->with('product:id,name');
+        }])
+        ->where('shift_id', $shift->id)
+        ->where('warehouse_id', $warehouseId)
+        ->where('category_order', 'ONLINE')
+        ->orderByDesc('id')
+        ->get();
+
+        $formattedTransactions = $transactions->map(function($transaction) {
+            return [
                 'id' => $transaction->id,
                 'sequence_number' => $transaction->sequence_number,
                 'order_type' => $transaction->order_type->name,
@@ -158,52 +58,52 @@ class TransactionController extends Controller
                 'payment_method' => $transaction->payment_method,
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
-                // 'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
                 'status' => $transaction->status,
-                'items' => [],
+                'items' => $transaction->transaction_details->map(function($detail) {
+                    return [
+                        'transaction_id' => $detail->transaction_id,
+                        'product_id' => $detail->product_id,
+                        'product_name' => $detail->product->name,
+                        'price' => $detail->product_price,
+                        'qty' => $detail->qty,
+                        'subtotal' => $detail->subtotal,
+                    ];
+                })->toArray(),
             ];
-
-            foreach ($transaction->transaction_details as $detail) {
-                $productDetail = [
-                    'transaction_id' => $transaction->id,
-                    'product_id' => $detail->product_id,
-                    'product_name' => $detail->product->name,
-                    'price' => $detail->product_price,
-                    'qty' => $detail->qty,
-                    'subtotal' => $detail->subtotal,
-                ];
-
-                $formattedTransaction['items'][] = $productDetail;
-            }
-
-            $formattedTransactions[] = $formattedTransaction;
-        }
+        });
 
         return response()->json($formattedTransactions, 200);
-
     }
+
 
     // get history offline transaciton
     public function offline()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
-        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                ->where('user_id', auth()->user()->id)
-                ->where('is_closed', 0)
-                ->first();
+        $userId = auth()->user()->id;
+        $warehouseId = auth()->user()->warehouse_id;
 
-        $transactions = Transaction::with('order_type', 'transaction_details.product')
-            ->where('shift_id', $shift->id)
-            ->where('warehouse_id', auth()->user()->warehouse_id)
-            ->where('category_order', 'OFFLINE')
-            // ->whereDate('date', $dateNow)
-            ->orderByDesc('id')
-            ->get();
+        $shift = Shift::where('warehouse_id', $warehouseId)
+            ->where('user_id', $userId)
+            ->where('is_closed', 0)
+            ->first();
 
-        $formattedTransactions = [];
+        if (!$shift) {
+            return response()->json([], 200);
+        }
 
-        foreach ($transactions as $transaction) {
-            $formattedTransaction = [
+        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function($query) {
+            $query->select('transaction_id', 'product_id', 'product_price', 'qty', 'subtotal')
+                ->with('product:id,name');
+        }])
+        ->where('shift_id', $shift->id)
+        ->where('warehouse_id', $warehouseId)
+        ->where('category_order', 'OFFLINE')
+        ->orderByDesc('id')
+        ->get();
+
+        $formattedTransactions = $transactions->map(function($transaction) {
+            return [
                 'id' => $transaction->id,
                 'sequence_number' => $transaction->sequence_number,
                 'order_type' => $transaction->order_type->name,
@@ -211,52 +111,48 @@ class TransactionController extends Controller
                 'payment_method' => $transaction->payment_method,
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
-                // 'status' => $transaction->paid_amount >= $transaction->total_amount ? 'Lunas' : 'Belum Lunas',
                 'status' => $transaction->status,
-                'items' => [],
+                'items' => $transaction->transaction_details->map(function($detail) {
+                    return [
+                        'transaction_id' => $detail->transaction_id,
+                        'product_id' => $detail->product_id,
+                        'product_name' => $detail->product->name,
+                        'price' => $detail->product_price,
+                        'qty' => $detail->qty,
+                        'subtotal' => $detail->subtotal,
+                    ];
+                })->toArray(),
             ];
-
-            foreach ($transaction->transaction_details as $detail) {
-                $productDetail = [
-                    'transaction_id' => $transaction->id,
-                    'product_id' => $detail->product_id,
-                    'product_name' => $detail->product->name,
-                    'price' => $detail->product_price,
-                    'qty' => $detail->qty,
-                    'subtotal' => $detail->subtotal,
-                ];
-
-                $formattedTransaction['items'][] = $productDetail;
-            }
-
-            $formattedTransactions[] = $formattedTransaction;
-        }
+        });
 
         return response()->json($formattedTransactions, 200);
-
     }
+
 
     public function notPaid()
     {
         $dateNow = Carbon::now()->format('Y-m-d');
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                // ->where('user_id', auth()->user()->id)
-                ->where('is_closed', 0)
-                ->first();
-        $transactions = Transaction::with('order_type', 'transaction_details.product')
-            ->where('warehouse_id', auth()->user()->warehouse_id)
-            // ->whereDate('date', $dateNow)
-            ->where('shift_id', $shift->id)
-            // ->whereNull('paid_amount')
-            ->where('status', 'Pending')
-            ->whereNull('payment_method')
-            ->orderByDesc('id')
-            ->get();
+            ->where('is_closed', 0)
+            ->first();
 
-        $formattedTransactions = [];
+        if (!$shift) {
+            return response()->json([], 200);
+        }
 
-        foreach ($transactions as $transaction) {
-            $formattedTransaction = [
+        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function($query) {
+            $query->select('transaction_id', 'product_id', 'product_price', 'qty', 'subtotal')
+                ->with('product:id,name');
+        }])
+        ->where('warehouse_id', auth()->user()->warehouse_id)
+        ->where('shift_id', $shift->id)
+        ->where('status', 'Pending')
+        ->whereNull('payment_method')
+        ->orderByDesc('id')
+        ->get();
+
+        $formattedTransactions = $transactions->map(function($transaction) {
+            return [
                 'id' => $transaction->id,
                 'sequence_number' => $transaction->sequence_number,
                 'order_type' => $transaction->order_type->name,
@@ -264,48 +160,28 @@ class TransactionController extends Controller
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
                 'status' => $transaction->status,
-                'items' => [],
+                'items' => $transaction->transaction_details->map(function($detail) {
+                    return [
+                        'transaction_id' => $detail->transaction_id,
+                        'product_id' => $detail->product_id,
+                        'product_name' => $detail->product->name,
+                        'price' => $detail->product_price,
+                        'qty' => $detail->qty,
+                        'subtotal' => $detail->subtotal,
+                    ];
+                })->toArray(),
             ];
-
-            foreach ($transaction->transaction_details as $detail) {
-                $productDetail = [
-                    'transaction_id' => $transaction->id,
-                    'product_id' => $detail->product_id,
-                    'product_name' => $detail->product->name,
-                    'price' => $detail->product_price,
-                    'qty' => $detail->qty,
-                    'subtotal' => $detail->subtotal,
-                ];
-
-                $formattedTransaction['items'][] = $productDetail;
-            }
-
-            $formattedTransactions[] = $formattedTransaction;
-        }
+        });
 
         return response()->json($formattedTransactions, 200);
-
     }
+
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $data = $request->all();
-        $validator = Validator::make($data, [
-            // 'order_type_id' => 'required',
-            // 'payment_method' => 'required',
-            // 'transaction_details' => 'required|array|min:1', // minimal ada satu transaksi_detail
-            // 'transaction_details.*.product_id' => 'required|numeric',
-            // 'transaction_details.*.qty' => 'required|numeric',
-            // 'transaction_details.*.subtotal' => 'required|numeric',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->messages()], 400);
-        }
-
         DB::beginTransaction();
 
         try {

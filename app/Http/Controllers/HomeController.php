@@ -29,8 +29,6 @@ use Mike42\Escpos\Printer;*/
 
 class HomeController extends Controller
 {
-    use \App\Traits\AutoUpdateTrait;
-
     public function home()
     {
         return view('backend.home');

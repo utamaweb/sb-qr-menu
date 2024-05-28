@@ -582,54 +582,45 @@ class TransactionController extends Controller
     {
         $warehouseId = auth()->user()->warehouse_id;
         $productId = $request->product_id;
-        // Query untuk mendapatkan produk dan harga dari warehouse
-        $product = Product::where('id', '=', $productId)->first();
 
-        if ($product) {
-            // Mendapatkan bahan baku dari produk
-            $ingredients = $product->ingredient()->get();
+        // Query untuk mendapatkan produk dan harga dari warehouse dengan eager loading untuk bahan baku
+        $product = Product::with('ingredient')->find($productId);
 
-            // Check shift
-            $shift = Shift::where('warehouse_id', $warehouseId)
-                ->where('is_closed', 0)
-                ->orderBy('id', 'DESC')
-                ->first();
-            if(!$shift){
-                return response()->json(['message' => 'Kasir belum buka'], 200);
-            }
-
-            // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
-            $ingredientStocks = [];
-            foreach ($ingredients as $ingredient) {
-                $lastStock = Stock::where('ingredient_id', $ingredient->id)
-                    ->where('shift_id', $shift->id)
-                    ->where('warehouse_id', $warehouseId)
-                    ->first();
-
-                if ($lastStock) {
-                    $ingredientStocks[$ingredient->id] = $lastStock->last_stock;
-                } else {
-                    $ingredientStocks[$ingredient->id] = 0; // Jika tidak ada stok, set qty menjadi 0
-                }
-            }
-
-            // Cek jika $ingredientStocks tidak kosong sebelum menggunakan min()
-            if (!empty($ingredientStocks)) {
-                // Ambil stok terkecil dari semua bahan baku
-                $smallestStock = min($ingredientStocks);
-            } else {
-                // Jika $ingredientStocks kosong, set qty terkecil menjadi 0
-                $smallestStock = 0;
-            }
-            // Tambahkan qty terkecil ke dalam produk
-            $product->qty = $smallestStock;
-            if($smallestStock < $request->qty){
-                return response()->json(['status' => False, 'message' => "Stok yang tersedia hanya " . $smallestStock], 200);
-            } else{
-                return response()->json(['status' => True,'message' => "Stok Tersedia"], 200);
-            }
+        if (!$product) {
+            return response()->json(['status' => false, 'message' => 'Produk tersebut tidak berada di outlet ini'], 200);
         }
 
-        return response()->json(['status' => false, 'message' => 'Produk tersebut tidak berada di outlet ini'], 200);
+        // Check shift
+        $shift = Shift::where('warehouse_id', $warehouseId)
+            ->where('is_closed', 0)
+            ->orderBy('id', 'DESC')
+            ->first();
+
+        if (!$shift) {
+            return response()->json(['message' => 'Kasir belum buka'], 200);
+        }
+
+        // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
+        $ingredientStocks = $product->ingredient->mapWithKeys(function ($ingredient) use ($shift, $warehouseId) {
+            $lastStock = Stock::where('ingredient_id', $ingredient->id)
+                ->where('shift_id', $shift->id)
+                ->where('warehouse_id', $warehouseId)
+                ->first();
+
+            return [$ingredient->id => $lastStock ? $lastStock->last_stock : 0];
+        });
+
+        // Ambil stok terkecil dari semua bahan baku
+        $smallestStock = $ingredientStocks->isNotEmpty() ? $ingredientStocks->min() : 0;
+
+        // Tambahkan qty terkecil ke dalam produk
+        $product->qty = $smallestStock;
+
+        if ($smallestStock < $request->qty) {
+            return response()->json(['status' => false, 'message' => "Stok yang tersedia hanya " . $smallestStock], 200);
+        } else {
+            return response()->json(['status' => true, 'message' => "Stok Tersedia"], 200);
+        }
     }
+
 }

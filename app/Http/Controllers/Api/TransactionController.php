@@ -26,7 +26,7 @@ class TransactionController extends Controller
     // get history online transaction
     public function online()
     {
-        $dateNow = Carbon::now()->format('Y-m-d');
+        // $dateNow = Carbon::now()->format('Y-m-d');
         $userId = auth()->user()->id;
         $warehouseId = auth()->user()->warehouse_id;
 
@@ -79,7 +79,7 @@ class TransactionController extends Controller
     // get history offline transaciton
     public function offline()
     {
-        $dateNow = Carbon::now()->format('Y-m-d');
+        // $dateNow = Carbon::now()->format('Y-m-d');
         $userId = auth()->user()->id;
         $warehouseId = auth()->user()->warehouse_id;
 
@@ -131,7 +131,7 @@ class TransactionController extends Controller
 
     public function notPaid()
     {
-        $dateNow = Carbon::now()->format('Y-m-d');
+        // $dateNow = Carbon::now()->format('Y-m-d');
         $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
             ->where('is_closed', 0)
             ->first();
@@ -195,7 +195,7 @@ class TransactionController extends Controller
                 foreach ($request->transaction_details as $detail) {
                     $total_qty += $detail['qty'];
                 }
-                $change_money = $request->paid_amount - $total_amount;
+                // $change_money = $request->paid_amount - $total_amount;
                 $dateNow = Carbon::now()->format('Y-m-d');
                 $dateTimeNow = Carbon::now();
                 // $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
@@ -270,7 +270,7 @@ class TransactionController extends Controller
                 }
                 $products = Product::whereIn('id', $product_ids)->get();
                 $ingredient_product_ids = IngredientProducts::whereIn('product_id', $product_ids)->get()->pluck('ingredient_id');
-                $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
+                // $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
                 // $ingredients = Ingredient::whereIn('id', $ingredient_product_ids)->get();
                 $ingredients = Stock::whereIn('id', $ingredient_product_ids)->get();
                 foreach ($request->transaction_details as $detail) {
@@ -349,7 +349,7 @@ class TransactionController extends Controller
                     // 'status' => 'Lunas'
                 ]);
 
-                $change_money = $request->paid_amount - $transaction->total_amount;
+                // $change_money = $request->paid_amount - $transaction->total_amount;
                 // if($transaction->paid_amount < $transaction->total_amount){
 
                 // update transaction status, etc lunas
@@ -404,9 +404,9 @@ class TransactionController extends Controller
             foreach ($request->transaction_details as $detail) {
                 $total_qty += $detail['qty'];
             }
-            $change_money = $request->paid_amount - $total_amount;
+            // $change_money = $request->paid_amount - $total_amount;
             $dateNow = Carbon::now()->format('Y-m-d');
-            $dateTimeNow = Carbon::now();
+            // $dateTimeNow = Carbon::now();
             $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
             // ->where('date', $dateNow)
             // ->where('user_id', auth()->user()->id)
@@ -429,7 +429,7 @@ class TransactionController extends Controller
                 $sequence_number = 1;
             }
 
-            $change_money = $request->paid_amount - $total_amount;
+            // $change_money = $request->paid_amount - $total_amount;
             // Insert ke table transaction (step 1 : buat transaksi)
             $transaction = Transaction::create([
                 'warehouse_id' => auth()->user()->warehouse_id,
@@ -481,7 +481,7 @@ class TransactionController extends Controller
             }
             $products = Product::whereIn('id', $product_ids)->get();
             $ingredient_product_ids = IngredientProducts::whereIn('product_id', $product_ids)->get()->pluck('ingredient_id');
-            $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
+            // $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
             // $ingredients = Ingredient::whereIn('id', $ingredient_product_ids)->get();
             $ingredients = Stock::whereIn('id', $ingredient_product_ids)->get();
             foreach ($request->transaction_details as $detail) {

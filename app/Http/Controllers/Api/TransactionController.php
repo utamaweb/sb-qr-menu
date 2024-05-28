@@ -707,10 +707,7 @@ class TransactionController extends Controller
         $warehouseId = auth()->user()->warehouse_id;
         $productId = $request->product_id;
         // Query untuk mendapatkan produk dan harga dari warehouse
-        $product = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
-            ->where('products.id', $productId)
-            ->where('product_warehouse.warehouse_id', $warehouseId)
-            ->first(['products.*', 'product_warehouse.price AS warehouse_harga']);
+        $product = Product::where('id', '=', $productId)->first();
 
         if ($product) {
             // Mendapatkan bahan baku dari produk

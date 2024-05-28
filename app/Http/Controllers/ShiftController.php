@@ -9,11 +9,9 @@ use Illuminate\Validation\Rule;
 use Keygen;
 use Auth;
 use DB;
-use App\Traits\CacheForget;
 
 class ShiftController extends Controller
 {
-    use CacheForget;
     public function index()
     {
         $shifts = Shift::get();
@@ -33,7 +31,6 @@ class ShiftController extends Controller
             'warehouse_id' => $request->warehouse_id,
             'initial_shift_money' => $request->initial_shift_money,
         ]);
-        // $this->cacheForget('ingredient_list');
         return redirect()->route('shift.index')->with('message', 'Data berhasil ditambahkan');
     }
 
@@ -50,7 +47,6 @@ class ShiftController extends Controller
             'warehouse_id' => $request->warehouse_id,
             'initial_shift_money' => $request->initial_shift_money,
         ]);
-        // $this->cacheForget('ingredient_list');
         return redirect()->route('shift.index')->with('message', 'Data berhasil diedit');
     }
 
@@ -61,7 +57,6 @@ class ShiftController extends Controller
             $lims_order_type_data = Shift::find($id);
             $lims_order_type_data->delete();
         }
-        // $this->cacheForget('ingredient_list');
         return 'Data berhasil dihapus!';
     }
 
@@ -69,7 +64,6 @@ class ShiftController extends Controller
     {
         $shift = Shift::find($id);
         $shift->delete();
-        // $this->cacheForget('ingredient_list');
         return redirect()->route('shift.index')->with('not_permitted', 'Data berhasil dihapus');
     }
 }

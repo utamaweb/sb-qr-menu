@@ -17,13 +17,11 @@ use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
 use DB;
 use App\Models\IngredientProducts;
-use App\Traits\CacheForget;
 use Intervention\Image\Facades\Image;
 use File;
 
 class ProductController extends Controller
 {
-    use CacheForget;
 
     public function index()
     {
@@ -106,8 +104,7 @@ class ProductController extends Controller
         //         }
         //     }
         // }
-        // $this->cacheForget('product_list');
-        // $this->cacheForget('product_list_with_variant');
+
         return redirect()->route('produk.index')->with('message', 'Data inserted successfully');
     }
 
@@ -188,7 +185,6 @@ class ProductController extends Controller
         //     }
         // }
 
-        $this->cacheForget('product_list');
         // \Session::flash('edit_message', 'Product updated successfully');
         return redirect()->route('produk.index')->with('message', 'Data updated successfully');
     }
@@ -287,8 +283,7 @@ class ProductController extends Controller
                 }
             }
         }
-        $this->cacheForget('product_list');
-        $this->cacheForget('product_list_with_variant');
+
         return 'Product deleted successfully!';
     }
 
@@ -300,8 +295,6 @@ class ProductController extends Controller
         }
         IngredientProducts::where('product_id', $lims_product_data->id)->delete();
         $lims_product_data->delete();
-        $this->cacheForget('product_list');
-        $this->cacheForget('product_list_with_variant');
         return redirect()->back()->with('message', 'Product deleted successfully');
     }
 }

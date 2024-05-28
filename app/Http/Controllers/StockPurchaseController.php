@@ -204,7 +204,6 @@ class StockPurchaseController extends Controller
             $lims_order_type_data = Shift::find($id);
             $lims_order_type_data->delete();
         }
-        // $this->cacheForget('ingredient_list');
         return 'Data berhasil dihapus!';
     }
 
@@ -213,7 +212,6 @@ class StockPurchaseController extends Controller
         $stockOpname = StockOpname::find($id);
         $stockOpnameDetails = StockOpnameDetail::whereStockOpnameId($id)->delete();
         $stockOpname->delete();
-        // $this->cacheForget('ingredient_list');
         return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 }

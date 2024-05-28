@@ -11,11 +11,9 @@ use App\Models\Transaction;
 use App\Models\CloseCashierProductSold;
 use Auth;
 use DB;
-use App\Traits\CacheForget;
 
 class CloseCashierController extends Controller
 {
-    use CacheForget;
     public function index()
     {
         $warehouseId = auth()->user()->warehouse_id;

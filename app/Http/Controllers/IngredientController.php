@@ -11,11 +11,9 @@ use Illuminate\Validation\Rule;
 use Keygen;
 use Auth;
 use DB;
-use App\Traits\CacheForget;
 
 class IngredientController extends Controller
 {
-    use CacheForget;
     public function index()
     {
         $lims_ingredient_all = Ingredient::where('business_id', auth()->user()->business_id)->get();
@@ -45,7 +43,6 @@ class IngredientController extends Controller
             'unit_id' => $request->unit_id,
             'business_id' => auth()->user()->business_id,
         ]);
-        $this->cacheForget('ingredient_list');
         return redirect()->back()->with('message', 'Data berhasil ditambahkan');
     }
 
@@ -68,7 +65,6 @@ class IngredientController extends Controller
             // 'max_stock' => $request->max_stock,
             'unit_id' => $request->unit_id,
         ]);
-        $this->cacheForget('ingredient_list');
         return redirect()->back()->with('message', 'Data berhasil diedit');
     }
 
@@ -80,7 +76,6 @@ class IngredientController extends Controller
             $lims_order_type_data->is_active = false;
             $lims_order_type_data->save();
         }
-        $this->cacheForget('ingredient_list');
         return 'Ingredient deleted successfully!';
     }
 
@@ -88,7 +83,6 @@ class IngredientController extends Controller
     {
         $lims_order_type_data = Ingredient::find($id);
         $lims_order_type_data->delete();
-        $this->cacheForget('ingredient_list');
         return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 }

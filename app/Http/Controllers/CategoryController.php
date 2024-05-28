@@ -13,12 +13,10 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
 use App\Traits\TenantInfo;
-use App\Traits\CacheForget;
 use Intervention\Image\Facades\Image;
 
 class CategoryController extends Controller
 {
-    use CacheForget;
     use TenantInfo;
 
     public function index()
@@ -57,7 +55,6 @@ class CategoryController extends Controller
         $lims_category_data['is_active'] = true;
 
         DB::table('categories')->insert($lims_category_data);
-        $this->cacheForget('category_list');
         return redirect()->back()->with('message', 'Kategori Berhasil Ditambah');
     }
 
@@ -125,7 +122,6 @@ class CategoryController extends Controller
             $category->is_active = true;
             $category->save();
         }
-        $this->cacheForget('category_list');
         return redirect()->back()->with('message', 'Category imported successfully');
     }
 
@@ -145,7 +141,6 @@ class CategoryController extends Controller
             $this->fileDelete('images/category/', $lims_category_data->image);
             $this->fileDelete('images/category/icons', $lims_category_data->icon);
         }
-        $this->cacheForget('category_list');
         return 'Category deleted successfully!';
     }
 
@@ -162,7 +157,6 @@ class CategoryController extends Controller
         $this->fileDelete('images/category/icons', $lims_category_data->icon);
 
         $lims_category_data->delete();
-        $this->cacheForget('category_list');
         return redirect()->back()->with('not_permitted', 'Kategori Berhasil Dihapus');
     }
 }

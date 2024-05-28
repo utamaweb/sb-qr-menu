@@ -11,11 +11,9 @@ use Illuminate\Support\Str;
 use Keygen;
 use Auth;
 use DB;
-use App\Traits\CacheForget;
 
 class WarehouseController extends Controller
 {
-    use CacheForget;
     public function index()
     {
         if(auth()->user()->hasRole('Superadmin')){
@@ -53,7 +51,6 @@ class WarehouseController extends Controller
             'address' => $request->address,
             'business_id' => $request->business_id
         ]);
-        $this->cacheForget('warehouse_list');
         return redirect()->back()->with('message', 'Data Berhasil Ditambahkan');
     }
 
@@ -84,7 +81,6 @@ class WarehouseController extends Controller
             'business_id' => $request->business_id,
             // 'logo' => $imageName,
         ]);
-        $this->cacheForget('warehouse_list');
         return redirect()->back()->with('message', 'Data Berhasil Diubah');
     }
 
@@ -126,7 +122,6 @@ class WarehouseController extends Controller
            $warehouse->is_active = true;
            $warehouse->save();
         }
-        $this->cacheForget('warehouse_list');
         return redirect()->back()->with('message', 'Warehouse imported successfully');
     }
 
@@ -138,7 +133,6 @@ class WarehouseController extends Controller
             $lims_warehouse_data->is_active = false;
             $lims_warehouse_data->save();
         }
-        $this->cacheForget('warehouse_list');
         return 'Warehouse deleted successfully!';
     }
 
@@ -150,7 +144,6 @@ class WarehouseController extends Controller
             $user->delete();
         }
         $lims_warehouse_data->delete();
-        $this->cacheForget('warehouse_list');
         return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 

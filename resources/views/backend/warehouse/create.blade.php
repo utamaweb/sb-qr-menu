@@ -29,6 +29,7 @@
                     <th>Nama Outlet</th>
                     <th>Bisnis</th>
                     <th>Alamat</th>
+                    <th>Tanggal Dibuat</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
@@ -39,6 +40,7 @@
                     <td>{{ $warehouse->name }}</td>
                     <td>{{ $warehouse->business->name }}</td>
                     <td>{{ $warehouse->address }}</td>
+                    <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
                     <td>
                         @can('ubah-warehouse')
                         <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$warehouse->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>

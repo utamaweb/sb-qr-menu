@@ -11,12 +11,10 @@ use App\Models\User;
 use App\Models\Department;
 use Auth;
 use Illuminate\Validation\Rule;
-use App\Traits\TenantInfo;
 use Illuminate\Support\Facades\File;
 
 class EmployeeController extends Controller
 {
-    use TenantInfo;
 
     public function index()
     {

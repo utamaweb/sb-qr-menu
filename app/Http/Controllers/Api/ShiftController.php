@@ -233,6 +233,19 @@ class ShiftController extends Controller
                     // $ingredientStock = Stock::where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
                     $ingredientStock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
 
+                    // Create Ingredient Stock if not exists
+                    if(!$ingredientStock) {
+                        $getLastStock = Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', '=', $stock['ingredient_id'])->orderBy('id', 'DESC')->first();
+
+                        $ingredientStock = Stock::create([
+                            'warehouse_id' => auth()->user()->warehouse_id,
+                            'ingredient_id' => $stock['ingredient_id'],
+                            'shift_id' => $shift->id,
+                            'first_stock' => $getLastStock->last_stock,
+                            'last_stock' => $getLastStock->last_stock,
+                        ]);
+                    }
+
                     $stockData = [
                         'ingredient_id' => $stock['ingredient_id'],
                         'ingredient_name' => $ingredientStock->ingredient->name,

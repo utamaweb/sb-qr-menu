@@ -286,7 +286,17 @@ class TransactionController extends Controller
                         $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
                         if (!$stock) {
                             // Handle jika stok belum ada
-                            continue;
+                            // continue;
+
+                            $getLastStock = Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', '=', $ingredient->id)->orderBy('id', 'DESC')->first();
+
+                            $stock = Stock::create([
+                                'warehouse_id' => auth()->user()->warehouse_id,
+                                'ingredient_id' => $ingredient->id,
+                                'shift_id' => $shift->id,
+                                'first_stock' => $getLastStock->last_stock,
+                                'last_stock' => $getLastStock->last_stock,
+                            ]);
                         }
 
                         if ($stock->last_stock < $qty) {

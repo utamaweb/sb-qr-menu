@@ -2,15 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\CloseCashier;
-use App\Models\Expense;
-use App\Models\Stock;
-use App\Models\StockPurchase;
-use App\Models\Transaction;
-use App\Models\CloseCashierProductSold;
-use Auth;
 use DB;
+use Auth;
+use App\Models\Stock;
+use App\Models\Expense;
+use App\Models\Transaction;
+use App\Models\CloseCashier;
+use Illuminate\Http\Request;
+use App\Models\StockPurchase;
+use App\Models\TransactionDetail;
+use App\Http\Controllers\Controller;
+use App\Models\CloseCashierProductSold;
 
 class CloseCashierController extends Controller
 {
@@ -68,6 +70,14 @@ class CloseCashierController extends Controller
             }
         }
         return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions', 'stocks', 'stocksIngredient'));
+    }
+
+
+    // Method to get CloseCashier Transaction Details
+    public function transactionDetails(Transaction $transaction) {
+        $details = TransactionDetail::where('transaction_id', $transaction->id)->get();
+
+        return response()->json($details);
     }
 
 }

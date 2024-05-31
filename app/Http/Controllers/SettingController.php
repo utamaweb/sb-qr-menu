@@ -22,7 +22,6 @@ use Clickatell\ClickatellException;
 
 class SettingController extends Controller
 {
-    use \App\Traits\TenantInfo;
 
     public function emptyDatabase()
     {

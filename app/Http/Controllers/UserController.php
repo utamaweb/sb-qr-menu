@@ -21,7 +21,6 @@ use App\Models\MailSetting;
 
 class UserController extends Controller
 {
-    use \App\Traits\MailInfo;
 
     public function index()
     {

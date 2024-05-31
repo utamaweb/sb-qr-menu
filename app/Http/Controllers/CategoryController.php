@@ -12,12 +12,10 @@ use Auth;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Validation\Rule;
-use App\Traits\TenantInfo;
 use Intervention\Image\Facades\Image;
 
 class CategoryController extends Controller
 {
-    use TenantInfo;
 
     public function index()
     {

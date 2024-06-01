@@ -21,6 +21,7 @@
                     <th>Total Tagihan</th>
                     <th>Jumlah Pesanan</th>
                     <th>Status</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -42,6 +43,58 @@
                         <div class="badge badge-danger">Batal</div>
                         @endif
                     </td>
+                    <td>
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#showModal-{{$transaction->id}}">
+                            Detail
+                        </button>
+                        {{-- Show Modal --}}
+                        <div id="showModal-{{$transaction->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                            <div role="document" class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                <h5 id="exampleModalLabel" class="modal-title"> Detail Transaksi </h5>
+                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                </div>
+                                <div class="modal-body">
+                                    <table class="table">
+                                        <thead>
+                                            <th>#</th>
+                                            <th>Produk</th>
+                                            <th>Harga</th>
+                                            <th>Qty</th>
+                                            <th>Subtotal</th>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($transaction->transaction_details as $detail)
+                                            <tr>
+                                                <td>{{$loop->iteration}}</td>
+                                                <td>{{$detail->product_name}}</td>
+                                                <td>@currency($detail->product_price)</td>
+                                                <td>{{$detail->qty}}</td>
+                                                <td>@currency($detail->subtotal)</td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+
+                                    <table class="table">
+                                        <tr class="text-center">
+                                            <td><h5>Total Qty</h5></td>
+                                            <td><h5 id="total-qty">{{$transaction->total_qty}}</h5></td>
+                                        </tr>
+                                        <tr class="text-center">
+                                            <td><h5>Total</h5></td>
+                                            <td><h5 id="total">@currency($transaction->total_amount)</h5></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+                    </td>
                 </tr>
                 @empty
                 <p>No users</p>
@@ -55,6 +108,7 @@
 
 @push('scripts')
 <script type="text/javascript">
+
     $("#list-transaction").addClass("active");
 
     var ingredient_id = [];

@@ -277,10 +277,12 @@
                     <td>{{$transaction->payment_method}} ({{$transaction->category_order}})</td>
                     <td>Rp. {{number_format($transaction->total_amount, 0, '', '.')}}</td>
                     <td>{{number_format($transaction->total_qty, 0, '', '.')}}</td>
-                    <td>@if($transaction->paid_amount != NULL)
+                    <td>@if($transaction->status == "Lunas")
                         <div class="badge badge-success">Lunas</div>
+                        @elseif($transaction->status == "Pending")
+                        <div class="badge badge-warning">Pending</div>
                         @else
-                        <div class="badge badge-danger">Belum Lunas</div>
+                        <div class="badge badge-danger">Batal</div>
                         @endif
                     </td>
                     <td>

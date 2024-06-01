@@ -264,16 +264,25 @@ class TransactionController extends Controller
                 // $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
                 $transaction['product_count'] = count($request->transaction_details);
 
+                $transaction['order_type'] = $transaction->order_type;
+                $transaction['order_type_name'] = $transaction['order_type']['name'];
+                DB::commit();
+                return response()->json($transaction, 200);
+            // Step 2. Payment Transaction
+            } else {
+                $dateNow = Carbon::now()->format('Y-m-d');
+                $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
+                $transaction = Transaction::findOrFail($request->transaction_id);
+                // Simpan detail transaksi
+                $transaction_details = $request->input('payment_details');
+                $transactionDetailsWithProducts = [];
                 $product_ids = [];
-                foreach ($request->transaction_details as $detail) {
+                foreach ($transaction_details as $detail) {
                     array_push($product_ids, $detail['product_id']);
                 }
                 $products = Product::whereIn('id', $product_ids)->get();
-                $ingredient_product_ids = IngredientProducts::whereIn('product_id', $product_ids)->get()->pluck('ingredient_id');
-                // $ingredient_product = IngredientProducts::whereIn('product_id', $product_ids)->get();
-                // $ingredients = Ingredient::whereIn('id', $ingredient_product_ids)->get();
-                $ingredients = Stock::whereIn('id', $ingredient_product_ids)->get();
-                foreach ($request->transaction_details as $detail) {
+                foreach ($transaction_details as $detail) {
+                    // get deal with stock
                     $product_id = $detail['product_id'];
                     $qty = $detail['qty'];
                     // Ambil produk terkait
@@ -319,18 +328,7 @@ class TransactionController extends Controller
                             'user_id' => auth()->user()->id,
                         ]);
                     }
-                }
-                $transaction['order_type'] = $transaction->order_type;
-                $transaction['order_type_name'] = $transaction['order_type']['name'];
-                DB::commit();
-                return response()->json($transaction, 200);
-            // Step 2. Payment Transaction
-            } else {
-                $transaction = Transaction::findOrFail($request->transaction_id);
-                // Simpan detail transaksi
-                $transaction_details = $request->input('payment_details');
-                $transactionDetailsWithProducts = [];
-                foreach ($transaction_details as $detail) {
+                    // end get deal with stock
                     $productDetail = [
                         'transaction_id' => $transaction->id,
                         'product_id' => $detail['product_id'],

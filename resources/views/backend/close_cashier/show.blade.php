@@ -258,13 +258,13 @@
                 <tr>
                     <th>#</th>
                     <th>Tanggal | Jam</th>
-                    <th>Outlet</th>
                     <th>Antrian</th>
                     <th>Tipe Pesanan</th>
                     <th>Tipe Pembayaran</th>
                     <th>Total Tagihan</th>
                     <th>Jumlah Pesanan</th>
                     <th>Status</th>
+                    <th class="not-exported">Aksi</th>
                 </tr>
             </thead>
             <tbody>
@@ -272,17 +272,23 @@
                 <tr>
                     <td>{{$loop->iteration}}</td>
                     <td>{{$transaction->date}} | {{$transaction->created_at->format('H:i:s')}}</td>
-                    <td>{{$transaction->warehouse->name}}</td>
                     <td>{{$transaction->sequence_number}}</td>
                     <td>{{$transaction->order_type->name}}</td>
                     <td>{{$transaction->payment_method}} ({{$transaction->category_order}})</td>
                     <td>Rp. {{number_format($transaction->total_amount, 0, '', '.')}}</td>
                     <td>{{number_format($transaction->total_qty, 0, '', '.')}}</td>
-                    <td>@if($transaction->paid_amount != NULL)
+                    <td>@if($transaction->status == "Lunas")
                         <div class="badge badge-success">Lunas</div>
+                        @elseif($transaction->status == "Pending")
+                        <div class="badge badge-warning">Pending</div>
                         @else
-                        <div class="badge badge-danger">Belum Lunas</div>
+                        <div class="badge badge-danger">Batal</div>
                         @endif
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-success" onclick="getDetails({{$transaction->id}})">
+                            Detail
+                        </button>
                     </td>
                 </tr>
                 @empty
@@ -293,10 +299,104 @@
     </div>
 </section>
 
+{{-- Modal for transaction detail --}}
+<div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content">
+        <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Detail Transaksi</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        </div>
+        <div class="modal-body">
+            <table class="table" id="transaction-detail">
+                <thead>
+                    <th>#</th>
+                    <th>Produk</th>
+                    <th>Harga</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+
+            <table class="table">
+                <tr class="text-center">
+                    <td><h5>Total Qty</h5></td>
+                    <td><h5 id="total-qty"></h5></td>
+                </tr>
+                <tr class="text-center">
+                    <td><h5>Total</h5></td>
+                    <td><h5 id="total"></h5></td>
+                </tr>
+            </table>
+        </div>
+        <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+        </div>
+    </div>
+    </div>
+</div>
+{{-- End of modal for transaction detail --}}
+
 @endsection
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
+
+    // Script for transaction detail Modal
+        function getDetails(id) {
+            $.ajax({
+                type: "GET",
+                url: `/admin/close-cashier/transaction/${id}`,
+                success: function(data) {
+                    // Delete table body items
+                    $('#transaction-detail tbody').empty();
+                    let total = 0;
+                    let totalQty = 0;
+                    // Loop for each data
+                    $.each(data, function(key, value) {
+                        // Append table body items
+                        $('#transaction-detail tbody').append(`
+                            <tr>
+                                <td>${key + 1}</td>
+                                <td>${value.product_name}</td>
+                                <td>Rp. ${formatNumber(value.product_price)}</td>
+                                <td>${value.qty}</td>
+                                <td>Rp. ${formatNumber(value.subtotal)}</td>
+                            </tr>
+                        `);
+
+                        // Count total
+                        total += parseInt(value.subtotal);
+                        totalQty += parseInt(value.qty);
+                    });
+
+                    $('#total-qty').html(totalQty);
+                    $('#total').html(`Rp. ${formatNumber(total)}`);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error dalam pengambilan data:', status, error);
+                }
+            });
+
+            $('#detailModal').modal('show');
+        }
+    // End of Script for transaction detail Modal
+
     $("ul#report").siblings('a').attr('aria-expanded','true');
     $("ul#report").addClass("show");
     $("ul#report #laporan-tutup-kasir").addClass("active");

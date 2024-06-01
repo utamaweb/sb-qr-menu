@@ -277,6 +277,9 @@ Route::group(['prefix' => 'admin'], function () {
             Route::delete('ojol/destroy/{ojol}', 'destroy')->name('destroy');
         });
 
+        // Route for CloseCashier transaction details
+        Route::get('close-cashier/transaction/{transaction}', [CloseCashierController::class, 'transactionDetails'])->name('close_cashier_transaction');
+
     });
 });
 

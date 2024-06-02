@@ -547,21 +547,20 @@ class TransactionController extends Controller
             $transaction = Transaction::find($id);
             if($transaction){
 
-                $shift = Shift::find($transaction->shift_id);
-                $details = TransactionDetail::where('transaction_id', $id)->get();
+                // $shift = Shift::find($transaction->shift_id);
+                // $details = TransactionDetail::where('transaction_id', $id)->get();
                 // Update stock sesuai stok sebelum cancel
-                foreach($details as $detail){
-                    $product_id = $detail->product_id;
-                    $ingredientProducts = IngredientProducts::where('product_id', $product_id)->get();
-                    foreach($ingredientProducts as $ingredientProduct){
-                        $stock = Stock::where('ingredient_id', $ingredientProduct->ingredient_id)->where('warehouse_id', $shift->warehouse_id)->where('shift_id', $shift->id)->first();
-                        $stock->update([
-                            'stock_used' => $stock->stock_used - $detail->qty,
-                            'last_stock' => $stock->last_stock + $detail->qty
-                        ]);
-                    }
-                    // $detail->delete();
-                }
+                // foreach($details as $detail){
+                //     $product_id = $detail->product_id;
+                //     $ingredientProducts = IngredientProducts::where('product_id', $product_id)->get();
+                //     foreach($ingredientProducts as $ingredientProduct){
+                //         $stock = Stock::where('ingredient_id', $ingredientProduct->ingredient_id)->where('warehouse_id', $shift->warehouse_id)->where('shift_id', $shift->id)->first();
+                //         $stock->update([
+                //             'stock_used' => $stock->stock_used - $detail->qty,
+                //             'last_stock' => $stock->last_stock + $detail->qty
+                //         ]);
+                //     }
+                // }
                 // Update status transaksi menjadi batal
                 $transaction->update([
                     'status' => 'Batal',

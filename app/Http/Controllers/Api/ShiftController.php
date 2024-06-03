@@ -22,6 +22,14 @@ use App\Models\CloseCashierProductSold;
 class ShiftController extends Controller
 {
     public function open(Request $request) {
+        $data = $request->all();
+        $validator = Validator::make($data, [
+            'stock' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->messages()], 400);
+        }
 
         DB::beginTransaction();
 

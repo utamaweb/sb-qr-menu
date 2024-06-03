@@ -18,6 +18,7 @@ use App\Models\OjolCloseCashier;
 use App\Models\TransactionDetail;
 use App\Http\Controllers\Controller;
 use App\Models\CloseCashierProductSold;
+use Illuminate\Support\Facades\Validator;
 
 class ShiftController extends Controller
 {

@@ -18,10 +18,19 @@ use App\Models\OjolCloseCashier;
 use App\Models\TransactionDetail;
 use App\Http\Controllers\Controller;
 use App\Models\CloseCashierProductSold;
+use Illuminate\Support\Facades\Validator;
 
 class ShiftController extends Controller
 {
     public function open(Request $request) {
+        $data = $request->all();
+        $validator = Validator::make($data, [
+            'stock' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->messages()], 400);
+        }
 
         DB::beginTransaction();
 

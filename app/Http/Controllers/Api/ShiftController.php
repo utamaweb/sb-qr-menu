@@ -25,7 +25,7 @@ class ShiftController extends Controller
     public function open(Request $request) {
         $data = $request->all();
         $validator = Validator::make($data, [
-            'stock' => 'required',
+            'stocks' => 'required',
         ]);
 
         if ($validator->fails()) {

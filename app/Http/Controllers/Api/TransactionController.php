@@ -284,7 +284,7 @@ class TransactionController extends Controller
                 foreach ($transaction_details as $detail) {
                     // get deal with stock
                     $product_id = $detail['product_id'];
-                    $qty = $detail['qty'];
+                    $product_qty = $detail['qty'];
                     // Ambil produk terkait
                     $product = $products->where('id', $product_id)->first();
 
@@ -293,6 +293,7 @@ class TransactionController extends Controller
 
                     foreach ($ingredients as $ingredient) {
                         $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
+                        $productIngredientQty = ProductIngredient::where('product_id', '=', $product->id)->where('ingredient_id', '=', $ingredient->id)->pluck('qty');
                         if (!$stock) {
                             // Handle jika stok belum ada
                             // continue;
@@ -308,21 +309,21 @@ class TransactionController extends Controller
                             ]);
                         }
 
-                        if ($stock->last_stock < $qty) {
+                        if ($stock->last_stock < $product_qty) {
                             // Jika stok kurang dari qty, return peringatan
                             DB::rollback();
                             return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 200);
                         }
 
-                        $stock->last_stock -= $qty;
-                        $stock->stock_used += $qty;
+                        $stock->last_stock -= ($productIngredientQty * $product_qty);
+                        $stock->stock_used += ($productIngredientQty * $product_qty);
                         $stock->save();
                         // Insert ke table transaction in out
                         TransactionInOut::create([
                             'warehouse_id' => auth()->user()->warehouse_id,
                             'ingredient_id' => $ingredient->id,
                             'transaction_id' => $transaction->id,
-                            'qty' => $qty,
+                            'qty' => $product_qty,
                             'date' => $dateNow,
                             'transaction_type' => 'out',
                             'user_id' => auth()->user()->id,

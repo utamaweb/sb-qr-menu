@@ -182,7 +182,7 @@ input[type=file]::file-selector-button:hover {
                                                 {{-- Start of Qty Input --}}
                                                 <div class="col-md-4">
                                                     <div class="form-group">
-                                                        <input type="number" class="form-control" name="qty[]" id="ingredientQty" autocomplete="off" required placeholder="Qty">
+                                                        <input type="number" class="form-control" min="1" name="qty[]" id="ingredientQty" autocomplete="off" required placeholder="Qty">
                                                     </div>
                                                 </div>
                                                 {{-- End of Qty Input --}}

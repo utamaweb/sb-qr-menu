@@ -169,6 +169,7 @@ class ProductController extends Controller
             Storage::delete('public/product_images/' . $product->image);
         }
         IngredientProducts::where('product_id', $product->id)->delete();
+        Product_Warehouse::where('product_id', $product->id)->delete();
         $product->delete();
         return redirect()->back()->with('message', 'Product deleted successfully');
     }

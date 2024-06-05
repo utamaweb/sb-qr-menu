@@ -107,7 +107,7 @@ input[type=file]::file-selector-button:hover {
                                                 <div class="input-group">
                                                     <select name="category_id" required
                                                         class="selectpicker form-control" data-live-search="true"
-                                                        data-live-search-style="begins" title="Select Category...">
+                                                        data-live-search-style="begins" title="---Pilih Kategori--- ">
                                                         @foreach($lims_category_list as $category)
                                                         <option value="{{$category->id}}" {{old('category_id') == $category->id ? 'selected' : ''}}>{{$category->name}}</option>
                                                         @endforeach
@@ -119,12 +119,11 @@ input[type=file]::file-selector-button:hover {
                                         <div class="col-md-4 form-group">
                                             <label>Satuan Produk *</strong> </label>
                                             <div class="input-group">
-                                                <select required class="form-control selectpicker" name="unit_id">
-                                                    <option value="" disabled selected>Select Product Unit...</option>
+                                                <select name="unit_id" required
+                                                        class="selectpicker form-control" data-live-search="true"
+                                                        data-live-search-style="begins" title="---Pilih Unit--- ">
                                                     @foreach($lims_unit_list as $unit)
-                                                    @if($unit->base_unit==null)
                                                     <option value="{{$unit->id}}">{{$unit->unit_name}}</option>
-                                                    @endif
                                                     @endforeach
                                                 </select>
                                             </div>
@@ -171,11 +170,9 @@ input[type=file]::file-selector-button:hover {
                                                 <div class="col-md-6">
                                                     <div class="form-group">
                                                         <select class="form-control" name="ingredients[]" placeholder="Pilih Bahan Baku">
-                                                            {{-- <option value="" disabled>Select Product Unit...</option> --}}
+                                                            <option value="" disabled>---Pilih Bahan Baku---</option>
                                                             @foreach($ingredients as $ingredient)
-                                                            @if($ingredient->base_unit==null)
                                                             <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
-                                                            @endif
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -231,7 +228,7 @@ input[type=file]::file-selector-button:hover {
 
 <script>
     // Start of ingredients script
-    let ingredient = 1;
+    let ingredient = 0;
 
     // Function to create new ingredient input
     $('#ingredients').on('click', '.addIng', function() {
@@ -276,10 +273,10 @@ input[type=file]::file-selector-button:hover {
     });
 
     $('#ingredients').on('click', '.remIng', function() {
-        if(ingredient != 1) {
+        // if(ingredient != 1) {
             $(this).parent().parent().parent().parent().remove();
             ingredient--;
-        }
+        // }
     });
 
     // End of ingredients script

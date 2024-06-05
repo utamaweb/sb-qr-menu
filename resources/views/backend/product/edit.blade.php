@@ -187,7 +187,9 @@ input[type=file]::file-selector-button:hover {
                                                 {{-- Start of Ingredient Input --}}
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <select class="form-control" name="ingredients[]" placeholder="Pilih Bahan Baku">
+                                                        <select name="ingredients[]" required
+                                                            class="selectpicker form-control" data-live-search="true"
+                                                            data-live-search-style="begins" title="---Pilih Bahan Baku--- ">
                                                             {{-- <option value="" disabled>Select Product Unit...</option> --}}
                                                             @foreach($ingredients as $ingredient)
                                                             <option value="{{$ingredient->id}}" {{$ingredientProduct->ingredient_id == $ingredient->id ? 'selected' : ''}}>{{$ingredient->name}}</option>
@@ -245,56 +247,48 @@ input[type=file]::file-selector-button:hover {
 <script type="text/javascript">
 
 // Start of ingredients script
-let ingredient = 0;
+$('.selectpicker').selectpicker();
 
-// Function to create new ingredient input
-$('#ingredients').on('click', '.addIng', function() {
-    $("#ingredients").append(`
-    <div class="row">
-        {{-- Start of Ingredient Input --}}
-        <div class="col-md-6">
-            <div class="form-group">
-                <select class="form-control" name="ingredients[]" palceholder="Pilih Bahan Baku">
-                    {{-- <option value="" disabled>Select Product Unit...</option> --}}
-                    @foreach($ingredients as $ingredient)
-                    @if($ingredient->base_unit==null)
-                    <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
-                    @endif
-                    @endforeach
-                </select>
+    // Function to create new ingredient input
+    $('#ingredients').on('click', '.addIng', function() {
+        // Append new ingredient input
+        var newIngredient = `
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <select name="ingredients[]" required
+                    class="selectpicker form-control" data-live-search="true"
+                    data-live-search-style="begins" title="---Pilih Bahan Baku--- ">
+                        @foreach($ingredients as $ingredient)
+                        <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
-        </div>
-        {{-- End of Ingredient Input --}}
-
-        {{-- Start of Qty Input --}}
-        <div class="col-md-4">
-            <div class="form-group">
-                <input type="number" class="form-control" name="qty[]" id="ingredientQty" autocomplete="off" required placeholder="Qty">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="number" class="form-control" name="qty[]" autocomplete="off" required placeholder="Qty">
+                </div>
             </div>
-        </div>
-        {{-- End of Qty Input --}}
-
-        {{-- Start of Add or Delete Button --}}
-        <div class="col-md-2">
-            <div class="form-group">
-                <div class="btn-group">
-                    <a class="btn btn-warning addIng"><i class="fa fa-plus"></i></a>
-                    <a class="btn btn-danger remIng"><i class="fa fa-times"></i></a>
+            <div class="col-md-2">
+                <div class="form-group">
+                    <div class="btn-group">
+                        <a class="btn btn-warning addIng"><i class="fa fa-plus"></i></a>
+                        <a class="btn btn-danger remIng"><i class="fa fa-times"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
-        {{-- End of Add or Delete Button --}}
-    </div>
-    `);
-    ingredient++;
-});
+        `;
 
-$('#ingredients').on('click', '.remIng', function() {
-    // if(ingredient != 1) {
+        $("#ingredients").append(newIngredient);
+        // Inisialisasi SelectPicker pada elemen yang baru di-append
+        $('.selectpicker').selectpicker('refresh');
+    });
+
+    $('#ingredients').on('click', '.remIng', function() {
         $(this).parent().parent().parent().parent().remove();
-        ingredient--;
-    // }
-});
+    });
 
 // End of ingredients script
 

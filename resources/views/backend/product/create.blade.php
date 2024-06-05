@@ -147,22 +147,64 @@ input[type=file]::file-selector-button:hover {
                                                 <input name="product_details" class="form-control" rows="3" value="{{old('product_details')}}">
                                             </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label>Bahan Baku</label>
-                                            <div class="search-box input-group mb-4">
+                                        {{-- <div class="col-md-4">
+                                            <label>Bahan Baku</label> --}}
+                                            {{-- <div class="search-box input-group mb-4"> --}}
                                                 {{-- <button class="btn btn-secondary"><i class="fa fa-barcode"></i></button> --}}
                                                 {{-- <input type="text" name="product_code_name" id="lims_productcodeSearch" placeholder="Pilih bahan baku..." class="form-control" /> --}}
-                                                <select class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins">
+                                                {{-- <select class="form-control selectpicker" name="ingredients[]" multiple data-live-search="true" data-live-search-style="begins"> --}}
                                                     {{-- <option value="" disabled>Select Product Unit...</option> --}}
-                                                    @foreach($ingredients as $ingredient)
+                                                    {{-- @foreach($ingredients as $ingredient)
                                                     @if($ingredient->base_unit==null)
                                                     <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
                                                     @endif
                                                     @endforeach
                                                 </select>
                                             </div>
+                                        </div> --}}
+
+                                        {{-- Start of Ingredient Section --}}
+                                        <div class="container" id="ingredients">
+                                            <label for="">Bahan Baku</label>
+                                            <div class="row">
+                                                {{-- Start of Ingredient Input --}}
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <select class="form-control" name="ingredients[]" placeholder="Pilih Bahan Baku">
+                                                            {{-- <option value="" disabled>Select Product Unit...</option> --}}
+                                                            @foreach($ingredients as $ingredient)
+                                                            @if($ingredient->base_unit==null)
+                                                            <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
+                                                            @endif
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                {{-- End of Ingredient Input --}}
+
+                                                {{-- Start of Qty Input --}}
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <input type="number" class="form-control" name="qty[]" id="ingredientQty" autocomplete="off" required placeholder="Qty">
+                                                    </div>
+                                                </div>
+                                                {{-- End of Qty Input --}}
+
+                                                {{-- Start of Add or Delete Button --}}
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <div class="btn-group">
+                                                            <a class="btn btn-warning addIng"><i class="fa fa-plus"></i></a>
+                                                            <a class="btn btn-danger remIng"><i class="fa fa-times"></i></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {{-- End of Add or Delete Button --}}
+                                            </div>
                                         </div>
-                                </div>
+                                        {{-- End of Ingredient Section --}}
+
+                                    </div>
                                 </div>
                                 <div class="col-md-12 d-flex justify-content-end">
                                     <div class="form-group mt-3 mr-2">
@@ -186,6 +228,62 @@ input[type=file]::file-selector-button:hover {
 @endsection
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+<script>
+    // Start of ingredients script
+    let ingredient = 1;
+
+    // Function to create new ingredient input
+    $('#ingredients').on('click', '.addIng', function() {
+        $("#ingredients").append(`
+        <div class="row">
+            {{-- Start of Ingredient Input --}}
+            <div class="col-md-6">
+                <div class="form-group">
+                    <select class="form-control" name="ingredients[]" palceholder="Pilih Bahan Baku">
+                        {{-- <option value="" disabled>Select Product Unit...</option> --}}
+                        @foreach($ingredients as $ingredient)
+                        @if($ingredient->base_unit==null)
+                        <option value="{{$ingredient->id}}">{{$ingredient->name}}</option>
+                        @endif
+                        @endforeach
+                    </select>
+                </div>
+            </div>
+            {{-- End of Ingredient Input --}}
+
+            {{-- Start of Qty Input --}}
+            <div class="col-md-4">
+                <div class="form-group">
+                    <input type="number" class="form-control" name="qty[]" id="ingredientQty" autocomplete="off" required placeholder="Qty">
+                </div>
+            </div>
+            {{-- End of Qty Input --}}
+
+            {{-- Start of Add or Delete Button --}}
+            <div class="col-md-2">
+                <div class="form-group">
+                    <div class="btn-group">
+                        <a class="btn btn-warning addIng"><i class="fa fa-plus"></i></a>
+                        <a class="btn btn-danger remIng"><i class="fa fa-times"></i></a>
+                    </div>
+                </div>
+            </div>
+            {{-- End of Add or Delete Button --}}
+        </div>
+        `);
+        ingredient++;
+    });
+
+    $('#ingredients').on('click', '.remIng', function() {
+        if(ingredient != 1) {
+            $(this).parent().parent().parent().parent().remove();
+            ingredient--;
+        }
+    });
+
+    // End of ingredients script
+</script>
 
 <script type="text/javascript">
 

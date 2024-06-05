@@ -632,7 +632,7 @@ class TransactionController extends Controller
         });
 
         // Ambil stok terkecil dari semua bahan baku
-        $smallestStock = $ingredientStocks->isNotEmpty() ? $ingredientStocks->min() : 0;
+        $smallestStock = $ingredientStocks->isNotEmpty() ? floor($ingredientStocks->min()) : 0;
 
         // Tambahkan qty terkecil ke dalam produk
         $product->qty = $smallestStock;

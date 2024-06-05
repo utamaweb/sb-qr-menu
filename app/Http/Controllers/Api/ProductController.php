@@ -211,11 +211,6 @@ class ProductController extends Controller
         }
     }
 
-    public function deleteFile($path = null)
-    {
-        Storage::disk('gcs')->delete($path);
-    }
-
     public function destroy(Request $request, $id)
     {
         $product = Product::find($id);

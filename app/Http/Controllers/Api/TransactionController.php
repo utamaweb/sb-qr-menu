@@ -17,6 +17,10 @@ use App\Models\TransactionInOut;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Events\TransactionNotPaid;
+use App\Events\TransactionPaid;
+use App\Events\TransactionCancelled;
+
 
 class TransactionController extends Controller
 {
@@ -267,6 +271,26 @@ class TransactionController extends Controller
                 $transaction['order_type'] = $transaction->order_type;
                 $transaction['order_type_name'] = $transaction['order_type']['name'];
                 DB::commit();
+                event(new TransactionNotPaid([
+                    'id' => $transaction->id,
+                    'sequence_number' => $transaction->sequence_number,
+                    'order_type' => $transaction->order_type->name,
+                    'payment_method' => $transaction->payment_method,
+                    'total_amount' => $transaction->total_amount,
+                    'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
+                    'status' => $transaction->status,
+                    'items' => $transaction->transaction_details->map(function($detail) {
+                        return [
+                            'transaction_id' => $detail->transaction_id,
+                            'product_id' => $detail->product_id,
+                            'product_name' => $detail->product->name,
+                            'price' => $detail->product_price,
+                            'qty' => $detail->qty,
+                            'subtotal' => $detail->subtotal,
+                        ];
+                    })->toArray(),
+                ]));
+
                 return response()->json($transaction, 200);
             // Step 2. Payment Transaction
             } else {
@@ -371,6 +395,7 @@ class TransactionController extends Controller
                         'status' => 'Lunas',
                     ]);
                     DB::commit();
+                    event(new TransactionPaid($transaction->id));
                 } else {
                     return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 200);
                 }
@@ -579,6 +604,7 @@ class TransactionController extends Controller
                     'status' => 'Batal',
                 ]);
                 DB::commit();
+                event(new TransactionCancelled($transaction->id));
                 return response()->json(['message' => 'Transaksi Berhasil Dibatalkan'], 200);
             } else {
                 return response()->json(['message' => 'Data transaksi tidak ada'], 200);

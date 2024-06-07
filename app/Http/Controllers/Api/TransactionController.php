@@ -20,6 +20,7 @@ use Carbon\Carbon;
 use App\Events\TransactionNotPaid;
 use App\Events\TransactionPaid;
 use App\Events\TransactionCancelled;
+use App\Events\RefreshTransactions;
 
 
 class TransactionController extends Controller
@@ -176,6 +177,7 @@ class TransactionController extends Controller
                 })->toArray(),
             ];
         });
+        // event(new RefreshTransactions($formattedTransactions));
 
         return response()->json($formattedTransactions, 200);
     }

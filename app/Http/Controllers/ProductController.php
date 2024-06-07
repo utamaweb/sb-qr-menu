@@ -19,6 +19,7 @@ use DB;
 use App\Models\IngredientProducts;
 use Intervention\Image\Facades\Image;
 use File;
+use Storage;
 
 class ProductController extends Controller
 {
@@ -47,17 +48,19 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
+        DB::beginTransaction();
         $isCodeExists = Product::where('code', $request->code)->first();
         if ($isCodeExists) {
             return redirect()->back()->with('not_permitted', 'Maaf, Kode Produk Tersebut Sudah Digunakan, Gunakan Kode Lain.');
         }
 
         $image = $request->image;
-        $imageName = 'default-img.png';
+        $imageName = 'default-images.jpg';
         if ($image) {
             $imageName = Str::slug($request->name) . '-' . Str::random(10) . '.' . $image->extension();
             $uploadImage = $image->storeAs('public/product_images', $imageName);
         }
+        // Insert to products
         $productInsert = Product::create([
             'type' => 'standard',
             'name' => $request->name,
@@ -70,42 +73,27 @@ class ProductController extends Controller
             'price' => intVal(str_replace(',', '', $request->price)),
             'image' => $imageName,
         ]);
-        if (isset($request->ingredients)) {
-            $productInsert->ingredient()->sync($request->ingredients);
+        // end insert to products
+
+        // insert ingredient_products
+        if($request->ingredients){
+            $ingredientIds = $request->ingredients;
+            if (count($ingredientIds) !== count(array_unique($ingredientIds))) {
+                DB::rollback();
+                return redirect()->route('produk.index')->with('not_permitted', 'Gagal Tambah Produk, Bahan Baku Tidak Boleh Sama Untuk Satu Produk');
+            }
+            foreach ($request->ingredients as $item => $ingredient) {
+                $data = array(
+                    'product_id' => $productInsert->id,
+                    'ingredient_id' => $request->ingredients[$item],
+                    'qty' => $request->qty[$item],
+                );
+                IngredientProducts::create($data);
+            }
         }
-        $roleName = auth()->user()->getRoleNames()[0];
-
-        // if(isset($data['is_diffPrice'])) {
-        //     $productInsert->update(['is_diffPrice' => 1]);
-        //     foreach ($data['diff_price'] as $key => $diff_price) {
-        //         if($diff_price) {
-        //             Product_Warehouse::create([
-        //                 "product_id" => $productInsert->id,
-        //                 "warehouse_id" => $data["warehouse_id"][$key],
-        //                 "price" => $diff_price
-        //             ]);
-        //         }
-        //     }
-        // } else {
-        //     if($roleName == 'Kasir'){
-        //         Product_Warehouse::create([
-        //             'product_id' => $productInsert->id,
-        //             'warehouse_id' => auth()->user()->warehouse_id,
-        //             'price' => $request->price
-        //         ]);
-        //     } else {
-        //         $warehouses = Warehouse::get();
-        //         foreach ($warehouses as $key => $warehouse) {
-        //             Product_Warehouse::create([
-        //                 "product_id" => $productInsert->id,
-        //                 "warehouse_id" => $warehouse->id,
-        //                 "price" => $request->price
-        //             ]);
-        //         }
-        //     }
-        // }
-
-        return redirect()->route('produk.index')->with('message', 'Data inserted successfully');
+        // end insert ingredient_products
+        DB::commit();
+        return redirect()->route('produk.index')->with('message', 'Produk Berhasil Ditambahkan');
     }
 
     public function edit($id)
@@ -113,13 +101,9 @@ class ProductController extends Controller
         $lims_category_list = Category::where('business_id', auth()->user()->business_id)->where('is_active', true)->get();
         $ingredients = Ingredient::where('business_id', auth()->user()->business_id)->get();
         $product_warehouses = Product_Warehouse::where('product_id', $id)->get();
-        $ingredientProducts = IngredientProducts::whereProductId($id)->get()->pluck('ingredient_id')->toArray();
+        $ingredientProducts = IngredientProducts::where('product_id', $id)->get();
         $lims_unit_list = Unit::where('is_active', true)->get();
         $product = Product::where('id', $id)->first();
-        if ($product->variant_option) {
-            $product->variant_option = json_decode($product->variant_option);
-            $product->variant_value = json_decode($product->variant_value);
-        }
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         $noOfVariantValue = 0;
         return view('backend.product.edit', compact('lims_category_list', 'lims_unit_list', 'product', 'lims_warehouse_list', 'noOfVariantValue', 'ingredients', 'ingredientProducts', 'product_warehouses'));
@@ -127,10 +111,11 @@ class ProductController extends Controller
 
     public function update(Request $request, $id)
     {
+        DB::beginTransaction();
         $image = $request->image;
         $productFind = Product::findOrFail($id);
         if ($image) {
-            $this->fileDelete('storage/product_images/', $productFind->image);
+            Storage::url('product_images/', $productFind->image)->delete();
             $imageName = Str::slug($request->name) . '-' . Str::random(10) . '.' . $image->extension();
             $uploadImage = $image->storeAs('public/product_images', $imageName);
         } else {
@@ -147,45 +132,27 @@ class ProductController extends Controller
             'price' => intVal(str_replace(',', '', $request->price)),
             'image' => $imageName,
         ]);
-        // if (isset($request->ingredients)) {
-            // $editProduct->ingredient()->sync($request->ingredients);
-        // }
-        $ingredients = $request->input('ingredients', []);
-        $editProduct->ingredient()->sync($ingredients);
 
-        $roleName = auth()->user()->getRoleNames()[0];
-
-        // if(isset($data['is_diffPrice'])) {
-        //     $editProduct->update(['is_diffPrice' => 1]);
-        //     foreach ($data['diff_price'] as $key => $diff_price) {
-        //         if($diff_price) {
-        //             Product_Warehouse::where('product_id', $id)->where('warehouse_id', $data['warehouse_id'][$key])->update([
-        //                 "product_id" => $id,
-        //                 "warehouse_id" => $data["warehouse_id"][$key],
-        //                 "price" => $diff_price
-        //             ]);
-        //         }
-        //     }
-        // } else {
-        //     if($roleName == 'Kasir'){
-        //         Product_Warehouse::where('product_id', $id)->where('warehouse_id', auth()->user()->warehouse_id)->update([
-        //             'product_id' => $editProduct->id,
-        //             'warehouse_id' => auth()->user()->warehouse_id,
-        //             'price' => $request->price
-        //         ]);
-        //     } else {
-        //         $warehouses = Warehouse::get();
-        //         foreach ($warehouses as $key => $warehouse) {
-        //             Product_Warehouse::where('product_id', $id)->where('warehouse_id', $warehouse->id)->update([
-        //                 "product_id" => $editProduct->id,
-        //                 "warehouse_id" => $warehouse->id,
-        //                 "price" => $request->price
-        //             ]);
-        //         }
-        //     }
-        // }
-
-        // \Session::flash('edit_message', 'Product updated successfully');
+        // insert ingredient_products
+        IngredientProducts::where('product_id', $editProduct->id)->forceDelete();
+        if($request->ingredients){
+            $ingredientIds = $request->ingredients;
+            if (count($ingredientIds) !== count(array_unique($ingredientIds))) {
+                DB::rollback();
+                return redirect()->route('produk.index')->with('not_permitted', 'Gagal Ubah Produk, Bahan Baku Tidak Boleh Sama Untuk Satu Produk');
+            }
+            // Delete Previous Ingredient Products
+            foreach ($request->ingredients as $item => $ingredient) {
+                $data = array(
+                    'product_id' => $editProduct->id,
+                    'ingredient_id' => $request->ingredients[$item],
+                    'qty' => $request->qty[$item],
+                );
+                IngredientProducts::create($data);
+            }
+        }
+        // end insert ingredient_products
+        DB::commit();
         return redirect()->route('produk.index')->with('message', 'Data updated successfully');
     }
 
@@ -195,106 +162,15 @@ class ProductController extends Controller
         return $id;
     }
 
-    public function search(Request $request)
-    {
-        $product_code = explode(" ", $request['data']);
-        $lims_product_data = Product::where('code', $product_code[0])->first();
-
-        $product[] = $lims_product_data->name;
-        $product[] = $lims_product_data->code;
-        $product[] = $lims_product_data->qty;
-        $product[] = $lims_product_data->price;
-        $product[] = $lims_product_data->id;
-        return $product;
-    }
-
-    public function saleUnit($id)
-    {
-        $unit = Unit::where("base_unit", $id)->orWhere('id', $id)->pluck('unit_name', 'id');
-        return json_encode($unit);
-    }
-
-    public function getData($id, $variant_id)
-    {
-        if ($variant_id) {
-            $data = Product::join('product_variants', 'products.id', 'product_variants.product_id')
-                ->select('products.name', 'product_variants.item_code')
-                ->where([
-                    ['products.id', $id],
-                    ['product_variants.variant_id', $variant_id]
-                ])->first();
-            $data->code = $data->item_code;
-        } else
-            $data = Product::select('name', 'code')->find($id);
-        return $data;
-    }
-
-
-
-    public function limsProductSearch(Request $request)
-    {
-        $product_code = explode("(", $request['data']);
-        $product_code[0] = rtrim($product_code[0], " ");
-        $lims_product_data = Product::where([
-            ['code', $product_code[0]],
-            ['is_active', true]
-        ])->first();
-        if (!$lims_product_data) {
-            $lims_product_data = Product::join('product_variants', 'products.id', 'product_variants.product_id')
-                ->select('products.*', 'product_variants.item_code', 'product_variants.variant_id', 'product_variants.additional_price')
-                ->where('product_variants.item_code', $product_code[0])
-                ->first();
-
-            $variant_id = $lims_product_data->variant_id;
-            $additional_price = $lims_product_data->additional_price;
-        } else {
-            $variant_id = '';
-            $additional_price = 0;
-        }
-        $product[] = $lims_product_data->name;
-        if ($lims_product_data->is_variant)
-            $product[] = $lims_product_data->item_code;
-        else
-            $product[] = $lims_product_data->code;
-
-        $product[] = $lims_product_data->price + $additional_price;
-        $product[] = DNS1D::getBarcodePNG($lims_product_data->code, $lims_product_data->barcode_symbology);
-        $product[] = $lims_product_data->promotion_price;
-        $product[] = config('currency');
-        $product[] = config('currency_position');
-        $product[] = $lims_product_data->qty;
-        $product[] = $lims_product_data->id;
-        $product[] = $variant_id;
-        return $product;
-    }
-
-    public function deleteBySelection(Request $request)
-    {
-        $product_id = $request['productIdArray'];
-        foreach ($product_id as $id) {
-            $lims_product_data = Product::findOrFail($id);
-            $lims_product_data->is_active = false;
-            $lims_product_data->save();
-
-            if ($lims_product_data->image) {
-                $images = explode(",", $lims_product_data->image);
-                foreach ($images as $image) {
-                    $this->fileDelete('images/product/', $image);
-                }
-            }
-        }
-
-        return 'Product deleted successfully!';
-    }
-
     public function destroy($id)
     {
-        $lims_product_data = Product::findOrFail($id);
-        if ($lims_product_data->image != 'zummXD2dvAtI.png') {
-            $this->fileDelete('storage/product_images/', $lims_product_data->image);
+        $product = Product::findOrFail($id);
+        if ($product->image != 'default-images.jpg') {
+            Storage::delete('public/product_images/' . $product->image);
         }
-        IngredientProducts::where('product_id', $lims_product_data->id)->delete();
-        $lims_product_data->delete();
+        IngredientProducts::where('product_id', $product->id)->delete();
+        Product_Warehouse::where('product_id', $product->id)->delete();
+        $product->delete();
         return redirect()->back()->with('message', 'Product deleted successfully');
     }
 }

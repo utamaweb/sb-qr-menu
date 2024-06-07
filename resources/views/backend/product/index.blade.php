@@ -33,7 +33,7 @@
                     <th>Kode</th>
                     <th>Kategori</th>
                     <th>Unit</th>
-                    <th>Bahan Baku</th>
+                    <th>Bahan Baku (qty)</th>
                     <th>Harga</th>
                     <th class="not-exported">Aksi</th>
                 </tr>

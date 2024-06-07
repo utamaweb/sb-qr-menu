@@ -23,14 +23,20 @@ use Illuminate\Support\Facades\Validator;
 class ShiftController extends Controller
 {
     public function open(Request $request) {
-        $data = $request->all();
-        $validator = Validator::make($data, [
-            'stocks' => 'required',
-        ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->messages()], 400);
+        $checkStocks = Stock::where('warehouse_id', auth()->user()->warehouse_id)->exists();
+
+        if($checkStocks) {
+            $data = $request->all();
+            $validator = Validator::make($data, [
+                'stocks' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json(['errors' => $validator->messages()], 400);
+            }
         }
+
 
         DB::beginTransaction();
 

@@ -9,7 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class IngredientProducts extends Model
 {
     use HasFactory, SoftDeletes;
-
+    protected $dates = ['deleted_at'];
+    protected $table = 'ingredient_products';
+    protected $fillable = ['product_id', 'ingredient_id','qty'];
+    protected $guarded = [];
     public function ingredient()
     {
         return $this->belongsTo('App\Models\Ingredient');

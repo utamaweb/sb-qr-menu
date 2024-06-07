@@ -159,17 +159,6 @@ class ProductController extends Controller
         return response()->json($product, 200);
     }
 
-    public function getPostByTitle(Request $request, $title)
-    {
-        $posts = Post::where('title', 'LIKE', '%' . $title . '%')->with('user')->get();
-        $posts->map(function ($item) {
-            $item['user']['avatar_url'] = $item['user']['avatar'] ? "https://storage.googleapis.com/ecocrafters_bucket/" . $item['user']['avatar'] : "https://storage.googleapis.com/ecocrafters-api.appspot.com/avatar.png";
-
-            return $item;
-        });
-        return response()->json($posts, 200);
-    }
-
     public function update(Request $request, $id)
     {
         $data = $request->all();
@@ -220,11 +209,6 @@ class ProductController extends Controller
             DB::rollback();
             return response()->json(['message' => $th->getMessage()], 500);
         }
-    }
-
-    public function deleteFile($path = null)
-    {
-        Storage::disk('gcs')->delete($path);
     }
 
     public function destroy(Request $request, $id)

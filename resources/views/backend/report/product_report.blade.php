@@ -56,23 +56,15 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($totalQtyPerProduct as $productId => $totalQty)
-                @php
-                $totalSubtotal = $totalSubtotalPerProduct[$productId];
-                $productInfo = $products[$productId] ?? null;
-                @endphp
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    @if ($productInfo)
-                    <td>{{$productInfo->name}}</td>
-                    <td>{{$productInfo->category->name}}</td>
-                    @endif
-                    <td>@currency($totalSubtotal)</td>
-                    <td>{{number_format($totalQty, 0, '', '.')}}</td>
-                </tr>
-                @empty
-                <p>No users</p>
-                @endforelse
+                @foreach ($products as $product)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $product->name }}</td>
+                        <td>{{ $product->category->name }}</td>
+                        <td>Rp. {{ number_format($product->subtotal, 0, ',', '.') }}</td>
+                        <td>{{ number_format($product->qty, 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>

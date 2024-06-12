@@ -792,7 +792,7 @@ class ReportController extends Controller
         }
 
         // Start of new Products get
-        $products = Product::whereIn('id', Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->pluck('product_id'))->get();
+        $products = Product::with('category')->whereIn('id', Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->pluck('product_id'))->get();
 
         $transactionDetails = TransactionDetail::whereIn('transaction_id', (Transaction::where('warehouse_id', auth()->user()->warehouse_id)->whereBetween('date', [$start_date, $end_date])->pluck('id')))->get();
 
@@ -802,8 +802,7 @@ class ReportController extends Controller
         }
         // End of new Products get
 
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        return view('backend.report.product_report', compact('start_date', 'end_date', 'lims_warehouse_list', 'products'));
+        return view('backend.report.product_report', compact('start_date', 'end_date', 'products'));
 
     }
 

@@ -20,21 +20,6 @@
                         </div>
                     </div>
                 </div>
-                @if(auth()->user()->hasRole(['Admin Bisnis', 'Superadmin']))
-                <div class="col-md-4 mt-3">
-                    <div class="form-group row">
-                        <label class="d-tc mt-2"><strong>{{trans('file.Choose Warehouse')}}</strong> &nbsp;</label>
-                        <div class="d-tc">
-                            <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" >
-                                <option value="">Semua Cabang</option>
-                                @foreach($lims_warehouse_list as $warehouse)
-                                <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                @endif
                 <div class="col-md-2 mt-3">
                     <div class="form-group">
                         <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>

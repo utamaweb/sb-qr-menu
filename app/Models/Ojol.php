@@ -26,4 +26,9 @@ class Ojol extends Model
         return $this->hasMany(OjolCloseCashier::class);
     }
 
+    // Relation to OjolWarehouse table
+    public function ojolWarehouses() {
+        return $this->hasMany(OjolWarehouse::class);
+    }
+
 }

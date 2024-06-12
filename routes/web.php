@@ -36,6 +36,7 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\CloseCashierController;
 use App\Http\Controllers\OjolController;
+use App\Http\Controllers\OjolWarehouseController;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -279,6 +280,15 @@ Route::group(['prefix' => 'admin'], function () {
 
         // Route for CloseCashier transaction details
         Route::get('close-cashier/transaction/{transaction}', [CloseCashierController::class, 'transactionDetails'])->name('close_cashier_transaction');
+        
+        // Route for OjolWarehouse
+        Route::controller(OjolWarehouseController::class)->name('ojol-warehouse.')->group(function() {
+            Route::get('ojol_outlet', 'index')->name('index');
+            Route::get('ojol_outlet/form/{ojol}', 'form')->name('form');
+            Route::post('ojol_outlet/form/{ojol}', 'store')->name('store');
+            Route::delete('ojol_outlet/destroy/{ojol}', 'destroy')->name('destroy');
+        });
+
 
     });
 });

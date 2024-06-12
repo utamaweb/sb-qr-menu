@@ -33,6 +33,7 @@
 
     {{-- Menu Admin Outlet --}}
     @elseif(auth()->user()->hasRole('Admin Outlet'))
+    <li id="ojek-online-outlet"><a href="{{route('ojol-warehouse.index')}}"> <i class="dripicons-user-id"></i><span>Ojek Online Outlet</span></a></li>
     <li id="produk-outlet"><a href="{{route('produk-outlet.index')}}"> <i class="dripicons-user-id"></i><span>Produk Outlet</span></a></li>
     <li id="daftar-stok"><a href="{{route('stok.index')}}"> <i class="dripicons-user-id"></i><span>Daftar Stok</span></a></li>
     <li id="tambah-stok"><a href="{{route('pembelian-stok.index')}}"> <i class="dripicons-user-id"></i><span>Tambah Stok</span></a></li>

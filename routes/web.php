@@ -1,14 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AccountsController;
-use App\Http\Controllers\AdjustmentController;
-use App\Http\Controllers\BillerController;
-use App\Http\Controllers\BrandController;
-use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\ProductWarehouseController;
@@ -18,16 +12,9 @@ use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\StockPurchaseController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\ProductController;
-use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ReturnController;
-use App\Http\Controllers\ReturnPurchaseController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingController;
-use App\Http\Controllers\StockCountController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\TableController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\BusinessController;
@@ -36,6 +23,8 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\CloseCashierController;
 use App\Http\Controllers\OjolController;
+use App\Http\Controllers\OjolWarehouseController;
+
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
@@ -49,7 +38,7 @@ Route::get('/get-storage', function () {
     Artisan::call('storage:link');
 });
 
-Route::get('/apk', function (){
+Route::get('/apk', function () {
     return redirect('https://drive.google.com/drive/folders/1E_jhYwX5jSP0VN3rvH8gE-yUSE7LJ4lw?usp=sharing');
 });
 Route::group(['prefix' => 'admin'], function () {
@@ -60,14 +49,14 @@ Route::group(['prefix' => 'admin'], function () {
     });
 
 
-    Route::group(['middleware' => 'auth:web'], function() {
-        Route::post('upload-apk', [HomeController::class,'uploadApk'])->name('uploadApk');
+    Route::group(['middleware' => 'auth:web'], function () {
+        Route::post('upload-apk', [HomeController::class, 'uploadApk'])->name('uploadApk');
         Route::controller(HomeController::class)->group(function () {
             Route::get('home', 'home');
         });
     });
 
-    Route::group(['middleware' => ['common', 'auth:web', 'active']], function() {
+    Route::group(['middleware' => ['common', 'auth:web', 'active']], function () {
 
         Route::controller(HomeController::class)->group(function () {
             Route::get('/', 'index');
@@ -77,8 +66,8 @@ Route::group(['prefix' => 'admin'], function () {
 
 
         // Need to check again
-        Route::resource('produk-outlet',ProductWarehouseController::class);
-        Route::resource('produk',ProductController::class)->except([ 'show']);
+        Route::resource('produk-outlet', ProductWarehouseController::class);
+        Route::resource('produk', ProductController::class)->except(['show']);
         Route::controller(ProductController::class)->group(function () {
             Route::post('products/product-data', 'productData');
             Route::get('products/gencode', 'generateCode');
@@ -90,7 +79,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('exportproduct', 'exportProduct')->name('product.export');
         });
 
-        Route::resource('role',RoleController::class);
+        Route::resource('role', RoleController::class);
         Route::controller(RoleController::class)->group(function () {
             Route::get('role/permission/{id}', 'permission')->name('role.permission');
             Route::post('role/set_permission', 'setPermission')->name('role.setPermission');
@@ -139,7 +128,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::resource('stok', StockController::class);
         Route::resource('stock-opname', StockOpnameController::class);
         Route::resource('close-cashier', CloseCashierController::class);
-        Route::put('stock-opname-detail/{id}', [StockOpnameController::class,'updateDetail'])->name('updateDetailStockOpname');
+        Route::put('stock-opname-detail/{id}', [StockOpnameController::class, 'updateDetail'])->name('updateDetailStockOpname');
         Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 
         Route::resource('pembelian-stok', StockPurchaseController::class);
@@ -268,7 +257,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::resource('pengeluaran', ExpenseController::class);
 
         // Route for Ojol
-        Route::controller(OjolController::class)->name('ojol.')->group(function() {
+        Route::controller(OjolController::class)->name('ojol.')->group(function () {
             Route::get('ojol', 'index')->name('index');
             Route::get('ojol/create', 'create')->name('create');
             Route::post('ojol/create', 'store')->name('store');
@@ -276,10 +265,15 @@ Route::group(['prefix' => 'admin'], function () {
             Route::put('ojol/edit/{ojol}', 'update')->name('update');
             Route::delete('ojol/destroy/{ojol}', 'destroy')->name('destroy');
         });
+        // Route for Ojol Warehouse
+        Route::controller(OjolWarehouseController::class)->name('ojol-warehouse.')->group(function () {
+            Route::get('ojol_outlet', 'index')->name('index');
+            Route::get('ojol_outlet/form/{ojol}', 'form')->name('form');
+            Route::post('ojol_outlet/form/{ojol}', 'store')->name('store');
+            Route::delete('ojol_outlet/destroy/{ojol}', 'destroy')->name('destroy');
+        });
 
         // Route for CloseCashier transaction details
         Route::get('close-cashier/transaction/{transaction}', [CloseCashierController::class, 'transactionDetails'])->name('close_cashier_transaction');
-
     });
 });
-

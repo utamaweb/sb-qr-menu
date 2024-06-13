@@ -12,15 +12,16 @@ use App\Http\Controllers\Controller;
 class OjolWarehouseController extends Controller
 {
     // Index
-    public function index() {
+    public function index()
+    {
         $business_id = Warehouse::find(auth()->user()->warehouse_id)->business_id;
         $ojols = Ojol::where('business_id', '=', $business_id)->where('deleted_at', '=', NULL)->get();
 
-        foreach($ojols as $ojol) {
+        foreach ($ojols as $ojol) {
             $ojolWarehouseCheck = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('ojol_id', '=', $ojol->id)->exists();
             $ojolWarehouse = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('ojol_id', '=', $ojol->id)->first();
 
-            if($ojolWarehouseCheck) {
+            if ($ojolWarehouseCheck) {
                 $ojol->percent = $ojolWarehouse->percent;
                 $ojol->extra_price = $ojolWarehouse->extra_price;
             } else {
@@ -32,11 +33,12 @@ class OjolWarehouseController extends Controller
     }
 
     // Form
-    public function form(Ojol $ojol) {
+    public function form(Ojol $ojol)
+    {
         $ojolWarehouseCheck = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('ojol_id', '=', $ojol->id)->exists();
         $ojolWarehouse = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('ojol_id', '=', $ojol->id)->first();
 
-        if($ojolWarehouseCheck) {
+        if ($ojolWarehouseCheck) {
             $ojol = $ojolWarehouse;
             $ojol->id = $ojol->ojol->id;
             $ojol->name = $ojolWarehouse->ojol->name;
@@ -46,7 +48,8 @@ class OjolWarehouseController extends Controller
     }
 
     // Store
-    public function store(Request $request, Ojol $ojol) {
+    public function store(Request $request, Ojol $ojol)
+    {
         $ojolWarehouseCheck = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('ojol_id', '=', $ojol->id)->exists();
         $ojolWarehouse = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('ojol_id', '=', $ojol->id)->first();
 
@@ -56,10 +59,10 @@ class OjolWarehouseController extends Controller
             'extra_price' => 'nullable'
         ]);
 
-        if($ojolWarehouseCheck) {
+        if ($ojolWarehouseCheck) {
             $ojolWarehouse->update([
                 'percent' => $request->percent,
-                'extra_price' => $request->extra_price
+                'extra_price' => str_replace(",", "", $request->extra_price)
             ]);
         } else {
             OjolWarehouse::create([
@@ -73,11 +76,12 @@ class OjolWarehouseController extends Controller
         return redirect()->route('ojol-warehouse.index')->with('message', 'Data berhasil disimpan');
     }
 
-    public function destroy(Ojol $ojol) {
+    public function destroy(Ojol $ojol)
+    {
         $ojolWarehouseCheck = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('ojol_id', '=', $ojol->id)->exists();
         $ojolWarehouse = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)->where('ojol_id', '=', $ojol->id)->first();
 
-        if($ojolWarehouseCheck) {
+        if ($ojolWarehouseCheck) {
             $ojolWarehouse->delete();
             return redirect()->route('ojol-warehouse.index')->with('message', 'Data berhasil diubah ke nilai awal!');
         } else {

@@ -17,18 +17,20 @@ class Ojol extends Model
 
 
     // Relations to Business table
-    public function business() {
+    public function business()
+    {
         return $this->belongsTo(Business::class);
     }
 
     // Relations to OjolCloseCashiers table
-    public function ojolCloseCashiers() {
+    public function ojolCloseCashiers()
+    {
         return $this->hasMany(OjolCloseCashier::class);
     }
 
-    // Relation to OjolWarehouse table
-    public function ojolWarehouses() {
+    // Relations to Transaction table
+    public function ojolWarehouses()
+    {
         return $this->hasMany(OjolWarehouse::class);
     }
-
 }

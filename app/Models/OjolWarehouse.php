@@ -12,11 +12,13 @@ class OjolWarehouse extends Model
 
     protected $fillable = ['warehouse_id', 'ojol_id', 'percent', 'extra_price'];
 
-    public function warehouse() {
+    public function warehouse()
+    {
         return $this->belongsTo('App\Models\Warehouse');
     }
 
-    public function ojol() {
+    public function ojol()
+    {
         return $this->belongsTo('App\Models\Ojol');
     }
 }

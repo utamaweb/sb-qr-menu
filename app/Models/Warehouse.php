@@ -26,8 +26,4 @@ class Warehouse extends Model
     {
         return $this->hasMany('App\Models\OjolWarehouse');
     }
-
-    public function ojolWarehouses() {
-        return $this->hasMany('App\Models\OjolWarehouse');
-    }
 }

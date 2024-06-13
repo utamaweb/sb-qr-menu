@@ -69,7 +69,7 @@ class OjolWarehouseController extends Controller
                 'warehouse_id' => auth()->user()->warehouse_id,
                 'ojol_id' => $ojol->id,
                 'percent' => $request->percent,
-                'extra_price' => str(",", "", $request->extra_price)
+                'extra_price' => str_replace(",", "", $request->extra_price)
             ]);
         }
 

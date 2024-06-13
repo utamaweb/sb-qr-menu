@@ -44,17 +44,17 @@ class TransactionController extends Controller
             return response()->json([], 200);
         }
 
-        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function($query) {
+        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function ($query) {
             $query->select('transaction_id', 'product_id', 'product_price', 'qty', 'subtotal')
                 ->with('product:id,name');
         }])
-        ->where('shift_id', $shift->id)
-        ->where('warehouse_id', $warehouseId)
-        ->where('category_order', 'ONLINE')
-        ->orderByDesc('id')
-        ->get();
+            ->where('shift_id', $shift->id)
+            ->where('warehouse_id', $warehouseId)
+            ->where('category_order', 'ONLINE')
+            ->orderByDesc('id')
+            ->get();
 
-        $formattedTransactions = $transactions->map(function($transaction) {
+        $formattedTransactions = $transactions->map(function ($transaction) {
             return [
                 'id' => $transaction->id,
                 'sequence_number' => $transaction->sequence_number,
@@ -64,7 +64,7 @@ class TransactionController extends Controller
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
                 'status' => $transaction->status,
-                'items' => $transaction->transaction_details->map(function($detail) {
+                'items' => $transaction->transaction_details->map(function ($detail) {
                     return [
                         'transaction_id' => $detail->transaction_id,
                         'product_id' => $detail->product_id,
@@ -97,17 +97,17 @@ class TransactionController extends Controller
             return response()->json([], 200);
         }
 
-        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function($query) {
+        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function ($query) {
             $query->select('transaction_id', 'product_id', 'product_price', 'qty', 'subtotal')
                 ->with('product:id,name');
         }])
-        ->where('shift_id', $shift->id)
-        ->where('warehouse_id', $warehouseId)
-        ->where('category_order', 'OFFLINE')
-        ->orderByDesc('id')
-        ->get();
+            ->where('shift_id', $shift->id)
+            ->where('warehouse_id', $warehouseId)
+            ->where('category_order', 'OFFLINE')
+            ->orderByDesc('id')
+            ->get();
 
-        $formattedTransactions = $transactions->map(function($transaction) {
+        $formattedTransactions = $transactions->map(function ($transaction) {
             return [
                 'id' => $transaction->id,
                 'sequence_number' => $transaction->sequence_number,
@@ -117,7 +117,7 @@ class TransactionController extends Controller
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
                 'status' => $transaction->status,
-                'items' => $transaction->transaction_details->map(function($detail) {
+                'items' => $transaction->transaction_details->map(function ($detail) {
                     return [
                         'transaction_id' => $detail->transaction_id,
                         'product_id' => $detail->product_id,
@@ -145,18 +145,18 @@ class TransactionController extends Controller
             return response()->json([], 200);
         }
 
-        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function($query) {
+        $transactions = Transaction::with(['order_type:id,name', 'transaction_details' => function ($query) {
             $query->select('transaction_id', 'product_id', 'product_price', 'qty', 'subtotal')
                 ->with('product:id,name');
         }])
-        ->where('warehouse_id', auth()->user()->warehouse_id)
-        ->where('shift_id', $shift->id)
-        ->where('status', 'Pending')
-        ->whereNull('payment_method')
-        ->orderByDesc('id')
-        ->get();
+            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->where('shift_id', $shift->id)
+            ->where('status', 'Pending')
+            ->whereNull('payment_method')
+            ->orderByDesc('id')
+            ->get();
 
-        $formattedTransactions = $transactions->map(function($transaction) {
+        $formattedTransactions = $transactions->map(function ($transaction) {
             return [
                 'id' => $transaction->id,
                 'sequence_number' => $transaction->sequence_number,
@@ -165,7 +165,7 @@ class TransactionController extends Controller
                 'total_amount' => $transaction->total_amount,
                 'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
                 'status' => $transaction->status,
-                'items' => $transaction->transaction_details->map(function($detail) {
+                'items' => $transaction->transaction_details->map(function ($detail) {
                     return [
                         'transaction_id' => $detail->transaction_id,
                         'product_id' => $detail->product_id,
@@ -192,7 +192,7 @@ class TransactionController extends Controller
 
         try {
             // Step 1. Create Transaction
-            if($request->transaction_details){
+            if ($request->transaction_details) {
                 $total_amount = 0;
                 foreach ($request->transaction_details as $detail) {
                     $total_amount += $detail['subtotal'];
@@ -206,17 +206,17 @@ class TransactionController extends Controller
                 $dateTimeNow = Carbon::now();
                 // $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
                 $checkShiftOpen = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                // ->where('date', $dateNow)
-                // ->where('user_id', auth()->user()->id)
-                ->where('is_closed', 0)
-                ->first();
-                if($checkShiftOpen == NULL){
+                    // ->where('date', $dateNow)
+                    // ->where('user_id', auth()->user()->id)
+                    ->where('is_closed', 0)
+                    ->first();
+                if ($checkShiftOpen == NULL) {
                     return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
                 }
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-                ->where('is_closed', 0)
-                // ->orderBy('id', 'desc')
-                ->first();
+                    ->where('is_closed', 0)
+                    // ->orderBy('id', 'desc')
+                    ->first();
 
                 $countTransactionInShift = Transaction::where('shift_id', $shift->id)->orderBy('id', 'DESC')->count();
                 $lastTransaction = Transaction::where('shift_id', $shift->id)->orderBy('id', 'DESC')->first();
@@ -294,7 +294,7 @@ class TransactionController extends Controller
                 // ]));
 
                 return response()->json($transaction, 200);
-            // Step 2. Payment Transaction
+                // Step 2. Payment Transaction
             } else {
                 $dateNow = Carbon::now()->format('Y-m-d');
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
@@ -388,7 +388,7 @@ class TransactionController extends Controller
                 // if($transaction->paid_amount < $transaction->total_amount){
 
                 // update transaction status, etc lunas
-                if($transaction->status == 'Pending'){
+                if ($transaction->status == 'Pending') {
 
                     $transaction->update([
                         'payment_method' => $request->payment_method,
@@ -404,8 +404,6 @@ class TransactionController extends Controller
                 $transaction['details'] = $transactionDetailsWithProducts;
                 return response()->json($transaction, 200);
             }
-
-
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json(['message' => $th->getMessage()], 500);
@@ -444,11 +442,11 @@ class TransactionController extends Controller
             $dateNow = Carbon::now()->format('Y-m-d');
             // $dateTimeNow = Carbon::now();
             $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-            // ->where('date', $dateNow)
-            // ->where('user_id', auth()->user()->id)
-            ->where('is_closed', 0)
-            ->first();
-            if($checkShift == NULL){
+                // ->where('date', $dateNow)
+                // ->where('user_id', auth()->user()->id)
+                ->where('is_closed', 0)
+                ->first();
+            if ($checkShift == NULL) {
                 return response()->json(['message' => 'Belum Ada Kasir Buka'], 200);
             }
 
@@ -585,7 +583,7 @@ class TransactionController extends Controller
         DB::beginTransaction();
         try {
             $transaction = Transaction::find($id);
-            if($transaction){
+            if ($transaction) {
 
                 // $shift = Shift::find($transaction->shift_id);
                 // $details = TransactionDetail::where('transaction_id', $id)->get();
@@ -648,28 +646,20 @@ class TransactionController extends Controller
             return response()->json(['message' => 'Kasir belum buka'], 200);
         }
 
-        // Ambil stok terakhir untuk setiap bahan baku di gudang tertentu
-        $ingredientStocks = $product->ingredient->mapWithKeys(function ($ingredient) use ($shift, $warehouseId, $productId) {
-            $productIngredientQty = IngredientProducts::where('product_id', '=', $productId)->where('ingredient_id', '=', $ingredient->id)->pluck('qty')->toArray();
-            $lastStock = Stock::where('ingredient_id', $ingredient->id)
-                ->where('shift_id', $shift->id)
-                ->where('warehouse_id', $warehouseId)
-                ->first();
-
-            return [$ingredient->id => $lastStock ? $lastStock->last_stock / min($productIngredientQty) : 0];
-        });
-
-        // Ambil stok terkecil dari semua bahan baku
-        $smallestStock = $ingredientStocks->isNotEmpty() ? floor($ingredientStocks->min()) : 0;
-
-        // Tambahkan qty terkecil ke dalam produk
-        $product->qty = $smallestStock;
-
-        if ($smallestStock < $request->qty) {
-            return response()->json(['status' => false, 'message' => "Stok yang tersedia hanya " . $smallestStock], 200);
+        // Ambil bahan baku terkait melalui model Ingredient
+        $qty = [];
+        $ingredients = $product->ingredient;
+        foreach ($ingredients as $ingredient) {
+            $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
+            $productIngredientQty = IngredientProducts::where('product_id', '=', $product->id)->where('ingredient_id', '=', $ingredient->id)->pluck('qty')->min();
+            $qty[] = floor($stock->last_stock / $productIngredientQty);
+        }
+        // Get smallest quantity
+        $qty = min($qty);
+        if ($qty < $request->qty) {
+            return response()->json(['status' => false, 'message' => "Stok yang tersedia hanya " . $qty], 200);
         } else {
             return response()->json(['status' => true, 'message' => "Stok Tersedia"], 200);
         }
     }
-
 }

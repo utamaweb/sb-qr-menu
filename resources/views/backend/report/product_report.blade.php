@@ -20,21 +20,6 @@
                         </div>
                     </div>
                 </div>
-                @if(auth()->user()->hasRole(['Admin Bisnis', 'Superadmin']))
-                <div class="col-md-4 mt-3">
-                    <div class="form-group row">
-                        <label class="d-tc mt-2"><strong>{{trans('file.Choose Warehouse')}}</strong> &nbsp;</label>
-                        <div class="d-tc">
-                            <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" >
-                                <option value="">Semua Cabang</option>
-                                @foreach($lims_warehouse_list as $warehouse)
-                                <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                @endif
                 <div class="col-md-2 mt-3">
                     <div class="form-group">
                         <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
@@ -56,23 +41,15 @@
                 </tr>
             </thead>
             <tbody>
-                @forelse ($totalQtyPerProduct as $productId => $totalQty)
-                @php
-                $totalSubtotal = $totalSubtotalPerProduct[$productId];
-                $productInfo = $products[$productId] ?? null;
-                @endphp
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    @if ($productInfo)
-                    <td>{{$productInfo->name}}</td>
-                    <td>{{$productInfo->category->name}}</td>
-                    @endif
-                    <td>@currency($totalSubtotal)</td>
-                    <td>{{number_format($totalQty, 0, '', '.')}}</td>
-                </tr>
-                @empty
-                <p>No users</p>
-                @endforelse
+                @foreach ($products as $product)
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $product->name }}</td>
+                        <td>{{ $product->category->name }}</td>
+                        <td>Rp. {{ number_format($product->subtotal, 0, ',', '.') }}</td>
+                        <td>{{ number_format($product->qty, 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>

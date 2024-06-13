@@ -790,49 +790,19 @@ class ReportController extends Controller
             $start_date = Carbon::now()->format('Y-m-d');
             $end_date = Carbon::now()->format('Y-m-d');
         }
-        if(auth()->user()->hasRole(['Superadmin', 'Admin Bisnis'])){
-            $warehouse_id = $data['warehouse_id'];
-        } else{
-            $warehouse_id = auth()->user()->warehouse_id;
+
+        // Start of new Products get
+        $products = Product::with('category')->whereIn('id', Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->pluck('product_id'))->get();
+
+        $transactionDetails = TransactionDetail::whereIn('transaction_id', (Transaction::where('warehouse_id', auth()->user()->warehouse_id)->whereBetween('date', [$start_date, $end_date])->pluck('id')))->get();
+
+        foreach($products as $product) {
+            $product['qty'] = $transactionDetails->where('product_id', $product->id)->sum('qty');
+            $product['subtotal'] = $transactionDetails->where('product_id', $product->id)->sum('subtotal');
         }
+        // End of new Products get
 
-        if ($warehouse_id == 0) {
-            $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-                ->whereBetween('transactions.date', [$start_date, $end_date])
-                ->get(['transaction_details.*']);
-        } else {
-            $transaction_details = TransactionDetail::join('transactions', 'transaction_details.transaction_id', '=', 'transactions.id')
-                ->whereBetween('transactions.date', [$start_date, $end_date])
-                ->where('transactions.warehouse_id', $warehouse_id)
-                ->get(['transaction_details.*']);
-        }
-
-        $totalQtyPerProduct = [];
-        $totalSubtotalPerProduct = [];
-        $products = Product::get();
-
-        $productId = []; // Inisialisasi variabel di luar loop
-
-        foreach ($transaction_details as $item) {
-            $productId = $item['product_id'];
-
-            // Menambahkan qty ke total qty per produk
-            if (isset($totalQtyPerProduct[$productId])) {
-                $totalQtyPerProduct[$productId] += $item['qty'];
-            } else {
-                $totalQtyPerProduct[$productId] = $item['qty'];
-            }
-
-            // Menambahkan subtotal ke total subtotal per produk
-            if (isset($totalSubtotalPerProduct[$productId])) {
-                $totalSubtotalPerProduct[$productId] += $item['subtotal'];
-            } else {
-                $totalSubtotalPerProduct[$productId] = $item['subtotal'];
-            }
-        }
-
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        return view('backend.report.product_report', compact('start_date', 'end_date', 'warehouse_id', 'lims_warehouse_list', 'productId', 'totalSubtotalPerProduct', 'totalQtyPerProduct', 'products'));
+        return view('backend.report.product_report', compact('start_date', 'end_date', 'products'));
 
     }
 

@@ -62,7 +62,7 @@ class OjolWarehouseController extends Controller
         if ($ojolWarehouseCheck) {
             $ojolWarehouse->update([
                 'percent' => $request->percent,
-                'extra_price' => $request->extra_price
+                'extra_price' => str_replace(",", "", $request->extra_price)
             ]);
         } else {
             OjolWarehouse::create([

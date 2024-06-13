@@ -59,17 +59,27 @@ class OjolWarehouseController extends Controller
             'extra_price' => 'nullable'
         ]);
 
+        $percent = 0;
+        $extra_price = 0;
+        if(!empty($request->extra_price)) {
+            $extra_price = $request->extra_price;
+        }
+
+        if(!empty($request->percent)) {
+            $percent = $request->percent;
+        }
+
         if ($ojolWarehouseCheck) {
             $ojolWarehouse->update([
-                'percent' => $request->percent,
-                'extra_price' => str_replace(",", "", $request->extra_price)
+                'percent' => $percent,
+                'extra_price' => str_replace(",", "", $extra_price)
             ]);
         } else {
             OjolWarehouse::create([
                 'warehouse_id' => auth()->user()->warehouse_id,
                 'ojol_id' => $ojol->id,
-                'percent' => $request->percent,
-                'extra_price' => str_replace(",", "", $request->extra_price)
+                'percent' => $percent,
+                'extra_price' => str_replace(",", "", $extra_price)
             ]);
         }
 

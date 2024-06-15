@@ -88,7 +88,7 @@ class StockPurchaseController extends Controller
                     'warehouse_id' => $request->warehouse_id,
                     'shift_id' => $shift->id,
                     'ingredient_id' => $request->ingredient_id[$item],
-                    'first_stock' => $request->qty[$item],
+                    // 'first_stock' => $request->qty[$item],
                     'stock_in' => $request->qty[$item],
                     'last_stock' => $request->qty[$item],
                 ]);

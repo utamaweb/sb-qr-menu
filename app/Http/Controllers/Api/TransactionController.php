@@ -192,7 +192,16 @@ class TransactionController extends Controller
 
         try {
             // Step 1. Create Transaction
-            if ($request->transaction_details) {
+            if ($request->category_order) {
+                $data = $request->all();
+                $validator = Validator::make($data, [
+                    'transaction_details' => 'required',
+                    'order_type_id' => 'required',
+                ]);
+
+                if ($validator->fails()) {
+                    return response()->json(['message' => 'Pilihan Menu & Jenis Pesanan Tidak Boleh Kosong'], 200);
+                }
                 $total_amount = 0;
                 foreach ($request->transaction_details as $detail) {
                     $total_amount += $detail['subtotal'];
@@ -211,7 +220,7 @@ class TransactionController extends Controller
                     ->where('is_closed', 0)
                     ->first();
                 if ($checkShiftOpen == NULL) {
-                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
+                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 200);
                 }
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
                     ->where('is_closed', 0)
@@ -296,6 +305,14 @@ class TransactionController extends Controller
                 return response()->json($transaction, 200);
                 // Step 2. Payment Transaction
             } else {
+                $data = $request->all();
+                $validator = Validator::make($data, [
+                    'payment_details' => 'required',
+                ]);
+
+                if ($validator->fails()) {
+                    return response()->json(['message' => 'Pilihan Menu Tidak Boleh Kosong'], 200);
+                }
                 $dateNow = Carbon::now()->format('Y-m-d');
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
                 $transaction = Transaction::findOrFail($request->transaction_id);

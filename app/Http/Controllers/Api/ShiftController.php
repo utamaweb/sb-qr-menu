@@ -22,11 +22,12 @@ use Illuminate\Support\Facades\Validator;
 
 class ShiftController extends Controller
 {
-    public function open(Request $request) {
+    public function open(Request $request)
+    {
 
         $checkStocks = Stock::where('warehouse_id', auth()->user()->warehouse_id)->exists();
 
-        if($checkStocks) {
+        if ($checkStocks) {
             $data = $request->all();
             $validator = Validator::make($data, [
                 'stocks' => 'required',
@@ -44,12 +45,12 @@ class ShiftController extends Controller
             $dateNow = Carbon::now()->format('Y-m-d');
             $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
             $roleName = auth()->user()->getRoleNames()[0];
-            if($roleName != 'Kasir'){
+            if ($roleName != 'Kasir') {
                 return response()->json(['status' => "gagal", 'message' => "Buka kasir harus dilakukan dengan role kasir."], 200);
             }
             // untuk nomor shift (1,2,3)
             $shiftNumber = 1;
-            if($checkShift && $checkShift->shift_number < 3){
+            if ($checkShift && $checkShift->shift_number < 3) {
                 $shiftNumber = $checkShift->shift_number + 1;
             }
             // check kasir sudah buka atau belum
@@ -58,7 +59,7 @@ class ShiftController extends Controller
                 ->where('is_closed', 0)
                 ->orderBy('id', 'DESC')
                 ->first();
-            if($checkUserShift){
+            if ($checkUserShift) {
                 return response()->json(['message' => "Kasir dengan user : " . $checkUserShift->user->name . " sudah dibuka sebelumnya."], 200);
             }
             // insert data ke table shift
@@ -71,7 +72,7 @@ class ShiftController extends Controller
                 'warehouse_id' => auth()->user()->warehouse_id,
             ]);
             // insert stock ke table stocks per shift
-            if($request->stocks){
+            if ($request->stocks) {
                 foreach ($request->stocks as $stock) {
                     // Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', $stock['ingredient_id'])->update([
                     //     'last_stock' => $stock['stock']
@@ -94,7 +95,8 @@ class ShiftController extends Controller
         }
     }
 
-    public function close(Request $request) {
+    public function close(Request $request)
+    {
         DB::beginTransaction();
 
         try {
@@ -105,17 +107,17 @@ class ShiftController extends Controller
                 ->where('is_closed', 0)
                 ->with('user')
                 ->first();
-            if($shift == NULL){
+            if ($shift == NULL) {
                 return response()->json(['message' => "Belum Ada Kasir Buka"], 200);
             }
             // check apakah kasir sudah tutup atau belum
             $closeCashierCheck = CloseCashier::where('shift_id', $shift->id)->where('is_closed', 1)->first();
-            if($closeCashierCheck){
+            if ($closeCashierCheck) {
                 return response()->json(['message' => 'Cashier Already Closed Before This'], 200);
             }
             // check apakah ada orderan belum selesai
             $checkTransactionInShift = Transaction::where('status', 'Pending')->where('shift_id', $shift->id)->whereNull('paid_amount')->whereNull('payment_method')->count();
-            if($checkTransactionInShift > 0){
+            if ($checkTransactionInShift > 0) {
                 return response()->json(['status' => 'gagal', 'message' => "Selesaikan orderan terlebih dahulu untuk tutup kasir"], 409);
             }
             // get transaksi sesuai shift
@@ -150,7 +152,7 @@ class ShiftController extends Controller
             foreach ($expenses as $expense) {
                 // $totalExpense += $expense['total_price'];
                 $totalExpense += $expense['amount'];
-                if($expense->qty == 0) {
+                if ($expense->qty == 0) {
                     continue;
                 } else {
                     $expense['price'] = $expense->amount / $expense->qty;
@@ -234,7 +236,7 @@ class ShiftController extends Controller
 
             $business_id = Warehouse::where('id', '=', auth()->user()->warehouse_id)->first()->business_id;
             $ojols = Ojol::where('business_id', '=', $business_id)->get();
-            foreach($ojols as $ojol) {
+            foreach ($ojols as $ojol) {
                 OjolCloseCashier::create([
                     'ojol_id' => $ojol->id,
                     'close_cashier_id' => $closeCashier->id,
@@ -249,7 +251,7 @@ class ShiftController extends Controller
                     $ingredientStock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $stock['ingredient_id'])->where('warehouse_id', auth()->user()->warehouse_id)->first();
 
                     // Create Ingredient Stock if not exists
-                    if(!$ingredientStock) {
+                    if (!$ingredientStock) {
                         $getLastStock = Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', '=', $stock['ingredient_id'])->orderBy('id', 'DESC')->first();
 
                         $ingredientStock = Stock::create([
@@ -295,27 +297,30 @@ class ShiftController extends Controller
         }
     }
 
-    public function checkCashier() {
+    public function checkCashier()
+    {
         $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
-        if($checkShift){
-            return response()->json(['status' => True,'message' => "Kasir di outlet ". auth()->user()->warehouse->name . " telah buka"], 200);
+        if ($checkShift) {
+            return response()->json(['status' => True, 'message' => "Kasir di outlet " . auth()->user()->warehouse->name . " telah buka"], 200);
         } else {
-            return response()->json(['status' => False, 'message' => "Tidak ada kasir buka di outlet ". auth()->user()->warehouse->name], 200);
+            return response()->json(['status' => False, 'message' => "Tidak ada kasir buka di outlet " . auth()->user()->warehouse->name], 200);
         }
     }
 
-    public function closable() {
+    public function closable()
+    {
         $checkShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
         $transactions = Transaction::where('status', 'Pending')->where('shift_id', $checkShift->id)->whereNull('payment_method')->whereNull('paid_amount')->count();
 
-        if($transactions > 0){
-            return response()->json(['status' => False,'message' => "Tidak bisa tutup kasir, terdapat orderan yang masih tersedia."], 200);
+        if ($transactions > 0) {
+            return response()->json(['status' => False, 'message' => "Tidak bisa tutup kasir, terdapat orderan yang masih tersedia."], 200);
         } else {
             return response()->json(['status' => True, 'message' => "Kasir bisa ditutup."], 200);
         }
     }
 
-    public function latest() {
+    public function latest()
+    {
         $latestShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
         if (!$latestShift) {
             $latestShift = [];
@@ -325,12 +330,13 @@ class ShiftController extends Controller
 
         // Eager load the ingredient relationship
         $ingredientStock = Stock::with('ingredient')
-                                ->where('warehouse_id', auth()->user()->warehouse_id)
-                                ->orderBy('id', 'DESC')
-                                ->get()
-                                ->unique('ingredient_id');
+            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->whereNull('deleted_at')
+            ->orderBy('id', 'DESC')
+            ->get()
+            ->unique('ingredient_id');
 
-        $stocks = $ingredientStock->map(function($stock) {
+        $stocks = $ingredientStock->map(function ($stock) {
             return [
                 'ingredient_id' => $stock->ingredient_id,
                 'ingredient_name' => $stock->ingredient->name,
@@ -344,5 +350,4 @@ class ShiftController extends Controller
         $latestShift['stocks'] = $stocks;
         return response()->json($latestShift, 200);
     }
-
 }

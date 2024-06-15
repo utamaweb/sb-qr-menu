@@ -14,12 +14,12 @@ class StockController extends Controller
      */
     public function index()
     {
-        if(auth()->user()->hasRole('Superadmin')){
+        if (auth()->user()->hasRole('Superadmin')) {
             $lims_ingredient_all = Stock::get();
-        } elseif(auth()->user()->hasRole('Admin Bisnis')) {
+        } elseif (auth()->user()->hasRole('Admin Bisnis')) {
             $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
             $lims_ingredient_all = Stock::whereIn('warehouse_id', $warehouse_id)->get();
-        } else{
+        } else {
             // $lims_ingredient_all = Stock::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->get();
             $stocks = DB::table('stocks')
                 ->select('ingredient_id', DB::raw('MAX(id) as max_id'))
@@ -77,7 +77,11 @@ class StockController extends Controller
      */
     public function destroy($id)
     {
-        $lims_order_type_data = Stock::find($id)->delete();
+        $stock = Stock::find($id);
+        $ingredient_id = $stock->ingredient_id;
+        $warehouse_id = $stock->warehouse_id;
+        // delete this ingredients from this outlet with all stocks
+        Stock::where('ingredient_id', $ingredient_id)->where('warehouse_id', $warehouse_id)->delete();
         return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
     }
 }

@@ -200,7 +200,7 @@ class TransactionController extends Controller
                 ]);
 
                 if ($validator->fails()) {
-                    return response()->json(['message' => 'Pilihan Menu & Jenis Pesanan Tidak Boleh Kosong'], 200);
+                    return response()->json(['message' => 'Pilihan Menu & Jenis Pesanan Tidak Boleh Kosong'], 500);
                 }
                 $total_amount = 0;
                 foreach ($request->transaction_details as $detail) {

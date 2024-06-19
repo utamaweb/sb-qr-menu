@@ -327,12 +327,14 @@ class ShiftController extends Controller
             $latestShift['stocks'] = [];
             return response()->json($latestShift, 200);
         }
+
         // Eager load the ingredient relationship
-        $ingredientStock = Stock::with('ingredient')
-            ->where('warehouse_id', auth()->user()->warehouse_id)
-            ->orderBy('id', 'DESC')
-            ->get()
-            ->unique('ingredient_id');
+        $ingredientStock = Stock::where('shift_id', $latestShift->id)->get();
+        // $ingredientStock = Stock::with('ingredient')
+        //     ->where('warehouse_id', auth()->user()->warehouse_id)
+        //     ->orderBy('id', 'DESC')
+        //     ->get()
+        //     ->unique('ingredient_id');
 
         $stocks = $ingredientStock->map(function ($stock) {
             return [

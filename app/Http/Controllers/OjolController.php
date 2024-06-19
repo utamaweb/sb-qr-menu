@@ -28,7 +28,7 @@ class OjolController extends Controller
         ]);
 
         $create = Ojol::create([
-            'name' => ucfirst($request->name),
+            'name' => strtoupper($request->name),
             'percent' => $request->percent,
             'extra_price' => intVal(str_replace(',', '', $request->extra_price)),
             'business_id' => auth()->user()->business_id
@@ -55,7 +55,7 @@ class OjolController extends Controller
         ]);
 
         $update = $ojol->update([
-            'name' => ucfirst($request->name),
+            'name' => strtoupper($request->name),
             'percent' => $request->percent,
             'extra_price' => intVal(str_replace(',', '', $request->extra_price))
         ]);

@@ -115,7 +115,7 @@ class ProductController extends Controller
         $image = $request->image;
         $productFind = Product::findOrFail($id);
         if ($image) {
-            Storage::url('product_images/', $productFind->image)->delete();
+            Storage::delete('public/product_images/' . $productFind->image);
             $imageName = Str::slug($request->name) . '-' . Str::random(10) . '.' . $image->extension();
             $uploadImage = $image->storeAs('public/product_images', $imageName);
         } else {

@@ -138,17 +138,6 @@
       0 => 'Spatie\\Permission\\PermissionServiceProvider',
     ),
   ),
-  'srmklive/paypal' => 
-  array (
-    'providers' => 
-    array (
-      0 => 'Srmklive\\PayPal\\Providers\\PayPalServiceProvider',
-    ),
-    'aliases' => 
-    array (
-      'PayPal' => 'Srmklive\\PayPal\\Facades\\PayPal',
-    ),
-  ),
   'tymon/jwt-auth' => 
   array (
     'aliases' => 

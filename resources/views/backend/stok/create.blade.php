@@ -33,6 +33,8 @@
                         <th>Stok Masuk</th>
                         <th>Stok Terjual</th>
                         <th>Stok Akhir</th>
+                    @else
+                        <th>Pesan</th>
                     @endif
                     <th>Unit</th>
                     <th class="not-exported">Aksi</th>
@@ -49,6 +51,8 @@
                         <td>{{ number_format($ingredient->stock_in, 0, '', '.') }}</td>
                         <td>{{ number_format($ingredient->stock_used, 0, '', '.') }}</td>
                         <td>{{ number_format($ingredient->last_stock, 0, '', '.') }}</td>
+                    @else
+                        <td>Shift kasir sedang berjalan, tutup kasir untuk melihat stok.</td>
                     @endif
                     <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
                     <td>

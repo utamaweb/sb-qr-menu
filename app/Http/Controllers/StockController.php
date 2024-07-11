@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Stock;
+use App\Models\Shift;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -28,8 +29,13 @@ class StockController extends Controller
                 ->get();
 
             $lims_ingredient_all = Stock::whereIn('id', $stocks->pluck('max_id'))->get();
+
+            // Get shift data to check if the latest shift is open
+            $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->first();
+            $checkShift = ($shift->is_closed == 0) ? true : false;
+
         }
-        return view('backend.stok.create', compact('lims_ingredient_all'));
+        return view('backend.stok.create', compact('lims_ingredient_all', 'checkShift'));
     }
 
     /**

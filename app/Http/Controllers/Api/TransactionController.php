@@ -674,7 +674,7 @@ class TransactionController extends Controller
         // Get smallest quantity
         $qty = min($qty);
         if ($qty < $request->qty) {
-            return response()->json(['status' => false, 'message' => "Stok yang tersedia hanya " . $qty], 200);
+            return response()->json(['status' => false, 'message' => "Stok Bahan Baku Tidak Mencukupi!"], 200);
         } else {
             return response()->json(['status' => true, 'message' => "Stok Tersedia"], 200);
         }

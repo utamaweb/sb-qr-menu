@@ -27,6 +27,7 @@
                 <tr>
                     <th>#</th>
                     <th>Nama Outlet</th>
+                    <th>Tipe</th>
                     <th>Bisnis</th>
                     <th>Alamat</th>
                     <th>Tanggal Dibuat</th>
@@ -38,6 +39,7 @@
                 <tr data-id="{{$warehouse->id}}">
                     <td>{{++$key}}</td>
                     <td>{{ $warehouse->name }}</td>
+                    <td>{{ ($warehouse->is_self_service == 0) ? 'Hanya Kasir' : 'Self Service' }}</td>
                     <td>{{ $warehouse->business->name }}</td>
                     <td>{{ $warehouse->address }}</td>
                     <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
@@ -82,6 +84,14 @@
                                         </div>
 
                                         {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
+
+                                        <div class="form-group">
+                                            <label for="service">Jenis Service *</label>
+                                            <select name="service" id="service" class="form-control">
+                                                <option value="1" {{ ($warehouse->is_self_service == 1) ? 'selected' : '' }}>Self Service</option>
+                                                <option value="0" {{ ($warehouse->is_self_service == 0) ? 'selected' : '' }}>Hanya Kasir</option>
+                                            </select>
+                                        </div>
                                         </div>
                                         <input type="submit" value="Submit" class="btn btn-primary">
                                     </form>
@@ -138,6 +148,15 @@
                         <label>Alamat *</label>
                         <input type="text" name="address" required class="form-control">
                     </div>
+
+                    <div class="form-group">
+                        <label for="service">Jenis Service *</label>
+                        <select name="service" id="service" class="form-control">
+                            <option value="1" {{ ($warehouse->is_self_service == 1) ? 'selected' : '' }}>Self Service</option>
+                            <option value="0" {{ ($warehouse->is_self_service == 0) ? 'selected' : '' }}>Hanya Kasir</option>
+                        </select>
+                    </div>
+
                     <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>

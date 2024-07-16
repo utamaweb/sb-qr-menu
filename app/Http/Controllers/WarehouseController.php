@@ -33,7 +33,10 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'max:255',
+            'name' => 'required|max:255',
+            'business_id' => 'required',
+            'address' => 'required',
+            'service' => 'required'
         ]);
         $input['is_active'] = true;
         // $image = $request->image;
@@ -47,11 +50,17 @@ class WarehouseController extends Controller
         $warehouse = Warehouse::create([
             'name' => $request->name,
             'is_active' => 1,
-            // 'logo' => $imageName,
             'address' => $request->address,
-            'business_id' => $request->business_id
+            'business_id' => $request->business_id,
+            'is_self_service' => $request->service
         ]);
-        return redirect()->back()->with('message', 'Data Berhasil Ditambahkan');
+
+        if($warehouse) {
+            return redirect()->back()->with('message', 'Data Berhasil Ditambahkan');
+        } else {
+            return redirect()->back()->with('message', 'Data Gagal Ditambahkan');
+        }
+
     }
 
     public function edit($id)
@@ -63,7 +72,10 @@ class WarehouseController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'max:255'
+            'name' => 'max:255',
+            'business_id' => 'required',
+            'address' => 'required',
+            'service' => 'required'
         ]);
         $input = $request->all();
         $lims_warehouse_data = Warehouse::find($id);
@@ -79,6 +91,7 @@ class WarehouseController extends Controller
             'name' => $request->name,
             'address' => $request->address,
             'business_id' => $request->business_id,
+            'is_self_service' => $request->service
             // 'logo' => $imageName,
         ]);
         return redirect()->back()->with('message', 'Data Berhasil Diubah');

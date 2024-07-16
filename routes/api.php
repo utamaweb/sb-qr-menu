@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\OjolController;
+use App\Http\Controllers\Api\ServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +86,11 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
 
     // OJOL
     Route::get('ojol', [OjolController::class, 'index']);
+
+    // Service
+    Route::controller(ServiceController::class)->group(function() {
+        Route::get('service/check', 'checkService');
+    });
 });
 
 

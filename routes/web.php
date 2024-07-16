@@ -24,6 +24,7 @@ use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\CloseCashierController;
 use App\Http\Controllers\OjolController;
 use App\Http\Controllers\OjolWarehouseController;
+use App\Http\Controllers\BusinessStockController;
 
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
@@ -275,5 +276,11 @@ Route::group(['prefix' => 'admin'], function () {
 
         // Route for CloseCashier transaction details
         Route::get('close-cashier/transaction/{transaction}', [CloseCashierController::class, 'transactionDetails'])->name('close_cashier_transaction');
+
+        // Route for business outler stocks
+        Route::controller(BusinessStockController::class)->name('business-stock.')->group(function() {
+            Route::get('/business_stocks', 'index')->name('index');
+        });
+
     });
 });

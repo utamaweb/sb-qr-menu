@@ -32,6 +32,7 @@
                     class="dripicons-user-id"></i><span>Produk</span></a></li>
         <li id="bahan-baku"><a href="{{ route('bahan-baku.index') }}"> <i class="dripicons-user-id"></i><span>Bahan
                     Baku</span></a></li>
+        <li id="business-stock"><a href="{{ route('business-stock.index') }}"> <i class="dripicons-user-id"></i><span>Daftar Stok</span></a></li>
         <li id="user"><a href="{{ route('user.index') }}"> <i class="dripicons-user"></i><span>User</span></a>
         </li>
         <li id="outlet"><a href="{{ route('outlet.index') }}"> <i

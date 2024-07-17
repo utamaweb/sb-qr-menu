@@ -3,6 +3,7 @@
 use App\Http\Controllers\DemoAutoUpdateController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CustomCategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PrinterController;
 use App\Http\Controllers\Api\TransactionController;
@@ -90,6 +91,11 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     // Service
     Route::controller(ServiceController::class)->group(function() {
         Route::get('service/check', 'checkService');
+    });
+
+    // CustomC Category Parent
+    Route::controller(CustomCategoryController::class)->group(function() {
+        Route::get('/customCategories', 'index');
     });
 });
 

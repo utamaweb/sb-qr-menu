@@ -54,13 +54,13 @@ class CustomCategoryController extends Controller
 
         if($checkCustom) {
             $customCategory->update([
-                'name' => $request->custom
+                'name' => ucwords($request->custom)
             ]);
         } else {
             CustomCategory::create([
                 'warehouse_id' => auth()->user()->warehouse_id,
                 'category_id' => $category,
-                'name' => $request->custom
+                'name' => ucwords($request->custom)
             ]);
         }
 

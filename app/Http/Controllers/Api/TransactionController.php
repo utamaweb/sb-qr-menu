@@ -625,14 +625,14 @@ class TransactionController extends Controller
             ], 400);
         }
 
-        // Get latest transaction sequence number
-        $latestTransactionSequence = Transaction::where('warehouse_id', auth()->user()->warehouse_id)->where('shift_id', $shift->id)->latest()->first()->sequence_number;
+        // Sequence number
 
-        // Check sequence number
-        if($latestTransactionSequence < 3) {
-            $latestTransactionSequence += 1;
+        $countTransactionInShift = Transaction::where('shift_id', $shift->id)->orderBy('id', 'DESC')->count();
+        $lastTransaction = Transaction::where('shift_id', $shift->id)->orderBy('id', 'DESC')->first();
+        if ($countTransactionInShift > 0) {
+            $sequence_number = $lastTransaction->sequence_number + 1;
         } else {
-            $latestTransactionSequence = 1;
+            $sequence_number = 1;
         }
 
         // Get total amount and total quantity
@@ -652,7 +652,7 @@ class TransactionController extends Controller
             $transaction = Transaction::create([
                 'shift_id' => $shift->id,
                 'warehouse_id' => auth()->user()->warehouse_id,
-                'sequence_number' => $latestTransactionSequence,
+                'sequence_number' => $sequence_number,
                 'order_type_id' => $request->order_type_id,
                 'category_order' => "OFFLINE",
                 'user_id' => auth()->user()->id,

@@ -745,9 +745,7 @@ class TransactionController extends Controller
                 $transaction['order_type_name'] = $transaction['order_type']['name'];
 
                 // Response if transaction created successfully
-                return response()->json([
-                    $transaction
-                ], 200);
+                return response()->json($transaction, 200);
             }
         } catch (\Throwable $th) {
             DB::rollBack();

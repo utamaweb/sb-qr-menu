@@ -626,7 +626,6 @@ class TransactionController extends Controller
         }
 
         // Sequence number
-
         $countTransactionInShift = Transaction::where('shift_id', $shift->id)->orderBy('id', 'DESC')->count();
         $lastTransaction = Transaction::where('shift_id', $shift->id)->orderBy('id', 'DESC')->first();
         if ($countTransactionInShift > 0) {

@@ -615,7 +615,7 @@ class TransactionController extends Controller
         }
 
         // Get Latest Shift data
-        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->latest();
+        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->latest()->first();
 
         // Check if there is no shift
         if(empty($shift) || ($shift->is_closed == 1)) {
@@ -626,7 +626,7 @@ class TransactionController extends Controller
         }
 
         // Get latest transaction sequence number
-        $latestTransactionSequence = Transaction::where('warehouse_id', auth()->user()->warehouse_id)->where('shift_id', $shift->id)->latest()->sequence_number;
+        $latestTransactionSequence = Transaction::where('warehouse_id', auth()->user()->warehouse_id)->where('shift_id', $shift->id)->latest()->first()->sequence_number;
 
         // Check sequence number
         if($latestTransactionSequence < 3) {
@@ -639,8 +639,8 @@ class TransactionController extends Controller
         $total_amount = 0;
         $total_qty = 0;
         foreach($request->transaction_details as $detail) {
-            $total_amount += $detail->subtotal;
-            $total_qty += $detail->qty;
+            $total_amount += $detail['subtotal'];
+            $total_qty += $detail['qty'];
         }
 
         // Get change money amount
@@ -673,35 +673,35 @@ class TransactionController extends Controller
                     // Create transaction detail
                     $transaction_detail = TransactionDetail::create([
                         'transaction_id' => $transaction->id,
-                        'product_id' => $detail->product_id,
-                        'product_name' => $detail->product_name,
-                        'product_price' => $detail->product_price,
-                        'qty' => $detail->qty,
-                        'subtotal' => $detail->subtotal,
+                        'product_id' => $detail['product_id'],
+                        'product_name' => $detail['product_name'],
+                        'product_price' => $detail['product_price'],
+                        'qty' => $detail['qty'],
+                        'subtotal' => $detail['subtotal'],
                     ]);
 
                     // Process if transaction detail created
                     if($transaction_detail) {
                         // Get product ingredients
-                        $product_ingredients = IngredientProducts::where('product_id', $detail->product_id)->get();
+                        $product_ingredients = IngredientProducts::where('product_id', $transaction_detail->product_id)->get();
 
                         // Get ingredients stock
                         foreach($product_ingredients as $ingredient) {
-                            $stock = Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('shift_id', $shift->id)->where('ingredient_id', $ingredient->ingredient_id)->first();
+                            $stock = Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('shift_id', $shift->id)->where('ingredient_id', $ingredient['ingredient_id'])->first();
 
                             // Process if there are stock
-                            if($stock->last_stock >= ($ingredient->qty * $detail->qty)) {
+                            if($stock->last_stock >= ($ingredient['qty'] * $detail['qty'])) {
                                 // Update stock
                                 $stock->update([
-                                    'stock_used' => $stock->stock_used += ($ingredient->qty * $detail->qty),
-                                    'last_used' => $stock->last_used + ($ingredient->qty * $detail->qty)
+                                    'stock_used' => $stock->stock_used += ($ingredient['qty'] * $detail['qty']),
+                                    'last_used' => $stock->last_used + ($ingredient['qty'] * $detail['qty'])
                                 ]);
 
                                 // Create transaction in out
                                 TransactionInOut::create([
                                     'warehouse_id' => auth()->user()->warehouse_id,
-                                    'ingredient_id' => $ingredient->ingredient_id,
-                                    'qty' => ($ingredient->qty * $detail->qty),
+                                    'ingredient_id' => $ingredient['ingredient_id'],
+                                    'qty' => ($ingredient['qty'] * $detail['qty']),
                                     'date' => date('Y-m-d'),
                                     'transaction_type' => 'out',
                                     'user_id' => auth()->user()->id,
@@ -731,7 +731,7 @@ class TransactionController extends Controller
                 $transaction['details'] = TransactionDetail::where('transaction_id', $transaction->id)->get();
 
                 // Get warehouse
-                $transaction['warehouse'] = Warehouse::where('warehouse_id', $transaction->warehouse_id)->first();
+                $transaction['warehouse'] = Warehouse::where('id', $transaction->warehouse_id)->first();
 
                 // Get datetime
                 $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
@@ -754,7 +754,7 @@ class TransactionController extends Controller
             DB::rollBack();
             return response()->json([
                 'status' => 'error',
-                'message' => $th->getMessage()
+                'message' => throw $th
             ], 500);
         }
     }

@@ -313,21 +313,28 @@ class TransactionController extends Controller
                 if ($validator->fails()) {
                     return response()->json(['message' => 'Pilihan Menu Tidak Boleh Kosong'], 200);
                 }
+
                 $dateNow = Carbon::now()->format('Y-m-d');
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)->where('is_closed', 0)->first();
                 $transaction = Transaction::findOrFail($request->transaction_id);
+
                 // Simpan detail transaksi
                 $transaction_details = $request->input('payment_details');
                 $transactionDetailsWithProducts = [];
                 $product_ids = [];
+
                 foreach ($transaction_details as $detail) {
                     array_push($product_ids, $detail['product_id']);
                 }
+
                 $products = Product::whereIn('id', $product_ids)->get();
+                $outOfStockIngredients = []; // Array untuk menyimpan bahan baku yang habis
+
                 foreach ($transaction_details as $detail) {
                     // get deal with stock
                     $product_id = $detail['product_id'];
                     $product_qty = $detail['qty'];
+                    
                     // Ambil produk terkait
                     $product = $products->where('id', $product_id)->first();
 
@@ -337,10 +344,9 @@ class TransactionController extends Controller
                     foreach ($ingredients as $ingredient) {
                         $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $ingredient->id)->where('warehouse_id', auth()->user()->warehouse_id)->first();
                         $productIngredientQty = IngredientProducts::where('product_id', '=', $product->id)->where('ingredient_id', '=', $ingredient->id)->pluck('qty')->min();
+
                         if (!$stock) {
                             // Handle jika stok belum ada
-                            // continue;
-
                             $getLastStock = Stock::where('warehouse_id', auth()->user()->warehouse_id)->where('ingredient_id', '=', $ingredient->id)->orderBy('id', 'DESC')->first();
 
                             $stock = Stock::create([
@@ -353,25 +359,27 @@ class TransactionController extends Controller
                         }
 
                         if ($stock->last_stock < ($productIngredientQty * $product_qty)) {
-                            // Jika stok kurang dari qty, return peringatan
-                            DB::rollback();
-                            return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 200);
+                            // Jika stok kurang dari qty, tambahkan bahan baku ke array
+                            if (!in_array($ingredient->name, $outOfStockIngredients)) {
+                                $outOfStockIngredients[] = $ingredient->name;
+                            }
+                        } else {
+                            $stock->last_stock -= ($productIngredientQty * $product_qty);
+                            $stock->stock_used += ($productIngredientQty * $product_qty);
+                            $stock->save();
+                            // Insert ke table transaction in out
+                            TransactionInOut::create([
+                                'warehouse_id' => auth()->user()->warehouse_id,
+                                'ingredient_id' => $ingredient->id,
+                                'transaction_id' => $transaction->id,
+                                'qty' => $product_qty,
+                                'date' => $dateNow,
+                                'transaction_type' => 'out',
+                                'user_id' => auth()->user()->id,
+                            ]);
                         }
-
-                        $stock->last_stock -= ($productIngredientQty * $product_qty);
-                        $stock->stock_used += ($productIngredientQty * $product_qty);
-                        $stock->save();
-                        // Insert ke table transaction in out
-                        TransactionInOut::create([
-                            'warehouse_id' => auth()->user()->warehouse_id,
-                            'ingredient_id' => $ingredient->id,
-                            'transaction_id' => $transaction->id,
-                            'qty' => $product_qty,
-                            'date' => $dateNow,
-                            'transaction_type' => 'out',
-                            'user_id' => auth()->user()->id,
-                        ]);
                     }
+                    
                     // end get deal with stock
                     $productDetail = [
                         'transaction_id' => $transaction->id,
@@ -387,6 +395,16 @@ class TransactionController extends Controller
                         'subtotal' => $detail['subtotal']
                     ]);
                 }
+
+                if (!empty($outOfStockIngredients)) {
+                    // Jika ada bahan baku yang habis, tampilkan pesan peringatan
+                    $ingredientsList = implode(', ', $outOfStockIngredients);
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Stok bahan baku '. $ingredientsList . ' berikut tidak mencukupi.'
+                    ], 200);
+                }
+
                 $total_amount = 0;
                 foreach ($request->payment_details as $detail) {
                     $total_amount += $detail['subtotal'];
@@ -398,15 +416,10 @@ class TransactionController extends Controller
                 $transaction->update([
                     'total_amount' => $total_amount,
                     'total_qty' => $total_qty,
-                    // 'status' => 'Lunas'
                 ]);
-
-                // $change_money = $request->paid_amount - $transaction->total_amount;
-                // if($transaction->paid_amount < $transaction->total_amount){
 
                 // update transaction status, etc lunas
                 if ($transaction->status == 'Pending') {
-
                     $transaction->update([
                         'payment_method' => $request->payment_method,
                         'paid_amount' => $request->paid_amount,
@@ -414,12 +427,13 @@ class TransactionController extends Controller
                         'status' => 'Lunas',
                     ]);
                     DB::commit();
-                    // event(new TransactionPaid($transaction->id));
                 } else {
                     return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 200);
                 }
+
                 $transaction['details'] = $transactionDetailsWithProducts;
                 return response()->json($transaction, 200);
+
             }
         } catch (\Throwable $th) {
             DB::rollback();

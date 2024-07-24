@@ -841,4 +841,22 @@ class TransactionController extends Controller
             return response()->json(['status' => true, 'message' => "Stok Tersedia"], 200);
         }
     }
+
+    // Delete transaction products
+    public function deleteTransactionProducts($id) {
+        $detail = TransactionDetail::where('id', $id)->first();
+        $delete = $detail->delete();
+
+        if($delete) {
+            return response()->json([
+                "status" => "ok",
+                "message" => "Produk berhasil dihapus"
+            ], 200);
+        } else {
+            return response()->json([
+                "status" => "error",
+                "message" => "Gagal menghapus produk"
+            ], 500);
+        }
+    }
 }

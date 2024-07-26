@@ -28,9 +28,9 @@ class AuthController extends Controller
 
         if(($user->hasRole('Customer')) AND ($warehouse->is_self_service == 0)) {
             return response()->json([
-                'status' => 'Unauthorized',
+                'status' => false,
                 'message' => 'User warehouse is not self service'
-            ], 401);
+            ], 200);
         }
 
         if ($validator->fails()) {

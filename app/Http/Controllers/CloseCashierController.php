@@ -14,6 +14,7 @@ use App\Models\TransactionDetail;
 use App\Http\Controllers\Controller;
 use App\Models\CloseCashierProductSold;
 
+
 class CloseCashierController extends Controller
 {
     public function index()
@@ -31,6 +32,29 @@ class CloseCashierController extends Controller
         // get detail tutup kasir
         $closeCashier = CloseCashier::find($id);
         // get produk terjual di shift tersebut
+        $paymentTransactions = Transaction::whereIn('payment_method', ['Tunai', 'GOFOOD', 'GRABFOOD', 'SHOPEEFOOD'])
+            ->where('shift_id', $closeCashier->shift_id)
+            ->get();
+
+        $transactionDetails = [
+            'Tunai' => [],
+            'GOFOOD' => [],
+            'GRABFOOD' => [],
+            'SHOPEEFOOD' => []
+        ];
+
+        foreach ($paymentTransactions as $transaction) {
+            $details = TransactionDetail::where('transaction_id', $transaction->id)->get();
+            foreach ($details as $detail) {
+                $transactionDetails[$transaction->payment_method][] = [
+                    'transaction_id' => $transaction->id,
+                    'payment_method' => $transaction->payment_method,
+                    'product_name' => $detail->product_name,
+                    'qty' => $detail->qty,
+                    'created_at' => $transaction->created_at
+                ];
+            }
+        }
         $closeCashierProductSolds = CloseCashierProductSold::where('close_cashier_id', $id)->get();
         // get pengeluaran shift tersebut
         $expenses = Expense::where('shift_id', $closeCashier->shift_id)->get();
@@ -69,7 +93,7 @@ class CloseCashierController extends Controller
                 $stocksIngredient[] = (object) $stockData;
             }
         }
-        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions', 'stocks', 'stocksIngredient'));
+        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions', 'stocks', 'stocksIngredient', 'transactionDetails'));
     }
 
 

@@ -123,18 +123,29 @@
 
                             <div class="card">
                                 <div class="card-body">
-                                    <h4>Produk Terjual</h4>
-
+                                    @foreach ($transactionDetails as $paymentMethod => $transactions)
+                                    <h4>Produk Terjual ({{ $paymentMethod }})</h4>
+                                    @if (count($transactions) > 0)
                                     <table class="table">
                                         <tbody>
-                                            @foreach ($closeCashierProductSolds as $product)
+                                            @foreach ($transactions as $detail)
                                                 <tr>
-                                                    <td style="width: 50%;">{{ $product->product_name }}</td>
-                                                    <td style="width: 50%; text-align: right;">{{ $product->qty }}</td>
+                                                    <td style="width: 50%;">{{ $detail['product_name'] }}</td>
+                                                    <td style="width: 50%; text-align: right;">{{ $detail['qty'] }}</td>
                                                 </tr>
                                             @endforeach
                                         </tbody>
                                     </table>
+                                    @else
+                                    <table class="table">
+                                        <tbody>
+                                                <tr>
+                                                    <td>Tidak Ada Produk Terjual</td>
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                                    @endif
+                                    @endforeach
                                 </div>
                             </div>
 

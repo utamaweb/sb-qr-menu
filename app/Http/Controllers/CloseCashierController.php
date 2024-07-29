@@ -38,13 +38,8 @@ class CloseCashierController extends Controller
         // adjust ojols
         $business_id = Warehouse::find(auth()->user()->warehouse_id)->business_id;
         $ojols = Ojol::where('business_id', $business_id)->get();
-        $ojolWarehouse = [];
-        $ojolName = [];
-        $ojolName[] = "Tunai";
+        $ojolName = ['Tunai'];
         foreach ($ojols as $ojol) {
-            $ojolWarehouse[] = OjolWarehouse::where('warehouse_id', '=', auth()->user()->warehouse_id)
-                                            ->where('ojol_id', '=', $ojol->id)
-                                            ->first();
             $ojolName[] = $ojol->name;
         }
 
@@ -70,7 +65,6 @@ class CloseCashierController extends Controller
                 if (isset($transactionDetails[$paymentMethod][$productName])) {
                     $transactionDetails[$paymentMethod][$productName] += $detail->qty;
                 } else {
-                    // Jika produk belum ada, tambahkan entri baru
                     $transactionDetails[$paymentMethod][$productName] = $detail->qty;
                 }
             }
@@ -84,6 +78,7 @@ class CloseCashierController extends Controller
         }
 
         // return $transactionDetails;
+
 
         $closeCashierProductSolds = CloseCashierProductSold::where('close_cashier_id', $id)->get();
         // get pengeluaran shift tersebut

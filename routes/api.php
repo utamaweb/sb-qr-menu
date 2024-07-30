@@ -3,6 +3,7 @@
 use App\Http\Controllers\DemoAutoUpdateController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CustomCategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\PrinterController;
 use App\Http\Controllers\Api\TransactionController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\Api\ShiftController;
 use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\OjolController;
+use App\Http\Controllers\Api\ServiceController;
 
 /*
 |--------------------------------------------------------------------------
@@ -71,10 +73,12 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('transaction/history/online', [TransactionController::class, 'online']);
     Route::get('transaction/history/offline', [TransactionController::class, 'offline']);
     Route::post('transaction/online', [TransactionController::class, 'storeOnline']);
+    Route::post('transaction/offline', [TransactionController::class, 'storeOffline']);
     Route::get('transaction/not-paid', [TransactionController::class, 'notPaid']);
     Route::get('transaction/order-types', [TransactionController::class, 'orderType']);
     Route::post('transaction', [TransactionController::class, 'store']);
     Route::delete('transaction/{id}/cancel', [TransactionController::class, 'cancel']);
+    Route::delete('transaction/product/delete/{id}', [TransactionController::class, 'deleteTransactionProducts']);
 
     // Shift / Close Cashier
     Route::post('shift/open', [ShiftController::class, 'open']);
@@ -85,6 +89,16 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
 
     // OJOL
     Route::get('ojol', [OjolController::class, 'index']);
+
+    // Service
+    Route::controller(ServiceController::class)->group(function() {
+        Route::get('service/check', 'checkService');
+    });
+
+    // CustomC Category Parent
+    Route::controller(CustomCategoryController::class)->group(function() {
+        Route::get('/customCategories', 'index');
+    });
 });
 
 

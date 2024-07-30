@@ -28,10 +28,14 @@
                     <th class="text-center">#</th>
                     <th>Nama Bahan Baku</th>
                     <th>Outlet</th>
-                    {{-- <th>Stok Awal</th> --}}
-                    <th>Stok Masuk</th>
-                    <th>Stok Terjual</th>
-                    <th>Stok Akhir</th>
+                    @if ($checkShift == false)
+                        {{-- <th>Stok Awal</th> --}}
+                        <th>Stok Masuk</th>
+                        <th>Stok Terjual</th>
+                        <th>Stok Akhir</th>
+                    @else
+                        <th>Pesan</th>
+                    @endif
                     <th>Unit</th>
                     <th class="not-exported">Aksi</th>
                 </tr>
@@ -42,10 +46,14 @@
                     <td class="text-center">{{++$key}}</td>
                     <td>{{ $ingredient->ingredient->name }}</td>
                     <td>{{ $ingredient->warehouse->name }}</td>
-                    {{-- <td>{{ $ingredient->first_stock }}</td> --}}
-                    <td>{{ number_format($ingredient->stock_in, 0, '', '.') }}</td>
-                    <td>{{ number_format($ingredient->stock_used, 0, '', '.') }}</td>
-                    <td>{{ number_format($ingredient->last_stock, 0, '', '.') }}</td>
+                    @if ($checkShift == false)
+                        {{-- <td>{{ $ingredient->first_stock }}</td> --}}
+                        <td>{{ number_format($ingredient->stock_in, 0, '', '.') }}</td>
+                        <td>{{ number_format($ingredient->stock_used, 0, '', '.') }}</td>
+                        <td>{{ number_format($ingredient->last_stock, 0, '', '.') }}</td>
+                    @else
+                        <td>Shift kasir sedang berjalan, tutup kasir untuk melihat stok.</td>
+                    @endif
                     <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
                     <td>
                         <div class="row">

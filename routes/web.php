@@ -24,6 +24,8 @@ use App\Http\Controllers\OrderTypeController;
 use App\Http\Controllers\CloseCashierController;
 use App\Http\Controllers\OjolController;
 use App\Http\Controllers\OjolWarehouseController;
+use App\Http\Controllers\BusinessStockController;
+use App\Http\Controllers\CustomCategoryController;
 
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
@@ -275,5 +277,19 @@ Route::group(['prefix' => 'admin'], function () {
 
         // Route for CloseCashier transaction details
         Route::get('close-cashier/transaction/{transaction}', [CloseCashierController::class, 'transactionDetails'])->name('close_cashier_transaction');
+
+        // Route for business outler stocks
+        Route::controller(BusinessStockController::class)->name('business-stock.')->group(function() {
+            Route::get('/business_stocks', 'index')->name('index');
+        });
+
+        // Route for custom category parent
+        Route::controller(CustomCategoryController::class)->name('custom-category.')->group(function() {
+            Route::get('/custom_categories', 'index')->name('index');
+            Route::get('/custom_category/{category}', 'form')->name('form');
+            Route::post('/custom_category/{category}', 'store')->name('store');
+            Route::delete('/custom_category/{category}', 'destroy')->name('destroy');
+        });
+
     });
 });

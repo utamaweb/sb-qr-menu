@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use DB;
 use Auth;
+use App\Models\Ojol;
 use App\Models\Stock;
 use App\Models\Expense;
+use App\Models\Warehouse;
 use App\Models\Transaction;
 use App\Models\CloseCashier;
 use Illuminate\Http\Request;
+use App\Models\OjolWarehouse;
 use App\Models\StockPurchase;
 use App\Models\TransactionDetail;
 use App\Http\Controllers\Controller;
 use App\Models\CloseCashierProductSold;
+
 
 class CloseCashierController extends Controller
 {
@@ -30,7 +34,52 @@ class CloseCashierController extends Controller
     public function show($id) {
         // get detail tutup kasir
         $closeCashier = CloseCashier::find($id);
+
+        // adjust ojols
+        $business_id = Warehouse::find(auth()->user()->warehouse_id)->business_id;
+        $ojols = Ojol::where('business_id', $business_id)->get();
+        $ojolName = ['Tunai'];
+        foreach ($ojols as $ojol) {
+            $ojolName[] = $ojol->name;
+        }
+
         // get produk terjual di shift tersebut
+        $paymentTransactions = Transaction::whereIn('payment_method', $ojolName)
+            ->where('shift_id', $closeCashier->shift_id)
+            ->get();
+
+        // init transactionDetails dynamically
+        $transactionDetails = [];
+        foreach ($ojolName as $paymentMethod) {
+            $transactionDetails[$paymentMethod] = [];
+        }
+
+        // count products
+        foreach ($paymentTransactions as $transaction) {
+            $details = TransactionDetail::where('transaction_id', $transaction->id)->get();
+            foreach ($details as $detail) {
+                $productName = $detail->product_name;
+                $paymentMethod = $transaction->payment_method;
+
+                // add qty to product
+                if (isset($transactionDetails[$paymentMethod][$productName])) {
+                    $transactionDetails[$paymentMethod][$productName] += $detail->qty;
+                } else {
+                    $transactionDetails[$paymentMethod][$productName] = $detail->qty;
+                }
+            }
+        }
+
+        // formatting array
+        foreach ($transactionDetails as $paymentMethod => $products) {
+            $transactionDetails[$paymentMethod] = array_map(function($productName, $qty) {
+                return ['product_name' => $productName, 'qty' => $qty];
+            }, array_keys($products), $products);
+        }
+
+        // return $transactionDetails;
+
+
         $closeCashierProductSolds = CloseCashierProductSold::where('close_cashier_id', $id)->get();
         // get pengeluaran shift tersebut
         $expenses = Expense::where('shift_id', $closeCashier->shift_id)->get();
@@ -39,11 +88,9 @@ class CloseCashierController extends Controller
         $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
         $sumStockPurchase = StockPurchase::where('shift_id', $closeCashier->shift_id)->sum('total_price');
         // get transaksi lunas shift tersebut
-        $transactions = Transaction::where('status', 'Lunas')->where('shift_id', $closeCashier->shift_id)->get();
+        $transactionals = Transaction::where('status', 'Lunas')->where('shift_id', $closeCashier->shift_id)->get();
         // get sisa stok shift tersebut
-        $stocksIngredient = []; // Pastikan untuk menginisialisasi array terlebih dahulu
-
-        $stocksIngredient = []; // Pastikan untuk menginisialisasi array terlebih dahulu
+        $stocksIngredient = [];
 
         $stocks = Stock::where('shift_id', $closeCashier->shift_id)->get();
 
@@ -69,7 +116,7 @@ class CloseCashierController extends Controller
                 $stocksIngredient[] = (object) $stockData;
             }
         }
-        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions', 'stocks', 'stocksIngredient'));
+        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactionals', 'stocks', 'stocksIngredient', 'transactionDetails'));
     }
 
 

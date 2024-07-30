@@ -32,6 +32,7 @@
                     class="dripicons-user-id"></i><span>Produk</span></a></li>
         <li id="bahan-baku"><a href="{{ route('bahan-baku.index') }}"> <i class="dripicons-user-id"></i><span>Bahan
                     Baku</span></a></li>
+        <li id="business-stock"><a href="{{ route('business-stock.index') }}"> <i class="dripicons-user-id"></i><span>Daftar Stok</span></a></li>
         <li id="user"><a href="{{ route('user.index') }}"> <i class="dripicons-user"></i><span>User</span></a>
         </li>
         <li id="outlet"><a href="{{ route('outlet.index') }}"> <i
@@ -48,6 +49,8 @@
 
         {{-- Menu Admin Outlet --}}
     @elseif(auth()->user()->hasRole('Admin Outlet'))
+        <li id="custom-category"><a href="{{ route('custom-category.index') }}"> <i
+                    class="dripicons-list"></i><span>Kategori Custom</span></a></li>
         <li id="ojek-online-outlet"><a href="{{ route('ojol-warehouse.index') }}"> <i
                     class="dripicons-user-id"></i><span>Ojek Online Outlet</span></a></li>
         <li id="produk-outlet"><a href="{{ route('produk-outlet.index') }}"> <i

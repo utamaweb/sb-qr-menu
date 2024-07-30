@@ -36,6 +36,8 @@
                         </div>
                     </div>
                     <div class="row">
+
+                        {{-- Start of Left Column --}}
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
@@ -71,8 +73,137 @@
                                     </table>
                                 </div>
                             </div>
-                        </div>
 
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4>Non Tunai</h4>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 50%;">Omset GOFOOD</td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->gofood_omzet)</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">Omset GRABFOOD</td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->grabfood_omzet)</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">Omset SHOPEEFOOD</td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->shopeefood_omzet)</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">Omset QRIS / TRANSFER</td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->transfer_omzet)</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">Total Non Tunai</td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->total_non_cash)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4>Cash Omset</h4>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 50%;">Omset Aplikasi - Total Non Tunai
+                                                </td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->total_income - $closeCashier->total_non_cash)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    @foreach ($transactionDetails as $paymentMethod => $transactions)
+                                    <h4>Produk Terjual ({{ $paymentMethod }})</h4>
+                                    @if (count($transactions) > 0)
+                                    <table class="table">
+                                        <tbody>
+                                            @foreach ($transactions as $detail)
+                                                <tr>
+                                                    <td style="width: 50%;">{{ $detail['product_name'] }}</td>
+                                                    <td style="width: 50%; text-align: right;">{{ $detail['qty'] }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                    @else
+                                    <table class="table">
+                                        <tbody>
+                                                <tr>
+                                                    <td>Tidak Ada Produk Terjual</td>
+                                                </tr>
+                                        </tbody>
+                                    </table>
+                                    @endif
+                                    @endforeach
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4>Pengeluaran</h4>
+
+                                    <table class="table">
+                                        <tbody>
+                                            @foreach ($expenses as $expense)
+                                                <tr>
+                                                    <td style="width: 50%;">
+                                                        {{ $expense->expenseCategory->name }}{{ empty($expense->note) ? '' : ' (' . $expense->note . ')' }}
+                                                    </td>
+                                                    <td style="width: 50%; text-align: right;">@currency($expense->amount)</td>
+                                                </tr>
+                                            @endforeach
+
+                                            <tr>
+                                                <td style="width: 50%;">Total Pengeluaran</td>
+                                                <td style="width: 50%; text-align: right;">@currency($sumExpense)</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">Total Penambahan Stok</td>
+                                                <td style="width: 50%; text-align: right;">@currency($sumStockPurchase)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4>Hasil Akhir</h4>
+
+                                    <table class="table">
+                                        <tbody>
+                                            <tr>
+                                                <td style="width: 50%;">Cash Omset - Total Pengeluaran</td>
+                                                {{-- <td style="width: 50%; text-align: right;">@currency($closeCashier->total_cash - $sumExpense - $sumStockPurchase)</td> --}}
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->total_income - $closeCashier->total_non_cash - $sumExpense)</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">Uang Tunai Di Laci</td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->cash_in_drawer)</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="width: 50%;">Selisih</td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->difference)</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        {{-- End of Left Column --}}
+
+                        {{-- Start of Right Column --}}
                         <div class="col-md-6">
                             <div class="card">
                                 <div class="card-body">
@@ -124,134 +255,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Non Tunai</h4>
-
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width: 50%;">Omset GOFOOD</td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->gofood_omzet)</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 50%;">Omset GRABFOOD</td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->grabfood_omzet)</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 50%;">Omset SHOPEEFOOD</td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->shopeefood_omzet)</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 50%;">Omset QRIS / TRANSFER</td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->transfer_omzet)</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 50%;">Total Non Tunai</td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->total_non_cash)</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Pengeluaran</h4>
-
-                                    <table class="table">
-                                        <tbody>
-                                            @foreach ($expenses as $expense)
-                                                <tr>
-                                                    <td style="width: 50%;">
-                                                        {{ $expense->expenseCategory->name }}{{ empty($expense->note) ? '' : ' (' . $expense->note . ')' }}
-                                                    </td>
-                                                    <td style="width: 50%; text-align: right;">@currency($expense->amount)</td>
-                                                </tr>
-                                            @endforeach
-
-                                            <tr>
-                                                <td style="width: 50%;">Total Pengeluaran</td>
-                                                <td style="width: 50%; text-align: right;">@currency($sumExpense)</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 50%;">Total Penambahan Stok</td>
-                                                <td style="width: 50%; text-align: right;">@currency($sumStockPurchase)</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Cash Omset</h4>
-
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width: 50%;">Omset Aplikasi - Total Non Tunai
-                                                </td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->total_income - $closeCashier->total_non_cash)</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Hasil Akhir</h4>
-
-                                    <table class="table">
-                                        <tbody>
-                                            <tr>
-                                                <td style="width: 50%;">Cash Omset - Total Pengeluaran</td>
-                                                {{-- <td style="width: 50%; text-align: right;">@currency($closeCashier->total_cash - $sumExpense - $sumStockPurchase)</td> --}}
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->total_income - $closeCashier->total_non_cash - $sumExpense)</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 50%;">Uang Tunai Di Laci</td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->cash_in_drawer)</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="width: 50%;">Selisih</td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->difference)</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <h4>Produk Terjual</h4>
-
-                                    <table class="table">
-                                        <tbody>
-                                            @foreach ($closeCashierProductSolds as $product)
-                                                <tr>
-                                                    <td style="width: 50%;">{{ $product->product_name }}</td>
-                                                    <td style="width: 50%; text-align: right;">{{ $product->qty }}</td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                        {{-- End of Right Column --}}
                     </div>
                 </div>
             </div>
@@ -282,7 +286,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($transactions as $key => $transaction)
+                    @forelse ($transactionals as $transaction)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $transaction->date }} | {{ $transaction->created_at->format('H:i:s') }}</td>

@@ -27,27 +27,27 @@ class CategoryController extends Controller
 
     public function store(Request $request)
     {
-        $request->name = preg_replace('/\s+/', ' ', $request->name);
+        // $request->name = preg_replace('/\s+/', ' ', $request->name);
         $this->validate($request, [
             'name' => 'max:255',
         ]);
-        $image = $request->image;
-        if ($image) {
-            $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
-            $imageName = date("Ymdhis");
-            if(!config('database.connections.saleprosaas_landlord')) {
-                $imageName = $imageName . '.' . $ext;
-                $image->move('public/images/category', $imageName);
-            }
-            else {
-                $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
-                $image->move('public/images/category', $imageName);
-            }
-            Image::make('public/images/category/'. $imageName)->fit(300, 300)->save();
-            $lims_category_data['image'] = $imageName;
-        }
-        $icon = $request->icon;
-        $lims_category_data['name'] = $request->name;
+        // $image = $request->image;
+        // if ($image) {
+        //     $ext = pathinfo($image->getClientOriginalName(), PATHINFO_EXTENSION);
+        //     $imageName = date("Ymdhis");
+        //     if(!config('database.connections.saleprosaas_landlord')) {
+        //         $imageName = $imageName . '.' . $ext;
+        //         $image->move('public/images/category', $imageName);
+        //     }
+        //     else {
+        //         $imageName = $this->getTenantId() . '_' . $imageName . '.' . $ext;
+        //         $image->move('public/images/category', $imageName);
+        //     }
+        //     Image::make('public/images/category/'. $imageName)->fit(300, 300)->save();
+        //     $lims_category_data['image'] = $imageName;
+        // }
+        // $icon = $request->icon;
+        $lims_category_data['name'] = ucfirst($request->name);
         $lims_category_data['business_id'] = auth()->user()->business_id;
         $lims_category_data['category_parent_id'] = $request->category_parent_id;
         $lims_category_data['is_active'] = true;
@@ -151,8 +151,8 @@ class CategoryController extends Controller
             $product_data->delete();
         }
 
-        $this->fileDelete('images/category/', $lims_category_data->image);
-        $this->fileDelete('images/category/icons', $lims_category_data->icon);
+        // $this->fileDelete('images/category/', $lims_category_data->image);
+        // $this->fileDelete('images/category/icons', $lims_category_data->icon);
 
         $lims_category_data->delete();
         return redirect()->back()->with('not_permitted', 'Kategori Berhasil Dihapus');

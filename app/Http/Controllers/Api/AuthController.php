@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use JWTAuth;
 use App\Models\User;
+use App\Models\Warehouse;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Facades\DB;
 
@@ -20,6 +21,17 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string'
         ]);
+
+        // Process to check if user warehouse is not self service
+        $user = User::where('email', $request->email)->first();
+        $warehouse = Warehouse::where('id', $user->warehouse_id)->first();
+
+        if(($user->hasRole('Customer')) AND ($warehouse->is_self_service == 0)) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User warehouse is not self service'
+            ], 200);
+        }
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->messages()], 400);

@@ -88,7 +88,7 @@ class CloseCashierController extends Controller
         $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
         $sumStockPurchase = StockPurchase::where('shift_id', $closeCashier->shift_id)->sum('total_price');
         // get transaksi lunas shift tersebut
-        $transactions = Transaction::where('status', 'Lunas')->where('shift_id', $closeCashier->shift_id)->get();
+        $transactionals = Transaction::where('status', 'Lunas')->where('shift_id', $closeCashier->shift_id)->get();
         // get sisa stok shift tersebut
         $stocksIngredient = [];
 
@@ -116,7 +116,7 @@ class CloseCashierController extends Controller
                 $stocksIngredient[] = (object) $stockData;
             }
         }
-        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactions', 'stocks', 'stocksIngredient', 'transactionDetails'));
+        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactionals', 'stocks', 'stocksIngredient', 'transactionDetails'));
     }
 
 

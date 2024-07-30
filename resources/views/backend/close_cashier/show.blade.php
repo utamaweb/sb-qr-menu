@@ -286,7 +286,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($transactions as $key => $transaction)
+                    @forelse ($transactionals as $transaction)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $transaction->date }} | {{ $transaction->created_at->format('H:i:s') }}</td>

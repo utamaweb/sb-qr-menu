@@ -40,9 +40,9 @@ Route::get('/get-storage', function () {
     Artisan::call('storage:link');
 });
 
-Route::get('/apk', function () {
-    return redirect('https://drive.google.com/drive/folders/1E_jhYwX5jSP0VN3rvH8gE-yUSE7LJ4lw?usp=sharing');
-});
+// Route::get('/apk', function () {
+//     return redirect('https://drive.google.com/drive/folders/1E_jhYwX5jSP0VN3rvH8gE-yUSE7LJ4lw?usp=sharing');
+// });
 Route::group(['prefix' => 'admin'], function () {
     Route::middleware(['web'])->group(function () {
         Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');

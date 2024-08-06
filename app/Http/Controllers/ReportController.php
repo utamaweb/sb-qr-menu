@@ -2,38 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
-use App\Models\ProductPurchase;
-use App\Models\Product_Sale;
-use App\Models\ProductQuotation;
-use App\Models\Sale;
-use App\Models\Purchase;
-use App\Models\Transaction;
-use App\Models\TransactionDetail;
-use App\Models\Quotation;
-use App\Models\Transfer;
-use App\Models\Returns;
-use App\Models\ProductReturn;
-use App\Models\ReturnPurchase;
-use App\Models\ProductTransfer;
-use App\Models\PurchaseProductReturn;
-use App\Models\Payment;
-use App\Models\Warehouse;
-use App\Models\Product_Warehouse;
-use App\Models\Expense;
-use App\Models\Payroll;
-use App\Models\User;
-use App\Models\Customer;
-use App\Models\Supplier;
-use App\Models\Variant;
-use App\Models\ProductVariant;
-use App\Models\Unit;
-use App\Models\CustomerGroup;
 use DB;
 use Auth;
 use Carbon\Carbon;
+use App\Models\Sale;
+use App\Models\Unit;
+use App\Models\User;
+use App\Models\Stock;
+use App\Models\Expense;
+use App\Models\Payment;
+use App\Models\Payroll;
+use App\Models\Product;
+use App\Models\Returns;
+use App\Models\Variant;
+use App\Models\Customer;
+use App\Models\Purchase;
+use App\Models\Supplier;
+use App\Models\Transfer;
+use App\Models\Quotation;
+use App\Models\Warehouse;
+use App\Models\Transaction;
+use App\Models\Product_Sale;
+use Illuminate\Http\Request;
+use App\Models\CustomerGroup;
+use App\Models\ProductReturn;
+use App\Models\ProductVariant;
+use App\Models\ReturnPurchase;
+use App\Models\ProductPurchase;
+use App\Models\ProductTransfer;
+use App\Models\ProductQuotation;
+use App\Models\Product_Warehouse;
+use App\Models\TransactionDetail;
 use Spatie\Permission\Models\Role;
+use App\Models\PurchaseProductReturn;
 use Spatie\Permission\Models\Permission;
 
 class ReportController extends Controller
@@ -4532,27 +4533,35 @@ class ReportController extends Controller
         // DISINI CONTROLLER LAPORAN SELISIH STOK 
         $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
         $data = $request->all();
-        if($data){
+        if($request->warehouse_id != "all"){
             $start_date = $data['start_date'];
             $end_date = $data['end_date'];
+            $warehouse_id = $data['warehouse_id'];
+            $warehouse_name = Warehouse::find($warehouse_id)->name;
+            // $stocks = Stock::where('warehouse_id', $warehouse_id)->where('difference_stock', '>', 0)->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date)->get();
+            // return $stocks;
+            $stocks = Stock::where('warehouse_id', $warehouse_id)
+                   ->where('difference_stock', '>', 0)
+                   ->whereDate('created_at', '>=', $start_date)
+                   ->whereDate('created_at', '<=', $end_date)
+                   ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
+                   ->groupBy('ingredient_id')
+                   ->get();
         } else{
-            $start_date = Carbon::now()->format('Y-m-d');
-            $end_date = Carbon::now()->format('Y-m-d');
+            $start_date = $data['start_date'];
+            $end_date = $data['end_date'];
+            // $start_date = Carbon::now()->format('Y-m-d');
+            // $end_date = Carbon::now()->format('Y-m-d');
+            $warehouse_id = 'all';
+            $warehouse_name = "Semua";
+            // $stocks = Stock::where('difference_stock', '>', 0)->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date)->get();
+            $stocks = Stock::where('difference_stock', '>', 0)
+                   ->whereDate('created_at', '>=', $start_date)
+                   ->whereDate('created_at', '<=', $end_date)
+                   ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
+                   ->groupBy('ingredient_id')
+                   ->get();
         }
-
-        // Start of new Products get
-        $products = Product::with('category')->whereIn('id', Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->pluck('product_id'))->get();
-
-        // $stocks = Stock::where('created_at', )
-
-        $transactionDetails = TransactionDetail::whereIn('transaction_id', (Transaction::where('warehouse_id', auth()->user()->warehouse_id)->whereBetween('date', [$start_date, $end_date])->pluck('id')))->get();
-
-        foreach($products as $product) {
-            $product['qty'] = $transactionDetails->where('product_id', $product->id)->sum('qty');
-            $product['subtotal'] = $transactionDetails->where('product_id', $product->id)->sum('subtotal');
-        }
-        // End of new Products get
-
-        return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'products','warehouses'));
+        return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'warehouses','warehouse_id','warehouse_name','stocks'));
     }
 }

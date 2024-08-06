@@ -13,9 +13,9 @@
                         <label class="d-tc mt-2"><strong>Pilih Tanggal</strong> &nbsp;</label>
                         <div class="d-tc">
                             <div class="input-group">
-                                <input type="text" class="daterangepicker-field form-control" value="" required />
-                                <input type="hidden" name="start_date" value="" />
-                                <input type="hidden" name="end_date" value="" />
+                                <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} s/d {{$end_date}}" required />
+                                <input type="hidden" name="start_date" value="{{$start_date}}" />
+                                <input type="hidden" name="end_date" value="{{$end_date}}" />
                             </div>
                         </div>
                     </div>
@@ -27,8 +27,9 @@
                             <div class="input-group">
                                 <select name="warehouse_id" class="selectpicker form-control" data-live-search="true"
                                 data-live-search-style="begins" title="---Pilih Outlet--- ">>
+                                    <option value="all" {{$warehouse_id == 'all' ? 'selected' : ''}}>Semua Outlet</option>
                                     @foreach($warehouses as $warehouse)
-                                    <option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
+                                    <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -44,31 +45,39 @@
             {!! Form::close() !!}
         </div>
     </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table table-hover" style="width: 100%">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Produk</th>
-                    <th>Kategori</th>
-                    <th>Jumlah Terjual (Rupiah)</th>
-                    <th>Jumlah Terjual (Kuantitas)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($products as $product)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $product->name }}</td>
-                        <td>{{ $product->category->name }}</td>
-                        <td>Rp. {{ number_format($product->subtotal, 0, ',', '.') }}</td>
-                        <td>{{ number_format($product->qty, 0, ',', '.') }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
 </section>
+<div class="forms">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex align-items-center">
+                        <a href="{{ route('report.differenceStockReport') }}" class="btn btn-info"><i class="dripicons-arrow-thin-left"></i> Kembali </a>
+                    </div>
+                    <div class="card-body">
+                        <h4>Laporan Selisih Stok - Outlet : {{$warehouse_name}}</h4>
+                        <div class="row">
+                            @foreach($stocks as $stock)
+                            <div class="col-md-6">
+                                <table class="table">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 50%;">{{$stock->ingredient->name}}</td>
+                                            <td style="width: 50%; text-align: right;">{{$stock->total_difference_stock}}</td>
+                                            <td style="width: 50%; text-align: right;">{{$stock->ingredient->unit->unit_code}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @endsection
 

@@ -46,6 +46,15 @@
                 <li id="exp-list-menu"><a href="{{ route('pengeluaran.index') }}">Daftar Pengeluaran</a></li>
             </ul>
         </li>
+        <li>
+            <a href="#report" aria-expanded="false" data-toggle="collapse"> <i
+                    class="dripicons-document-remove"></i><span>Laporan</span></a>
+            <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
+                <li id="laporan-transaksi-produk"><a href="{{ route('report.differenceStockReport') }}">Laporan Selisih Stok</a>
+                </li>
+
+            </ul>
+        </li>
 
         {{-- Menu Admin Outlet --}}
     @elseif(auth()->user()->hasRole('Admin Outlet'))

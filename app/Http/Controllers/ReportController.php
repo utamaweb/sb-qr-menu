@@ -4526,4 +4526,33 @@ class ReportController extends Controller
         $lims_purchase_data = $q->get();
         return view('backend.report.supplier_due_report', compact('lims_purchase_data', 'start_date', 'end_date'));
     }
+    
+    public function differenceStockReport(Request $request)
+    {
+        // DISINI CONTROLLER LAPORAN SELISIH STOK 
+        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+        $data = $request->all();
+        if($data){
+            $start_date = $data['start_date'];
+            $end_date = $data['end_date'];
+        } else{
+            $start_date = Carbon::now()->format('Y-m-d');
+            $end_date = Carbon::now()->format('Y-m-d');
+        }
+
+        // Start of new Products get
+        $products = Product::with('category')->whereIn('id', Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->pluck('product_id'))->get();
+
+        // $stocks = Stock::where('created_at', )
+
+        $transactionDetails = TransactionDetail::whereIn('transaction_id', (Transaction::where('warehouse_id', auth()->user()->warehouse_id)->whereBetween('date', [$start_date, $end_date])->pluck('id')))->get();
+
+        foreach($products as $product) {
+            $product['qty'] = $transactionDetails->where('product_id', $product->id)->sum('qty');
+            $product['subtotal'] = $transactionDetails->where('product_id', $product->id)->sum('subtotal');
+        }
+        // End of new Products get
+
+        return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'products','warehouses'));
+    }
 }

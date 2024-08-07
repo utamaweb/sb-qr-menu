@@ -4548,10 +4548,13 @@ class ReportController extends Controller
                    ->groupBy('ingredient_id')
                    ->get();
         } else{
-            $start_date = $data['start_date'];
-            $end_date = $data['end_date'];
-            // $start_date = Carbon::now()->format('Y-m-d');
-            // $end_date = Carbon::now()->format('Y-m-d');
+            if($request->start_date){
+                $start_date = $data['start_date'];
+                $end_date = $data['end_date'];
+            } else {
+                $start_date = Carbon::now()->format('Y-m-d');
+                $end_date = Carbon::now()->format('Y-m-d');
+            }
             $warehouse_id = 'all';
             $warehouse_name = "Semua";
             // $stocks = Stock::where('difference_stock', '>', 0)->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date)->get();

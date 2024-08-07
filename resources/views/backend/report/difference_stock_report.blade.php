@@ -3,15 +3,15 @@
 <section class="forms">
     <div class="container-fluid">
         <div class="card">
-            <div class="card-header mt-2">
+            <div class="card-header">
                 <h3 class="text-center">Laporan Selisih Stok</h3>
             </div>
             {!! Form::open(['route' => 'report.differenceStockReport', 'method' => 'get']) !!}
-            <div class="row mb-3 product-report-filter">
-                <div class="col-md-4 offset-md-2 mt-3">
-                    <div class="form-group row">
-                        <label class="d-tc mt-2"><strong>Pilih Tanggal</strong> &nbsp;</label>
-                        <div class="d-tc">
+            <div class="row product-report-filter d-flex justify-content-center align-items-center">
+                <div class="col-md-4 mt-3">
+                    <div class="form-group row justify-content-center align-items-center">
+                        <label class=""><strong>Pilih Tanggal</strong> &nbsp;</label>
+                        <div class="col-md-8 col-sm-4">
                             <div class="input-group">
                                 <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} s/d {{$end_date}}" required />
                                 <input type="hidden" name="start_date" value="{{$start_date}}" />
@@ -21,13 +21,12 @@
                     </div>
                 </div>
                 @if(auth()->user()->hasRole('Admin Bisnis'))
-                <div class="col-md-4  mt-3">
-                    <div class="form-group row">
-                        <label class="d-tc mt-2"><strong>Pilih Outlet</strong> &nbsp;</label>
-                        <div class="d-tc">
+                <div class="col-md-4 mt-3">
+                    <div class="form-group row justify-content-center align-items-center">
+                        <label class=""><strong>Pilih Outlet</strong> &nbsp;</label>
+                        <div class="col-md-8">
                             <div class="input-group">
-                                <select name="warehouse_id" class="selectpicker form-control" data-live-search="true"
-                                data-live-search-style="begins" title="---Pilih Outlet--- ">>
+                                <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="---Pilih Outlet---">
                                     <option value="all" {{$warehouse_id == 'all' ? 'selected' : ''}}>Semua Outlet</option>
                                     @foreach($warehouses as $warehouse)
                                     <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
@@ -38,8 +37,8 @@
                     </div>
                 </div>
                 @endif
-                <div class="col-md-2 mt-3">
-                    <div class="form-group">
+                <div class="col-md-2">
+                    <div class="form-group text-center">
                         <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
                     </div>
                 </div>
@@ -48,6 +47,8 @@
         </div>
     </div>
 </section>
+
+
 <div class="forms">
     <div class="container-fluid">
         <div class="row">

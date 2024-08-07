@@ -20,6 +20,7 @@
                         </div>
                     </div>
                 </div>
+                @if(auth()->user()->hasRole('Admin Bisnis'))
                 <div class="col-md-4  mt-3">
                     <div class="form-group row">
                         <label class="d-tc mt-2"><strong>Pilih Outlet</strong> &nbsp;</label>
@@ -36,6 +37,7 @@
                         </div>
                     </div>
                 </div>
+                @endif
                 <div class="col-md-2 mt-3">
                     <div class="form-group">
                         <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
@@ -86,7 +88,7 @@
 $('.selectpicker').selectpicker();
     $("ul#report").siblings('a').attr('aria-expanded','true');
     $("ul#report").addClass("show");
-    $("ul#report #laporan-transaksi-produk").addClass("active");
+    $("ul#report #laporan-selisih").addClass("active");
 
     var ingredient_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
@@ -103,7 +105,7 @@ $('.selectpicker').selectpicker();
       callback: function(startDate, endDate, period){
         var start_date = startDate.format('YYYY-MM-DD');
         var end_date = endDate.format('YYYY-MM-DD');
-        var title = start_date + ' To ' + end_date;
+        var title = start_date + ' s/d ' + end_date;
         $(this).val(title);
         $(".product-report-filter input[name=start_date]").val(start_date);
         $(".product-report-filter input[name=end_date]").val(end_date);

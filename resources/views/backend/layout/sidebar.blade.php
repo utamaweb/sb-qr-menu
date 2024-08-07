@@ -50,7 +50,7 @@
             <a href="#report" aria-expanded="false" data-toggle="collapse"> <i
                     class="dripicons-document-remove"></i><span>Laporan</span></a>
             <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
-                <li id="laporan-transaksi-produk"><a href="{{ route('report.differenceStockReport') }}?warehouse_id=all">Laporan Selisih Stok</a>
+                <li id="laporan-selisih"><a href="{{ route('report.differenceStockReport') }}?warehouse_id=all">Laporan Selisih Stok</a>
                 </li>
 
             </ul>
@@ -77,6 +77,8 @@
                     class="dripicons-document-remove"></i><span>Laporan</span></a>
             <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
                 <li id="laporan-tutup-kasir"><a href="{{ route('close-cashier.index') }}">Laporan Tutup Kasir</a></li>
+                <li id="laporan-selisih"><a href="{{ route('report.differenceStockReport') }}">Laporan Selisih Stok</a>
+                </li>
                 <li id="laporan-transaksi-produk"><a href="{{ route('report.product') }}">Laporan Transaksi Produk</a>
                 </li>
 

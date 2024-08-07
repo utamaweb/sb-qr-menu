@@ -4530,23 +4530,48 @@ class ReportController extends Controller
     
     public function differenceStockReport(Request $request)
     {
-        // DISINI CONTROLLER LAPORAN SELISIH STOK 
         $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
         $data = $request->all();
-        if($request->warehouse_id != "all"){
-            $start_date = $data['start_date'];
-            $end_date = $data['end_date'];
-            $warehouse_id = $data['warehouse_id'];
-            $warehouse_name = Warehouse::find($warehouse_id)->name;
-            // $stocks = Stock::where('warehouse_id', $warehouse_id)->where('difference_stock', '>', 0)->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date)->get();
-            // return $stocks;
-            $stocks = Stock::where('warehouse_id', $warehouse_id)
-                   ->where('difference_stock', '>', 0)
-                   ->whereDate('created_at', '>=', $start_date)
-                   ->whereDate('created_at', '<=', $end_date)
-                   ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
-                   ->groupBy('ingredient_id')
-                   ->get();
+        // make condition for admin outlet & admin business
+        if(auth()->user()->hasRole('Admin Bisnis')){
+            // condition for warehouse (all or specific)
+            if($request->warehouse_id != "all"){
+                if($request->start_date){
+                    $start_date = $data['start_date'];
+                    $end_date = $data['end_date'];
+                } else {
+                    $start_date = Carbon::now()->format('Y-m-d');
+                    $end_date = Carbon::now()->format('Y-m-d');
+                }
+                $warehouse_id = $data['warehouse_id'];
+                $warehouse_name = Warehouse::find($warehouse_id)->name;
+                $stocks = Stock::where('warehouse_id', $warehouse_id)
+                    ->where('difference_stock', '>', 0)
+                    ->whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date)
+                    ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
+                    ->groupBy('ingredient_id')
+                    ->get();
+            } else{
+                if($request->start_date){
+                    $start_date = $data['start_date'];
+                    $end_date = $data['end_date'];
+                } else {
+                    $start_date = Carbon::now()->format('Y-m-d');
+                    $end_date = Carbon::now()->format('Y-m-d');
+                }
+                $warehouse_id = 'all';
+                $warehouse_name = "Semua";
+                $business_id = auth()->user()->business_id;
+                $warehouse_ids = Warehouse::where('business_id', $business_id)->pluck('id');
+                $stocks = Stock::where('difference_stock', '>', 0)
+                    ->whereIn('warehouse_id', $warehouse_ids)
+                    ->whereDate('created_at', '>=', $start_date)
+                    ->whereDate('created_at', '<=', $end_date)
+                    ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
+                    ->groupBy('ingredient_id')
+                    ->get();
+            }
         } else{
             if($request->start_date){
                 $start_date = $data['start_date'];
@@ -4555,15 +4580,15 @@ class ReportController extends Controller
                 $start_date = Carbon::now()->format('Y-m-d');
                 $end_date = Carbon::now()->format('Y-m-d');
             }
-            $warehouse_id = 'all';
-            $warehouse_name = "Semua";
-            // $stocks = Stock::where('difference_stock', '>', 0)->whereDate('created_at', '>=', $start_date)->whereDate('created_at', '<=', $end_date)->get();
-            $stocks = Stock::where('difference_stock', '>', 0)
-                   ->whereDate('created_at', '>=', $start_date)
-                   ->whereDate('created_at', '<=', $end_date)
-                   ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
-                   ->groupBy('ingredient_id')
-                   ->get();
+            $warehouse_id = auth()->user()->warehouse_id;
+            $warehouse_name = Warehouse::find($warehouse_id)->name;
+            $stocks = Stock::where('warehouse_id', $warehouse_id)
+                ->where('difference_stock', '>', 0)
+                ->whereDate('created_at', '>=', $start_date)
+                ->whereDate('created_at', '<=', $end_date)
+                ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
+                ->groupBy('ingredient_id')
+                ->get();
         }
         return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'warehouses','warehouse_id','warehouse_name','stocks'));
     }

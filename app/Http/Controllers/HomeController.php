@@ -57,6 +57,12 @@ class HomeController extends Controller
             $countWarehouse = Warehouse::where('business_id', $business_id)->count();
             $countProduct = Product::where('business_id', $business_id)->count();
             $countIngredient = Ingredient::where('business_id', $business_id)->count();
+            $totalIncomeThisMonth = Transaction::whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', Carbon::now()->format('Y-m-01'))->where('date', '<=', Carbon::now()->format('Y-m-t'))->sum('total_amount');
+            $totalIncomePreviousMonth = Transaction::whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', Carbon::now()->startOfMonth()->subMonthsNoOverflow()->toDateString())->where('date', '<=', Carbon::now()->subMonthsNoOverflow()->endOfMonth()->toDateString())->sum('total_amount');
+            $countTransactionThisMonth = Transaction::whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', Carbon::now()->format('Y-m-01'))->where('date', '<=', Carbon::now()->format('Y-m-t'))->count();
+            $countTransactionPreviousMonth = Transaction::whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', Carbon::now()->startOfMonth()->subMonthsNoOverflow()->toDateString())->where('date', '<=', Carbon::now()->subMonthsNoOverflow()->endOfMonth()->toDateString())->count();
+            // return Carbon::now()->startOfMonth()->subMonthsNoOverflow()->toDateString();
+            // return Carbon::now()->subMonthsNoOverflow()->endOfMonth()->toDateString();
         }
         if(auth()->user()->warehouse_id == NULL){
             $revenue = Transaction::where('status', 'Lunas')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum(DB::raw('total_amount'));
@@ -111,7 +117,7 @@ class HomeController extends Controller
         }
         // end arus uang
         if(auth()->user()->hasRole('Admin Bisnis')){
-            return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet', 'countProduct', 'countIngredient'));
+            return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet', 'countProduct', 'countIngredient','totalIncomePreviousMonth','totalIncomeThisMonth', 'countTransactionPreviousMonth', 'countTransactionThisMonth'));
         } elseif(auth()->user()->hasRole('Superadmin')){
             return view('backend.index', compact('purchase_return','revenue', 'expense', 'profit', 'payment_recieved', 'payment_sent', 'month', 'countBusiness', 'countWarehouse','countAdminBisnis', 'countAdminOutlet'));
         } else {

@@ -149,6 +149,50 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-wallet" style="color: #e9b61e"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">@currency($totalIncomeThisMonth)</div>
+                        <a href="{{ route('user.index') }}">
+                            <div class="name"><strong style="color: #e9b61e">Total Pendapatan Bulan ini</strong></div>
+                        </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-wallet" style="color: #e9b61e"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">@currency($totalIncomePreviousMonth)</div>
+                        <a href="{{ route('user.index') }}">
+                            <div class="name"><strong style="color: #e9b61e">Total Pendapatan Bulan Kemaren</strong></div>
+                        </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-wallet" style="color: #7b0ab8"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countTransactionThisMonth}}</div>
+                        <a href="{{ route('user.index') }}">
+                            <div class="name"><strong style="color: #7b0ab8">Jumlah Transaksi Bulan Ini</strong></div>
+                        </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title">
+                    <div class="icon"><i class="dripicons-wallet" style="color: #7b0ab8"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countTransactionPreviousMonth}}</div>
+                        <a href="{{ route('user.index') }}">
+                            <div class="name"><strong style="color: #7b0ab8">Jumlah Transaksi Bulan Kemaren</strong></div>
+                        </a>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

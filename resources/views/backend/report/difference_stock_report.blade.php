@@ -9,35 +9,42 @@
             {!! Form::open(['route' => 'report.differenceStockReport', 'method' => 'get']) !!}
             <div class="row product-report-filter d-flex justify-content-center align-items-center">
                 <div class="col-md-4 mt-3">
-                    <div class="form-group row justify-content-center align-items-center">
-                        <label class=""><strong>Pilih Tanggal</strong> &nbsp;</label>
-                        <div class="col-md-8 col-sm-4">
-                            <div class="input-group">
-                                <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} s/d {{$end_date}}" required />
-                                <input type="hidden" name="start_date" value="{{$start_date}}" />
-                                <input type="hidden" name="end_date" value="{{$end_date}}" />
-                            </div>
+                    <div class="form-group">
+                        <label for="date-range" class="form-label"><strong>Pilih Tanggal</strong></label>
+                        <div class="input-group">
+                            <input type="text" id="date-range" class="daterangepicker-field form-control" value="{{$start_date}} s/d {{$end_date}}" required />
+                            <input type="hidden" name="start_date" value="{{$start_date}}" />
+                            <input type="hidden" name="end_date" value="{{$end_date}}" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="shift-select" class="form-label"><strong>Pilih Shift</strong></label>
+                        <div class="input-group">
+                            <select id="shift-select" name="shift" class="form-control">
+                                <option value="all" {{request()->shift == 'all' ? 'selected' : '' }}>Semua</option>
+                                <option value="1" {{$shift[0] == 1 && count($shift) == 1 ? 'selected' : ''}}>1</option>
+                                <option value="2" {{$shift[0] == 2 && count($shift) == 1 ? 'selected' : ''}}>2</option>
+                                <option value="3" {{$shift[0] == 3 && count($shift) == 1 ? 'selected' : ''}}>3</option>
+                            </select>
                         </div>
                     </div>
                 </div>
                 @if(auth()->user()->hasRole('Admin Bisnis'))
                 <div class="col-md-4 mt-3">
-                    <div class="form-group row justify-content-center align-items-center">
-                        <label class=""><strong>Pilih Outlet</strong> &nbsp;</label>
-                        <div class="col-md-8">
-                            <div class="input-group">
-                                <select name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="---Pilih Outlet---">
-                                    <option value="all" {{$warehouse_id == 'all' ? 'selected' : ''}}>Semua Outlet</option>
-                                    @foreach($warehouses as $warehouse)
-                                    <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                    <div class="form-group">
+                        <label for="warehouse-select" class="form-label"><strong>Pilih Outlet</strong></label>
+                        <div class="input-group">
+                            <select id="warehouse-select" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="---Pilih Outlet---">
+                                <option value="all" {{$warehouse_id == 'all' ? 'selected' : ''}}>Semua Outlet</option>
+                                @foreach($warehouses as $warehouse)
+                                <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                 </div>
                 @endif
-                <div class="col-md-2">
+                <div class="col-md-2 mt-3">
                     <div class="form-group text-center">
                         <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
                     </div>
@@ -49,6 +56,7 @@
 </section>
 
 
+
 <div class="forms">
     <div class="container-fluid">
         <div class="row">
@@ -58,28 +66,35 @@
                         <a href="{{ route('report.differenceStockReport') }}" class="btn btn-info"><i class="dripicons-arrow-thin-left"></i> Kembali </a>
                     </div>
                     <div class="card-body">
-                        <h4>Laporan Selisih Stok - Outlet : {{$warehouse_name}}</h4>
-                        <div class="row">
-                            @foreach($stocks as $stock)
-                            <div class="col-md-6">
-                                <table class="table">
-                                    <tbody>
-                                        <tr>
-                                            <td style="width: 50%;">{{$stock->ingredient->name}}</td>
-                                            <td style="width: 50%; text-align: right;">{{$stock->total_difference_stock}}</td>
-                                            <td style="width: 50%; text-align: right;">{{$stock->ingredient->unit->unit_code}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            @endforeach
-                        </div>
+                        <h4>Laporan Selisih Stok</h4>
+                        <br>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Outlet</th>
+                                    <th>Bahan Baku</th>
+                                    <th>Selisih</th>
+                                    <th>Shift</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($stocks as $stock)
+                                    <tr>
+                                        <td>{{ $stock->warehouse_name }}</td>
+                                        <td>{{ $stock->ingredient_name }}</td>
+                                        <td>{{ $stock->total_difference_stock }}</td>
+                                        <td>{{ $stock->shift_number }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 
 
 @endsection

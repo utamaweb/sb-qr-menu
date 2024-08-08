@@ -4530,66 +4530,52 @@ class ReportController extends Controller
     
     public function differenceStockReport(Request $request)
     {
-        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
-        $data = $request->all();
-        // make condition for admin outlet & admin business
-        if(auth()->user()->hasRole('Admin Bisnis')){
-            // condition for warehouse (all or specific)
-            if($request->warehouse_id != "all"){
-                if($request->start_date){
-                    $start_date = $data['start_date'];
-                    $end_date = $data['end_date'];
-                } else {
-                    $start_date = Carbon::now()->format('Y-m-d');
-                    $end_date = Carbon::now()->format('Y-m-d');
-                }
-                $warehouse_id = $data['warehouse_id'];
-                $warehouse_name = Warehouse::find($warehouse_id)->name;
-                $stocks = Stock::where('warehouse_id', $warehouse_id)
-                    ->where('difference_stock', '>', 0)
-                    ->whereDate('created_at', '>=', $start_date)
-                    ->whereDate('created_at', '<=', $end_date)
-                    ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
-                    ->groupBy('ingredient_id')
-                    ->get();
-            } else{
-                if($request->start_date){
-                    $start_date = $data['start_date'];
-                    $end_date = $data['end_date'];
-                } else {
-                    $start_date = Carbon::now()->format('Y-m-d');
-                    $end_date = Carbon::now()->format('Y-m-d');
-                }
-                $warehouse_id = 'all';
-                $warehouse_name = "Semua";
-                $business_id = auth()->user()->business_id;
-                $warehouse_ids = Warehouse::where('business_id', $business_id)->pluck('id');
-                $stocks = Stock::where('difference_stock', '>', 0)
-                    ->whereIn('warehouse_id', $warehouse_ids)
-                    ->whereDate('created_at', '>=', $start_date)
-                    ->whereDate('created_at', '<=', $end_date)
-                    ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
-                    ->groupBy('ingredient_id')
-                    ->get();
-            }
-        } else{
-            if($request->start_date){
-                $start_date = $data['start_date'];
-                $end_date = $data['end_date'];
-            } else {
-                $start_date = Carbon::now()->format('Y-m-d');
-                $end_date = Carbon::now()->format('Y-m-d');
-            }
-            $warehouse_id = auth()->user()->warehouse_id;
-            $warehouse_name = Warehouse::find($warehouse_id)->name;
-            $stocks = Stock::where('warehouse_id', $warehouse_id)
-                ->where('difference_stock', '>', 0)
-                ->whereDate('created_at', '>=', $start_date)
-                ->whereDate('created_at', '<=', $end_date)
-                ->selectRaw('ingredient_id, SUM(difference_stock) as total_difference_stock')
-                ->groupBy('ingredient_id')
-                ->get();
+        // Kondisi untuk filter tanggal
+        if ($request->input('start_date')) {
+            $start_date = $request->input('start_date');
+            $end_date = $request->input('end_date');
+        } else {
+            $start_date = date("Y-m-d");
+            $end_date = date("Y-m-d");
         }
-        return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'warehouses','warehouse_id','warehouse_name','stocks'));
+
+        // Kondisi untuk shift
+        if($request->shift != "all"){
+            $shift = [(int) $request->shift];
+        } else {
+            $shift = [1,2,3];
+        }
+
+        // Kondisi untuk role admin outlet
+        if (auth()->user()->hasRole('Admin Outlet')) {
+            $warehouse_id = auth()->user()->warehouse_id;
+
+            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
+            $stocks = Stock::where('stocks.difference_stock', '!=', 0)
+                ->where('stocks.warehouse_id', $warehouse_id)
+                ->whereIn('shifts.shift_number', $shift)
+                ->whereDate('stocks.created_at', '>=', $start_date)
+                ->whereDate('stocks.created_at', '<=', $end_date)
+                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+                ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
+                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+                ->select(
+                    'warehouses.name as warehouse_name',
+                    'ingredients.name as ingredient_name',
+                    'shifts.shift_number',
+                    DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
+                )
+                ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
+                ->orderBy('warehouses.name')
+                ->orderBy('ingredients.name')
+                ->orderBy('shifts.shift_number')
+                ->get();
+
+            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift'));
+        }
+
+        return view('backend.report.difference_stock_report', compact('start_date', 'end_date'));
     }
+
+
 }

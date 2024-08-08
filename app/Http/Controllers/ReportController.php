@@ -4572,6 +4572,37 @@ class ReportController extends Controller
                 ->get();
 
             return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift'));
+        } else {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+            $warehouse_ids = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+            if($request->warehouse_id != 'all'){
+                $warehouse_id = [(int) $request->warehouse_id];
+            } else {
+                $warehouse_id = $warehouse_ids;
+            }
+
+            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
+            $stocks = Stock::where('stocks.difference_stock', '!=', 0)
+                ->wherein('stocks.warehouse_id', $warehouse_id)
+                ->whereIn('shifts.shift_number', $shift)
+                ->whereDate('stocks.created_at', '>=', $start_date)
+                ->whereDate('stocks.created_at', '<=', $end_date)
+                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+                ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
+                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+                ->select(
+                    'warehouses.name as warehouse_name',
+                    'ingredients.name as ingredient_name',
+                    'shifts.shift_number',
+                    DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
+                )
+                ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
+                ->orderBy('warehouses.name')
+                ->orderBy('ingredients.name')
+                ->orderBy('shifts.shift_number')
+                ->get();
+
+            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift', 'warehouse_id', 'warehouses'));
         }
 
         return view('backend.report.difference_stock_report', compact('start_date', 'end_date'));

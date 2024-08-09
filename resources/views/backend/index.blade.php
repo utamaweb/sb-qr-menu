@@ -155,7 +155,7 @@
                         <div>
                             <div class="count-number revenue-data">@currency($totalIncomeThisMonth)</div>
                             <a href="{{ route('user.index') }}">
-                                <div class="name"><strong style="color: #e9b61e">Total Pendapatan Bulan ini</strong></div>
+                                <div class="name"><strong style="color: #e9b61e">Total Pendapatan Bulan Ini</strong></div>
                             </a>
                         </div>
                     </div>
@@ -166,7 +166,7 @@
                     <div>
                         <div class="count-number revenue-data">@currency($totalIncomePreviousMonth)</div>
                         <a href="{{ route('user.index') }}">
-                            <div class="name"><strong style="color: #e9b61e">Total Pendapatan Bulan Kemaren</strong></div>
+                            <div class="name"><strong style="color: #e9b61e">Total Pendapatan Bulan Lalu</strong></div>
                         </a>
                     </div>
                   </div>
@@ -188,7 +188,7 @@
                     <div>
                         <div class="count-number revenue-data">{{$countTransactionPreviousMonth}}</div>
                         <a href="{{ route('user.index') }}">
-                            <div class="name"><strong style="color: #7b0ab8">Jumlah Transaksi Bulan Kemaren</strong></div>
+                            <div class="name"><strong style="color: #7b0ab8">Jumlah Transaksi Bulan Lalu</strong></div>
                         </a>
                     </div>
                   </div>

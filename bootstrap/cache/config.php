@@ -132,18 +132,18 @@
   ),
   'broadcasting' => 
   array (
-    'default' => 'pusher',
+    'default' => 'log',
     'connections' => 
     array (
       'pusher' => 
       array (
         'driver' => 'pusher',
-        'key' => 'local',
-        'secret' => 'local',
-        'app_id' => 'local',
+        'key' => '',
+        'secret' => '',
+        'app_id' => '',
         'options' => 
         array (
-          'cluster' => 'ap1',
+          'cluster' => 'mt1',
           'useTLS' => false,
           'encrypted' => false,
           'host' => '127.0.0.1',
@@ -188,7 +188,7 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\framework/cache/data',
+        'path' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -238,7 +238,7 @@
       array (
         'driver' => 'sqlite',
         'url' => NULL,
-        'database' => 'sb-pos',
+        'database' => 'sb_pos',
         'prefix' => '',
         'foreign_key_constraints' => true,
       ),
@@ -248,7 +248,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'sb-pos',
+        'database' => 'sb_pos',
         'username' => 'root',
         'password' => '',
         'unix_socket' => '',
@@ -276,7 +276,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'sb-pos',
+        'database' => 'sb_pos',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -291,7 +291,7 @@
         'url' => NULL,
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'sb-pos',
+        'database' => 'sb_pos',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -338,7 +338,7 @@
     array (
       'enabled' => true,
       'driver' => 'file',
-      'path' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\debugbar',
+      'path' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\debugbar',
       'connection' => NULL,
       'provider' => '',
       'hostname' => '127.0.0.1',
@@ -446,12 +446,12 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\app',
+        'root' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\app',
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\app/public',
+        'root' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\app/public',
         'url' => 'http://localhost/storage',
         'visibility' => 'public',
       ),
@@ -534,13 +534,13 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\logs/laravel.log',
+        'path' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\logs/laravel.log',
         'level' => 'debug',
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\logs/laravel.log',
+        'path' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
       ),
@@ -590,7 +590,7 @@
       ),
       'emergency' => 
       array (
-        'path' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\logs/laravel.log',
+        'path' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\logs/laravel.log',
       ),
     ),
   ),
@@ -613,7 +613,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => 'D:\\laragon\\www\\sb-pos-fix\\resources\\views/vendor/mail',
+        0 => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\resources\\views/vendor/mail',
       ),
     ),
     'log_channel' => NULL,
@@ -624,7 +624,7 @@
     'stubs' => 
     array (
       'enabled' => false,
-      'path' => 'D:\\laragon\\www\\sb-pos-fix\\vendor/nwidart/laravel-modules/src/Commands/stubs',
+      'path' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\vendor/nwidart/laravel-modules/src/Commands/stubs',
       'files' => 
       array (
         'routes/web' => 'Routes/web.php',
@@ -688,9 +688,9 @@
     ),
     'paths' => 
     array (
-      'modules' => 'D:\\laragon\\www\\sb-pos-fix\\Modules',
-      'assets' => 'D:\\laragon\\www\\sb-pos-fix\\public\\modules',
-      'migration' => 'D:\\laragon\\www\\sb-pos-fix\\database/migrations',
+      'modules' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\Modules',
+      'assets' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\public\\modules',
+      'migration' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\database/migrations',
       'generator' => 
       array (
         'config' => 
@@ -883,7 +883,7 @@
       'enabled' => false,
       'paths' => 
       array (
-        0 => 'D:\\laragon\\www\\sb-pos-fix\\vendor/*/*',
+        0 => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\vendor/*/*',
       ),
     ),
     'composer' => 
@@ -912,7 +912,7 @@
       'file' => 
       array (
         'class' => 'Nwidart\\Modules\\Activators\\FileActivator',
-        'statuses-file' => 'D:\\laragon\\www\\sb-pos-fix\\modules_statuses.json',
+        'statuses-file' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\modules_statuses.json',
         'cache-key' => 'activator.installed',
         'cache-lifetime' => 604800,
       ),
@@ -1057,7 +1057,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\framework/sessions',
+    'files' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -1077,9 +1077,9 @@
   array (
     'paths' => 
     array (
-      0 => 'D:\\laragon\\www\\sb-pos-fix\\resources\\views',
+      0 => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\resources\\views',
     ),
-    'compiled' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\framework\\views',
+    'compiled' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\framework\\views',
   ),
   'websockets' => 
   array (
@@ -1091,10 +1091,10 @@
     array (
       0 => 
       array (
-        'id' => 'local',
+        'id' => '',
         'name' => 'Laravel',
-        'key' => 'local',
-        'secret' => 'local',
+        'key' => '',
+        'secret' => '',
         'path' => '/',
         'capacity' => NULL,
         'enable_client_messages' => false,
@@ -1269,7 +1269,7 @@
     ),
     'temporary_files' => 
     array (
-      'local_path' => 'D:\\laragon\\www\\sb-pos-fix\\storage\\framework/cache/laravel-excel',
+      'local_path' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix\\storage\\framework/cache/laravel-excel',
       'local_permissions' => 
       array (
       ),
@@ -1362,7 +1362,7 @@
     array (
     ),
     'enable_runnable_solutions' => NULL,
-    'remote_sites_path' => 'D:\\laragon\\www\\sb-pos-fix',
+    'remote_sites_path' => 'C:\\Personal Files\\Kerja\\Project\\sb-pos-fix',
     'local_sites_path' => '',
     'housekeeping_endpoint_prefix' => '_ignition',
     'settings_file_path' => '',

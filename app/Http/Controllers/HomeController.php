@@ -58,6 +58,7 @@ class HomeController extends Controller
             $countProduct = Product::where('business_id', $business_id)->count();
             $countIngredient = Ingredient::where('business_id', $business_id)->count();
             $totalIncomeThisMonth = Transaction::whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', Carbon::now()->format('Y-m-01'))->where('date', '<=', Carbon::now()->format('Y-m-t'))->sum('total_amount');
+            // return $totalIncomeThisMonth;
             $totalIncomePreviousMonth = Transaction::whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', Carbon::now()->startOfMonth()->subMonthsNoOverflow()->toDateString())->where('date', '<=', Carbon::now()->subMonthsNoOverflow()->endOfMonth()->toDateString())->sum('total_amount');
             $countTransactionThisMonth = Transaction::whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', Carbon::now()->format('Y-m-01'))->where('date', '<=', Carbon::now()->format('Y-m-t'))->count();
             $countTransactionPreviousMonth = Transaction::whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', Carbon::now()->startOfMonth()->subMonthsNoOverflow()->toDateString())->where('date', '<=', Carbon::now()->subMonthsNoOverflow()->endOfMonth()->toDateString())->count();
@@ -93,11 +94,16 @@ class HomeController extends Controller
                 $end_date = date("Y-m", $start).'-'.date('t', mktime(0, 0, 0, date("m", $start), 1, date("Y", $start)));
 
                 $recieved_amount = DB::table('transactions')->where('status', 'Lunas')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
+                $recieved_amount_business = DB::table('transactions')->whereNotNull('shift_id')->whereIn('warehouse_id', $warehouses)->where('status', 'Lunas')->where('date', '>=', $start_date)->where('date', '<=', $end_date)->sum('total_amount');
                 $sent_amount = DB::table('expenses')->whereNotNull('shift_id')->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $stockPurchase = StockPurchase::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_price');
                 $expense_amount = Expense::whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('amount');
                 $sent_amount = $sent_amount + $expense_amount + $stockPurchase;
-                $payment_recieved[] = number_format((float)($recieved_amount), config('decimal'), '.', '');
+                if(auth()->user()->hasRole('Admin Bisnis')){
+                    $payment_recieved[] = number_format((float)($recieved_amount_business), config('decimal'), '.', '');
+                } else {
+                    $payment_recieved[] = number_format((float)($recieved_amount), config('decimal'), '.', '');
+                }
                 $payment_sent[] = number_format((float)$sent_amount, config('decimal'), '.', '');
                 $month[] = date("F", strtotime($start_date));
                 $start = strtotime("+1 month", $start);

@@ -2,38 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Product;
-use App\Models\ProductPurchase;
-use App\Models\Product_Sale;
-use App\Models\ProductQuotation;
-use App\Models\Sale;
-use App\Models\Purchase;
-use App\Models\Transaction;
-use App\Models\TransactionDetail;
-use App\Models\Quotation;
-use App\Models\Transfer;
-use App\Models\Returns;
-use App\Models\ProductReturn;
-use App\Models\ReturnPurchase;
-use App\Models\ProductTransfer;
-use App\Models\PurchaseProductReturn;
-use App\Models\Payment;
-use App\Models\Warehouse;
-use App\Models\Product_Warehouse;
-use App\Models\Expense;
-use App\Models\Payroll;
-use App\Models\User;
-use App\Models\Customer;
-use App\Models\Supplier;
-use App\Models\Variant;
-use App\Models\ProductVariant;
-use App\Models\Unit;
-use App\Models\CustomerGroup;
 use DB;
 use Auth;
 use Carbon\Carbon;
+use App\Models\Sale;
+use App\Models\Unit;
+use App\Models\User;
+use App\Models\Stock;
+use App\Models\Expense;
+use App\Models\Payment;
+use App\Models\Payroll;
+use App\Models\Product;
+use App\Models\Returns;
+use App\Models\Variant;
+use App\Models\Customer;
+use App\Models\Purchase;
+use App\Models\Supplier;
+use App\Models\Transfer;
+use App\Models\Quotation;
+use App\Models\Warehouse;
+use App\Models\Transaction;
+use App\Models\Product_Sale;
+use Illuminate\Http\Request;
+use App\Models\CustomerGroup;
+use App\Models\ProductReturn;
+use App\Models\ProductVariant;
+use App\Models\ReturnPurchase;
+use App\Models\ProductPurchase;
+use App\Models\ProductTransfer;
+use App\Models\ProductQuotation;
+use App\Models\Product_Warehouse;
+use App\Models\TransactionDetail;
 use Spatie\Permission\Models\Role;
+use App\Models\PurchaseProductReturn;
 use Spatie\Permission\Models\Permission;
 
 class ReportController extends Controller
@@ -4526,4 +4527,86 @@ class ReportController extends Controller
         $lims_purchase_data = $q->get();
         return view('backend.report.supplier_due_report', compact('lims_purchase_data', 'start_date', 'end_date'));
     }
+    
+    public function differenceStockReport(Request $request)
+    {
+        // Kondisi untuk filter tanggal
+        if ($request->input('start_date')) {
+            $start_date = $request->input('start_date');
+            $end_date = $request->input('end_date');
+        } else {
+            $start_date = date("Y-m-d");
+            $end_date = date("Y-m-d");
+        }
+
+        // Kondisi untuk shift
+        if($request->shift != "all"){
+            $shift = [(int) $request->shift];
+        } else {
+            $shift = [1,2,3];
+        }
+
+        // Kondisi untuk role admin outlet
+        if (auth()->user()->hasRole('Admin Outlet')) {
+            $warehouse_id = auth()->user()->warehouse_id;
+
+            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
+            $stocks = Stock::where('stocks.difference_stock', '!=', 0)
+                ->where('stocks.warehouse_id', $warehouse_id)
+                ->whereIn('shifts.shift_number', $shift)
+                ->whereDate('stocks.created_at', '>=', $start_date)
+                ->whereDate('stocks.created_at', '<=', $end_date)
+                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+                ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
+                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+                ->select(
+                    'warehouses.name as warehouse_name',
+                    'ingredients.name as ingredient_name',
+                    'shifts.shift_number',
+                    DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
+                )
+                ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
+                ->orderBy('warehouses.name')
+                ->orderBy('ingredients.name')
+                ->orderBy('shifts.shift_number')
+                ->get();
+
+            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift'));
+        } else {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+            $warehouse_ids = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+            if($request->warehouse_id != 'all'){
+                $warehouse_id = [(int) $request->warehouse_id];
+            } else {
+                $warehouse_id = $warehouse_ids;
+            }
+
+            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
+            $stocks = Stock::where('stocks.difference_stock', '!=', 0)
+                ->wherein('stocks.warehouse_id', $warehouse_id)
+                ->whereIn('shifts.shift_number', $shift)
+                ->whereDate('stocks.created_at', '>=', $start_date)
+                ->whereDate('stocks.created_at', '<=', $end_date)
+                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+                ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
+                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+                ->select(
+                    'warehouses.name as warehouse_name',
+                    'ingredients.name as ingredient_name',
+                    'shifts.shift_number',
+                    DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
+                )
+                ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
+                ->orderBy('warehouses.name')
+                ->orderBy('ingredients.name')
+                ->orderBy('shifts.shift_number')
+                ->get();
+
+            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift', 'warehouse_id', 'warehouses'));
+        }
+
+        return view('backend.report.difference_stock_report', compact('start_date', 'end_date'));
+    }
+
+
 }

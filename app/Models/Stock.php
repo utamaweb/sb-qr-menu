@@ -20,4 +20,8 @@ class Stock extends Model
     {
         return $this->belongsTo('App\Models\Ingredient');
     }
+    public function shift()
+    {
+        return $this->belongsTo('App\Models\Shift');
+    }
 }

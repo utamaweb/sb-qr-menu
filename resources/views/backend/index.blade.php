@@ -149,6 +149,60 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-sm-3">
+                    <div class="wrapper count-title h-100">
+                        <div class="icon"><i class="dripicons-wallet" style="color: #e9b61e"></i></div>
+                        <div>
+                            <div class="count-number revenue-data">@currency($totalIncomeThisMonth)</div>
+                            <a href="javascript:void(0)">
+                                <div class="name"><strong style="color: #e9b61e">Total Pendapatan Bulan Ini</strong></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title h-100">
+                    <div class="icon"><i class="dripicons-wallet" style="color: #e9b61e"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">@currency($totalIncomePreviousMonth)</div>
+                        <a href="javascript:void(0)">
+                            <div class="name"><strong style="color: #e9b61e">Total Pendapatan Bulan Lalu</strong></div>
+                        </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title h-100">
+                    <div class="icon"><i class="dripicons-wallet" style="color: #7b0ab8"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countTransactionThisMonth}}</div>
+                        <a href="javascript:void(0)">
+                            <div class="name"><strong style="color: #7b0ab8">Jumlah Transaksi Bulan Ini</strong></div>
+                        </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-3">
+                  <div class="wrapper count-title h-100">
+                    <div class="icon"><i class="dripicons-wallet" style="color: #7b0ab8"></i></div>
+                    <div>
+                        <div class="count-number revenue-data">{{$countTransactionPreviousMonth}}</div>
+                        <a href="javascript:void(0)">
+                            <div class="name"><strong style="color: #7b0ab8">Jumlah Transaksi Bulan Lalu</strong></div>
+                        </a>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-12 mt-4">
+                  <div class="card line-chart-example">
+                    <div class="card-header d-flex align-items-center">
+                      <h4>Pendapatan 6 Bulan Terakhir</h4>
+                    </div>
+                    <div class="card-body">
+                      <canvas id="cashFlowAdminBusiness" data-color = "{{$color}}" data-color_rgba = "{{$color_rgba}}" data-recieved = "{{json_encode($payment_recieved)}}" data-month = "{{json_encode($month)}}" data-label1="Pendapatan"></canvas>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

@@ -38,7 +38,7 @@ class CloseCashierController extends Controller
         // adjust ojols
         $business_id = Warehouse::find(auth()->user()->warehouse_id)->business_id;
         $ojols = Ojol::where('business_id', $business_id)->get();
-        $ojolName = ['Tunai'];
+        $ojolName = ['Tunai','Transfer'];
         foreach ($ojols as $ojol) {
             $ojolName[] = $ojol->name;
         }

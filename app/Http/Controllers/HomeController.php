@@ -50,6 +50,7 @@ class HomeController extends Controller
         if(auth()->user()->hasRole('Superadmin')){
             $countAdminOutlet = User::where('role_id', 3)->count();
             $countWarehouse = Warehouse::count();
+            $warehouses = Warehouse::all()->pluck('id');
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
             $business_id = auth()->user()->business_id;
             $warehouses = Warehouse::where('business_id', $business_id)->pluck('id');

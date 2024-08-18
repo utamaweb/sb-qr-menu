@@ -39,6 +39,12 @@ Route::fallback(function () {
 Route::get('/get-storage', function () {
     Artisan::call('storage:link');
 });
+Route::get('/config-clear', function () {
+    Artisan::call('config:clear');
+});
+Route::get('/optimize-clear', function () {
+    Artisan::call('optimize:clear');
+});
 
 // Route::get('/apk', function () {
 //     return redirect('https://drive.google.com/drive/folders/1E_jhYwX5jSP0VN3rvH8gE-yUSE7LJ4lw?usp=sharing');

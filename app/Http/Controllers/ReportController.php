@@ -4607,6 +4607,157 @@ class ReportController extends Controller
 
         return view('backend.report.difference_stock_report', compact('start_date', 'end_date'));
     }
+    
+    public function remainingStockReport(Request $request)
+    {
+        // return $request;
+        // Kondisi untuk filter tanggal
+        if($request->month) {
+            $month = $request->month;
+            $year = $request->year;
+        } else {
+            $month = date('m');
+            $year = date('Y');
+        }
+
+        // Kondisi untuk role admin outlet
+        if (auth()->user()->hasRole('Admin Outlet')) {
+            $warehouse_id = auth()->user()->warehouse_id;
+
+            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
+            $stocks = Stock::where('stocks.last_stock', '!=', 0)
+                ->where('stocks.warehouse_id', $warehouse_id)
+                ->whereDate('stocks.created_at', '>=', $start_date)
+                ->whereDate('stocks.created_at', '<=', $end_date)
+                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+                ->select(
+                    'warehouses.name as warehouse_name',
+                    'ingredients.name as ingredient_name',
+                    DB::raw('SUM(stocks.last_stock) as total_last_stock')
+                )
+                ->groupBy('warehouses.name', 'ingredients.name')
+                ->orderBy('warehouses.name')
+                ->orderBy('ingredients.name')
+                ->get();
+
+            return view('backend.report.remaining_stock_report', compact('start_date', 'end_date', 'stocks', 'shift'));
+        } else {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+            $warehouse_ids = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+
+            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
+            // $stocks = Stock::where('stocks.last_stock', '!=', 0)
+            //     ->wherein('stocks.warehouse_id', $warehouse_id)
+            //     ->whereMonth('stocks.created_at', '=', $month)
+            //     ->whereYear('stocks.created_at', '=', $year)
+            //     ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+            //     ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+            //     ->select(
+            //         'warehouses.name as warehouse_name',
+            //         'ingredients.name as ingredient_name',
+            //         DB::raw('SUM(stocks.last_stock) as total_last_stock')
+            //     )
+            //     ->groupBy('warehouses.name', 'ingredients.name')
+            //     ->orderBy('warehouses.name')
+            //     ->orderBy('ingredients.name')
+            //     ->get();
+            // Retrieve the stock data grouped by warehouse and ingredient
+            $stocks = Stock::where('stocks.last_stock', '!=', 0)
+            ->whereIn('stocks.warehouse_id', $warehouse_ids)
+            ->whereMonth('stocks.created_at', $month)
+            ->whereYear('stocks.created_at', $year)
+            ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+            ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+            ->join('units', 'ingredients.unit_id', '=', 'units.id')  // Join ke tabel units
+            ->select(
+                'warehouses.name as warehouse_name',
+                'ingredients.name as ingredient_name',
+                'units.unit_name as unit_name',  // Ambil nama unit dari tabel units
+                DB::raw('SUM(stocks.last_stock) as total_last_stock')
+            )
+            ->groupBy('warehouses.name', 'ingredients.name', 'units.unit_name')  // Tambahkan units.name ke group by
+            ->orderBy('warehouses.name')
+            ->orderBy('ingredients.name')
+            ->get();
+
+            // return $stocks;
+
+            // Group the results by warehouse_name
+            $groupedStocks = $stocks->groupBy('warehouse_name');
+
+            // Format the results as desired
+            $formattedStocks = $groupedStocks->map(function ($items, $warehouseName) {
+            return [
+                'warehouse_name' => $warehouseName,
+                'stocks' => $items->map(function ($item) {
+                    return [
+                        'ingredient_name' => $item->ingredient_name,
+                        'unit_name' => $item->unit_name,
+                        'total_last_stock' => $item->total_last_stock,
+                    ];
+                })
+            ];
+            });
+            // return $formattedStocks;
+            return view('backend.report.remaining_stock_report', compact('month', 'year', 'stocks', 'warehouse_ids', 'warehouses','formattedStocks'));
+        }
+
+        return view('backend.report.remaining_stock_report', compact('start_date', 'end_date'));
+    }
+    
+    public function remainingStockReportPrint(Request $request)
+    {
+        // Kondisi untuk filter tanggal
+        if($request->month) {
+            $month = $request->month;
+            $year = $request->year;
+        } else {
+            $month = date('m');
+            $year = date('Y');
+        }
+        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+        $warehouse_ids = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+
+        // Retrieve the stock data grouped by warehouse and ingredient
+        $stocks = Stock::where('stocks.last_stock', '!=', 0)
+            ->whereIn('stocks.warehouse_id', $warehouse_ids)
+            ->whereMonth('stocks.created_at', $month)
+            ->whereYear('stocks.created_at', $year)
+            ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+            ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+            ->join('units', 'ingredients.unit_id', '=', 'units.id')  // Join ke tabel units
+            ->select(
+                'warehouses.name as warehouse_name',
+                'ingredients.name as ingredient_name',
+                'units.unit_name as unit_name',  // Ambil nama unit dari tabel units
+                DB::raw('SUM(stocks.last_stock) as total_last_stock')
+            )
+            ->groupBy('warehouses.name', 'ingredients.name', 'units.unit_name')  // Tambahkan units.name ke group by
+            ->orderBy('warehouses.name')
+            ->orderBy('ingredients.name')
+            ->get();
+
+        // Group the results by warehouse_name
+        $groupedStocks = $stocks->groupBy('warehouse_name');
+
+        // Format the results as desired
+        $formattedStocks = $groupedStocks->map(function ($items, $warehouseName) {
+        return [
+            'warehouse_name' => $warehouseName,
+            'stocks' => $items->map(function ($item) {
+                return [
+                    'ingredient_name' => $item->ingredient_name,
+                    'unit_name' => $item->unit_name,
+                    'total_last_stock' => $item->total_last_stock,
+                ];
+            })
+        ];
+        });
+        return view('backend.report.remaining_stock_report_pdf', compact('month', 'year', 'stocks', 'warehouse_ids', 'warehouses','formattedStocks'));
+
+        // return view('backend.report.remaining_stock_report', compact('start_date', 'end_date'));
+    }
 
 
 }

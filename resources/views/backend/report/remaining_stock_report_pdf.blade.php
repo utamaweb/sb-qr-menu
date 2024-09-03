@@ -122,9 +122,6 @@
                 font-size: 12px;
                 color: #333;
             }
-            footer::after {
-                content: "Halaman " counter(page);
-            }
         }
     </style>
 </head>
@@ -176,7 +173,6 @@
 </div>
 
 <!-- Footer untuk Nomor Halaman -->
-<footer></footer>
 
 <!-- Script untuk otomatis membuka dialog print -->
 <script>

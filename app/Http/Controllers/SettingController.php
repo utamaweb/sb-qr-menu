@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Customer;
-use App\Models\CustomerGroup;
-use App\Models\Warehouse;
-use App\Models\Biller;
-use App\Models\Account;
-use App\Models\Currency;
-use App\Models\PosSetting;
-use App\Models\MailSetting;
-use App\Models\GeneralSetting;
-use App\Models\HrmSetting;
-use App\Models\RewardPointSetting;
 use DB;
 use ZipArchive;
-use Twilio\Rest\Client;
 use Clickatell\Rest;
+use App\Models\Biller;
+use App\Models\Account;
+use Twilio\Rest\Client;
+use App\Models\Currency;
+use App\Models\Customer;
+use App\Models\Warehouse;
+use App\Models\HrmSetting;
+use App\Models\PosSetting;
+use App\Models\MailSetting;
+use Illuminate\Http\Request;
+use App\Models\CustomerGroup;
+use App\Models\GeneralSetting;
+use App\Models\RewardPointSetting;
 use Clickatell\ClickatellException;
+use Illuminate\Support\Facades\Storage;
 
 class SettingController extends Controller
 {
@@ -68,7 +69,7 @@ class SettingController extends Controller
         $general_setting->developed_by = $data['developed_by'];
         $logo = $request->site_logo;
         if ($logo) {
-            $this->fileDelete('storage/images/logo', $general_setting->site_logo);
+            Storage::delete('storage/images/logo', $general_setting->site_logo);
 
             $ext = pathinfo($logo->getClientOriginalName(), PATHINFO_EXTENSION);
             $logoName = date("Ymdhis") . '.' . $ext;

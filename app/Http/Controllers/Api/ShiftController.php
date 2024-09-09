@@ -49,8 +49,8 @@ class ShiftController extends Controller
                 return response()->json(['status' => "gagal", 'message' => "Buka kasir harus dilakukan dengan role kasir."], 200);
             }
 
-            if($request->shiftNumber) {
-                $shiftNumber = $request->shiftNumber;
+            if($request->shift_number) {
+                $shiftNumber = $request->shift_number;
             } else {
                 // untuk nomor shift (1,2,3)
                 $shiftNumber = 1;

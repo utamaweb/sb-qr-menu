@@ -177,4 +177,27 @@ class WarehouseController extends Controller
 
         return response()->json($html);
     }
+
+    // Warehouse Max Shifts Count
+    public function maxShiftPage() {
+        return view('backend.warehouse.maxShift');
+    }
+
+    // Warehouse Max Shifts Count Update
+    public function maxShiftUpdate(Request $request) {
+        $validate = $request->validate([
+            'max_shift' => 'numeric|required',
+        ]);
+
+        // Update proceess
+        $update = auth()->user()->warehouse->update([
+            'max_shift_count' => $validate['max_shift'],
+        ]);
+
+        if($update) {
+            return redirect()->route('maxShiftPage')->with('message', 'Jumlah Shift Maksimal Berhasil diubah!');
+        } else {
+            return redirect()->route('maxShiftPage')->with('message', 'Jumlah Shift Maksimal Gagal diubah!');
+        }
+    }
 }

@@ -60,6 +60,8 @@
     @elseif(auth()->user()->hasRole('Admin Outlet'))
         <li id="custom-category"><a href="{{ route('custom-category.index') }}"> <i
                     class="dripicons-list"></i><span>Kategori Custom</span></a></li>
+        <li id="max_shift_link"><a href="{{ route('maxShiftPage') }}"> <i
+                    class="dripicons-clock"></i><span>Jumlah Shift</span></a></li>
         <li id="ojek-online-outlet"><a href="{{ route('ojol-warehouse.index') }}"> <i
                     class="dripicons-user-id"></i><span>Ojek Online Outlet</span></a></li>
         <li id="produk-outlet"><a href="{{ route('produk-outlet.index') }}"> <i

@@ -132,7 +132,7 @@
     <div class="card">
         <div class="card-header">
             <h3 class="text-center">Laporan Sisa Stok</h3>
-            <img src="{{Storage::url('images/logo/'.$general_setting->site_logo)}}" alt="Logo" style="max-width: 150px; margin-top: 10px;">
+            <img src="{{ public_path('storage/images/logo/'.$general_setting->site_logo) }}" alt="Logo" style="max-width: 150px; margin-top: 10px;">
             <br>
             <h4 class="text-center">Bulan: {{$month}} Tahun: {{$year}}</h4>
         </div>
@@ -176,7 +176,7 @@
 
 <!-- Script untuk otomatis membuka dialog print -->
 <script>
-    window.print();
+    // window.print();
 </script>
 </body>
 </html>

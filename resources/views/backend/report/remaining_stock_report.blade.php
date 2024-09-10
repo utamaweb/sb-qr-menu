@@ -16,13 +16,13 @@
                             <select name="year" id="year" class="form-control">
                                 <option value="">---Pilih Tahun---</option>
                                 @php
-                                    $tahun = date('Y');
-                                    $minYear = $tahun - 10;
-                                    $maxYear = $tahun;
+                                $tahun = date('Y');
+                                $minYear = $tahun - 10;
+                                $maxYear = $tahun;
                                 @endphp
-
+                                
                                 @for ($i = $maxYear; $i >= $minYear; $i--)
-                                    <option value="{{ $i }}" {{$year == $i ? 'selected' : ''}}>{{ $i }}</option>
+                                <option value="{{ $i }}" {{$year == $i ? 'selected' : ''}}>{{ $i }}</option>
                                 @endfor
                             </select>
                         </div>
@@ -35,16 +35,16 @@
                             <select name="month" id="month" class="form-control">
                                 <option value="">---Pilih Bulan---</option>
                                 @php
-                                    $currentMonth = date('m');
-                                    for ($m = 1; $m <= 12; $m++) {
-                                        $monthValue = str_pad($m, 2, '0', STR_PAD_LEFT);
-                                        $monthLabel = Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F');
-                                @endphp
-                                        <option value="{{ $monthValue }}" {{ $month == $monthValue ? 'selected' : '' }}>
-                                            {{ $monthLabel }}
-                                        </option>
-                                @php
-                                    }
+                                $currentMonth = date('m');
+                                for ($m = 1; $m <= 12; $m++) {
+                                    $monthValue = str_pad($m, 2, '0', STR_PAD_LEFT);
+                                    $monthLabel = Carbon\Carbon::create()->month($m)->locale('id')->translatedFormat('F');
+                                    @endphp
+                                    <option value="{{ $monthValue }}" {{ $month == $monthValue ? 'selected' : '' }}>
+                                        {{ $monthLabel }}
+                                    </option>
+                                    @php
+                                }
                                 @endphp
                             </select>
                         </div>
@@ -70,22 +70,25 @@
                         <a href="{{ route('report.differenceStockReport') }}" class="btn btn-info">
                             <i class="dripicons-arrow-thin-left"></i> Kembali
                         </a>
+                        @if($formattedStocks->count() > 0)
                         <a href="{{ route('report.remainingStockReportPrint') }}?month={{$month}}&year={{$year}}" class="btn btn-success">
                             <i class="dripicons-print"></i> Cetak PDF
                         </a>
+                        @endif
+                        {{-- <button id="clickbind" class="btn btn-success"><i class="dripicons-print"></i> Cetak PDF</button> --}}
                     </div>
                     <div class="card-body">
-                        <h4>Laporan Selisih Stok</h4>
+                        <h4>Laporan Sisa Stok</h4>
                         <br>
                         <div class="row">
-                            @foreach($formattedStocks as $warehouse)
-                            <div class="col-md-6  align-items-stretch"> <!-- Flexbox added here -->
+                            @forelse($formattedStocks as $warehouse)
+                            <div class="col-md-12 align-items-stretch"> <!-- Flexbox added here -->
                                 <div class="card mb-4 flex-fill"> <!-- Flexbox fill added here -->
                                     <div class="card-header">
-                                        <h4>{{ $warehouse['warehouse_name'] }}</h4>
+                                        <h4><b>{{ $warehouse['warehouse_name'] }}</b></h4>
                                     </div>
                                     <div class="card-body">
-                                        <table class="table table-striped">
+                                        <table class="table table-bordered">
                                             <thead>
                                                 <tr>
                                                     <th>Bahan Baku</th>
@@ -106,7 +109,13 @@
                                     </div>
                                 </div>
                             </div>
-                            @endforeach
+                            @empty
+                            <div class="col-md-12 align-items-stretch"> <!-- Flexbox added here -->
+                                <div class="card mb-4 flex-fill"> <!-- Flexbox fill added here -->
+                                    Belum ada laporan sisa stok pada periode ini.
+                                </div>
+                            </div>
+                            @endforelse
                         </div> <!-- End row -->
                     </div>
                 </div>
@@ -119,46 +128,47 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
 <script type="text/javascript">
-$('.selectpicker').selectpicker();
-$("ul#report").siblings('a').attr('aria-expanded','true');
-$("ul#report").addClass("show");
-$("ul#report #laporan-sisa").addClass("active");
-
-$('.selectpicker').selectpicker('refresh');
-
-$(".daterangepicker-field").daterangepicker({
-  callback: function(startDate, endDate, period){
-    var start_date = startDate.format('YYYY-MM-DD');
-    var end_date = endDate.format('YYYY-MM-DD');
-    var title = start_date + ' s/d ' + end_date;
-    $(this).val(title);
-    $(".product-report-filter input[name=start_date]").val(start_date);
-    $(".product-report-filter input[name=end_date]").val(end_date);
-  }
-});
-
-$('#ingredient-table').DataTable( {
-    "order": [],
-    'language': {
-        'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
-        "info": '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-        "search": 'Cari',
-        'paginate': {
+    $('.selectpicker').selectpicker();
+    $("ul#report").siblings('a').attr('aria-expanded','true');
+    $("ul#report").addClass("show");
+    $("ul#report #laporan-sisa").addClass("active");
+    
+    $('.selectpicker').selectpicker('refresh');
+    
+    $(".daterangepicker-field").daterangepicker({
+        callback: function(startDate, endDate, period){
+            var start_date = startDate.format('YYYY-MM-DD');
+            var end_date = endDate.format('YYYY-MM-DD');
+            var title = start_date + ' s/d ' + end_date;
+            $(this).val(title);
+            $(".product-report-filter input[name=start_date]").val(start_date);
+            $(".product-report-filter input[name=end_date]").val(end_date);
+        }
+    });
+    
+    $('#ingredient-table').DataTable( {
+        "order": [],
+        'language': {
+            'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
+            "info": '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
+            "search": 'Cari',
+            'paginate': {
                 'previous': '<i class="dripicons-chevron-left"></i>',
                 'next': '<i class="dripicons-chevron-right"></i>'
-        }
-    },
-    'columnDefs': [
+            }
+        },
+        'columnDefs': [
         // Add specific column definitions if needed
-    ],
-    'select': { 
-        style: 'multi',  
-        selector: 'td:first-child'
-    },
-    'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
-    dom: '<"row"lfB>rtip',
-    buttons: [
+        ],
+        'select': { 
+            style: 'multi',  
+            selector: 'td:first-child'
+        },
+        'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        dom: '<"row"lfB>rtip',
+        buttons: [
         {
             extend: 'pdf',
             text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
@@ -196,7 +206,7 @@ $('#ingredient-table').DataTable( {
             text: '<i title="column visibility" class="fa fa-eye"></i>',
             columns: ':gt(0)'
         },
-    ],
-});
+        ],
+    });
 </script>
 @endpush

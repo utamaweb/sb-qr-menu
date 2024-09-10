@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Laporan Sisa Stok</title>
+    <title>Laporan Sisa Stok {{$month}} - {{$year}}</title>
     <style>
         /* Reset dan dasar styling */
         body {
@@ -141,7 +141,7 @@
     <!-- Konten Laporan -->
     <div class="row">
         @foreach($formattedStocks as $warehouse)
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="card">
                 <div class="card-header">
                     <h4>{{ $warehouse['warehouse_name'] }}</h4>

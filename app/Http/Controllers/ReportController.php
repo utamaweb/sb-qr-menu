@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use DB;
+use PDF;
 use Auth;
 use Carbon\Carbon;
 use App\Models\Sale;
@@ -4754,9 +4755,9 @@ class ReportController extends Controller
             })
         ];
         });
-        return view('backend.report.remaining_stock_report_pdf', compact('month', 'year', 'stocks', 'warehouse_ids', 'warehouses','formattedStocks'));
-
-        // return view('backend.report.remaining_stock_report', compact('start_date', 'end_date'));
+        $pdf = PDF::loadview('backend.report.remaining_stock_report_pdf', compact('month', 'year', 'stocks', 'warehouse_ids', 'warehouses','formattedStocks'));
+        return $pdf->download('laporan-sisa-stok-'.$month . '-'. $year .'.pdf');
+        // return view('backend.report.remaining_stock_report_pdf', compact('month', 'year', 'stocks', 'warehouse_ids', 'warehouses','formattedStocks'));
     }
 
 

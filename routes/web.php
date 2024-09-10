@@ -300,5 +300,9 @@ Route::group(['prefix' => 'admin'], function () {
             Route::delete('/custom_category/{category}', 'destroy')->name('destroy');
         });
 
+        // Route for warehouse max shifts count
+        Route::get('/max_shifts', [WarehouseController::class, 'maxShiftPage'])->name('maxShiftPage');
+        Route::put('/max_shifts', [WarehouseController::class, 'maxShiftUpdate'])->name('maxShiftUpdate');
+
     });
 });

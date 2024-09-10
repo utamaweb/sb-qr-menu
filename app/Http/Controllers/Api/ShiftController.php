@@ -48,11 +48,17 @@ class ShiftController extends Controller
             if ($roleName != 'Kasir') {
                 return response()->json(['status' => "gagal", 'message' => "Buka kasir harus dilakukan dengan role kasir."], 200);
             }
-            // untuk nomor shift (1,2,3)
-            $shiftNumber = 1;
-            if ($checkShift && $checkShift->shift_number < 3) {
-                $shiftNumber = $checkShift->shift_number + 1;
+
+            if($request->shift_number) {
+                $shiftNumber = $request->shift_number;
+            } else {
+                // untuk nomor shift (1,2,3)
+                $shiftNumber = 1;
+                if ($checkShift && $checkShift->shift_number < auth()->user()->warehouse->max_shift_count) {
+                    $shiftNumber = $checkShift->shift_number + 1;
+                }
             }
+
             // check kasir sudah buka atau belum
             $checkUserShift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
                 ->where('user_id', auth()->user()->id)

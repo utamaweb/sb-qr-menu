@@ -36,9 +36,9 @@
                         <label for="warehouse-select" class="form-label"><strong>Pilih Outlet</strong></label>
                         <div class="input-group">
                             <select id="warehouse-select" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="---Pilih Outlet---">
-                                <option value="all" {{$warehouse_id == 'all' ? 'selected' : ''}}>Semua Outlet</option>
+                                <option value="all" {{ $warehouse_request == 'all' ? 'selected' : ''}}>Semua Outlet</option>
                                 @foreach($warehouses as $warehouse)
-                                <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_id[0] ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_request ? 'selected' : ''}}>{{$warehouse->name}}</option>
                                 @endforeach
                             </select>
                         </div>

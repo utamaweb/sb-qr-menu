@@ -4581,7 +4581,7 @@ class ReportController extends Controller
             } else {
                 $warehouse_id = $warehouse_ids;
             }
-
+            $warehouse_request = $request->get('warehouse_id');
             // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
             $stocks = Stock::where('stocks.difference_stock', '!=', 0)
                 ->wherein('stocks.warehouse_id', $warehouse_id)
@@ -4603,7 +4603,7 @@ class ReportController extends Controller
                 ->orderBy('shifts.shift_number')
                 ->get();
 
-            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift', 'warehouse_id', 'warehouses'));
+            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift', 'warehouse_id', 'warehouses', 'warehouse_request'));
         }
 
         return view('backend.report.difference_stock_report', compact('start_date', 'end_date'));

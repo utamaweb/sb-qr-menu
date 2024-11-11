@@ -220,7 +220,7 @@ class TransactionController extends Controller
                     ->where('is_closed', 0)
                     ->first();
                 if ($checkShiftOpen == NULL) {
-                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 200);
+                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
                 }
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
                     ->where('is_closed', 0)
@@ -402,7 +402,7 @@ class TransactionController extends Controller
                     return response()->json([
                         'status' => false,
                         'message' => 'Stok bahan baku '. $ingredientsList . ' berikut tidak mencukupi.'
-                    ], 200);
+                    ], 500);
                 }
 
                 $total_amount = 0;
@@ -428,7 +428,7 @@ class TransactionController extends Controller
                     ]);
                     DB::commit();
                 } else {
-                    return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 200);
+                    return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 500);
                 }
 
                 $transaction['details'] = $transactionDetailsWithProducts;
@@ -437,6 +437,7 @@ class TransactionController extends Controller
             }
         } catch (\Throwable $th) {
             DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }

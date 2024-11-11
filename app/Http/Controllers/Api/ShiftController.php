@@ -447,6 +447,7 @@ class ShiftController extends Controller
             return response()->json($response, 200);
         } catch (\Throwable $th) {
             DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }

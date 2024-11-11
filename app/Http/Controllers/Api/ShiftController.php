@@ -319,17 +319,17 @@ class ShiftController extends Controller
                 ->first();
 
             if (is_null($shift)) {
-                return response()->json(['message' => "Belum Ada Kasir Buka"], 200);
+                return response()->json(['message' => "Belum Ada Kasir Buka"], 500);
             }
 
             // Cek apakah kasir sudah tutup
             if (CloseCashier::where('shift_id', $shift->id)->where('is_closed', 1)->exists()) {
-                return response()->json(['message' => 'Cashier Already Closed Before This'], 200);
+                return response()->json(['message' => 'Cashier Already Closed Before This'], 500);
             }
 
             // Cek jika ada orderan belum selesai
             if (Transaction::where('status', 'Pending')->where('shift_id', $shift->id)->exists()) {
-                return response()->json(['status' => 'gagal', 'message' => "Selesaikan orderan terlebih dahulu untuk tutup kasir"], 409);
+                return response()->json(['status' => 'gagal', 'message' => "Selesaikan orderan terlebih dahulu untuk tutup kasir"], 500);
             }
 
             // Ambil transaksi dan expenses sesuai shift

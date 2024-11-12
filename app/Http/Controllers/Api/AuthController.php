@@ -63,6 +63,7 @@ class AuthController extends Controller
             return response()->json($response);
 
         } catch (JWTException $e) {
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
 
@@ -96,6 +97,7 @@ class AuthController extends Controller
             return response()->json($response);
 
         } catch (JWTException $e) {
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => 'Token refresh failed'], 500);
         }
     }

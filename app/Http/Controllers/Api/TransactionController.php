@@ -220,7 +220,7 @@ class TransactionController extends Controller
                     ->where('is_closed', 0)
                     ->first();
                 if ($checkShiftOpen == NULL) {
-                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 200);
+                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
                 }
                 $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
                     ->where('is_closed', 0)
@@ -311,7 +311,7 @@ class TransactionController extends Controller
                 ]);
 
                 if ($validator->fails()) {
-                    return response()->json(['message' => 'Pilihan Menu Tidak Boleh Kosong'], 200);
+                    return response()->json(['message' => 'Pilihan Menu Tidak Boleh Kosong'], 500);
                 }
 
                 $dateNow = Carbon::now()->format('Y-m-d');
@@ -402,7 +402,7 @@ class TransactionController extends Controller
                     return response()->json([
                         'status' => false,
                         'message' => 'Stok bahan baku '. $ingredientsList . ' berikut tidak mencukupi.'
-                    ], 200);
+                    ], 500);
                 }
 
                 $total_amount = 0;
@@ -428,7 +428,7 @@ class TransactionController extends Controller
                     ]);
                     DB::commit();
                 } else {
-                    return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 200);
+                    return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 500);
                 }
 
                 $transaction['details'] = $transactionDetailsWithProducts;
@@ -437,6 +437,7 @@ class TransactionController extends Controller
             }
         } catch (\Throwable $th) {
             DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }
@@ -455,7 +456,7 @@ class TransactionController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->messages()], 400);
+            return response()->json(['errors' => $validator->messages()], 500);
         }
 
         DB::beginTransaction();
@@ -478,7 +479,7 @@ class TransactionController extends Controller
                 ->where('is_closed', 0)
                 ->first();
             if ($checkShift == NULL) {
-                return response()->json(['message' => 'Belum Ada Kasir Buka'], 200);
+                return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
             }
 
             $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
@@ -579,7 +580,7 @@ class TransactionController extends Controller
                     if ($stock->last_stock < ($productIngredientQty * $qty)) {
                         // Jika stok kurang dari qty, return peringatan
                         DB::rollback();
-                        return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 200);
+                        return response()->json(['message' => 'Stok bahan baku ' . $ingredient->name . ' tidak mencukupi.'], 500);
                     }
 
                     $stock->last_stock -= ($productIngredientQty * $qty);
@@ -604,6 +605,7 @@ class TransactionController extends Controller
             return response()->json($transaction, 200);
         } catch (\Throwable $th) {
             DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }
@@ -625,7 +627,7 @@ class TransactionController extends Controller
             return response()->json([
                 'status' => 'Error',
                 'errors' => $validate->errors(),
-            ], 400);
+            ], 500);
         }
 
         // Get Latest Shift data
@@ -636,7 +638,7 @@ class TransactionController extends Controller
             return response()->json([
                 'status' => 'Error',
                 'message' => 'Shift belum dibuka',
-            ], 400);
+            ], 500);
         }
 
         // Sequence number
@@ -728,7 +730,7 @@ class TransactionController extends Controller
                                 return response()->json([
                                     'status' => 'error',
                                     'message' => 'Stok bahan baku tidak mencukupi.'
-                                ], 400);
+                                ], 500);
                             }
                         }
                     } else { // Response if fail to create transaction details
@@ -736,7 +738,7 @@ class TransactionController extends Controller
                         return response()->json([
                             'status' => 'error',
                             'message' => 'Gagal membuat detail transaksi.'
-                        ], 400);
+                        ], 500);
                     }
                 }
 
@@ -763,6 +765,7 @@ class TransactionController extends Controller
             }
         } catch (\Throwable $th) {
             DB::rollBack();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => throw $th
@@ -800,10 +803,11 @@ class TransactionController extends Controller
                 // event(new TransactionCancelled($transaction->id));
                 return response()->json(['message' => 'Transaksi Berhasil Dibatalkan'], 200);
             } else {
-                return response()->json(['message' => 'Data transaksi tidak ada'], 200);
+                return response()->json(['message' => 'Data transaksi tidak ada'], 500);
             }
         } catch (\Throwable $th) {
             DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }
@@ -850,7 +854,7 @@ class TransactionController extends Controller
         // Get smallest quantity
         $qty = min($qty);
         if ($qty < $request->qty) {
-            return response()->json(['status' => false, 'message' => "Stok Bahan Baku Tidak Mencukupi!"], 200);
+            return response()->json(['status' => false, 'message' => "Stok Bahan Baku Tidak Mencukupi!"], 500);
         } else {
             return response()->json(['status' => true, 'message' => "Stok Tersedia"], 200);
         }

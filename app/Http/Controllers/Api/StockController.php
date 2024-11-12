@@ -191,7 +191,7 @@ class StockController extends Controller
             foreach($request->ingredients as $item){
                 if($item['qty'] < 1){
                     DB::rollback();
-                    return response()->json(['message' => "Jumlah Kuantitas Harus Diisi Minimal 1."], 200);
+                    return response()->json(['message' => "Jumlah Kuantitas Harus Diisi Minimal 1."], 500);
                 }
                 StockPurchaseIngredient::create([
                     'stock_purchase_id' => $stockPurchase->id,
@@ -231,6 +231,7 @@ class StockController extends Controller
             return response()->json($stockPurchase, 200);
         } catch (\Throwable $th) {
             DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }
@@ -247,7 +248,7 @@ class StockController extends Controller
             $shift = Shift::where('date', $dateNow)->where('is_closed', 0)->first();
         }
         if($shift == NULL){
-            return response()->json(['message' => "Belum ada kasir buka."], 200);
+            return response()->json(['message' => "Belum ada kasir buka."], 500);
         }
         $total_qty = 0;
         $total_price = 0;
@@ -329,6 +330,7 @@ class StockController extends Controller
             return response()->json($stockPurchase, 200);
         } catch (\Throwable $th) {
             DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => $th->getMessage()], 500);
         }
     }

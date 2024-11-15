@@ -345,7 +345,7 @@ class ShiftController extends Controller
 
             // Update Shift Setelah tutup kasir
             $shift->update([
-                'end_time' => Carbon::now(),
+                'end_time' => Carbon::now()->format('Y-m-d H:i:s'),
                 'closing_balance' => $request->cash_in_drawer,
                 'total_transaction' => $totalMoney,
                 'is_closed' => 1
@@ -363,7 +363,7 @@ class ShiftController extends Controller
                 'shift_id' => $shift->id,
                 'date' => $shift->date,
                 'open_time' => $shift->start_time,
-                'close_time' => Carbon::now(),
+                'close_time' => Carbon::now()->format('Y-m-d H:i:s'),
                 'initial_balance' => $shift->opening_balance,
                 'is_closed' => 1,
                 'total_cash' => $totalCash,

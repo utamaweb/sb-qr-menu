@@ -336,7 +336,15 @@ class ShiftController extends Controller
             // Ambil transaksi dan expenses sesuai shift
             $transactions = Transaction::where('status', 'Lunas')->where('shift_id', $shift->id)->with('transaction_details')->get();
             $expenses = Expense::where('shift_id', $shift->id)->with('expenseCategory')->get();
-
+            foreach ($expenses as $expense) {
+                $totalExpense += $expense['total_price'];
+                $totalExpense += $expense['amount'];
+                if ($expense->qty == 0) {
+                    continue;
+                } else {
+                    $expense['price'] = $expense->amount / $expense->qty;
+                }
+            }
             $totalExpense = $expenses->sum('amount');
             $totalCash = $transactions->where('payment_method', 'Tunai')->sum('total_amount');
             $totalNonCash = $transactions->where('payment_method', '!=', 'Tunai')->sum('total_amount');

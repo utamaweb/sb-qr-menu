@@ -345,7 +345,7 @@ class ShiftController extends Controller
 
             foreach ($expenses as $expense) {
                 // $totalExpense += $expense['total_price'];
-                $totalExpense += $expense['amount'];
+                // $totalExpense += $expense['amount'];
                 if ($expense->qty == 0) {
                     continue;
                 } else {

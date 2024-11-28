@@ -7,11 +7,11 @@
                 <h3 class="text-center">Laporan Transaksi Produk</h3>
             </div>
             {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
-            <div class="row mb-3 product-report-filter">
-                <div class="col-md-4 offset-md-2 mt-3">
-                    <div class="form-group row">
-                        <label class="d-tc mt-2"><strong>Pilih Tanggal</strong> &nbsp;</label>
-                        <div class="d-tc">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label class=""><strong>Pilih Tanggal</strong> &nbsp;</label>
+                        <div class="">
                             <div class="input-group">
                                 <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} To {{$end_date}}" required />
                                 <input type="hidden" name="start_date" value="{{$start_date}}" />
@@ -20,7 +20,9 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-2 mt-3">
+            </div>
+            <div>
+                <div class="col-md-6">
                     <div class="form-group">
                         <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
                     </div>

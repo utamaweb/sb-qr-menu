@@ -785,28 +785,33 @@ class ReportController extends Controller
     public function productReport(Request $request)
     {
         $data = $request->all();
-        if($data){
-            $start_date = $data['start_date'];
-            $end_date = $data['end_date'];
-        } else{
-            $start_date = Carbon::now()->format('Y-m-d');
-            $end_date = Carbon::now()->format('Y-m-d');
-        }
 
-        // Start of new Products get
-        $products = Product::with('category')->whereIn('id', Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->pluck('product_id'))->get();
+        $start_date = $data['start_date'] ?? Carbon::now()->format('Y-m-d');
+        $end_date = $data['end_date'] ?? Carbon::now()->format('Y-m-d');
 
-        $transactionDetails = TransactionDetail::whereIn('transaction_id', (Transaction::where('warehouse_id', auth()->user()->warehouse_id)->whereBetween('date', [$start_date, $end_date])->pluck('id')))->get();
+        $warehouseId = auth()->user()->warehouse_id;
 
-        foreach($products as $product) {
-            $product['qty'] = $transactionDetails->where('product_id', $product->id)->sum('qty');
-            $product['subtotal'] = $transactionDetails->where('product_id', $product->id)->sum('subtotal');
-        }
-        // End of new Products get
+        // query optimized
+        $products = Product::with('category')
+            ->whereIn('id', Product_Warehouse::where('warehouse_id', $warehouseId)->pluck('product_id'))
+            ->select('products.*')
+            ->leftJoinSub(
+                TransactionDetail::selectRaw('product_id, SUM(qty) as total_qty, SUM(subtotal) as total_subtotal')
+                    ->whereIn('transaction_id', Transaction::where('warehouse_id', $warehouseId)
+                        ->whereBetween('date', [$start_date, $end_date])
+                        ->pluck('id'))
+                    ->groupBy('product_id'),
+                'transaction_summary',
+                'products.id',
+                '=',
+                'transaction_summary.product_id'
+            )
+            ->selectRaw('COALESCE(transaction_summary.total_qty, 0) as qty, COALESCE(transaction_summary.total_subtotal, 0) as subtotal')
+            ->get();
 
         return view('backend.report.product_report', compact('start_date', 'end_date', 'products'));
-
     }
+
 
     public function listTransaction()
     {
@@ -4528,7 +4533,7 @@ class ReportController extends Controller
         $lims_purchase_data = $q->get();
         return view('backend.report.supplier_due_report', compact('lims_purchase_data', 'start_date', 'end_date'));
     }
-    
+
     public function differenceStockReport(Request $request)
     {
         // Kondisi untuk filter tanggal
@@ -4608,7 +4613,7 @@ class ReportController extends Controller
 
         return view('backend.report.difference_stock_report', compact('start_date', 'end_date'));
     }
-    
+
     public function remainingStockReport(Request $request)
     {
         // return $request;
@@ -4706,7 +4711,7 @@ class ReportController extends Controller
 
         return view('backend.report.remaining_stock_report', compact('start_date', 'end_date'));
     }
-    
+
     public function remainingStockReportPrint(Request $request)
     {
         // Kondisi untuk filter tanggal

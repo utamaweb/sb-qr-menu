@@ -13,13 +13,13 @@
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class=""><strong>Pilih Tanggal Mulai</strong> </label>
-                        <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
+                        <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}" autocomplete="off">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
                         <label class=""><strong>Pilih Tanggal Selesai</strong> </label>
-                        <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
+                        <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}" autocomplete="off">
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -185,4 +185,26 @@ $('#ingredient-table').DataTable( {
     ],
 });
 </script>
+
+<script>
+    $(document).ready(function() {
+        // Fungsi untuk memeriksa tanggal
+        function validateDates() {
+            var startDate = new Date($("input[name='start_date']").val());
+            var endDate = new Date($("input[name='end_date']").val());
+
+            // Jika tanggal mulai lebih besar dari tanggal selesai
+            if (startDate > endDate) {
+                alert("Tanggal Mulai tidak boleh lebih besar dari Tanggal Selesai.");
+                $("input[name='start_date']").val(''); // Mengosongkan input tanggal mulai
+                $("input[name='end_date']").val(''); // Mengosongkan input tanggal selesai
+            }
+        }
+
+        // Event listener untuk perubahan pada input tanggal
+        $("input[name='start_date'], input[name='end_date']").on("change", function() {
+            validateDates();
+        });
+    });
+    </script>
 @endpush

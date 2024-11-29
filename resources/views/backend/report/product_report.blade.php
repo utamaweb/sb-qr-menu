@@ -2,32 +2,30 @@
 
 <section class="forms">
     <div class="container-fluid">
-        <div class="card">
-            <div class="card-header mt-2">
-                <h3 class="text-center">Laporan Transaksi Produk</h3>
-                <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
-            </div>
-            {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
-            <div class="row ml-3 mr-3">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class=""><strong>Pilih Tanggal Mulai</strong> </label>
-                        <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">Laporan Transaksi Produk</h3>
+                        <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
                     </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class=""><strong>Pilih Tanggal Selesai</strong> </label>
-                        <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <div class="form-group">
-                        <button class="btn btn-primary" type="submit">Submit</button>
+
+                    <div class="card-body">
+                        {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
+                            <div class="form-group">
+                                <label for=""><strong>Pilih Tanggal</strong></label>
+                                <div class="input-group">
+                                    <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
+                                    <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
+                                    <button class="btn btn-primary" type="submit">Submit</button>
+                                </div>
+                            </div>
+                        {!! Form::close() !!}
                     </div>
                 </div>
             </div>
         </div>
+
 
         <div class="row">
             <div class="col-md-12">
@@ -88,7 +86,7 @@
     $("ul#report #laporan-transaksi-produk").addClass("active");
 
     var ingredient_id = [];
-    var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
+    var user_verified = {{ json_encode(env('USER_VERIFIED')) }};
 
     $.ajaxSetup({
         headers: {
@@ -98,39 +96,17 @@
 
     $('.selectpicker').selectpicker('refresh');
 
-
-
     $('#ingredient-table').DataTable( {
         "order": [],
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
-             "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  'Cari',
-            'paginate': {
+            "info"      : '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
+            "search"    : 'Cari',
+            'paginate'  : {
                     'previous': '<i class="dripicons-chevron-left"></i>',
-                    'next': '<i class="dripicons-chevron-right"></i>'
+                    'next'    : '<i class="dripicons-chevron-right"></i>'
             }
         },
-        'columnDefs': [
-            // {
-            //     "orderable": false,
-            //     'targets': [0, 2]
-            // },
-            // {
-            //     'render': function(data, type, row, meta){
-            //         if(type === 'display'){
-            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-            //         }
-
-            //        return data;
-            //     },
-            //     'checkboxes': {
-            //        'selectRow': true,
-            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-            //     },
-            //     'targets': [0]
-            // }
-        ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
         dom: '<"row"lfB>rtip',
@@ -173,8 +149,6 @@
                 columns: ':gt(0)'
             },
         ],
-    } );
+    });
 </script>
-
-
 @endpush

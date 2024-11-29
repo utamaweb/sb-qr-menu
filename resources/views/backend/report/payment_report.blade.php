@@ -6,16 +6,16 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="text-center">Laporan Pembayaran</h3>
+                        <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
                     </div>
                     <div class="card-body">
-                        {!! Form::open(['route' => 'report.paymentByDate', 'method' => 'post']) !!}
+                        {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
                             <div class="form-group">
-                                <label><strong>Pilih Tanggal</strong></label>
+                                <label for=""><strong>Pilih Tanggal</strong></label>
                                 <div class="input-group">
-                                    <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} s/d {{$end_date}}" required />
-                                    <input type="hidden" name="start_date" />
-                                    <input type="hidden" name="end_date" />
-                                    <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
+                                    <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
+                                    <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
+                                    <button class="btn btn-primary" type="submit">Submit</button>
                                 </div>
                             </div>
                         {!! Form::close() !!}

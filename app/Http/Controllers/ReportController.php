@@ -785,9 +785,13 @@ class ReportController extends Controller
     public function productReport(Request $request)
     {
         $data = $request->all();
-
-        $start_date = $data['start_date'] ?? Carbon::now()->format('Y-m-d');
-        $end_date = $data['end_date'] ?? Carbon::now()->format('Y-m-d');
+        if($data){
+            $start_date = $data['start_date'];
+            $end_date = $data['end_date'];
+        } else{
+            $start_date = Carbon::now()->format('Y-m-d');
+            $end_date = Carbon::now()->format('Y-m-d');
+        }
 
         $warehouseId = auth()->user()->warehouse_id;
 

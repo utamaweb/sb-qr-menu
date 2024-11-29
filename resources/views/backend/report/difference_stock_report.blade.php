@@ -3,76 +3,62 @@
 
 <section class="forms">
     <div class="container-fluid">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-center">Laporan Selisih Stok</h3>
-                <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
-            </div>
-            {!! Form::open(['route' => 'report.differenceStockReport', 'method' => 'get']) !!}
-            <div class="row ml-3 mr-3">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class=""><strong>Pilih Tanggal Mulai</strong> </label>
-                        <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label class=""><strong>Pilih Tanggal Selesai</strong> </label>
-                        <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="shift-select" class="form-label"><strong>Pilih Shift</strong></label>
-                        <div class="input-group">
-                            <select id="shift-select" name="shift" class="form-control">
-                                <option value="all" {{request()->shift == 'all' ? 'selected' : '' }}>Semua</option>
-                                <option value="1" {{$shift[0] == 1 && count($shift) == 1 ? 'selected' : ''}}>1</option>
-                                <option value="2" {{$shift[0] == 2 && count($shift) == 1 ? 'selected' : ''}}>2</option>
-                                <option value="3" {{$shift[0] == 3 && count($shift) == 1 ? 'selected' : ''}}>3</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                @if(auth()->user()->hasRole('Admin Bisnis'))
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label for="warehouse-select" class="form-label"><strong>Pilih Outlet</strong></label>
-                        <div class="input-group">
-                            <select id="warehouse-select" name="warehouse_id" class="selectpicker form-control" data-live-search="true" data-live-search-style="begins" title="---Pilih Outlet---">
-                                <option value="all" {{ $warehouse_request == 'all' ? 'selected' : ''}}>Semua Outlet</option>
-                                @foreach($warehouses as $warehouse)
-                                <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_request ? 'selected' : ''}}>{{$warehouse->name}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                @endif
-                <div class="col-md-8">
-                    <div class="form-group">
-                        <button class="btn btn-primary" type="submit">Submit</button>
-                    </div>
-                </div>
-            </div>
-            {!! Form::close() !!}
-        </div>
-    </div>
-</section>
-
-<div class="forms">
-    <div class="container-fluid">
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header d-flex align-items-center">
-                        <a href="{{ route('report.differenceStockReport') }}" class="btn btn-info"><i class="dripicons-arrow-thin-left"></i> Kembali </a>
+                    <div class="card-header">
+                        <h3 class="text-center">Laporan Selisih Stok</h3>
+                        <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
                     </div>
                     <div class="card-body">
-                        <h4>Laporan Selisih Stok</h4>
-                        <br>
+                        {!! Form::open(['route' => 'report.differenceStockReport', 'method' => 'get']) !!}
+                            <div class="form-group">
+                                <label for=""><strong>Pilih Tanggal</strong></label>
+                                <div class="input-group">
+                                    <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
+                                    <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label><strong>Pilih Shift</strong></label>
+                                <div class="input-group">
+                                    <select id="shift-select" name="shift" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
+                                    title="Pilih shift">
+                                        <option value="all" {{request()->shift == 'all' ? 'selected' : '' }}>Semua</option>
+                                        <option value="1" {{$shift[0] == 1 && count($shift) == 1 ? 'selected' : ''}}>1</option>
+                                        <option value="2" {{$shift[0] == 2 && count($shift) == 1 ? 'selected' : ''}}>2</option>
+                                        <option value="3" {{$shift[0] == 3 && count($shift) == 1 ? 'selected' : ''}}>3</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            @if(auth()->user()->hasRole('Admin Bisnis'))
+                                <div class="form-group">
+                                    <label><strong>Pilih Outlet</strong></label>
+                                    <select id="warehouse-select" name="warehouse_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
+                                    title="Pilih outlet">
+                                        <option value="all" {{ $warehouse_request == 'all' ? 'selected' : ''}}>Semua Outlet</option>
+                                        @foreach($warehouses as $warehouse)
+                                        <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_request ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+
+                            <div class="form-group text-right">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        {!! Form::close() !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
                         <div class="table-responsive">
                             <table id="ingredient-table" class="table">
                                 <thead>
@@ -100,7 +86,7 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 
 @endsection
 
@@ -113,17 +99,6 @@ $("ul#report #laporan-selisih").addClass("active");
 
 $('.selectpicker').selectpicker('refresh');
 
-$(".daterangepicker-field").daterangepicker({
-  callback: function(startDate, endDate, period){
-    var start_date = startDate.format('YYYY-MM-DD');
-    var end_date = endDate.format('YYYY-MM-DD');
-    var title = start_date + ' s/d ' + end_date;
-    $(this).val(title);
-    $(".product-report-filter input[name=start_date]").val(start_date);
-    $(".product-report-filter input[name=end_date]").val(end_date);
-  }
-});
-
 $('#ingredient-table').DataTable( {
     "order": [],
     'language': {
@@ -135,9 +110,6 @@ $('#ingredient-table').DataTable( {
                 'next': '<i class="dripicons-chevron-right"></i>'
         }
     },
-    'columnDefs': [
-        // Add specific column definitions if needed
-    ],
     'select': {
         style: 'multi',
         selector: 'td:first-child'
@@ -185,4 +157,26 @@ $('#ingredient-table').DataTable( {
     ],
 });
 </script>
+
+<script>
+    $(document).ready(function() {
+        // Fungsi untuk memeriksa tanggal
+        function validateDates() {
+            var startDate = new Date($("input[name='start_date']").val());
+            var endDate = new Date($("input[name='end_date']").val());
+
+            // Jika tanggal mulai lebih besar dari tanggal selesai
+            if (startDate > endDate) {
+                alert("Tanggal Mulai tidak boleh lebih besar dari Tanggal Selesai.");
+                $("input[name='start_date']").val(''); // Mengosongkan input tanggal mulai
+                $("input[name='end_date']").val(''); // Mengosongkan input tanggal selesai
+            }
+        }
+
+        // Event listener untuk perubahan pada input tanggal
+        $("input[name='start_date'], input[name='end_date']").on("change", function() {
+            validateDates();
+        });
+    });
+    </script>
 @endpush

@@ -1,68 +1,77 @@
 @extends('backend.layout.main') @section('content')
 <section class="forms">
     <div class="container-fluid">
-        <div class="card">
-            <div class="card-header mt-2">
-                <h3 class="text-center">Laporan Pembayaran</h3>
-            </div>
-            {!! Form::open(['route' => 'report.paymentByDate', 'method' => 'post']) !!}
-            <div class="col-md-6 offset-md-3 mt-3 mb-3">
-                <div class="form-group row">
-                    <label class="d-tc mt-2"><strong>Pilih Tanggal</strong> &nbsp;</label>
-                    <div class="d-tc">
-                        <div class="input-group">
-                            <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} To {{$end_date}}" required />
-                            <input type="hidden" name="start_date" />
-                            <input type="hidden" name="end_date" />
-                            <div class="input-group-append">
-                                <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">Laporan Pembayaran</h3>
+                        <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
+                            <div class="form-group">
+                                <label for=""><strong>Pilih Tanggal</strong></label>
+                                <div class="input-group">
+                                    <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
+                                    <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
+                                    <button class="btn btn-primary" type="submit">Submit</button>
+                                </div>
                             </div>
+                        {!! Form::close() !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive mb-4">
+                            <table id="report-table" class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tanggal</th>
+                                        <th>Outlet </th>
+                                        <th>Tipe Pemesanan</th>
+                                        <th>Tipe Pembayaran</th>
+                                        <th>Total Pembayaran</th>
+                                        <th>Total Pesanan (Qty)</th>
+                                        <th>Kasir</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($lims_payment_data as $payment)
+                                    <tr>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td>{{$payment->date}}</td>
+                                        <td>{{$payment->warehouse->name}}</td>
+                                        <td>{{$payment->order_type->name}}</td>
+                                        <td>{{$payment->payment_method}}</td>
+                                        <td>{{number_format($payment->total_amount, 0, '', ',')}}</td>
+                                        <td>{{number_format($payment->total_qty, 0, '', ',')}}</td>
+                                        <td>{{$payment->user->name}}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                                <tfoot class="tfoot active">
+                                    <th></th>
+                                    <th>{{trans('file.Total')}}:</th>
+                                    <th></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>{{number_format(0, $general_setting->decimal, '', ',')}}</th>
+                                    <th>{{number_format(0, $general_setting->decimal, '', ',')}}</th>
+                                    <th></th>
+                                </tfoot>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-            {!! Form::close() !!}
         </div>
-    </div>
-    <div class="table-responsive mb-4">
-        <table id="report-table" class="table table-hover">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Tanggal</th>
-                    <th>Outlet </th>
-                    <th>Tipe Pemesanan</th>
-                    <th>Tipe Pembayaran</th>
-                    <th>Total Pembayaran</th>
-                    <th>Total Pesanan (Qty)</th>
-                    <th>Kasir</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($lims_payment_data as $payment)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$payment->date}}</td>
-                    <td>{{$payment->warehouse->name}}</td>
-                    <td>{{$payment->order_type->name}}</td>
-                    <td>{{$payment->payment_method}}</td>
-                    <td>{{number_format($payment->total_amount, 0, '', ',')}}</td>
-                    <td>{{number_format($payment->total_qty, 0, '', ',')}}</td>
-                    <td>{{$payment->user->name}}</td>
-                </tr>
-                @endforeach
-            </tbody>
-            <tfoot class="tfoot active">
-                <th></th>
-                <th>{{trans('file.Total')}}:</th>
-                <th></th>
-                <th></th>
-                <th></th>
-                <th>{{number_format(0, $general_setting->decimal, '', ',')}}</th>
-                <th>{{number_format(0, $general_setting->decimal, '', ',')}}</th>
-                <th></th>
-            </tfoot>
-        </table>
     </div>
 </section>
 
@@ -96,26 +105,6 @@
                     'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
-        'columnDefs': [
-            // {
-            //     "orderable": false,
-            //     'targets': 0
-            // },
-            // {
-            //     'render': function(data, type, row, meta){
-            //         if(type === 'display'){
-            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-            //         }
-
-            //        return data;
-            //     },
-            //     'checkboxes': {
-            //        'selectRow': true,
-            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-            //     },
-            //     'targets': [0]
-            // }
-        ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
         dom: '<"row"lfB>rtip',

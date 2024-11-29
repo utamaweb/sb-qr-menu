@@ -2,58 +2,61 @@
 
 <section class="forms">
     <div class="container-fluid">
-        <div class="card">
-            <div class="card-header mt-2">
-                <h3 class="text-center">Laporan Transaksi Produk</h3>
-            </div>
-            {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class=""><strong>Pilih Tanggal</strong> &nbsp;</label>
-                        <div class="">
-                            <div class="input-group">
-                                <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} To {{$end_date}}" required />
-                                <input type="hidden" name="start_date" value="{{$start_date}}" />
-                                <input type="hidden" name="end_date" value="{{$end_date}}" />
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">Laporan Transaksi Produk</h3>
+                    </div>
+                    <div class="card-body">
+                        {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
+                            <div class="form-group">
+                                <label class=""><strong>Pilih Tanggal</strong> &nbsp;</label>
+                                <div class="input-group">
+                                    <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} To {{$end_date}}" required />
+                                    <input type="hidden" name="start_date" value="{{$start_date}}" />
+                                    <input type="hidden" name="end_date" value="{{$end_date}}" />
+                                    <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
+                                </div>
                             </div>
+                        {!! Form::close() !!}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="ingredient-table" class="table table-hover" style="width: 100%">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Produk</th>
+                                        <th>Kategori</th>
+                                        <th>Jumlah Terjual (Rupiah)</th>
+                                        <th>Jumlah Terjual (Kuantitas)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($products as $product)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $product->name }}</td>
+                                            <td>{{ $product->category->name }}</td>
+                                            <td>Rp. {{ number_format($product->subtotal, 0, ',', '.') }}</td>
+                                            <td>{{ number_format($product->qty, 0, ',', '.') }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-            <div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
-                    </div>
-                </div>
-            </div>
-            {!! Form::close() !!}
         </div>
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table table-hover" style="width: 100%">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Produk</th>
-                    <th>Kategori</th>
-                    <th>Jumlah Terjual (Rupiah)</th>
-                    <th>Jumlah Terjual (Kuantitas)</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($products as $product)
-                    <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $product->name }}</td>
-                        <td>{{ $product->category->name }}</td>
-                        <td>Rp. {{ number_format($product->subtotal, 0, ',', '.') }}</td>
-                        <td>{{ number_format($product->qty, 0, ',', '.') }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
     </div>
 </section>
 
@@ -179,106 +182,59 @@
     });
 });
 
-    $('#ingredient-table').DataTable( {
-        "order": [],
-        'language': {
-            'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
-             "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  'Cari',
-            'paginate': {
-                    'previous': '<i class="dripicons-chevron-left"></i>',
-                    'next': '<i class="dripicons-chevron-right"></i>'
-            }
+$('#ingredient-table').DataTable( {
+    "order": [],
+    'language': {
+        'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
+        "info"      : '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
+        "search"    : 'Cari',
+        'paginate'  : {
+                'previous': '<i class="dripicons-chevron-left"></i>',
+                'next'    : '<i class="dripicons-chevron-right"></i>'
+        }
+    },
+    'select': { style: 'multi',  selector: 'td:first-child'},
+    'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    dom: '<"row"lfB>rtip',
+    buttons: [
+        {
+            extend: 'pdf',
+            text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
+            exportOptions: {
+                columns: ':visible:Not(.not-exported)',
+                rows: ':visible'
+            },
         },
-        'columnDefs': [
-            // {
-            //     "orderable": false,
-            //     'targets': [0, 2]
-            // },
-            // {
-            //     'render': function(data, type, row, meta){
-            //         if(type === 'display'){
-            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-            //         }
-
-            //        return data;
-            //     },
-            //     'checkboxes': {
-            //        'selectRow': true,
-            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-            //     },
-            //     'targets': [0]
-            // }
-        ],
-        'select': { style: 'multi',  selector: 'td:first-child'},
-        'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        dom: '<"row"lfB>rtip',
-        buttons: [
-            {
-                extend: 'pdf',
-                text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
+        {
+            extend: 'excel',
+            text: '<i title="export to excel" class="dripicons-document-new"></i>',
+            exportOptions: {
+                columns: ':visible:Not(.not-exported)',
+                rows: ':visible'
             },
-            {
-                extend: 'excel',
-                text: '<i title="export to excel" class="dripicons-document-new"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
+        },
+        {
+            extend: 'csv',
+            text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
+            exportOptions: {
+                columns: ':visible:Not(.not-exported)',
+                rows: ':visible'
             },
-            {
-                extend: 'csv',
-                text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
+        },
+        {
+            extend: 'print',
+            text: '<i title="print" class="fa fa-print"></i>',
+            exportOptions: {
+                columns: ':visible:Not(.not-exported)',
+                rows: ':visible'
             },
-            {
-                extend: 'print',
-                text: '<i title="print" class="fa fa-print"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
-            },
-            // {
-            //     text: '<i title="delete" class="dripicons-cross"></i>',
-            //     className: 'buttons-delete',
-            //     action: function ( e, dt, node, config ) {
-            //             ingredient_id.length = 0;
-            //             $(':checkbox:checked').each(function(i){
-            //                 if(i){
-            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
-            //                 }
-            //             });
-            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-            //                 $.ajax({
-            //                     type:'POST',
-            //                     url:'ingredient/deletebyselection',
-            //                     data:{
-            //                         unitIdArray: ingredient_id
-            //                     },
-            //                     success:function(data){
-            //                         alert(data);
-            //                     }
-            //                 });
-            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
-            //             }
-            //             else if(!ingredient_id.length)
-            //                 alert('No unit is selected!');
-            //     }
-            // },
-            {
-                extend: 'colvis',
-                text: '<i title="column visibility" class="fa fa-eye"></i>',
-                columns: ':gt(0)'
-            },
-        ],
-    } );
+        },
+        {
+            extend: 'colvis',
+            text: '<i title="column visibility" class="fa fa-eye"></i>',
+            columns: ':gt(0)'
+        },
+    ],
+});
 </script>
 @endpush

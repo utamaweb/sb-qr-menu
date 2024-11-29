@@ -1,4 +1,4 @@
-@extends('backend.layout.main') 
+@extends('backend.layout.main')
 @section('content')
 
 <section class="forms">
@@ -6,18 +6,23 @@
         <div class="card">
             <div class="card-header">
                 <h3 class="text-center">Laporan Selisih Stok</h3>
+                <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
             </div>
             {!! Form::open(['route' => 'report.differenceStockReport', 'method' => 'get']) !!}
-            <div class="row product-report-filter d-flex justify-content-center align-items-center">
-                <div class="col-md-4 mt-3">
+            <div class="row ml-3 mr-3">
+                <div class="col-md-6">
                     <div class="form-group">
-                        <label for="date-range" class="form-label"><strong>Pilih Tanggal</strong></label>
-                        <div class="input-group">
-                            <input type="text" id="date-range" class="daterangepicker-field form-control" value="{{$start_date}} s/d {{$end_date}}" required />
-                            <input type="hidden" name="start_date" value="{{$start_date}}" />
-                            <input type="hidden" name="end_date" value="{{$end_date}}" />
-                        </div>
+                        <label class=""><strong>Pilih Tanggal Mulai</strong> </label>
+                        <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}" autocomplete="off">
                     </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class=""><strong>Pilih Tanggal Selesai</strong> </label>
+                        <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}" autocomplete="off">
+                    </div>
+                </div>
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="shift-select" class="form-label"><strong>Pilih Shift</strong></label>
                         <div class="input-group">
@@ -30,8 +35,9 @@
                         </div>
                     </div>
                 </div>
+
                 @if(auth()->user()->hasRole('Admin Bisnis'))
-                <div class="col-md-4 mt-3">
+                <div class="col-md-6">
                     <div class="form-group">
                         <label for="warehouse-select" class="form-label"><strong>Pilih Outlet</strong></label>
                         <div class="input-group">
@@ -45,9 +51,9 @@
                     </div>
                 </div>
                 @endif
-                <div class="col-md-2 mt-3">
-                    <div class="form-group text-center">
-                        <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
+                <div class="col-md-8">
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Submit</button>
                     </div>
                 </div>
             </div>
@@ -132,8 +138,8 @@ $('#ingredient-table').DataTable( {
     'columnDefs': [
         // Add specific column definitions if needed
     ],
-    'select': { 
-        style: 'multi',  
+    'select': {
+        style: 'multi',
         selector: 'td:first-child'
     },
     'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
@@ -179,4 +185,26 @@ $('#ingredient-table').DataTable( {
     ],
 });
 </script>
+
+<script>
+    $(document).ready(function() {
+        // Fungsi untuk memeriksa tanggal
+        function validateDates() {
+            var startDate = new Date($("input[name='start_date']").val());
+            var endDate = new Date($("input[name='end_date']").val());
+
+            // Jika tanggal mulai lebih besar dari tanggal selesai
+            if (startDate > endDate) {
+                alert("Tanggal Mulai tidak boleh lebih besar dari Tanggal Selesai.");
+                $("input[name='start_date']").val(''); // Mengosongkan input tanggal mulai
+                $("input[name='end_date']").val(''); // Mengosongkan input tanggal selesai
+            }
+        }
+
+        // Event listener untuk perubahan pada input tanggal
+        $("input[name='start_date'], input[name='end_date']").on("change", function() {
+            validateDates();
+        });
+    });
+    </script>
 @endpush

@@ -5,26 +5,25 @@
         <div class="card">
             <div class="card-header mt-2">
                 <h3 class="text-center">Laporan Transaksi Produk</h3>
+                <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
             </div>
             {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="form-group">
-                        <label class=""><strong>Pilih Tanggal</strong> &nbsp;</label>
-                        <div class="">
-                            <div class="input-group">
-                                <input type="text" class="daterangepicker-field form-control" value="{{$start_date}} To {{$end_date}}" required />
-                                <input type="hidden" name="start_date" value="{{$start_date}}" />
-                                <input type="hidden" name="end_date" value="{{$end_date}}" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div>
+            <div class="row ml-3 mr-3">
                 <div class="col-md-6">
                     <div class="form-group">
-                        <button class="btn btn-primary" type="submit">{{trans('file.submit')}}</button>
+                        <label class=""><strong>Pilih Tanggal Mulai</strong> </label>
+                        <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label class=""><strong>Pilih Tanggal Selesai</strong> </label>
+                        <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <button class="btn btn-primary" type="submit">Submit</button>
                     </div>
                 </div>
             </div>

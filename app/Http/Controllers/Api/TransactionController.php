@@ -334,7 +334,7 @@ class TransactionController extends Controller
                     // get deal with stock
                     $product_id = $detail['product_id'];
                     $product_qty = $detail['qty'];
-                    
+
                     // Ambil produk terkait
                     $product = $products->where('id', $product_id)->first();
 
@@ -379,7 +379,7 @@ class TransactionController extends Controller
                             ]);
                         }
                     }
-                    
+
                     // end get deal with stock
                     $productDetail = [
                         'transaction_id' => $transaction->id,

@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use JWTAuth;
 use App\Models\User;
 use App\Models\Warehouse;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -52,6 +53,8 @@ class AuthController extends Controller
 
             $refreshToken = JWTAuth::fromUser($user);
 
+            Cache::put('refresh_token_' . $user->id, $refreshToken, 60 * 60 * 24 * 7);
+
             // Menyertakan token refresh bersama dengan token akses dalam respons
             $response = [
                 'user' => $user,
@@ -63,7 +66,7 @@ class AuthController extends Controller
             return response()->json($response);
 
         } catch (JWTException $e) {
-            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
+            \Log::emergency("File:" . $e->getFile() . " Line:" . $e->getLine() . " Message:" . $e->getMessage());
             return response()->json(['message' => $e->getMessage()], 500);
         }
 
@@ -72,7 +75,7 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
-
+        Cache::forget('refresh_token_' . auth('api')->id());
         return response()->json(['message' => 'Log out success']);
     }
 
@@ -81,11 +84,20 @@ class AuthController extends Controller
         $refreshToken = $request->input('refresh_token');
 
         try {
+            $cachedRefreshToken = Cache::get('refresh_token_' . auth('api')->id());
+            // return $cachedRefreshToken;
+            if (!$cachedRefreshToken || $cachedRefreshToken!== $refreshToken) {
+                return response()->json(['message' => 'Invalid refresh token'], 500);
+            }
+
             $token = JWTAuth::parseToken()->refresh();
 
             // Mendapatkan user terkait dengan token baru
             $user = JWTAuth::setToken($token)->toUser();
             $refreshToken = JWTAuth::fromUser($user);
+
+            Cache::forget('refresh_token_' . auth('api')->id());
+            Cache::put('refresh_token_' . $user->id, $refreshToken, 60 * 60 * 24 * 7);
 
             // Menyertakan token akses baru dalam respons
             $response = [
@@ -97,7 +109,7 @@ class AuthController extends Controller
             return response()->json($response);
 
         } catch (JWTException $e) {
-            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
+            \Log::emergency("File:" . $e->getFile() . " Line:" . $e->getLine() . " Message:" . $e->getMessage());
             return response()->json(['message' => 'Token refresh failed'], 500);
         }
     }

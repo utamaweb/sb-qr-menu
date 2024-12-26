@@ -14,7 +14,7 @@ class ProductWarehouseController extends Controller
      */
     public function index()
     {
-        $productWarehouses = Product_Warehouse::where('warehouse_id', auth()->user()->warehouse_id)->get();
+        $productWarehouses = Product_Warehouse::with('product', 'warehouse', 'product.category')->where('warehouse_id', auth()->user()->warehouse_id)->get();
         return view('backend.product_warehouse.index', compact('productWarehouses'));
     }
 

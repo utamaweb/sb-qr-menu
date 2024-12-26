@@ -20,7 +20,10 @@
     <div class="card">
         <div class="card-header">
             <a href="{{route('produk-outlet.create')}}" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Produk Outlet</a>
-            <a href="#" class="btn btn-sm btn-success"><i class="dripicons-checklist"></i> Urutkan Produk</a>
+            {{-- <a href="#" class="btn btn-sm btn-success"><i class="dripicons-checklist"></i> Urutkan Produk</a> --}}
+            <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#sortModal">
+                <i class="dripicons-checklist"></i> Urutkan Produk
+            </button>
         </div>
 
         <div class="card-body">
@@ -76,6 +79,42 @@
             </div>
         </div>
     </div>
+
+    {{-- Sort modal --}}
+    <div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sortModalLabel">Pilih Kategori untuk Diurutkan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                            <th>Kategori</th>
+                            <th>Aksi</th>
+                        </thead>
+                        <tbody>
+                            @foreach ($categories as $item)
+                                <tr>
+                                    <td>{{ $item->name }}</td>
+                                    <td>
+                                        <a href="{{ route('produk-outlet.sort', $item->id) }}" class="btn btn-sm btn-primary">Pilih</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- End of sort modal --}}
 </section>
 
 @endsection

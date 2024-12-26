@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Product_Warehouse;
 use App\Models\Warehouse;
 use App\Models\Product;
+use App\Models\CategoryParent;
+use App\Models\Category;
 
 class ProductWarehouseController extends Controller
 {
@@ -14,8 +16,13 @@ class ProductWarehouseController extends Controller
      */
     public function index()
     {
-        $productWarehouses = Product_Warehouse::with('product', 'warehouse', 'product.category')->where('warehouse_id', auth()->user()->warehouse_id)->get();
-        return view('backend.product_warehouse.index', compact('productWarehouses'));
+        $productWarehouses = Product_Warehouse::with('product', 'warehouse', 'product.category')
+            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->get();
+
+        $categories = CategoryParent::get();
+
+        return view('backend.product_warehouse.index', compact('productWarehouses', 'categories'));
     }
 
     public function create()
@@ -92,5 +99,19 @@ class ProductWarehouseController extends Controller
     {
         $data = Product_Warehouse::find($id)->delete();
         return redirect()->back()->with('not_permitted', 'Data berhasil dihapus');
+    }
+
+    public function sort($category) {
+        $categoryParent = CategoryParent::find($category);
+        $categories = Category::where('category_parent_id', $category)->get()->pluck('id');
+
+        $products = Product_Warehouse::with('product', 'product.category')
+            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->whereHas('product.category', function($query) use ($categories) {
+                $query->whereIn('id', $categories);
+            })
+            ->get();
+
+        return view('backend.product_warehouse.sort', compact('products', 'categoryParent'));
     }
 }

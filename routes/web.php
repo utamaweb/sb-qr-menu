@@ -74,6 +74,7 @@ Route::group(['prefix' => 'admin'], function () {
 
 
         // Need to check again
+        Route::get('produk-outlet/sort/{category}', [ProductWarehouseController::class, 'sort'])->name('produk-outlet.sort');
         Route::resource('produk-outlet', ProductWarehouseController::class);
         Route::resource('produk', ProductController::class)->except(['show']);
         Route::controller(ProductController::class)->group(function () {

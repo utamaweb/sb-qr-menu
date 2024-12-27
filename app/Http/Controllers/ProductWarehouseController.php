@@ -8,6 +8,7 @@ use App\Models\Warehouse;
 use App\Models\Product;
 use App\Models\CategoryParent;
 use App\Models\Category;
+use DB;
 
 class ProductWarehouseController extends Controller
 {
@@ -113,5 +114,26 @@ class ProductWarehouseController extends Controller
             ->get();
 
         return view('backend.product_warehouse.sort', compact('products', 'categoryParent'));
+    }
+
+    public function storeSort(Request $request) {
+        $ids = explode(',', $request->ids);
+
+        try {
+            DB::beginTransaction();
+
+            foreach ($ids as $key => $id) {
+                Product_Warehouse::find($id)->update([
+                    'sort' => $key + 1,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('produk-outlet.index')->with('message', 'Data berhasil disimpan');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->route('produk-outlet.index')->with('message', 'Data gagal disimpan');
+        }
+
     }
 }

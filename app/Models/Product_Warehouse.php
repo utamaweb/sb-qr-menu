@@ -10,8 +10,7 @@ class Product_Warehouse extends Model
     use SoftDeletes;
 	protected $table = 'product_warehouse';
     protected $fillable =[
-
-        "product_id", "warehouse_id", "price"
+        "product_id", "warehouse_id", "price", "sort"
     ];
 
     public function product()

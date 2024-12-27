@@ -22,11 +22,12 @@
                 </div>
 
                 <div class="card-footer">
-                    <form action="" method="post" id="sort-form">
+                    <form action="{{ route('produk-outlet.storeSort') }}" method="POST" id="sort-form">
                         @csrf
                         @method('PUT')
 
                         <input type="hidden" name="ids" id="ids">
+                        <input type="hidden" name="category" value="{{ $categoryParent->id }}">
 
                         <button class="btn btn-sm btn-primary">Simpan</button>
                     </form>
@@ -56,7 +57,7 @@
 
             $('#ids').val(ids.join(',')); // Menggabungkan ID menjadi string
             console.log(ids);
-            // this.submit(); // Mengirim form setelah mengisi ID
+            this.submit(); // Mengirim form setelah mengisi ID
         });
     </script>
 @endpush

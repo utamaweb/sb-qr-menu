@@ -31,7 +31,8 @@ class ProductController extends Controller
         $products = Product::join('product_warehouse', 'products.id', '=', 'product_warehouse.product_id')
             ->where('product_warehouse.warehouse_id', $warehouseId)
             ->where('product_warehouse.deleted_at', NULL)
-            ->get(['products.*', 'product_warehouse.price AS warehouse_harga'])
+            ->get(['products.*', 'product_warehouse.price AS warehouse_harga', 'product_warehouse.sort AS sort'])
+            ->sortBy('sort')->sortBy('category_parent_id')
             ->map(function ($product) use ($warehouseId) {
                 $ingredients = $product->ingredient()->get();
                 if(count($ingredients) > 0) {
@@ -75,6 +76,8 @@ class ProductController extends Controller
                     $product->price = $product->warehouse_harga;
                 }
 
+                $product->sort = $product->sort;
+
                 // Hitung harga untuk setiap ojol
                 $business_id = Warehouse::where('id', '=', $warehouseId)->first()->business_id;
                 $ojols = Ojol::where('business_id', '=', $business_id)->get(); // Ganti dengan model dan query yang sesuai
@@ -94,7 +97,7 @@ class ProductController extends Controller
                 $product->category_parent_name = $product->category->category_parent->name;
 
                 return $product;
-            });
+            })->values();
 
         return response()->json($products, 200);
     }

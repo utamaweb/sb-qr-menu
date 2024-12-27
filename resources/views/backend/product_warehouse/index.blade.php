@@ -16,61 +16,105 @@
     <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
             aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
     @endif
-    {{-- @can('tambah-user') --}}
-        <a href="{{route('produk-outlet.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Produk Outlet</a>
-            {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
-    {{-- @endcan --}}
+
+    <div class="card">
+        <div class="card-header">
+            <a href="{{route('produk-outlet.create')}}" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Produk Outlet</a>
+            {{-- <a href="#" class="btn btn-sm btn-success"><i class="dripicons-checklist"></i> Urutkan Produk</a> --}}
+            <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#sortModal">
+                <i class="dripicons-checklist"></i> Urutkan Produk
+            </button>
         </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Produk</th>
-                    <th>Kategori</th>
-                    <th>Outlet</th>
-                    <th>Harga</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($productWarehouses as $key=>$productWarehouse)
-                <tr data-id="{{$productWarehouse->id}}">
-                    <td>{{++$key}}</td>
-                    <td>{{ $productWarehouse->product->name }}</td>
-                    <td>{{ $productWarehouse->product->category->name }}</td>
-                    <td>{{ $productWarehouse->warehouse->name}}</td>
-                    <td>@currency($productWarehouse->price)</td>
-                    <td>
-                        {{-- @canany(['ubah-user', 'hapus-user']) --}}
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
-                                <span class="caret"></span>
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
-                                @can('ubah-user')
-                                <li>
-                                	<a href="{{ route('produk-outlet.edit', $productWarehouse->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
-                                </li>
-                                @endcan
-                                <li class="divider"></li>
-                                @can('hapus-user')
-                                {{ Form::open(['route' => ['produk-outlet.destroy', $productWarehouse->id], 'method' => 'DELETE'] ) }}
-                                <li>
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                </li>
-                                {{ Form::close() }}
-                                @endcan
-                            </ul>
-                        </div>
-                        {{-- @endcanany --}}
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="ingredient-table" class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Produk</th>
+                            <th>Kategori</th>
+                            <th>Outlet</th>
+                            <th>Harga</th>
+                            <th class="not-exported">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($productWarehouses as $key=>$productWarehouse)
+                        <tr data-id="{{$productWarehouse->id}}">
+                            <td>{{++$key}}</td>
+                            <td>{{ $productWarehouse->product->name }}</td>
+                            <td>{{ $productWarehouse->product->category->name }}</td>
+                            <td>{{ $productWarehouse->warehouse->name}}</td>
+                            <td>@currency($productWarehouse->price)</td>
+                            <td>
+                                {{-- @canany(['ubah-user', 'hapus-user']) --}}
+                                <div class="btn-group">
+                                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
+                                        <span class="caret"></span>
+                                        <span class="sr-only">Toggle Dropdown</span>
+                                    </button>
+                                    <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
+                                        @can('ubah-user')
+                                        <li>
+                                            <a href="{{ route('produk-outlet.edit', $productWarehouse->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
+                                        </li>
+                                        @endcan
+                                        <li class="divider"></li>
+                                        @can('hapus-user')
+                                        {{ Form::open(['route' => ['produk-outlet.destroy', $productWarehouse->id], 'method' => 'DELETE'] ) }}
+                                        <li>
+                                            <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                        </li>
+                                        {{ Form::close() }}
+                                        @endcan
+                                    </ul>
+                                </div>
+                                {{-- @endcanany --}}
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+
+    {{-- Sort modal --}}
+    <div class="modal fade" id="sortModal" tabindex="-1" aria-labelledby="sortModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="sortModalLabel">Pilih Kategori untuk Diurutkan</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table">
+                        <thead>
+                            <th>Kategori</th>
+                            <th>Aksi</th>
+                        </thead>
+                        <tbody>
+                            @foreach ($categories as $item)
+                                <tr>
+                                    <td>{{ $item->name }}</td>
+                                    <td>
+                                        <a href="{{ route('produk-outlet.sort', $item->id) }}" class="btn btn-sm btn-primary">Pilih</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- End of sort modal --}}
 </section>
 
 @endsection

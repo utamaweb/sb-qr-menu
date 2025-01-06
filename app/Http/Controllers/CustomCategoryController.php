@@ -10,34 +10,14 @@ class CustomCategoryController extends Controller
 {
     // Index
     public function index() {
-        $categories = CategoryParent::all();
-
-        foreach ($categories as $category) {
-            $checkCustom = CustomCategory::where('warehouse_id', auth()->user()->warehouse_id)->where('category_id', $category->id)->whereNull('deleted_at')->exists();
-            $customCategory = CustomCategory::where('warehouse_id', auth()->user()->warehouse_id)->where('category_id', $category->id)->whereNull('deleted_at')->first();
-
-            if($checkCustom) {
-                $category['custom'] = $customCategory->name;
-            } else {
-                $category['custom'] = "-";
-            }
-        }
+        $categories = CategoryParent::with('customCategory')->get();
 
         return view('backend.custom_category.index', compact('categories'));
     }
 
     // Form
-    public function form($category) {
-        $checkCustom = CustomCategory::where('warehouse_id', auth()->user()->warehouse_id)->where('category_id', $category)->whereNull('deleted_at')->exists();
-        $customCategory = CustomCategory::where('warehouse_id', auth()->user()->warehouse_id)->where('category_id', $category)->whereNull('deleted_at')->first();
-
-        $category = CategoryParent::where('id', $category)->first();
-
-        if($checkCustom) {
-            $category['custom'] = $customCategory->name;
-        } else {
-            $category['custom'] = "-";
-        }
+    public function form($category) {;
+        $category = CategoryParent::with('customCategory')->where('id', $category)->first();
 
         return view('backend.custom_category.form', compact('category'));
 

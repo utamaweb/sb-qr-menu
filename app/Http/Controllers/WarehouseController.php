@@ -20,13 +20,13 @@ class WarehouseController extends Controller
             $lims_warehouse_all = Warehouse::where('is_active', true)->get();
             $business = Business::get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
-            $business = Business::where('id', auth()->user()->business_id)->get();
-            $lims_warehouse_all = Warehouse::where('is_active', true)->where('business_id', auth()->user()->business_id)->get();
+            $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->business_id)->firstOrFail();
+            $lims_warehouse_all = $business->warehouse;
         } else{
-            $business = Business::where('id', auth()->user()->warehouse->business_id)->get();
-            $lims_warehouse_all = Warehouse::where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+            $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->warehouse->business_id)->first();
+            $lims_warehouse_all = $business->warehouse;
         }
-        $numberOfWarehouse = Warehouse::where('is_active', true)->count();
+        $numberOfWarehouse = $lims_warehouse_all->count();
         return view('backend.warehouse.create', compact('lims_warehouse_all', 'numberOfWarehouse','business'));
     }
 

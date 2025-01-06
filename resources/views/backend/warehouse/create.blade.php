@@ -3,113 +3,110 @@
 <section>
     <div class="container-fluid">
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-    @can('tambah-warehouse')
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Outlet</a>&nbsp;
-    @endcan
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nama Outlet</th>
-                    <th>Tipe</th>
-                    <th>Bisnis</th>
-                    <th>Alamat</th>
-                    <th>Tanggal Dibuat</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($lims_warehouse_all as $key=>$warehouse)
-                <tr data-id="{{$warehouse->id}}">
-                    <td>{{++$key}}</td>
-                    <td>{{ $warehouse->name }}</td>
-                    <td>{{ ($warehouse->is_self_service == 0) ? 'Hanya Kasir' : 'Self Service' }}</td>
-                    <td>{{ $warehouse->business->name }}</td>
-                    <td>{{ $warehouse->address }}</td>
-                    <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
-                    <td>
-                        @can('ubah-warehouse')
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$warehouse->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
-                        {{-- Edit Modal --}}
-                        <div id="editModal-{{$warehouse->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                            <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> Ubah Outlet</h5>
-                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                </div>
-                                <div class="modal-body">
-                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('outlet.update', $warehouse->id)}}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="form-group">
-                                        <div class="form-group">
-                                            <label>Nama Outlet *</label>
-                                            <input type="text" value="{{$warehouse->name}}" name="name" required class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Nama Bisnis *</label>
-                                            @if(auth()->user()->hasRole('Superadmin'))
-                                            <select name="business_id" class="form-control">
-                                                <option value="">---Pilih Bisnis---</option>
-                                                @foreach($business as $bisnis)
-                                                <option value="{{$bisnis->id}}" {{$bisnis->id == $warehouse->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
-                                                @endforeach
-                                            </select>
-                                            @elseif(auth()->user()->hasRole('Admin Bisnis'))
-                                            <input type="hidden" readonly name="business_id" class="form-control" value="{{$warehouse->business->id}}">
-                                            <input type="text" readonly name="business_name" class="form-control" value="{{$warehouse->business->name}}">
-                                            @endif
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Alamat *</label>
-                                            <input type="text" value="{{$warehouse->address}}" name="address" required class="form-control">
-                                        </div>
+        @include('includes.alerts')
 
-                                        {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Outlet</span>
+                @can('tambah-warehouse')
+                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Outlet</a>
+                @endcan
+            </div>
 
-                                        <div class="form-group">
-                                            <label for="service">Jenis Service *</label>
-                                            <select name="service" id="service" class="form-control">
-                                                <option value="1" {{ ($warehouse->is_self_service == 1) ? 'selected' : '' }}>Self Service</option>
-                                                <option value="0" {{ ($warehouse->is_self_service == 0) ? 'selected' : '' }}>Hanya Kasir</option>
-                                            </select>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama Outlet</th>
+                                <th>Tipe</th>
+                                <th>Bisnis</th>
+                                <th>Alamat</th>
+                                <th>Tanggal Dibuat</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($lims_warehouse_all as $key=>$warehouse)
+                            <tr data-id="{{$warehouse->id}}">
+                                <td>{{++$key}}</td>
+                                <td>{{ $warehouse->name }}</td>
+                                <td>{{ ($warehouse->is_self_service == 0) ? 'Hanya Kasir' : 'Self Service' }}</td>
+                                <td>{{ $warehouse->business->name }}</td>
+                                <td>{{ $warehouse->address }}</td>
+                                <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
+                                <td>
+                                    @can('ubah-warehouse')
+                                    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$warehouse->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                                    {{-- Edit Modal --}}
+                                    <div id="editModal-{{$warehouse->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                                        <div role="document" class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 id="exampleModalLabel" class="modal-title"> Ubah Outlet</h5>
+                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                                                <form action="{{route('outlet.update', $warehouse->id)}}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="form-group">
+                                                    <div class="form-group">
+                                                        <label>Nama Outlet *</label>
+                                                        <input type="text" value="{{$warehouse->name}}" name="name" required class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Nama Bisnis *</label>
+                                                        @if(auth()->user()->hasRole('Superadmin'))
+                                                        <select name="business_id" class="form-control">
+                                                            <option value="">---Pilih Bisnis---</option>
+                                                            @foreach($business as $bisnis)
+                                                            <option value="{{$bisnis->id}}" {{$bisnis->id == $warehouse->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
+                                                            @endforeach
+                                                        </select>
+                                                        @elseif(auth()->user()->hasRole('Admin Bisnis'))
+                                                        <input type="hidden" readonly name="business_id" class="form-control" value="{{$warehouse->business->id}}">
+                                                        <input type="text" readonly name="business_name" class="form-control" value="{{$warehouse->business->name}}">
+                                                        @endif
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Alamat *</label>
+                                                        <input type="text" value="{{$warehouse->address}}" name="address" required class="form-control">
+                                                    </div>
+
+                                                    {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
+
+                                                    <div class="form-group">
+                                                        <label for="service">Jenis Service *</label>
+                                                        <select name="service" id="service" class="form-control">
+                                                            <option value="1" {{ ($warehouse->is_self_service == 1) ? 'selected' : '' }}>Self Service</option>
+                                                            <option value="0" {{ ($warehouse->is_self_service == 0) ? 'selected' : '' }}>Hanya Kasir</option>
+                                                        </select>
+                                                    </div>
+                                                    </div>
+                                                    <input type="submit" value="Submit" class="btn btn-primary">
+                                                </form>
+                                            </div>
                                         </div>
                                         </div>
-                                        <input type="submit" value="Submit" class="btn btn-primary">
-                                    </form>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        @endcan
-                        @can('hapus-warehouse')
-                        {{ Form::open(['route' => ['outlet.destroy', $warehouse->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
-                                {{ Form::close() }}
-                        @endcan
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                                    </div>
+                                    @endcan
+                                    @can('hapus-warehouse')
+                                    {{ Form::open(['route' => ['outlet.destroy', $warehouse->id], 'method' => 'DELETE'] ) }}
+                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                            {{ Form::close() }}
+                                    @endcan
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 </section>
 

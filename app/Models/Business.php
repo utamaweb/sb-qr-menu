@@ -13,7 +13,7 @@ class Business extends Model
 
     public function warehouse()
     {
-    	return $this->hasMany('App\Models\Warehouse');
+    	return $this->hasMany(Warehouse::class);
     }
     public function expenseCategory()
     {

@@ -28,9 +28,9 @@ class ProductController extends Controller
     {
         $roleName = auth()->user()->getRoleNames()[0];
         if (auth()->user()->hasRole('Superadmin')) {
-            $products = Product::get();
+            $products = Product::with('category', 'unit', 'ingredient')->get();
         } elseif (auth()->user()->hasRole('Admin Bisnis')) {
-            $products = Product::where('business_id', auth()->user()->business_id)->get();
+            $products = Product::with('category', 'unit', 'ingredient')->where('business_id', auth()->user()->business_id)->get();
         }
         return view('backend.product.index', compact('products', 'roleName'));
     }

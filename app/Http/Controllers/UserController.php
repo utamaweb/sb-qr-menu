@@ -25,15 +25,15 @@ class UserController extends Controller
     public function index()
     {
         if(auth()->user()->hasRole('Superadmin')){
-            $lims_user_list = User::get();
+            $lims_user_list = User::with('business', 'warehouse')->get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
-            $outlet = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-            $lims_user_list = User::where('business_id', auth()->user()->business_id)->orWhereIn('warehouse_id', $outlet)->get();
+            $outlet = Warehouse::with('users', 'users.business', 'users.warehouse')->where('business_id', auth()->user()->business_id)->first();
+            $lims_user_list = $outlet->users;
         } else{
-            $lims_user_list = User::where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+            $lims_user_list = User::with('business', 'warehouse')->where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
         }
 
-        $numberOfUserAccount = User::where('is_active', true)->count();
+        $numberOfUserAccount = $lims_user_list->count();
         return view('backend.user.index', compact('lims_user_list', 'numberOfUserAccount'));
     }
 

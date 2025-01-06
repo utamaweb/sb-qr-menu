@@ -16,8 +16,7 @@ class IngredientController extends Controller
 {
     public function index()
     {
-        $lims_ingredient_all = Ingredient::where('business_id', auth()->user()->business_id)->get();
-        // $lims_ingredient_all = Stock::get();
+        $lims_ingredient_all = Ingredient::with('unit')->where('business_id', auth()->user()->business_id)->get();
         $units = Unit::get();
         return view('backend.bahan_baku.create', compact('lims_ingredient_all', 'units'));
     }

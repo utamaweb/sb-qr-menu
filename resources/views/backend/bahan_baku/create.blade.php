@@ -3,102 +3,87 @@
 <section>
     <div class="container-fluid">
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-        @can('tambah-bahanbaku')
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>&nbsp;
-        @endcan
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Nama Bahan Baku</th>
-                    <th>Unit</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($lims_ingredient_all as $key=>$ingredient)
-                <tr data-id="{{$ingredient->id}}">
-                    <td class="text-center">{{++$key}}</td>
-                    <td>{{ $ingredient->name }}</td>
-                    <td>{{ $ingredient->unit->unit_name }}</td>
-                    <td>
-                        <div class="row">
-                            @can('ubah-bahanbaku')
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
-                        {{-- Edit Modal --}}
-                        <div id="editModal-{{$ingredient->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                            <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title">Ubah Bahan Baku</h5>
-                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                </div>
-                                <div class="modal-body">
-                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('bahan-baku.update', $ingredient->id)}}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="form-group">
-                                        <div class="form-group">
-                                            <label>Nama Bahan Baku *</label>
-                                            <input type="text" value="{{$ingredient->name}}" name="name" required class="form-control">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Unit *</label>
-                                            <select name="unit_id" id="" class="form-control">
-                                                <option value="---Pilih Unit---"></option>
-                                                @foreach($units as $unit)
-                                                <option value="{{$unit->id}}" {{$ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        {{-- <div class="row">
-                                            <div class="form-group col-md-6">
-                                                <label>Stok Awal *</label>
-                                                <input type="number" value="{{$ingredient->first_stock}}" name="first_stock" required class="form-control">
-                                            </div>
-                                            <div class="form-group col-md-6">
-                                                <label>Batas Stok Maksimum *</label>
-                                                <input type="number" value="{{$ingredient->max_stock}}" name="max_stock" required class="form-control">
-                                            </div>
-                                        </div> --}}
-                                        {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
-                                        </div>
-                                        <input type="submit" value="Submit" class="btn btn-primary">
-                                    </form>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        @endcan
+        @include('includes.alerts')
 
-                        @can('hapus-bahanbaku')
-                        {{ Form::open(['route' => ['bahan-baku.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                {{ Form::close() }}
-                        @endcan
-                    </td>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Bahan Baku</span>
+                @can('tambah-bahanbaku')
+                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>
+                @endcan
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Nama Bahan Baku</th>
+                                <th>Unit</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($lims_ingredient_all as $key=>$ingredient)
+                            <tr data-id="{{$ingredient->id}}">
+                                <td class="text-center">{{++$key}}</td>
+                                <td>{{ $ingredient->name }}</td>
+                                <td>{{ $ingredient->unit->unit_name }}</td>
+                                <td>
+                                    <div class="row">
+                                        @can('ubah-bahanbaku')
+                                    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
+                                    {{-- Edit Modal --}}
+                                    <div id="editModal-{{$ingredient->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                                        <div role="document" class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 id="exampleModalLabel" class="modal-title">Ubah Bahan Baku</h5>
+                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                                                <form action="{{route('bahan-baku.update', $ingredient->id)}}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="form-group">
+                                                    <div class="form-group">
+                                                        <label>Nama Bahan Baku *</label>
+                                                        <input type="text" value="{{$ingredient->name}}" name="name" required class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Unit *</label>
+                                                        <select name="unit_id" id="" class="form-control">
+                                                            <option value="---Pilih Unit---"></option>
+                                                            @foreach($units as $unit)
+                                                            <option value="{{$unit->id}}" {{$ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    </div>
+                                                    <input type="submit" value="Submit" class="btn btn-primary">
+                                                </form>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    @endcan
+
+                                    @can('hapus-bahanbaku')
+                                    {{ Form::open(['route' => ['bahan-baku.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
+                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                            {{ Form::close() }}
+                                    @endcan
+                                </td>
+                            </div>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+            </div>
+        </div>
     </div>
 </section>
 
@@ -128,16 +113,6 @@
                             @endforeach
                         </select>
                     </div>
-                    {{-- <div class="row">
-                        <div class="form-group col-md-6">
-                            <label>Stok Awal *</label>
-                            <input type="number" name="first_stock" required class="form-control">
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label>Batas Stok Maksimum *</label>
-                            <input type="number" name="max_stock" required class="form-control">
-                        </div>
-                    </div> --}}
                     <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>

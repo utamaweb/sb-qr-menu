@@ -3,124 +3,120 @@
 <section>
     <div class="container-fluid">
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
+        @include('includes.alerts')
 
-    @if(auth()->user()->hasRole('Kasir'))
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Pengeluaran</a>&nbsp;
-    @endif
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Pengeluaran</th>
-                    <th>Keterangan</th>
-                    <th>Kuantitas</th>
-                    <th>Total</th>
-                    <th>Outlet</th>
-                    <th>Dibuat | Waktu</th>
-                    @if(auth()->user()->hasRole('Kasir'))
-                    <th class="not-exported">Aksi</th>
-                    @endif
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($expenses as $key=>$expense)
-                <tr data-id="{{$expense->id}}">
-                    <td>{{++$key}}</td>
-                    <td>{{ $expense->expenseCategory->name }}</td>
-                    <td>{{ (($expense->note == NULL) ? '-' : $expense->note) }}</td>
-                    <td>{{ $expense->qty }}</td>
-                    <td>@currency($expense->amount)</td>
-                    <td>{{ $expense->warehouse->name }}</td>
-                    <td>{{ $expense->user->name }} | {{$expense->created_at}}</td>
-                    @if(auth()->user()->hasRole('Kasir'))
-                    <td>
-                        @can('ubah-daftarpengeluaran')
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense->id}}"><i class="dripicons-document-edit"></i> Uba</button>
-                        {{-- Edit Modal --}}
-                        <div id="editModal-{{$expense->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                            <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> Ubah Pengeluaran</h5>
-                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                </div>
-                                <div class="modal-body">
-                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('pengeluaran.update', $expense->id)}}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="row">
-                                            <div class="col-md-6 form-group">
-                                                <label>Nama Pengeluaran *</label>
-                                                <select name="expense_category_id" class="selectpicker form-control" required
-                                                    data-live-search="true" data-live-search-style="begins" title="Pilih Pengeluaran...">
-                                                    @foreach($lims_expense_category_list as $expense_category)
-                                                    <option value="{{$expense_category->id}}" {{$expense->expense_category_id == $expense_category->id ? 'selected' : ''}}>
-                                                        {{$expense_category->name}}
-                                                    </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 form-group">
-                                                <label>Kuantitas *</label>
-                                                <input type="number" name="qty" required class="form-control" value="{{$expense->qty}}">
-                                            </div>
-                                            <div class="col-md-6 form-group">
-                                                <label>Total *</label>
-                                                <input type="text" name="amount" required class="form-control" value="{{$expense->amount}}">
-                                            </div>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Pengeluaran</span>
+                @if(auth()->user()->hasRole('Kasir'))
+                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Pengeluaran</a>
+                @endif
+            </div>
 
-                                            {{-- <div class="col-md-6 form-group">
-                                                <label>Cabang *</label>
-                                                <select name="warehouse_id" class="selectpicker form-control" required data-live-search="true"
-                                                    data-live-search-style="begins" title="Pilih cabang...">
-                                                    @foreach($lims_warehouse_list as $warehouse)
-                                                    <option value="{{$warehouse->id}}" {{$expense->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{$warehouse->name}}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div> --}}
-                                            <div class="col-md-6 form-group">
-                                                <label>Keterangan</label>
-                                                <input type="text" name="note" class="form-control" value="{{$expense->note}}">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Pengeluaran</th>
+                                <th>Keterangan</th>
+                                <th>Kuantitas</th>
+                                <th>Total</th>
+                                <th>Outlet</th>
+                                <th>Dibuat | Waktu</th>
+                                @if(auth()->user()->hasRole('Kasir'))
+                                <th class="not-exported">Aksi</th>
+                                @endif
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($expenses as $key=>$expense)
+                            <tr data-id="{{$expense->id}}">
+                                <td>{{++$key}}</td>
+                                <td>{{ $expense->expenseCategory->name }}</td>
+                                <td>{{ (($expense->note == NULL) ? '-' : $expense->note) }}</td>
+                                <td>{{ $expense->qty }}</td>
+                                <td>@currency($expense->amount)</td>
+                                <td>{{ $expense->warehouse->name }}</td>
+                                <td>{{ $expense->user->name }} | {{$expense->created_at}}</td>
+                                @if(auth()->user()->hasRole('Kasir'))
+                                <td>
+                                    @can('ubah-daftarpengeluaran')
+                                    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense->id}}"><i class="dripicons-document-edit"></i> Uba</button>
+                                    {{-- Edit Modal --}}
+                                    <div id="editModal-{{$expense->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                                        <div role="document" class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 id="exampleModalLabel" class="modal-title"> Ubah Pengeluaran</h5>
+                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                                                <form action="{{route('pengeluaran.update', $expense->id)}}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="row">
+                                                        <div class="col-md-6 form-group">
+                                                            <label>Nama Pengeluaran *</label>
+                                                            <select name="expense_category_id" class="selectpicker form-control" required
+                                                                data-live-search="true" data-live-search-style="begins" title="Pilih Pengeluaran...">
+                                                                @foreach($lims_expense_category_list as $expense_category)
+                                                                <option value="{{$expense_category->id}}" {{$expense->expense_category_id == $expense_category->id ? 'selected' : ''}}>
+                                                                    {{$expense_category->name}}
+                                                                </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6 form-group">
+                                                            <label>Kuantitas *</label>
+                                                            <input type="number" name="qty" required class="form-control" value="{{$expense->qty}}">
+                                                        </div>
+                                                        <div class="col-md-6 form-group">
+                                                            <label>Total *</label>
+                                                            <input type="text" name="amount" required class="form-control" value="{{$expense->amount}}">
+                                                        </div>
+
+                                                        {{-- <div class="col-md-6 form-group">
+                                                            <label>Cabang *</label>
+                                                            <select name="warehouse_id" class="selectpicker form-control" required data-live-search="true"
+                                                                data-live-search-style="begins" title="Pilih cabang...">
+                                                                @foreach($lims_warehouse_list as $warehouse)
+                                                                <option value="{{$warehouse->id}}" {{$expense->warehouse_id == $warehouse->id ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div> --}}
+                                                        <div class="col-md-6 form-group">
+                                                            <label>Keterangan</label>
+                                                            <input type="text" name="note" class="form-control" value="{{$expense->note}}">
+                                                        </div>
+                                                    </div>
+
+                                                    {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
+                                                    <input type="submit" value="Submit" class="btn btn-primary">
+                                                </form>
                                             </div>
                                         </div>
+                                        </div>
+                                    </div>
+                                    @endcan
 
-                                        {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
-                                        <input type="submit" value="Submit" class="btn btn-primary">
-                                    </form>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        @endcan
+                                    @can('hapus-daftarpengeluaran')
+                                    {{ Form::open(['route' => ['pengeluaran.destroy', $expense->id], 'method' => 'DELETE'] ) }}
+                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                            {{ Form::close() }}
+                                    @endcan
+                                </td>
+                                @endif
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-                        @can('hapus-daftarpengeluaran')
-                        {{ Form::open(['route' => ['pengeluaran.destroy', $expense->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                {{ Form::close() }}
-                        @endcan
-                    </td>
-                    @endif
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
     </div>
 </section>
 

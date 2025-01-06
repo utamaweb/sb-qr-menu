@@ -25,12 +25,12 @@ class ExpenseController extends Controller
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
             $lims_expense_category_list = ExpenseCategory::where('business_id', auth()->user()->business_id)->get();
             $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-            $expenses = Expense::whereIn('warehouse_id', $warehouse_id)->get();
+            $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->whereIn('warehouse_id', $warehouse_id)->get();
         } else{
             $warehouse = Warehouse::where('id', auth()->user()->warehouse_id)->first();
             $business_id = $warehouse->business_id;
             $lims_expense_category_list = ExpenseCategory::where('business_id', $business_id)->get();
-            $expenses = Expense::where('warehouse_id', auth()->user()->warehouse_id)->get();
+            $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->where('warehouse_id', auth()->user()->warehouse_id)->get();
         }
         $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
         return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list'));

@@ -1,47 +1,52 @@
 @extends('backend.layout.main') @section('content')
     <section>
-        <div class="table-responsive">
-            <table id="ingredient-table" class="table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Waktu Buka / Tutup Kasir</th>
-                        <th>Kasir</th>
-                        <th>Outlet</th>
-                        <th>Shift</th>
-                        <th>Modal Awal</th>
-                        <th>Total Tunai</th>
-                        <th>Total Non Tunai</th>
-                        <th class="not-exported">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($closeCashiers as $key => $closeCashier)
-                        <tr data-id="{{ $closeCashier->id }}">
-                            <td>{{ ++$key }}</td>
-                            <td><b>Buka:</b> {{ $closeCashier->open_time }} <br>
-                                <b>Tutup:</b> {{ $closeCashier->close_time }}
-                            </td>
-                            <td>{{ $closeCashier->shift->user->name }}</td>
-                            <td>{{ $closeCashier->shift->warehouse->name }}</td>
-                            <td>{{ $closeCashier->shift->shift_number }}</td>
-                            <td>@currency($closeCashier->initial_balance)</td>
-                            <td>@currency($closeCashier->total_cash)</td>
-                            <td>@currency($closeCashier->total_non_cash)</td>
-                            <td>
-                                <div class="row">
-                                    <a href="{{ route('close-cashier.show', $closeCashier->id) }}" class="btn btn-link"><i
-                                            class="dripicons-italic"></i> Detail</a>
-                                    {{-- <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$closeCashier->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button> --}}
-                                    {{-- {{ Form::open(['route' => ['stock-opname.destroy', $closeCashier->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
-                                {{ Form::close() }} --}}
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <div class="container-fluid">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <span>Laporan Tutup Kasir</span>
+                </div>
+
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="ingredient-table" class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Waktu Buka / Tutup Kasir</th>
+                                    <th>Kasir</th>
+                                    <th>Outlet</th>
+                                    <th>Shift</th>
+                                    <th>Modal Awal</th>
+                                    <th>Total Tunai</th>
+                                    <th>Total Non Tunai</th>
+                                    <th class="not-exported">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($closeCashiers as $key => $closeCashier)
+                                    <tr data-id="{{ $closeCashier->id }}">
+                                        <td>{{ ++$key }}</td>
+                                        <td><b>Buka:</b> {{ $closeCashier->open_time }} <br>
+                                            <b>Tutup:</b> {{ $closeCashier->close_time }}
+                                        </td>
+                                        <td>{{ $closeCashier->shift->user->name }}</td>
+                                        <td>{{ $closeCashier->shift->warehouse->name }}</td>
+                                        <td>{{ $closeCashier->shift->shift_number }}</td>
+                                        <td>@currency($closeCashier->initial_balance)</td>
+                                        <td>@currency($closeCashier->total_cash)</td>
+                                        <td>@currency($closeCashier->total_non_cash)</td>
+                                        <td>
+                                            <div class="row">
+                                                <a href="{{ route('close-cashier.show', $closeCashier->id) }}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </section>
 @endsection

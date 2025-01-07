@@ -3,71 +3,67 @@
 <section>
     <div class="container-fluid">
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-        {{-- @can('tambah-bahanbaku')
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>&nbsp;
-        @endcan --}}
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Nama Bahan Baku</th>
-                    <th>Outlet</th>
-                    @if ($checkShift == false)
-                        {{-- <th>Stok Awal</th> --}}
-                        <th>Stok Masuk</th>
-                        <th>Stok Terjual</th>
-                        <th>Stok Akhir</th>
-                    @else
-                        <th>Pesan</th>
-                    @endif
-                    <th>Unit</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($lims_ingredient_all as $key=>$ingredient)
-                <tr data-id="{{$ingredient->id}}">
-                    <td class="text-center">{{++$key}}</td>
-                    <td>{{ $ingredient->ingredient->name }}</td>
-                    <td>{{ $ingredient->warehouse->name }}</td>
-                    @if ($checkShift == false)
-                        {{-- <td>{{ $ingredient->first_stock }}</td> --}}
-                        <td>{{ number_format($ingredient->stock_in, 0, '', '.') }}</td>
-                        <td>{{ number_format($ingredient->stock_used, 0, '', '.') }}</td>
-                        <td>{{ number_format($ingredient->last_stock, 0, '', '.') }}</td>
-                    @else
-                        <td>Shift kasir sedang berjalan, tutup kasir untuk melihat stok.</td>
-                    @endif
-                    <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
-                    <td>
-                        <div class="row">
-                        @can('hapus-bahanbaku')
-                        {{ Form::open(['route' => ['stok.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                {{ Form::close() }}
-                        @endcan
-                    </td>
+        @include('includes.alerts')
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Daftar Stok</span>
+                {{-- @can('tambah-bahanbaku')
+                <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>&nbsp;
+                @endcan --}}
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Nama Bahan Baku</th>
+                                <th>Outlet</th>
+                                @if ($checkShift == false)
+                                    {{-- <th>Stok Awal</th> --}}
+                                    <th>Stok Masuk</th>
+                                    <th>Stok Terjual</th>
+                                    <th>Stok Akhir</th>
+                                @else
+                                    <th>Pesan</th>
+                                @endif
+                                <th>Unit</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($lims_ingredient_all as $key=>$ingredient)
+                            <tr data-id="{{$ingredient->id}}">
+                                <td class="text-center">{{++$key}}</td>
+                                <td>{{ $ingredient->ingredient->name }}</td>
+                                <td>{{ $ingredient->warehouse->name }}</td>
+                                @if ($checkShift == false)
+                                    {{-- <td>{{ $ingredient->first_stock }}</td> --}}
+                                    <td>{{ number_format($ingredient->stock_in, 0, '', '.') }}</td>
+                                    <td>{{ number_format($ingredient->stock_used, 0, '', '.') }}</td>
+                                    <td>{{ number_format($ingredient->last_stock, 0, '', '.') }}</td>
+                                @else
+                                    <td>Shift kasir sedang berjalan, tutup kasir untuk melihat stok.</td>
+                                @endif
+                                <td>{{ $ingredient->ingredient->unit->unit_name }}</td>
+                                <td>
+                                    <div class="row">
+                                    @can('hapus-bahanbaku')
+                                    {{ Form::open(['route' => ['stok.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
+                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                            {{ Form::close() }}
+                                    @endcan
+                                </td>
+                            </div>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+            </div>
+        </div>
     </div>
 </section>
 

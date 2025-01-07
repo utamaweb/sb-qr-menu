@@ -3,104 +3,107 @@
 <section class="forms">
     <div class="container-fluid">
         <div class="card">
-            <div class="card-header mt-2">
-                <h3 class="text-center">List Transaksi</h3>
+            <div class="card-header">
+                <span>List Transaksi</span>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table table-hover" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Tanggal | Jam</th>
+                                <th>Outlet</th>
+                                <th>Antrian</th>
+                                <th>Tipe Pesanan</th>
+                                <th>Tipe Pembayaran</th>
+                                <th>Total Tagihan</th>
+                                <th>Jumlah Pesanan</th>
+                                <th>Status</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($transactions as $key => $transaction)
+                            <tr>
+                                <td>{{$loop->iteration}}</td>
+                                <td>{{$transaction->date}} | {{$transaction->created_at->format('H:i:s')}}</td>
+                                <td>{{$transaction->warehouse->name}}</td>
+                                <td>{{$transaction->sequence_number}}</td>
+                                <td>{{$transaction->order_type->name}}</td>
+                                <td>{{$transaction->payment_method}} ({{$transaction->category_order}})</td>
+                                <td>Rp. {{number_format($transaction->total_amount, 0, '', '.')}}</td>
+                                <td>{{number_format($transaction->total_qty, 0, '', '.')}}</td>
+                                <td>@if($transaction->status == "Lunas")
+                                    <div class="badge badge-success">Lunas</div>
+                                    @elseif($transaction->status == "Pending")
+                                    <div class="badge badge-warning">Pending</div>
+                                    @else
+                                    <div class="badge badge-danger">Batal</div>
+                                    @endif
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#showModal-{{$transaction->id}}">
+                                        Detail
+                                    </button>
+                                    {{-- Show Modal --}}
+                                    <div id="showModal-{{$transaction->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                                        <div role="document" class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 id="exampleModalLabel" class="modal-title"> Detail Transaksi </h5>
+                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <table class="table">
+                                                    <thead>
+                                                        <th>#</th>
+                                                        <th>Produk</th>
+                                                        <th>Harga</th>
+                                                        <th>Qty</th>
+                                                        <th>Subtotal</th>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach($transaction->transaction_details as $detail)
+                                                        <tr>
+                                                            <td>{{$loop->iteration}}</td>
+                                                            <td>{{$detail->product_name}}</td>
+                                                            <td>@currency($detail->product_price)</td>
+                                                            <td>{{$detail->qty}}</td>
+                                                            <td>@currency($detail->subtotal)</td>
+                                                        </tr>
+                                                        @endforeach
+                                                    </tbody>
+                                                </table>
+
+                                                <table class="table">
+                                                    <tr class="text-center">
+                                                        <td><h5>Total Qty</h5></td>
+                                                        <td><h5 id="total-qty">{{$transaction->total_qty}}</h5></td>
+                                                    </tr>
+                                                    <tr class="text-center">
+                                                        <td><h5>Total</h5></td>
+                                                        <td><h5 id="total">@currency($transaction->total_amount)</h5></td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            @empty
+                            <p>No users</p>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table table-hover" style="width: 100%">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Tanggal | Jam</th>
-                    <th>Outlet</th>
-                    <th>Antrian</th>
-                    <th>Tipe Pesanan</th>
-                    <th>Tipe Pembayaran</th>
-                    <th>Total Tagihan</th>
-                    <th>Jumlah Pesanan</th>
-                    <th>Status</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse ($transactions as $key => $transaction)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$transaction->date}} | {{$transaction->created_at->format('H:i:s')}}</td>
-                    <td>{{$transaction->warehouse->name}}</td>
-                    <td>{{$transaction->sequence_number}}</td>
-                    <td>{{$transaction->order_type->name}}</td>
-                    <td>{{$transaction->payment_method}} ({{$transaction->category_order}})</td>
-                    <td>Rp. {{number_format($transaction->total_amount, 0, '', '.')}}</td>
-                    <td>{{number_format($transaction->total_qty, 0, '', '.')}}</td>
-                    <td>@if($transaction->status == "Lunas")
-                        <div class="badge badge-success">Lunas</div>
-                        @elseif($transaction->status == "Pending")
-                        <div class="badge badge-warning">Pending</div>
-                        @else
-                        <div class="badge badge-danger">Batal</div>
-                        @endif
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#showModal-{{$transaction->id}}">
-                            Detail
-                        </button>
-                        {{-- Show Modal --}}
-                        <div id="showModal-{{$transaction->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                            <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> Detail Transaksi </h5>
-                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                </div>
-                                <div class="modal-body">
-                                    <table class="table">
-                                        <thead>
-                                            <th>#</th>
-                                            <th>Produk</th>
-                                            <th>Harga</th>
-                                            <th>Qty</th>
-                                            <th>Subtotal</th>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($transaction->transaction_details as $detail)
-                                            <tr>
-                                                <td>{{$loop->iteration}}</td>
-                                                <td>{{$detail->product_name}}</td>
-                                                <td>@currency($detail->product_price)</td>
-                                                <td>{{$detail->qty}}</td>
-                                                <td>@currency($detail->subtotal)</td>
-                                            </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-
-                                    <table class="table">
-                                        <tr class="text-center">
-                                            <td><h5>Total Qty</h5></td>
-                                            <td><h5 id="total-qty">{{$transaction->total_qty}}</h5></td>
-                                        </tr>
-                                        <tr class="text-center">
-                                            <td><h5>Total</h5></td>
-                                            <td><h5 id="total">@currency($transaction->total_amount)</h5></td>
-                                        </tr>
-                                    </table>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                                </div>
-                            </div>
-                        </div>
-                        </div>
-                    </td>
-                </tr>
-                @empty
-                <p>No users</p>
-                @endforelse
-            </tbody>
-        </table>
     </div>
 </section>
 

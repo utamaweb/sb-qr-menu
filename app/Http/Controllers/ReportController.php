@@ -826,12 +826,13 @@ class ReportController extends Controller
         $totalQtyPerProduct = [];
         $totalSubtotalPerProduct = [];
         if(auth()->user()->hasRole('Superadmin')){
-            $transactions = Transaction::orderBy('id', 'DESC')->get();
+            $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')->orderBy('id', 'DESC')->get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
             $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-            $transactions = Transaction::whereIn('warehouse_id', $warehouse_id)->orderBy('id', 'DESC')->get();
+            // $warehouse_id = auth()->user()->warehouse->business->warehouses->pluck('id');
+            $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')->whereIn('warehouse_id', $warehouse_id)->orderBy('id', 'DESC')->get();
         } else{
-            $transactions = Transaction::where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->get();
+            $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')->where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->get();
         }
         return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct'));
 

@@ -232,7 +232,7 @@ class CloseCashierController extends Controller
 
     // Method to get CloseCashier Transaction Details
     public function transactionDetails(Transaction $transaction) {
-        $details = TransactionDetail::where('transaction_id', $transaction->id)->get();
+        $details = TransactionDetail::with('product')->where('transaction_id', $transaction->id)->get();
 
         return response()->json($details);
     }

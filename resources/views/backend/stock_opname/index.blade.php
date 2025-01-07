@@ -9,7 +9,7 @@
             <div class="card-header d-flex justify-content-between">
                 <span>Stok Opname</span>
                 @can('tambah-stokopname')
-                <a href="{{route('stock-opname.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Stok Opname</a>
+                <a href="{{route('stock-opname.create')}}" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Stok Opname</a>
                 @endcan
             </div>
 

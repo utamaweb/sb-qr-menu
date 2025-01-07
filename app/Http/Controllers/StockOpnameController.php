@@ -19,9 +19,9 @@ class StockOpnameController extends Controller
     public function index()
     {
         if(auth()->user()->hasRole('Superadmin')){
-            $stockOpnames = StockOpname::get();
+            $stockOpnames = StockOpname::with('warehouse')->get();
         } else {
-            $stockOpnames = StockOpname::where('warehouse_id', auth()->user()->warehouse_id)->get();
+            $stockOpnames = StockOpname::with('warehouse')->where('warehouse_id', auth()->user()->warehouse_id)->get();
         }
         $stockOpnameDetails = StockOpnameDetail::get();
 

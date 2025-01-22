@@ -48,17 +48,16 @@
             ajax: "{{ route('expenses.data') }}",
             columns: [
                 { data: null, name: 'DT_RowIndex', orderable: false, searchable: false, render: function(data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1; // Nomor urut otomatis
+                    return meta.row + meta.settings._iDisplayStart + 1;
                 }},
-                { data: 'expense_category.name', name: 'expenseCategory.name' }, // Nama kategori pengeluaran
-                { data: 'note', name: 'note' }, // Keterangan
-                { data: 'qty', name: 'qty' }, // Kuantitas
+                { data: 'expense_category.name', name: 'expenseCategory.name' },
+                { data: 'note', name: 'note' },
+                { data: 'qty', name: 'qty' },
                 { data: 'amount', name: 'amount', render: function(data, type, row) {
-                    // Format nilai menggunakan helper currency
-                    return 'Rp ' + Number(data).toLocaleString('id-ID'); // Format mata uang Indonesia
+                    return 'Rp ' + Number(data).toLocaleString('id-ID');
                 }},
-                { data: 'warehouse.name', name: 'warehouse.name' }, // Nama outlet
-                { data: 'created_at', name: 'created_at' }, // Waktu dibuat
+                { data: 'warehouse.name', name: 'warehouse.name' },
+                { data: 'created_at', name: 'created_at' },
             ],
             language: {
                 search: 'Cari:',

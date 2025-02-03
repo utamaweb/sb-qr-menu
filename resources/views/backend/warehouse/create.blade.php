@@ -1,307 +1,90 @@
-@extends('backend.layout.main') @section('content')
+@extends('backend.layout.main')
+@section('content')
 
-<section>
-    <div class="container-fluid">
+    <section>
+        <div class="container-fluid">
 
-        @include('includes.alerts')
+            @include('includes.alerts')
 
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <span>Outlet</span>
-                @can('tambah-warehouse')
-                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Outlet</a>
-                @endcan
-            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <span>Outlet</span>
+                    @can('tambah-warehouse')
+                        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Outlet</a>
+                    @endcan
+                </div>
 
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="ingredient-table" class="table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Nama Outlet</th>
-                                <th>Tipe</th>
-                                <th>Bisnis</th>
-                                <th>Alamat</th>
-                                <th>Tanggal Dibuat</th>
-                                <th class="not-exported">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($lims_warehouse_all as $key=>$warehouse)
-                            <tr data-id="{{$warehouse->id}}">
-                                <td>{{++$key}}</td>
-                                <td>{{ $warehouse->name }}</td>
-                                <td>{{ ($warehouse->is_self_service == 0) ? 'Hanya Kasir' : 'Self Service' }}</td>
-                                <td>{{ $warehouse->business->name }}</td>
-                                <td>{{ $warehouse->address }}</td>
-                                <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
-                                <td>
-                                    @can('ubah-warehouse')
-                                    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$warehouse->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
-                                    {{-- Edit Modal --}}
-                                    <div id="editModal-{{$warehouse->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                                        <div role="document" class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h5 id="exampleModalLabel" class="modal-title"> Ubah Outlet</h5>
-                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                            </div>
-                                            <div class="modal-body">
-                                            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                                <form action="{{route('outlet.update', $warehouse->id)}}" method="POST">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <div class="form-group">
-                                                    <div class="form-group">
-                                                        <label>Nama Outlet *</label>
-                                                        <input type="text" value="{{$warehouse->name}}" name="name" required class="form-control">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Nama Bisnis *</label>
-                                                        @if(auth()->user()->hasRole('Superadmin'))
-                                                        <select name="business_id" class="form-control">
-                                                            <option value="">---Pilih Bisnis---</option>
-                                                            @foreach($business as $bisnis)
-                                                            <option value="{{$bisnis->id}}" {{$bisnis->id == $warehouse->business_id ? 'selected' : ''}}>{{$bisnis->name}}</option>
-                                                            @endforeach
-                                                        </select>
-                                                        @elseif(auth()->user()->hasRole('Admin Bisnis'))
-                                                        <input type="hidden" readonly name="business_id" class="form-control" value="{{$warehouse->business->id}}">
-                                                        <input type="text" readonly name="business_name" class="form-control" value="{{$warehouse->business->name}}">
-                                                        @endif
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Alamat *</label>
-                                                        <input type="text" value="{{$warehouse->address}}" name="address" required class="form-control">
-                                                    </div>
-
-                                                    {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
-
-                                                    <div class="form-group">
-                                                        <label for="service">Jenis Service *</label>
-                                                        <select name="service" id="service" class="form-control">
-                                                            <option value="1" {{ ($warehouse->is_self_service == 1) ? 'selected' : '' }}>Self Service</option>
-                                                            <option value="0" {{ ($warehouse->is_self_service == 0) ? 'selected' : '' }}>Hanya Kasir</option>
-                                                        </select>
-                                                    </div>
-                                                    </div>
-                                                    <input type="submit" value="Submit" class="btn btn-primary">
-                                                </form>
-                                            </div>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    @endcan
-                                    @can('hapus-warehouse')
-                                    {{ Form::open(['route' => ['outlet.destroy', $warehouse->id], 'method' => 'DELETE'] ) }}
-                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="outlet-table" class="table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Nama Outlet</th>
+                                    <th>Tipe</th>
+                                    <th>Bisnis</th>
+                                    <th>Alamat</th>
+                                    <th>Tanggal Dibuat</th>
+                                    <th>Tagihan</th>
+                                    <th>Tanggal Expired</th>
+                                    <th class="not-exported">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($lims_warehouse_all as $key=>$warehouse)
+                                <tr data-id="{{$warehouse->id}}">
+                                    <td>{{++$key}}</td>
+                                    <td>{{ $warehouse->name }}</td>
+                                    <td>{{ ($warehouse->is_self_service == 0) ? 'Hanya Kasir' : 'Self Service' }}</td>
+                                    <td>{{ $warehouse->business->name }}</td>
+                                    <td>{{ $warehouse->address }}</td>
+                                    <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
+                                    <td>{{ $warehouse->tagihan ?? '-' }}</td>
+                                    <td>{{ $warehouse->expired_at ? date('d M Y', strtotime($warehouse->expired_at)) : '-' }}</td>
+                                    <td>
+                                        @can('ubah-warehouse')
+                                            <button type="button" class="btn btn-sm btn-link" data-toggle="modal" data-target="#editModal-{{$warehouse->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                                        @endcan
+                                        @can('hapus-warehouse')
+                                            {{ Form::open(['route' => ['outlet.destroy', $warehouse->id], 'method' => 'DELETE'] ) }}
+                                                <button type="submit" class="btn btn-sm btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
                                             {{ Form::close() }}
-                                    @endcan
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                                        @endcan
+                                    </td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+
         </div>
+    </section>
 
-    </div>
-</section>
+    {{-- Create modal --}}
+    @include('backend.warehouse.createModal')
+    {{-- End of create modal --}}
 
-
-<!-- Create Modal -->
-<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-        <div class="modal-content">
-            {!! Form::open(['route' => 'outlet.store', 'method' => 'post']) !!}
-            <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Tambah Outlet</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-            </div>
-            <div class="modal-body">
-                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                <form>
-                    <div class="form-group">
-                        <label>Nama Outlet *</label>
-                        <input type="text" name="name" required class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Nama Bisnis *</label>
-                        @if(auth()->user()->hasRole('Superadmin'))
-                        <select name="business_id" class="form-control">
-                            <option value="">---Pilih Bisnis---</option>
-                            @foreach($business as $bisnis)
-                            <option value="{{$bisnis->id}}">{{$bisnis->name}}</option>
-                            @endforeach
-                        </select>
-                        @elseif(auth()->user()->hasRole('Admin Bisnis'))
-                        <input type="text" readonly class="form-control" name="business_name" value="{{auth()->user()->business->name}}">
-                        <input type="hidden" readonly class="form-control" name="business_id" value="{{auth()->user()->business->id}}">
-                        @endif
-                    </div>
-                    <div class="form-group">
-                        <label>Alamat *</label>
-                        <input type="text" name="address" required class="form-control">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="service">Jenis Service *</label>
-                        <select name="service" id="service" class="form-control">
-                            <option value="1" {{ ($warehouse->is_self_service == 1) ? 'selected' : '' }}>Self Service</option>
-                            <option value="0" {{ ($warehouse->is_self_service == 0) ? 'selected' : '' }}>Hanya Kasir</option>
-                        </select>
-                    </div>
-
-                    <input type="submit" value="Submit" class="btn btn-primary">
-            </form>
-        </div>
-        {{ Form::close() }}
-    </div>
-</div>
-</div>
-
+    {{-- Edit Modal --}}
+    {{-- End of edit modal --}}
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
-    // $("ul#outlet").siblings('a').attr('aria-expanded','true');
-    // $("ul#outlet").addClass("show");
-    // $("ul#outlet #warehouse-menu").addClass("active");
     $("#outlet").addClass("active");
-    var ingredient_id = [];
-    var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
 
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $(document).ready(function() {
-    $(document).on('click', '.open-EditUnitDialog', function() {
-        var url = "ingredient/"
-        var id = $(this).data('id').toString();
-        url = url.concat(id).concat("/edit");
-
-        $.get(url, function(data) {
-            $("input[name='name']").val(data['name']);
-            $("input[name='address']").val(data['address']);
-            $("input[name='unit_id']").val(data['unit_id']);
-            $("input[name='operation_value']").val(data['operation_value']);
-            $("input[name='ingredient_id']").val(data['id']);
-            $("#base_unit_edit").val(data['base_unit']);
-            if(data['base_unit']!=null)
-            {
-                $(".operator").show();
-                $(".operation_value").show();
-            }
-            else
-            {
-                $(".operator").hide();
-                $(".operation_value").hide();
-            }
-            $('.selectpicker').selectpicker('refresh');
-
-        });
-    });
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $( "#select_all" ).on( "change", function() {
-        if ($(this).is(':checked')) {
-            $("tbody input[type='checkbox']").prop('checked', true);
-        }
-        else {
-            $("tbody input[type='checkbox']").prop('checked', false);
-        }
-    });
-
-    $("#export").on("click", function(e){
-        e.preventDefault();
-        var unit = [];
-        $(':checkbox:checked').each(function(i){
-          unit[i] = $(this).val();
-        });
-        $.ajax({
-           type:'POST',
-           url:'/exportunit',
-           data:{
-
-                unitArray: unit
-            },
-           success:function(data){
-            alert('Exported to CSV file successfully! Click Ok to download file');
-            window.location.href = data;
-           }
-        });
-    });
-
-    $('.open-CreateUnitDialog').on('click', function() {
-        $(".operator").hide();
-        $(".operation_value").hide();
-
-    });
-
-    $('#base_unit_create').on('change', function() {
-        if($(this).val()){
-            $("#createModal .operator").show();
-            $("#createModal .operation_value").show();
-        }
-        else{
-            $("#createModal .operator").hide();
-            $("#createModal .operation_value").hide();
-        }
-    });
-
-    $('#base_unit_edit').on('change', function() {
-        if($(this).val()){
-            $("#editModal .operator").show();
-            $("#editModal .operation_value").show();
-        }
-        else{
-            $("#editModal .operator").hide();
-            $("#editModal .operation_value").hide();
-        }
-    });
-});
-
-    $('#ingredient-table').DataTable( {
+    $('#outlet-table').DataTable( {
         "order": [],
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
-             "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  'Cari',
-            'paginate': {
+            'info'      : '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
+            'search'    : 'Cari',
+            'paginate'  : {
                     'previous': '<i class="dripicons-chevron-left"></i>',
-                    'next': '<i class="dripicons-chevron-right"></i>'
+                    'next'    : '<i class="dripicons-chevron-right"></i>'
             }
         },
-        'columnDefs': [
-            // {
-            //     "orderable": false,
-            //     'targets': [0, 2]
-            // },
-            // {
-            //     'render': function(data, type, row, meta){
-            //         if(type === 'display'){
-            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-            //         }
-
-            //        return data;
-            //     },
-            //     'checkboxes': {
-            //        'selectRow': true,
-            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-            //     },
-            //     'targets': [0]
-            // }
-        ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
         dom: '<"row"lfB>rtip',
@@ -338,33 +121,6 @@
                     rows: ':visible'
                 },
             },
-            // {
-            //     text: '<i title="delete" class="dripicons-cross"></i>',
-            //     className: 'buttons-delete',
-            //     action: function ( e, dt, node, config ) {
-            //             ingredient_id.length = 0;
-            //             $(':checkbox:checked').each(function(i){
-            //                 if(i){
-            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
-            //                 }
-            //             });
-            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-            //                 $.ajax({
-            //                     type:'POST',
-            //                     url:'ingredient/deletebyselection',
-            //                     data:{
-            //                         unitIdArray: ingredient_id
-            //                     },
-            //                     success:function(data){
-            //                         alert(data);
-            //                     }
-            //                 });
-            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
-            //             }
-            //             else if(!ingredient_id.length)
-            //                 alert('No unit is selected!');
-            //     }
-            // },
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',

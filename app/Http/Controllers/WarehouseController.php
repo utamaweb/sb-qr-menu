@@ -17,7 +17,7 @@ class WarehouseController extends Controller
     public function index()
     {
         if(auth()->user()->hasRole('Superadmin')){
-            $lims_warehouse_all = Warehouse::where('is_active', true)->get();
+            $lims_warehouse_all = Warehouse::with('business')->where('is_active', true)->get();
             $business = Business::get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
             $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->business_id)->firstOrFail();

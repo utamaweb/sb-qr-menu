@@ -268,6 +268,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('expenses/deletebyselection', 'deleteBySelection');
         });
         Route::resource('pengeluaran', ExpenseController::class);
+        Route::get('/expenses/data', [ExpenseController::class, 'getExpenses'])->name('expenses.data');
+
 
         // Route for Ojol
         Route::controller(OjolController::class)->name('ojol.')->group(function () {

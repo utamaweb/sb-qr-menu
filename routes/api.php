@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\OjolController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -99,6 +100,11 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     // CustomC Category Parent
     Route::controller(CustomCategoryController::class)->group(function() {
         Route::get('/customCategories', 'index');
+    });
+
+    // Subscription
+    Route::controller(SubscriptionController::class)->group(function() {
+        Route::get('subscription/status', 'getStatus');
     });
 });
 

@@ -90,8 +90,9 @@ class WarehouseController extends Controller
             'name' => $request->name,
             'address' => $request->address,
             'business_id' => $request->business_id,
-            'is_self_service' => $request->service
-            // 'logo' => $imageName,
+            'is_self_service' => $request->service,
+            'tagihan' => intVal(str_replace(',', '', $request->tagihan)),
+            'expired_at' => $request->expired_at
         ]);
         return redirect()->back()->with('message', 'Data Berhasil Diubah');
     }

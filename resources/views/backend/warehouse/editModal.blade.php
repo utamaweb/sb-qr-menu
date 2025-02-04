@@ -56,6 +56,23 @@
                     </div>
                     {{-- End of service input --}}
 
+                    {{-- Tagihan input --}}
+                    <div class="form-group">
+                        <label for="editTagihan">Tagihan <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp.</span>
+                            <input type="text" name="tagihan" id="editTagihan" class="form-control" step="any" value="{{old('tagihan')}}" oninput="changeValue(this)" required>
+                        </div>
+                    </div>
+                    {{-- End of tagihan input --}}
+
+                    {{-- Expired date input --}}
+                    <div class="form-group">
+                        <label for="editExpiredAt">Tanggal Expired <span class="text-danger">*</span></label>
+                        <input type="date" name="expired_at" id="editExpiredAt" class="form-control" value="{{old('expired_at')}}" required>
+                    </div>
+                    {{-- End of expired date input --}}
+
                     {{-- Submit button --}}
                     <input type="submit" value="Submit" class="btn btn-primary">
                     {{-- End of submit button --}}
@@ -84,6 +101,8 @@
                 $('#editAddress').val(data.address);
                 $('#editService').selectpicker('val', data.is_self_service);
                 $('#editBusiness').selectpicker('val', data.business_id);
+                $('#editTagihan').val(formatNumber(data.tagihan));
+                $('#editExpiredAt').val(data.expired_at);
 
                 $('#editModal').modal('show');
             },

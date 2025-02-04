@@ -8,7 +8,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>Input yang ditandai dengan * wajib diisi.</small></p>
+                <p class="italic"><small>Input yang ditandai dengan <span class="text-danger">*</span> wajib diisi.</small></p>
                 <form method="post" id="editForm">
                     @csrf
                     @method('PUT')
@@ -17,14 +17,14 @@
 
                     {{-- Name input --}}
                     <div class="form-group">
-                        <label>Nama Outlet *</label>
+                        <label>Nama Outlet <span class="text-danger">*</span></label>
                         <input type="text" name="name" id="editName" required class="form-control">
                     </div>
                     {{-- End of name input --}}
 
                     {{-- Business input --}}
                     <div class="form-group">
-                        <label>Nama Bisnis *</label>
+                        <label>Nama Bisnis <span class="text-danger">*</span></label>
                         @if(auth()->user()->hasRole('Superadmin'))
                         <select name="business_id" class="form-control" id="editBusiness">
                             <option value="">---Pilih Bisnis---</option>
@@ -41,14 +41,14 @@
 
                     {{-- Address input --}}
                     <div class="form-group">
-                        <label>Alamat *</label>
+                        <label>Alamat <span class="text-danger">*</span></label>
                         <input type="text" name="address" id="editAddress" required class="form-control">
                     </div>
                     {{-- End of address input --}}
 
                     {{-- Service input --}}
                     <div class="form-group">
-                        <label for="editService">Jenis Service *</label>
+                        <label for="editService">Jenis Service <span class="text-danger">*</span></label>
                         <select name="service" id="editService" class="form-control">
                             <option value="1">Self Service</option>
                             <option value="0">Hanya Kasir</option>
@@ -101,8 +101,9 @@
                 $('#editAddress').val(data.address);
                 $('#editService').selectpicker('val', data.is_self_service);
                 $('#editBusiness').selectpicker('val', data.business_id);
-                $('#editTagihan').val(formatNumber(data.tagihan));
+                $('#editTagihan').val(formatNumber(data.tagihan == null ? 0 : data.tagihan));
                 $('#editExpiredAt').val(data.expired_at);
+                $('#editExpiredAt').attr('min', new Date().toISOString().split('T')[0]);
 
                 $('#editModal').modal('show');
             },

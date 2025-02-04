@@ -118,6 +118,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('warehouse/lims_warehouse_search', 'limsWarehouseSearch')->name('warehouse.search');
             Route::get('warehouse/all', 'warehouseAll')->name('warehouse.all');
             Route::get('outlet/get-outlet-by-id/{id}', 'getOutletById')->name('outlet.getById');
+            Route::put('outlet/renewal/{id}', 'renewal')->name('outlet.renewal');
         });
         Route::resource('outlet', WarehouseController::class)->except('show');
 

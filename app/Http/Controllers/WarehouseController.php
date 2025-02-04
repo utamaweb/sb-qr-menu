@@ -168,4 +168,27 @@ class WarehouseController extends Controller
 
         return response()->json($outlet);
     }
+
+    /**
+     * Renew outlet subscription
+     */
+    public function renewal(Request $request, $id) {
+        // Find outlet by id
+        $outlet = Warehouse::find($id);
+
+        try {
+            DB::beginTransaction();
+
+            // Update outlet subscription
+            $outlet->update([
+                'expired_at' => $request->expired_at,
+            ]);
+
+            DB::commit();
+            return redirect()->route('outlet.index')->with('message', 'Berhasil menyelesaikan pembayaran tagihan!');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->route('outlet.index')->with('message', 'Gagal menyelesaikan pembayaran tagihan!');
+        }
+    }
 }

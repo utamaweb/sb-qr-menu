@@ -50,6 +50,9 @@
                                                 <button type="submit" class="btn btn-sm btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Delete</button>
                                             {{ Form::close() }}
                                         @endcan
+                                        @if (auth()->user()->hasRole('Superadmin'))
+                                            <button type="button" class="btn btn-sm btn-link" onclick="renewalModal({{$warehouse->id}})"><i class="dripicons-clockwise"></i> Renewal</button>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
@@ -69,6 +72,10 @@
     {{-- Edit Modal --}}
     @include('backend.warehouse.editModal')
     {{-- End of edit modal --}}
+
+    {{-- Renewal modal --}}
+    @include('backend.warehouse.renewalModal')
+    {{-- End of renewal modal --}}
 @endsection
 
 @push('scripts')

@@ -43,11 +43,11 @@
                                     <td>{{ $warehouse->expired_at ? date('d M Y', strtotime($warehouse->expired_at)) : '-' }}</td>
                                     <td>
                                         @can('ubah-warehouse')
-                                            <button type="button" class="btn btn-sm btn-link" data-toggle="modal" data-target="#editModal-{{$warehouse->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button>
+                                            <button type="button" class="btn btn-sm btn-link" onclick="editModal({{$warehouse->id}})"><i class="dripicons-document-edit"></i> Edit</button>
                                         @endcan
                                         @can('hapus-warehouse')
                                             {{ Form::open(['route' => ['outlet.destroy', $warehouse->id], 'method' => 'DELETE'] ) }}
-                                                <button type="submit" class="btn btn-sm btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                                <button type="submit" class="btn btn-sm btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Delete</button>
                                             {{ Form::close() }}
                                         @endcan
                                     </td>
@@ -67,6 +67,7 @@
     {{-- End of create modal --}}
 
     {{-- Edit Modal --}}
+    @include('backend.warehouse.editModal')
     {{-- End of edit modal --}}
 @endsection
 

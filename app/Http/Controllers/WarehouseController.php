@@ -27,7 +27,7 @@ class WarehouseController extends Controller
             $lims_warehouse_all = $business->warehouse;
         }
         $numberOfWarehouse = $lims_warehouse_all->count();
-        return view('backend.warehouse.create', compact('lims_warehouse_all', 'numberOfWarehouse','business'));
+        return view('backend.warehouse.index', compact('lims_warehouse_all', 'numberOfWarehouse','business'));
     }
 
     public function store(Request $request)
@@ -97,47 +97,6 @@ class WarehouseController extends Controller
         return redirect()->back()->with('message', 'Data Berhasil Diubah');
     }
 
-    public function importWarehouse(Request $request)
-    {
-        //get file
-        $upload=$request->file('file');
-        $ext = pathinfo($upload->getClientOriginalName(), PATHINFO_EXTENSION);
-        if($ext != 'csv')
-            return redirect()->back()->with('not_permitted', 'Please upload a CSV file');
-        $filename =  $upload->getClientOriginalName();
-        $upload=$request->file('file');
-        $filePath=$upload->getRealPath();
-        //open and read
-        $file=fopen($filePath, 'r');
-        $header= fgetcsv($file);
-        $escapedHeader=[];
-        //validate
-        foreach ($header as $key => $value) {
-            $lheader=strtolower($value);
-            $escapedItem=preg_replace('/[^a-z]/', '', $lheader);
-            array_push($escapedHeader, $escapedItem);
-        }
-        //looping through othe columns
-        while($columns=fgetcsv($file))
-        {
-            if($columns[0]=="")
-                continue;
-            foreach ($columns as $key => $value) {
-                $value=preg_replace('/\D/','',$value);
-            }
-           $data= array_combine($escapedHeader, $columns);
-
-           $warehouse = Warehouse::firstOrNew([ 'name'=>$data['name'], 'is_active'=>true ]);
-           $warehouse->name = $data['name'];
-           $warehouse->phone = $data['phone'];
-           $warehouse->email = $data['email'];
-           $warehouse->address = $data['address'];
-           $warehouse->is_active = true;
-           $warehouse->save();
-        }
-        return redirect()->back()->with('message', 'Warehouse imported successfully');
-    }
-
     public function deleteBySelection(Request $request)
     {
         $warehouse_id = $request['warehouseIdArray'];
@@ -199,5 +158,14 @@ class WarehouseController extends Controller
         } else {
             return redirect()->route('maxShiftPage')->with('message', 'Jumlah Shift Maksimal Gagal diubah!');
         }
+    }
+
+    /**
+     * Get outlet by id
+     */
+    public function getOutletById($id) {
+        $outlet = Warehouse::with('business')->find($id);
+
+        return response()->json($outlet);
     }
 }

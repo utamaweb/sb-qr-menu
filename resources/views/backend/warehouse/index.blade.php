@@ -40,7 +40,28 @@
                                     <td>{{ $warehouse->address }}</td>
                                     <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
                                     <td>Rp. {{ number_format($warehouse->tagihan, 0, ',', '.') }}</td>
-                                    <td>{{ $warehouse->expired_at ? date('d M Y', strtotime($warehouse->expired_at)) : '-' }}</td>
+                                    <td>
+                                        @php
+                                            if($warehouse->expired_at != null) {
+                                                $expired_date = \Carbon\Carbon::parse($warehouse->expired_at);
+                                                $today_date = \Carbon\Carbon::now();
+                                                $difference_days = $expired_date->diffInDays($today_date);
+                                                $isGreater = $expired_date->gt($today_date);
+
+                                                $expired_at = date('d M Y', strtotime($warehouse->expired_at));
+
+                                                if($difference_days > 5 && $isGreater) {
+                                                    echo '<span class="badge badge-success">' . $expired_at . '</span>';
+                                                } elseif($difference_days <= 5 && $isGreater) {
+                                                    echo '<span class="badge badge-warning">' . $expired_at . '</span>';
+                                                } elseif(!$isGreater) {
+                                                    echo '<span class="badge badge-danger">' . $expired_at . '</span>';
+                                                }
+                                            } else {
+                                                echo '-';
+                                            }
+                                        @endphp
+                                    </td>
                                     <td>
                                         @can('ubah-warehouse')
                                             <button type="button" class="btn btn-sm btn-link" onclick="editModal({{$warehouse->id}})"><i class="dripicons-document-edit"></i> Edit</button>

@@ -39,9 +39,6 @@ class WarehouseController extends Controller
             'service' => 'required'
         ]);
         $input['is_active'] = true;
-        // $image = $request->image;
-        // $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
-        // $uploadImage = $image->storeAs('public/outlet_logo', $imageName);
         if(auth()->user()->hasRole('Superadmin')){
             $business_id = $request->business_id;
         } else{
@@ -52,7 +49,9 @@ class WarehouseController extends Controller
             'is_active' => 1,
             'address' => $request->address,
             'business_id' => $request->business_id,
-            'is_self_service' => $request->service
+            'is_self_service' => $request->service,
+            'tagihan' => intVal(str_replace(',', '', $request->tagihan)),
+            'expired_at' => $request->expired_at
         ]);
 
         if($warehouse) {

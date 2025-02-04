@@ -39,7 +39,7 @@
                                     <td>{{ $warehouse->business->name }}</td>
                                     <td>{{ $warehouse->address }}</td>
                                     <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
-                                    <td>{{ $warehouse->tagihan ?? '-' }}</td>
+                                    <td>Rp. {{ number_format($warehouse->tagihan, 0, ',', '.') }}</td>
                                     <td>{{ $warehouse->expired_at ? date('d M Y', strtotime($warehouse->expired_at)) : '-' }}</td>
                                     <td>
                                         @can('ubah-warehouse')
@@ -72,6 +72,25 @@
 @endsection
 
 @push('scripts')
+<script>
+    // Function to change input value to formattedNumber
+    function changeValue(input) {
+        var value = formatNumber(input.value);
+        input.value = value;
+    }
+
+    // Function to format number into number format
+    function formatNumber(number) {
+        // Remove non-digit characters
+        var numericValue = number.toString().replace(/\D/g, "");
+
+        // Add thousand separators
+        var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+        return formattedNumber;
+    }
+</script>
+
 <script type="text/javascript">
     $("#outlet").addClass("active");
 

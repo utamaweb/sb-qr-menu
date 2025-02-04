@@ -7,14 +7,14 @@
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                <p class="italic"><small>Inputan yang ditandai dengan <span class="text-danger">*</span> wajib diisi.</small></p>
                 <form>
                     <div class="form-group">
-                        <label>Nama Outlet *</label>
+                        <label>Nama Outlet <span class="text-danger">*</span></label>
                         <input type="text" name="name" required class="form-control">
                     </div>
                     <div class="form-group">
-                        <label>Nama Bisnis *</label>
+                        <label>Nama Bisnis <span class="text-danger">*</span></label>
                         @if(auth()->user()->hasRole('Superadmin'))
                         <select name="business_id" class="form-control">
                             <option value="">---Pilih Bisnis---</option>
@@ -28,16 +28,29 @@
                         @endif
                     </div>
                     <div class="form-group">
-                        <label>Alamat *</label>
+                        <label>Alamat <span class="text-danger">*</span></label>
                         <input type="text" name="address" required class="form-control">
                     </div>
 
                     <div class="form-group">
-                        <label for="service">Jenis Service *</label>
+                        <label for="service">Jenis Service <span class="text-danger">*</span></label>
                         <select name="service" id="service" class="form-control">
                             <option value="1" {{ ($warehouse->is_self_service == 1) ? 'selected' : '' }}>Self Service</option>
                             <option value="0" {{ ($warehouse->is_self_service == 0) ? 'selected' : '' }}>Hanya Kasir</option>
                         </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tagihan">Tagihan <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">Rp.</span>
+                            <input type="text" name="tagihan" id="tagihan" class="form-control" step="any" value="{{old('tagihan')}}" oninput="changeValue(this)" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="expired_at">Tanggal Expired <span class="text-danger">*</span></label>
+                        <input type="date" name="expired_at" id="expired_at" class="form-control" value="{{old('expired_at')}}" required>
                     </div>
 
                     <input type="submit" value="Submit" class="btn btn-primary">

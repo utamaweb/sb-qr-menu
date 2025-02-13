@@ -53,6 +53,16 @@
                         <input type="date" name="expired_at" id="expired_at" class="form-control" value="{{old('expired_at')}}" required>
                     </div>
 
+                    {{-- Whatsapp input --}}
+                    <div class="form-group">
+                        <label for="whatsapp">Whatsapp <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">+62</span>
+                            <input type="number" name="whatsapp" id="whatsapp" class="form-control" value="{{old('whatsapp')}}" required>
+                        </div>
+                    </div>
+                    {{-- End of whatsapp input --}}
+
                     <input type="submit" value="Submit" class="btn btn-primary">
             </form>
         </div>

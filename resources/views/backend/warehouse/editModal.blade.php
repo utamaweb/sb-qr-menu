@@ -73,6 +73,16 @@
                     </div>
                     {{-- End of expired date input --}}
 
+                    {{-- Whatsapp input --}}
+                    <div class="form-group">
+                        <label for="editWhatsapp">Whatsapp <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text">+62</span>
+                            <input type="number" name="whatsapp" id="editWhatsapp" class="form-control" value="{{old('whatsapp')}}" required>
+                        </div>
+                    </div>
+                    {{-- End of whatsapp input --}}
+
                     {{-- Submit button --}}
                     <input type="submit" value="Submit" class="btn btn-primary">
                     {{-- End of submit button --}}
@@ -104,6 +114,7 @@
                 $('#editTagihan').val(formatNumber(data.tagihan == null ? 0 : data.tagihan));
                 $('#editExpiredAt').val(data.expired_at);
                 $('#editExpiredAt').attr('min', new Date().toISOString().split('T')[0]);
+                $('#editWhatsapp').val(data.whatsapp);
 
                 $('#editModal').modal('show');
             },

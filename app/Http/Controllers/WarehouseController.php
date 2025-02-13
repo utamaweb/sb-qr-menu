@@ -51,7 +51,8 @@ class WarehouseController extends Controller
             'business_id' => $request->business_id,
             'is_self_service' => $request->service,
             'tagihan' => intVal(str_replace(',', '', $request->tagihan)),
-            'expired_at' => $request->expired_at
+            'expired_at' => $request->expired_at,
+            'whatsapp' => $request->whatsapp
         ]);
 
         if($warehouse) {
@@ -92,7 +93,8 @@ class WarehouseController extends Controller
             'business_id' => $request->business_id,
             'is_self_service' => $request->service,
             'tagihan' => intVal(str_replace(',', '', $request->tagihan)),
-            'expired_at' => $request->expired_at
+            'expired_at' => $request->expired_at,
+            'whatsapp' => $request->whatsapp
         ]);
         return redirect()->back()->with('message', 'Data Berhasil Diubah');
     }

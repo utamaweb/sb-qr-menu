@@ -1,96 +1,124 @@
-@extends('backend.layout.main') @section('content')
+@extends('backend.layout.main')
+@section('content')
 
-<section>
-    <div class="container-fluid">
+    <section>
+        <div class="container-fluid">
 
-    @if($errors->has('unit_code'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('unit_code') }}
-    </div>
-    @endif
-    @if($errors->has('unit_name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('unit_name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
+        @if($errors->has('unit_code'))
+        <div class="alert alert-danger alert-dismissible text-center">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>{{ $errors->first('unit_code') }}
+        </div>
+        @endif
+        @if($errors->has('unit_name'))
+        <div class="alert alert-danger alert-dismissible text-center">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
+                    aria-hidden="true">&times;</span></button>{{ $errors->first('unit_name') }}
+        </div>
+        @endif
+        
+        @include('includes.alerts')
 
-    @can('tambah-unit')
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i>Tambah Unit</a>&nbsp;
-    @endcan
-        {{-- <a href="#" data-toggle="modal" data-target="#importUnit" class="btn btn-primary"><i class="dripicons-copy"></i> {{trans('file.Import Unit')}}</a> --}}
-    </div>
-    <div class="table-responsive">
-        <table id="unit-table" class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Kode</th>
-                    <th>Nama</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($lims_unit_all as $key=>$unit)
-                <tr data-id="{{$unit->id}}">
-                    <td class="text-center">{{++$key}}</td>
-                    <td>{{ $unit->unit_code }}</td>
-                    <td>{{ $unit->unit_name }}</td>
-                    <td>
-                        @canany(['ubah-unit', 'hapus-unit'])
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
-                                <span class="caret"></span>
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
-                                @can('ubah-unit')
-                                <li>
-                                    <button type="button" data-id="{{$unit->id}}" class="open-EditUnitDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> Update
-                                </button>
-                                </li>
-                                @endcan
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Unit</span>
+                @can('tambah-unit')
+                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-sm btn-info"><i class="dripicons-plus"></i>Tambah Unit</a>
+                @endcan
+            </div>
 
-                                <li class="divider"></li>
-                                @can('hapus-unit')
-                                {{ Form::open(['route' => ['unit.destroy', $unit->id], 'method' => 'DELETE'] ) }}
-                                <li>
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                </li>
-                                {{ Form::close() }}
-                                @endcan
-                            </ul>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="unit-table" class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Kode</th>
+                                <th>Nama</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($lims_unit_all as $key=>$unit)
+                            <tr data-id="{{$unit->id}}">
+                                <td class="text-center">{{++$key}}</td>
+                                <td>{{ $unit->unit_code }}</td>
+                                <td>{{ $unit->unit_name }}</td>
+                                <td>
+                                    @canany(['ubah-unit', 'hapus-unit'])
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
+                                            <span class="caret"></span>
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
+                                            @can('ubah-unit')
+                                            <li>
+                                                <button type="button" data-id="{{$unit->id}}" class="open-EditUnitDialog btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> Update
+                                            </button>
+                                            </li>
+                                            @endcan
+        
+                                            <li class="divider"></li>
+                                            @can('hapus-unit')
+                                            {{ Form::open(['route' => ['unit.destroy', $unit->id], 'method' => 'DELETE'] ) }}
+                                            <li>
+                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                            </li>
+                                            {{ Form::close() }}
+                                            @endcan
+                                        </ul>
+                                    </div>
+                                    @endcanany
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Modal -->
+
+    <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+        <div role="document" class="modal-dialog">
+            <div class="modal-content">
+                {!! Form::open(['route' => 'unit.store', 'method' => 'post']) !!}
+                <div class="modal-header">
+                    <h5 id="exampleModalLabel" class="modal-title">Tambah Unit</h5>
+                    <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                </div>
+                <div class="modal-body">
+                    <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                    <form>
+                        <div class="form-group">
+                        <label>Kode *</label>
+                        {{Form::text('unit_code',null,array('required' => 'required', 'class' => 'form-control'))}}
                         </div>
-                        @endcanany
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                        <div class="form-group">
+                            <label>Nama *</label>
+                            {{Form::text('unit_name',null,array('required' => 'required', 'class' => 'form-control'))}}
+                        </div>
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                </form>
+            </div>
+            {{ Form::close() }}
+        </div>
     </div>
-</section>
-<!-- Modal -->
 
-<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
+    <div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+        <div role="document" class="modal-dialog">
         <div class="modal-content">
-            {!! Form::open(['route' => 'unit.store', 'method' => 'post']) !!}
+            {!! Form::open(['route' => ['unit.update',1], 'method' => 'put']) !!}
             <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Tambah Unit</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+            <h5 id="exampleModalLabel" class="modal-title"> Update Unit</h5>
+            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
                 <form>
+                    <input type="hidden" name="unit_id">
                     <div class="form-group">
                     <label>Kode *</label>
                     {{Form::text('unit_code',null,array('required' => 'required', 'class' => 'form-control'))}}
@@ -99,73 +127,45 @@
                         <label>Nama *</label>
                         {{Form::text('unit_name',null,array('required' => 'required', 'class' => 'form-control'))}}
                     </div>
-                    <input type="submit" value="Submit" class="btn btn-primary">
-            </form>
+                    <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+                </form>
+            </div>
+            {{ Form::close() }}
         </div>
-        {{ Form::close() }}
+        </div>
     </div>
-</div>
-</div>
 
-<div id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => ['unit.update',1], 'method' => 'put']) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> Update Unit</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-          <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-            <form>
-                <input type="hidden" name="unit_id">
-                <div class="form-group">
-                <label>Kode *</label>
-                {{Form::text('unit_code',null,array('required' => 'required', 'class' => 'form-control'))}}
-                </div>
-                <div class="form-group">
-                    <label>Nama *</label>
-                    {{Form::text('unit_name',null,array('required' => 'required', 'class' => 'form-control'))}}
+    <div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+        <div role="document" class="modal-dialog">
+        <div class="modal-content">
+            {!! Form::open(['route' => 'unit.import', 'method' => 'post', 'files' => true]) !!}
+            <div class="modal-header">
+            <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
+            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+            </div>
+            <div class="modal-body">
+                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                <p>{{trans('file.The correct column order is')}} (unit_code*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>{{trans('file.Upload CSV File')}} *</label>
+                            {{Form::file('file', array('class' => 'form-control','required'))}}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label> {{trans('file.Sample File')}}</label>
+                            <a href="sample_file/sample_unit.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
+                        </div>
+                    </div>
                 </div>
                 <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
-            </form>
-        </div>
-        {{ Form::close() }}
-      </div>
-    </div>
-</div>
-
-<div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => 'unit.import', 'method' => 'post', 'files' => true]) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-            <p>{{trans('file.The correct column order is')}} (unit_code*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{trans('file.Upload CSV File')}} *</label>
-                        {{Form::file('file', array('class' => 'form-control','required'))}}
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label> {{trans('file.Sample File')}}</label>
-                        <a href="sample_file/sample_unit.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
-                    </div>
-                </div>
             </div>
-            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+            {{ Form::close() }}
         </div>
-        {{ Form::close() }}
-      </div>
+        </div>
     </div>
-</div>
 
 @endsection
 

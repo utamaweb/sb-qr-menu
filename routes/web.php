@@ -26,6 +26,7 @@ use App\Http\Controllers\OjolController;
 use App\Http\Controllers\OjolWarehouseController;
 use App\Http\Controllers\BusinessStockController;
 use App\Http\Controllers\CustomCategoryController;
+use App\Http\Controllers\WhatsappController;
 
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
@@ -70,6 +71,12 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('/', 'index');
             Route::get('/dashboard', 'dashboard')->name('admin.dashboard');
             Route::get('my-transactions/{year}/{month}', 'myTransaction');
+        });
+
+        // Route for configs
+        Route::controller(WhatsappController::class)->name('whatsapp.')->group(function() {
+            Route::get('/whatsapp', 'index')->name('index');
+            Route::post('/whatsapp/store', 'store')->name('store');
         });
 
 

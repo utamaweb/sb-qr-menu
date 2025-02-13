@@ -10,7 +10,7 @@
             <div class="card-header d-flex justify-content-between">
                 <span>Tipe Pesanan</span>
                 @can('tambah-tipepesanan')
-                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Tipe Pesanan</a>
+                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Tipe Pesanan</a>
                 @endcan
             </div>
 

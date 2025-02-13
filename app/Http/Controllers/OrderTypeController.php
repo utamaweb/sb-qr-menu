@@ -14,8 +14,6 @@ class OrderTypeController extends Controller
     public function index()
     {
         $orderTypes = OrderType::get();
-        // $lims_order_type_all = OrderType::where('is_active', true)->get();
-        // $numberOfOrderType = OrderType::where('is_active', true)->count();
         return view('backend.order-type.create', compact('orderTypes'));
     }
 

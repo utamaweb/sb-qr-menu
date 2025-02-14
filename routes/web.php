@@ -77,6 +77,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::controller(WhatsappController::class)->name('whatsapp.')->group(function() {
             Route::get('/whatsapp', 'index')->name('index');
             Route::post('/whatsapp/store', 'store')->name('store');
+            Route::get('/whatsapp/sessions', 'sessions')->name('sessions');
+            Route::get('/whatsapp/session-details', 'sessionDetails')->name('sessionDetails');
+            Route::post('/whatsapp/create-session', 'createSession')->name('createSession');
+            Route::get('/whatsapp/logout', 'logout')->name('logout');
+            Route::get('/whatsapp/check-connection', 'checkConnection')->name('checkConnection');
+            Route::get('/whatsapp/check-number/{number}', 'checkNumber')->name('checkNumber');
+            Route::post('/whatsapp/send-message/{number}/{message}', 'sendMessage')->name('sendMessage');
         });
 
 

@@ -21,6 +21,9 @@
                     class="dripicons-shopping-bag"></i><span>Transaksi(comingsoon)</span></a></li>
         <li id="setting"><a href="{{ route('setting.general') }}"> <i
                     class="dripicons-gear"></i><span>Pengaturan</span></a></li>
+        <li>
+            <a href="{{ route('whatsapp.index') }}"> <i class="dripicons-gear"></i> <span>Whatsapp</span></a>
+        </li>
 
         {{-- Menu Admin Bisnis --}}
     @elseif(auth()->user()->hasRole('Admin Bisnis'))

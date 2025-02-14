@@ -12,14 +12,14 @@
   ),
   'barryvdh/laravel-dompdf' => 
   array (
-    'aliases' => 
-    array (
-      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
-    ),
     'providers' => 
     array (
       0 => 'Barryvdh\\DomPDF\\ServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Pdf' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
+      'PDF' => 'Barryvdh\\DomPDF\\Facade\\Pdf',
     ),
   ),
   'beyondcode/laravel-websockets' => 
@@ -35,13 +35,13 @@
   ),
   'intervention/image' => 
   array (
-    'aliases' => 
-    array (
-      'Image' => 'Intervention\\Image\\Facades\\Image',
-    ),
     'providers' => 
     array (
       0 => 'Intervention\\Image\\ImageServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Image' => 'Intervention\\Image\\Facades\\Image',
     ),
   ),
   'laravel/sanctum' => 
@@ -90,25 +90,25 @@
   ),
   'maatwebsite/excel' => 
   array (
-    'aliases' => 
-    array (
-      'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
-    ),
     'providers' => 
     array (
       0 => 'Maatwebsite\\Excel\\ExcelServiceProvider',
     ),
+    'aliases' => 
+    array (
+      'Excel' => 'Maatwebsite\\Excel\\Facades\\Excel',
+    ),
   ),
   'milon/barcode' => 
   array (
+    'providers' => 
+    array (
+      0 => 'Milon\\Barcode\\BarcodeServiceProvider',
+    ),
     'aliases' => 
     array (
       'DNS1D' => 'Milon\\Barcode\\Facades\\DNS1DFacade',
       'DNS2D' => 'Milon\\Barcode\\Facades\\DNS2DFacade',
-    ),
-    'providers' => 
-    array (
-      0 => 'Milon\\Barcode\\BarcodeServiceProvider',
     ),
   ),
   'nesbot/carbon' => 
@@ -134,13 +134,13 @@
   ),
   'nwidart/laravel-modules' => 
   array (
-    'aliases' => 
-    array (
-      'Module' => 'Nwidart\\Modules\\Facades\\Module',
-    ),
     'providers' => 
     array (
       0 => 'Nwidart\\Modules\\LaravelModulesServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'Module' => 'Nwidart\\Modules\\Facades\\Module',
     ),
   ),
   'spatie/laravel-ignition' => 
@@ -163,13 +163,13 @@
   ),
   'srmklive/paypal' => 
   array (
-    'aliases' => 
-    array (
-      'PayPal' => 'Srmklive\\PayPal\\Facades\\PayPal',
-    ),
     'providers' => 
     array (
       0 => 'Srmklive\\PayPal\\Providers\\PayPalServiceProvider',
+    ),
+    'aliases' => 
+    array (
+      'PayPal' => 'Srmklive\\PayPal\\Facades\\PayPal',
     ),
   ),
   'tymon/jwt-auth' => 

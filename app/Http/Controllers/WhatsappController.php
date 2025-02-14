@@ -5,15 +5,27 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Config;
 use Illuminate\Support\Facades\DB;
+use App\Services\WhatsappService;
 
 class WhatsappController extends Controller
 {
+    protected $whatsapp;
+
+    /**
+     * Class constructor.
+     */
+    public function __construct() {
+        $this->whatsapp = new WhatsappService();
+    }
+
     /**
      * Whatsapp configuration index
      */
     public function index() {
         // Get all configs
         $configs = Config::all();
+
+        dd($this->whatsapp->getSessionList());
 
         return view('backend.config.whatsapp', compact('configs'));
     }

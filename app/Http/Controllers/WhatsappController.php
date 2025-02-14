@@ -25,8 +25,6 @@ class WhatsappController extends Controller
         // Get all configs
         $configs = Config::all();
 
-        dd($this->whatsapp->getSessionList());
-
         return view('backend.config.whatsapp', compact('configs'));
     }
 
@@ -46,5 +44,54 @@ class WhatsappController extends Controller
             DB::rollBack();
             return redirect()->route('whatsapp.index')->with('message', 'Configuration could not be saved. Please try again.');
         }
+    }
+
+    /**
+     * Get all sessions
+     */
+    public function sessions() {
+        return $this->whatsapp->getSessions();
+    }
+
+    /**
+     * Get session details
+     */
+    public function sessionDetails() {
+        return $this->whatsapp->getSessionDetail();
+    }
+
+    /**
+     * Create session
+     */
+    public function createSession() {
+        return $this->whatsapp->createSession();
+    }
+
+    /**
+     * Logout session
+     */
+    public function logout() {
+        return $this->whatsapp->logout();
+    }
+
+    /**
+     * Check API connection
+     */
+    public function checkConnection() {
+        return $this->whatsapp->checkConnection();
+    }
+
+    /**
+     * Check number
+     */
+    public function checkNumber($number) {
+        return $this->whatsapp->checkNumber($number);
+    }
+
+    /**
+     * Send message
+     */
+    public function sendMessage($number, $message) {
+        return $this->whatsapp->sendMessage($number, $message);
     }
 }

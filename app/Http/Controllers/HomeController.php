@@ -40,97 +40,101 @@ class HomeController extends Controller
     }
 
     public function dashboard()
-{
-    $user = auth()->user();
-    $now = Carbon::now();
-    $startOfMonth = $now->startOfMonth()->toDateString();
-    $endOfMonth = $now->endOfMonth()->toDateString();
-    $startOfLastMonth = $now->copy()->subMonthNoOverflow()->startOfMonth()->toDateString();
-    $endOfLastMonth = $now->copy()->subMonthNoOverflow()->endOfMonth()->toDateString();
+    {
+        $user = auth()->user();
+        $now = Carbon::now();
+        $startOfMonth = $now->startOfMonth()->toDateString();
+        $endOfMonth = $now->endOfMonth()->toDateString();
+        $startOfLastMonth = $now->copy()->subMonthNoOverflow()->startOfMonth()->toDateString();
+        $endOfLastMonth = $now->copy()->subMonthNoOverflow()->endOfMonth()->toDateString();
 
-    // Elemen Paling Atas di dashboard
-    $countBusiness = Business::count();
-    $countAdminBisnis = User::where('role_id', 2)->count();
+        // Elemen Paling Atas di dashboard
+        $countBusiness = Business::count();
+        $countAdminBisnis = User::where('role_id', 2)->count();
 
-    $countWarehouse = 0;
-    $countAdminOutlet = 0;
-    $countProduct = 0;
-    $countIngredient = 0;
-    $totalIncomeThisMonth = 0;
-    $totalIncomePreviousMonth = 0;
-    $countTransactionThisMonth = 0;
-    $countTransactionPreviousMonth = 0;
+        $countWarehouse = 0;
+        $countAdminOutlet = 0;
+        $countProduct = 0;
+        $countIngredient = 0;
+        $totalIncomeThisMonth = 0;
+        $totalIncomePreviousMonth = 0;
+        $countTransactionThisMonth = 0;
+        $countTransactionPreviousMonth = 0;
 
-    if ($user->hasRole('Superadmin')) {
-        $countAdminOutlet = User::where('role_id', 3)->count();
-        $countWarehouse = Warehouse::count();
-        $warehouses = Warehouse::pluck('id');
-    } elseif ($user->hasRole('Admin Bisnis')) {
-        $business_id = $user->business_id;
-        $warehouses = Warehouse::where('business_id', $business_id)->pluck('id');
-        $countAdminOutlet = User::where('role_id', 3)->whereIn('warehouse_id', $warehouses)->count();
-        $countWarehouse = Warehouse::where('business_id', $business_id)->count();
-        $countProduct = Product::where('business_id', $business_id)->count();
-        $countIngredient = Ingredient::where('business_id', $business_id)->count();
+        if ($user->hasRole('Superadmin')) {
+            $countAdminOutlet = User::where('role_id', 3)->count();
+            $countWarehouse = Warehouse::count();
+            $warehouses = Warehouse::pluck('id');
 
-        $totalIncomeThisMonth = $this->getTransactionSum($warehouses, $startOfMonth, $endOfMonth);
-        $totalIncomePreviousMonth = $this->getTransactionSum($warehouses, $startOfLastMonth, $endOfLastMonth);
-        $countTransactionThisMonth = $this->getTransactionCount($warehouses, $startOfMonth, $endOfMonth);
-        $countTransactionPreviousMonth = $this->getTransactionCount($warehouses, $startOfLastMonth, $endOfLastMonth);
+            $data = compact('countBusiness', 'countWarehouse', 'countAdminBisnis', 'countAdminOutlet');
+        } elseif ($user->hasRole('Admin Bisnis')) {
+            $business_id = $user->business_id;
+            $warehouses = Warehouse::where('business_id', $business_id)->pluck('id');
+            $countAdminOutlet = User::where('role_id', 3)->whereIn('warehouse_id', $warehouses)->count();
+            $countWarehouse = Warehouse::where('business_id', $business_id)->count();
+            $countProduct = Product::where('business_id', $business_id)->count();
+            $countIngredient = Ingredient::where('business_id', $business_id)->count();
+
+            $totalIncomeThisMonth = $this->getTransactionSum($warehouses, $startOfMonth, $endOfMonth);
+            $totalIncomePreviousMonth = $this->getTransactionSum($warehouses, $startOfLastMonth, $endOfLastMonth);
+            $countTransactionThisMonth = $this->getTransactionCount($warehouses, $startOfMonth, $endOfMonth);
+            $countTransactionPreviousMonth = $this->getTransactionCount($warehouses, $startOfLastMonth, $endOfLastMonth);
+
+            $data = compact('countBusiness', 'countWarehouse', 'countAdminBisnis', 'countAdminOutlet', 'totalIncomeThisMonth', 'totalIncomePreviousMonth', 'countTransactionThisMonth', 'countTransactionPreviousMonth', 'countProduct', 'countIngredient');
+        } else {
+            $revenue = $this->getTransactionSum([$user->warehouse_id], $startOfMonth, $endOfMonth);
+            $purchase_return = $this->getTransactionQtySum([$user->warehouse_id], $startOfMonth, $endOfMonth);
+            $expense = $this->getExpenseSum([$user->warehouse_id], $startOfMonth, $endOfMonth);
+            $stockPurchase = $this->getStockPurchaseSum([$user->warehouse_id], $startOfMonth, $endOfMonth);
+            $expense += $stockPurchase;
+            $profit = $revenue - $expense;
+
+            $data = compact(
+                'purchase_return', 'revenue', 'expense', 'profit', 'countBusiness', 'countWarehouse', 'countAdminBisnis', 'countAdminOutlet',
+                'countProduct', 'countIngredient', 'totalIncomePreviousMonth', 'totalIncomeThisMonth', 'countTransactionPreviousMonth', 'countTransactionThisMonth'
+            );
+        }
+
+        return view('backend.index', $data);
     }
 
-    $revenue = $this->getTransactionSum([$user->warehouse_id], $startOfMonth, $endOfMonth);
-    $purchase_return = $this->getTransactionQtySum([$user->warehouse_id], $startOfMonth, $endOfMonth);
-    $expense = $this->getExpenseSum([$user->warehouse_id], $startOfMonth, $endOfMonth);
-    $stockPurchase = $this->getStockPurchaseSum([$user->warehouse_id], $startOfMonth, $endOfMonth);
-    $expense += $stockPurchase;
-    $profit = $revenue - $expense;
+    private function getTransactionSum($warehouses, $startDate, $endDate)
+    {
+        return Transaction::whereIn('warehouse_id', $warehouses)
+            ->where('status', 'Lunas')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('total_amount');
+    }
 
-    $data = compact(
-        'purchase_return', 'revenue', 'expense', 'profit', 'countBusiness', 'countWarehouse', 'countAdminBisnis', 'countAdminOutlet',
-        'countProduct', 'countIngredient', 'totalIncomePreviousMonth', 'totalIncomeThisMonth', 'countTransactionPreviousMonth', 'countTransactionThisMonth'
-    );
+    private function getTransactionQtySum($warehouses, $startDate, $endDate)
+    {
+        return Transaction::whereIn('warehouse_id', $warehouses)
+            ->where('status', 'Lunas')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->sum('total_qty');
+    }
 
-    return view('backend.index', $data);
-}
+    private function getExpenseSum($warehouses, $startDate, $endDate)
+    {
+        return Expense::whereIn('warehouse_id', $warehouses)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('amount');
+    }
 
-private function getTransactionSum($warehouses, $startDate, $endDate)
-{
-    return Transaction::whereIn('warehouse_id', $warehouses)
-        ->where('status', 'Lunas')
-        ->whereBetween('date', [$startDate, $endDate])
-        ->sum('total_amount');
-}
+    private function getStockPurchaseSum($warehouses, $startDate, $endDate)
+    {
+        return StockPurchase::whereIn('warehouse_id', $warehouses)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->sum('total_price');
+    }
 
-private function getTransactionQtySum($warehouses, $startDate, $endDate)
-{
-    return Transaction::whereIn('warehouse_id', $warehouses)
-        ->where('status', 'Lunas')
-        ->whereBetween('date', [$startDate, $endDate])
-        ->sum('total_qty');
-}
-
-private function getExpenseSum($warehouses, $startDate, $endDate)
-{
-    return Expense::whereIn('warehouse_id', $warehouses)
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->sum('amount');
-}
-
-private function getStockPurchaseSum($warehouses, $startDate, $endDate)
-{
-    return StockPurchase::whereIn('warehouse_id', $warehouses)
-        ->whereBetween('created_at', [$startDate, $endDate])
-        ->sum('total_price');
-}
-
-private function getTransactionCount($warehouses, $startDate, $endDate)
-{
-    return Transaction::whereIn('warehouse_id', $warehouses)
-        ->where('status', 'Lunas')
-        ->whereBetween('date', [$startDate, $endDate])
-        ->count();
-}
+    private function getTransactionCount($warehouses, $startDate, $endDate)
+    {
+        return Transaction::whereIn('warehouse_id', $warehouses)
+            ->where('status', 'Lunas')
+            ->whereBetween('date', [$startDate, $endDate])
+            ->count();
+    }
 
 
     public function uploadApk(Request $request)

@@ -27,6 +27,7 @@ use App\Http\Controllers\OjolWarehouseController;
 use App\Http\Controllers\BusinessStockController;
 use App\Http\Controllers\CustomCategoryController;
 use App\Http\Controllers\WhatsappController;
+use App\Http\Controllers\CustomMessageController;
 
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
@@ -73,7 +74,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('my-transactions/{year}/{month}', 'myTransaction');
         });
 
-        // Route for configs
+        // Route for whatsapp
         Route::controller(WhatsappController::class)->name('whatsapp.')->group(function() {
             Route::get('/whatsapp', 'index')->name('index');
             Route::post('/whatsapp/store', 'store')->name('store');
@@ -84,6 +85,11 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('/whatsapp/check-connection', 'checkConnection')->name('checkConnection');
             Route::get('/whatsapp/check-number/{number}', 'checkNumber')->name('checkNumber');
             Route::post('/whatsapp/send-message/{number}/{message}', 'sendMessage')->name('sendMessage');
+        });
+
+        // Route for custom message
+        Route::controller(CustomMessageController::class)->name('custom-message.')->group(function() {
+            Route::resource('custom-message', CustomMessageController::class);
         });
 
 

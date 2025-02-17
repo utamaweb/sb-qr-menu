@@ -17,7 +17,7 @@
                         <th>#</th>
                         <th>Key</th>
                         <th>Value</th>
-                        <th>Action</th>
+                        <th class="not-exported">Action</th>
                     </thead>
                     <tbody>
                         @foreach ($custom_messages as $item)

@@ -79,9 +79,14 @@
                         <div class="input-group">
                             <span class="input-group-text">+62</span>
                             <input type="number" name="whatsapp" id="editWhatsapp" class="form-control" value="{{old('whatsapp')}}" required>
+                            <button type="button" id="edit-check-whatsapp" class="btn btn-primary">Check</button>
                         </div>
                     </div>
                     {{-- End of whatsapp input --}}
+
+                    {{-- Active wa number input --}}
+                    <input type="hidden" name="active_wa_number" id="edit_active_wa_number" value="0">
+                    {{-- End of active wa number input --}}
 
                     {{-- Submit button --}}
                     <input type="submit" value="Submit" class="btn btn-primary">
@@ -93,36 +98,86 @@
 </div>
 
 @push('scripts')
-<script>
-    function editModal(id) {
-        $('#editId').val(id);
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $('#edit-check-whatsapp').click(function() {
+            let phone = "62" + $('#editWhatsapp').val();
 
-        // Get outlet data
-        $.ajax({
-            url: "{{ route('outlet.getById', ['id' => '__id__']) }}".replace('__id__', id),
-            type: 'GET',
-            dataType: 'json',
-            success: function (data) {
+            // Check wa connection
+            $.ajax({
+                url: '{{ route("whatsapp.checkConnection") }}',
+                method: 'GET',
+                success: function(response) {
+                    if(response.data == true) {
+                        // Check if phone number is wa registered
+                        $.ajax({
+                            url: '{{ route("whatsapp.checkNumber", ["number" => "__phone__"]) }}'.replace('__phone__', phone),
+                            method: 'GET',
+                            success: function(response) {
+                                if (response.data == true) {
+                                    Swal.fire({
+                                        text: 'Nomor telpon terdaftar di Whatsapp!',
+                                        icon: 'success',
+                                        timer: 2000,
+                                        showConfirmButton: false,
+                                    });
 
-                // Update form action value
-                $('#editForm').attr('action', "{{ route('outlet.update', ['outlet' => '__id__']) }}".replace('__id__', id));
-
-                $('#editName').val(data.name);
-                $('#editAddress').val(data.address);
-                $('#editService').selectpicker('val', data.is_self_service);
-                $('#editBusiness').selectpicker('val', data.business_id);
-                $('#editTagihan').val(formatNumber(data.tagihan == null ? 0 : data.tagihan));
-                $('#editExpiredAt').val(data.expired_at);
-                $('#editExpiredAt').attr('min', new Date().toISOString().split('T')[0]);
-                $('#editWhatsapp').val(data.whatsapp);
-
-                $('#editModal').modal('show');
-            },
-            error: function (error) {
-                console.error('Error fetching outlet data:', error);
-                alert('Terjadi kesalahan saat mengambil data outlet.');
-            }
+                                    $('#edit_active_wa_number').val('1');
+                                } else {
+                                    Swal.fire({
+                                        text: 'Nomor telpon tidak terdaftar di Whatsapp!',
+                                        icon: 'error',
+                                        timer: 2000,
+                                        showConfirmButton: false,
+                                    });
+                                }
+                            },
+                            error: function(error) {
+                                console.log(error);
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            text: 'Tidak dapat terhubung ke Whatsapp!',
+                            icon: 'error',
+                            timer: 2000,
+                            showConfirmButton: false,
+                        });
+                    }
+                },
+            });
         });
-    }
-</script>
+    </script>
+    <script>
+        function editModal(id) {
+            $('#editId').val(id);
+
+            // Get outlet data
+            $.ajax({
+                url: "{{ route('outlet.getById', ['id' => '__id__']) }}".replace('__id__', id),
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+
+                    // Update form action value
+                    $('#editForm').attr('action', "{{ route('outlet.update', ['outlet' => '__id__']) }}".replace('__id__', id));
+
+                    $('#editName').val(data.name);
+                    $('#editAddress').val(data.address);
+                    $('#editService').selectpicker('val', data.is_self_service);
+                    $('#editBusiness').selectpicker('val', data.business_id);
+                    $('#editTagihan').val(formatNumber(data.tagihan == null ? 0 : data.tagihan));
+                    $('#editExpiredAt').val(data.expired_at);
+                    $('#editExpiredAt').attr('min', new Date().toISOString().split('T')[0]);
+                    $('#editWhatsapp').val(data.whatsapp);
+
+                    $('#editModal').modal('show');
+                },
+                error: function (error) {
+                    console.error('Error fetching outlet data:', error);
+                    alert('Terjadi kesalahan saat mengambil data outlet.');
+                }
+            });
+        }
+    </script>
 @endpush

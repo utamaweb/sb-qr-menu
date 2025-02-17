@@ -59,9 +59,14 @@
                         <div class="input-group">
                             <span class="input-group-text">+62</span>
                             <input type="number" name="whatsapp" id="whatsapp" class="form-control" value="{{old('whatsapp')}}" required>
+                            <button type="button" id="check-whatsapp" class="btn btn-primary">Check</button>
                         </div>
                     </div>
                     {{-- End of whatsapp input --}}
+
+                    {{-- Active wa number input --}}
+                    <input type="hidden" name="active_wa_number" id="active_wa_number" value="0">
+                    {{-- End of active wa number input --}}
 
                     <input type="submit" value="Submit" class="btn btn-primary">
             </form>
@@ -70,3 +75,56 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $('#check-whatsapp').click(function() {
+            let phone = "62" + $('#whatsapp').val();
+
+            // Check wa connection
+            $.ajax({
+                url: '{{ route("whatsapp.checkConnection") }}',
+                method: 'GET',
+                success: function(response) {
+                    if(response.data == true) {
+                        // Check if phone number is wa registered
+                        $.ajax({
+                            url: '{{ route("whatsapp.checkNumber", ["number" => "__phone__"]) }}'.replace('__phone__', phone),
+                            method: 'GET',
+                            success: function(response) {
+                                if (response.data == true) {
+                                    Swal.fire({
+                                        text: 'Nomor telpon terdaftar di Whatsapp!',
+                                        icon: 'success',
+                                        timer: 2000,
+                                        showConfirmButton: false,
+                                    });
+
+                                    $('#active_wa_number').val('1');
+                                } else {
+                                    Swal.fire({
+                                        text: 'Nomor telpon tidak terdaftar di Whatsapp!',
+                                        icon: 'error',
+                                        timer: 2000,
+                                        showConfirmButton: false,
+                                    });
+                                }
+                            },
+                            error: function(error) {
+                                console.log(error);
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            text: 'Tidak dapat terhubung ke Whatsapp!',
+                            icon: 'error',
+                            timer: 2000,
+                            showConfirmButton: false,
+                        });
+                    }
+                },
+            });
+        });
+    </script>
+@endpush

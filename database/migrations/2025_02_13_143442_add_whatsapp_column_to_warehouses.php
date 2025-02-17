@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('warehouses', function (Blueprint $table) {
             $table->string('whatsapp')->after('expired_at')->nullable();
+            $table->boolean('is_whatsapp_active')->after('whatsapp')->default(false);
         });
     }
 

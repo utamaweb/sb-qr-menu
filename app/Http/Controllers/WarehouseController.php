@@ -33,10 +33,10 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|max:255',
+            'name'        => 'required|max:255',
             'business_id' => 'required',
-            'address' => 'required',
-            'service' => 'required'
+            'address'     => 'required',
+            'service'     => 'required'
         ]);
         $input['is_active'] = true;
         if(auth()->user()->hasRole('Superadmin')){
@@ -45,14 +45,15 @@ class WarehouseController extends Controller
             $business_id = auth()->user()->business_id;
         }
         $warehouse = Warehouse::create([
-            'name' => $request->name,
-            'is_active' => 1,
-            'address' => $request->address,
-            'business_id' => $request->business_id,
-            'is_self_service' => $request->service,
-            'tagihan' => intVal(str_replace(',', '', $request->tagihan)),
-            'expired_at' => $request->expired_at,
-            'whatsapp' => $request->whatsapp
+            'name'               => $request->name,
+            'is_active'          => 1,
+            'address'            => $request->address,
+            'business_id'        => $request->business_id,
+            'is_self_service'    => $request->service,
+            'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
+            'expired_at'         => $request->expired_at,
+            'whatsapp'           => $request->whatsapp,
+            'is_whatsapp_active' => $request->active_wa_number
         ]);
 
         if($warehouse) {
@@ -72,10 +73,10 @@ class WarehouseController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'max:255',
+            'name'        => 'max:255',
             'business_id' => 'required',
-            'address' => 'required',
-            'service' => 'required'
+            'address'     => 'required',
+            'service'     => 'required'
         ]);
         $input = $request->all();
         $lims_warehouse_data = Warehouse::find($id);
@@ -88,13 +89,14 @@ class WarehouseController extends Controller
             $imageName = $lims_warehouse_data->logo;
         }
         $lims_warehouse_data->update([
-            'name' => $request->name,
-            'address' => $request->address,
-            'business_id' => $request->business_id,
-            'is_self_service' => $request->service,
-            'tagihan' => intVal(str_replace(',', '', $request->tagihan)),
-            'expired_at' => $request->expired_at,
-            'whatsapp' => $request->whatsapp
+            'name'               => $request->name,
+            'address'            => $request->address,
+            'business_id'        => $request->business_id,
+            'is_self_service'    => $request->service,
+            'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
+            'expired_at'         => $request->expired_at,
+            'whatsapp'           => $request->whatsapp,
+            'is_whatsapp_active' => $request->active_wa_number
         ]);
         return redirect()->back()->with('message', 'Data Berhasil Diubah');
     }

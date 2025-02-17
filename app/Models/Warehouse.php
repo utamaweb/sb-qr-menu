@@ -9,8 +9,7 @@ class Warehouse extends Model
 {
     use SoftDeletes;
     protected $fillable = [
-
-        "name", "phone", "email", "address", "is_self_service", "is_active", "business_id", "max_shift_count", "tagihan", "expired_at", "whatsapp"
+        "name", "phone", "email", "address", "is_self_service", "is_active", "business_id", "max_shift_count", "tagihan", "expired_at", "whatsapp", "is_whatsapp_active"
     ];
 
     public function product()

@@ -27,7 +27,12 @@
                                     <td>{{ $item->value }}</td>
                                     <td style="width: 20%">
                                         <button type="button" class="btn btn-sm btn-success" onclick="edit('{{ $item->id }}')"><i class="dripicons-pencil"></i> Edit</button>
-                                        <a href="#" class="btn btn-sm btn-danger" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Delete</a>
+                                        <form action="{{ route('custom-message.destroy', $item->id) }}" method="POST" style="display: inline-block" class="delete-form">
+                                            @csrf
+                                            @method('DELETE')
+
+                                            <button type="submit" class="btn btn-sm btn-danger"><i class="dripicons-trash"></i> Delete</button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
@@ -49,6 +54,9 @@
 @endsection
 
 @push('scripts')
+{{-- Sweetalert2 CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
     $(document).ready(function() {
         $('#custom-message-table').DataTable({
@@ -130,5 +138,27 @@
             }
         });
     }
+</script>
+
+<script>
+    $('.delete-form').submit(function(e) {
+        e.preventDefault();
+
+        // Swal confirmation
+        Swal.fire({
+            title: 'Hapus Custom Message',
+            text: 'Apakah anda yakin ingin menghapus custom message ini?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Ya, hapus!'
+        }).then((result) => {
+            // Jika hasilnya benar, submit form
+            if (result.value) {
+                this.submit();
+            }
+        });
+    });
 </script>
 @endpush

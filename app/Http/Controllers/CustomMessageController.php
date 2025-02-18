@@ -94,6 +94,16 @@ class CustomMessageController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            CustomMessage::destroy($id);
+
+            DB::commit();
+            return redirect()->route('custom-message.index')->with('message', 'Data berhasil dihapus');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->route('custom-message.index')->with('error', 'Data gagal dihapus');
+        }
     }
 }

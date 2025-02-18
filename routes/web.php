@@ -88,7 +88,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
 
         // Route for custom message
-        Route::controller(CustomMessageController::class)->name('custom-message.')->group(function() {
+        Route::controller(CustomMessageController::class)->group(function() {
             Route::resource('custom-message', CustomMessageController::class);
         });
 

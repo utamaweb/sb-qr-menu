@@ -19,6 +19,9 @@
         <li id="outlet"><a href="#"> <i class="dripicons-tags"></i><span>Harga(comingsoon)</span></a></li>
         <li id="outlet"><a href="#"> <i class="dripicons-shopping-bag"></i><span>Transaksi(comingsoon)</span></a></li>
         <li>
+            <a href="{{ route('custom-message.index') }}"> <i class="dripicons-message"></i> <span>Custom Message</span></a>
+        </li>
+        <li>
             <a href="{{ route('whatsapp.index') }}"> <i class="dripicons-conversation"></i> <span>Whatsapp</span></a>
         </li>
         <li id="setting"><a href="{{ route('setting.general') }}"> <i

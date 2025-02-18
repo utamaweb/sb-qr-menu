@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\CustomMessage;
+use Illuminate\Support\Facades\DB;
 
 class CustomMessageController extends Controller
 {
@@ -31,7 +32,20 @@ class CustomMessageController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            CustomMessage::create([
+                'key'   => strtoupper(str_replace(' ', '_', $request->key)),
+                'value' => $request->value,
+            ]);
+
+            DB::commit();
+            return redirect()->route('custom-message.index')->with('message', 'Data berhasil disimpan');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->route('custom-message.index')->with('error', 'Data gagal disimpan');
+        }
     }
 
     /**

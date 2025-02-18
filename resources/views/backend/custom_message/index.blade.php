@@ -1,42 +1,46 @@
 @extends('backend.layout.main')
 
 @section('content')
-<section>
-    <div class="container-fluid">
-        @include('includes.alerts')
+    <section>
+        <div class="container-fluid">
+            @include('includes.alerts')
 
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <span>Custom Message</span>
-                <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#createModal"><i class="dripicons-plus"></i> Tambah</button>
-            </div>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between">
+                    <span>Custom Message</span>
+                    <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#createModal"><i class="dripicons-plus"></i> Tambah</button>
+                </div>
 
-            <div class="card-body">
-                <table class="table table-hover tabel-bordered" id="custom-message-table">
-                    <thead>
-                        <th>#</th>
-                        <th>Key</th>
-                        <th>Value</th>
-                        <th class="not-exported">Action</th>
-                    </thead>
-                    <tbody>
-                        @foreach ($custom_messages as $item)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $item->key }}</td>
-                                <td>{{ $item->value }}</td>
-                                <td>
-                                    <a href="{{ route('custom-message.edit', ['id' => $item->id]) }}" class="btn btn-sm btn-primary"><i class="dripicons-edit"></i> Edit</a>
-                                    <a href="#" class="btn btn-sm btn-danger" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Delete</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <div class="card-body">
+                    <table class="table table-hover tabel-bordered" id="custom-message-table">
+                        <thead>
+                            <th>#</th>
+                            <th>Key</th>
+                            <th>Value</th>
+                            <th class="not-exported">Action</th>
+                        </thead>
+                        <tbody>
+                            @foreach ($custom_messages as $item)
+                                <tr>
+                                    <td style="width: 10%">{{ $loop->iteration }}</td>
+                                    <td style="width: 30%">{{ $item->key }}</td>
+                                    <td>{{ $item->value }}</td>
+                                    <td style="width: 20%">
+                                        <a href="{{ route('custom-message.edit', $item->id) }}" class="btn btn-sm btn-primary"><i class="dripicons-pencil"></i> Edit</a>
+                                        <a href="#" class="btn btn-sm btn-danger" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Delete</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+
+    {{-- Create modal --}}
+    @include('backend.custom_message.createModal')
+    {{-- End of create modal --}}
 
 @endsection
 

@@ -25,7 +25,7 @@ class SubscriptionController extends Controller
             $isGreater = $expired_date->gt($today_date);
 
             $expired_at = date('d M Y', strtotime($outlet->expired_at));
-
+            $message = '';
 
             if($difference_days > 5 && $isGreater) {
                 $status = 'Aktif';
@@ -34,13 +34,15 @@ class SubscriptionController extends Controller
             } elseif(!$isGreater) {
                 $status = 'Berakhir';
                 $isExpired = true;
+                $message = config('custom_message.EXPIRE_MESSAGE');
             }
         }
 
         return response()->json([
-            'status' => $status,
+            'status'     => $status,
             'expired_at' => $outlet->expired_at ?? '-',
-            'isExpired' => $isExpired
+            'isExpired'  => $isExpired,
+            'message'    => $message
         ]);
 
     }

@@ -774,6 +774,16 @@ class TransactionController extends Controller
     }
 
     /**
+     * Generate OTP Code 6-digit
+     */
+    public function generateOtp()
+    {
+        $otp = rand(100000, 999999);
+        return $otp;
+    }
+
+
+    /**
      * Cancel transaction
      * @param Request $request
      * @param $id

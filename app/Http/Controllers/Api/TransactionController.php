@@ -773,42 +773,49 @@ class TransactionController extends Controller
         }
     }
 
-
+    /**
+     * Cancel transaction
+     * @param Request $request
+     * @param $id
+     */
     public function cancel(Request $request, $id)
     {
         DB::beginTransaction();
         try {
             $transaction = Transaction::find($id);
             if ($transaction) {
+                // Check if cancelation otp is not empty and equal to request otp
+                if(!empty($transaction->cancelation_otp) && ($transaction->cancelation_otp == $request->otp)) {
+                    // Update status transaksi menjadi batal
+                    $transaction->update([
+                        'status' => 'Batal',
+                    ]);
 
-                // $shift = Shift::find($transaction->shift_id);
-                // $details = TransactionDetail::where('transaction_id', $id)->get();
-                // Update stock sesuai stok sebelum cancel
-                // foreach($details as $detail){
-                //     $product_id = $detail->product_id;
-                //     $ingredientProducts = IngredientProducts::where('product_id', $product_id)->get();
-                //     foreach($ingredientProducts as $ingredientProduct){
-                //         $stock = Stock::where('ingredient_id', $ingredientProduct->ingredient_id)->where('warehouse_id', $shift->warehouse_id)->where('shift_id', $shift->id)->first();
-                //         $stock->update([
-                //             'stock_used' => $stock->stock_used - $detail->qty,
-                //             'last_stock' => $stock->last_stock + $detail->qty
-                //         ]);
-                //     }
-                // }
-                // Update status transaksi menjadi batal
-                $transaction->update([
-                    'status' => 'Batal',
-                ]);
-                DB::commit();
-                // event(new TransactionCancelled($transaction->id));
-                return response()->json(['message' => 'Transaksi Berhasil Dibatalkan'], 200);
+                    DB::commit();
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Transaksi Berhasil Dibatalkan'
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'OTP transaksi tidak valid'
+                    ], 201);
+                }
+
             } else {
-                return response()->json(['message' => 'Data transaksi tidak ada'], 500);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Data transaksi tidak ada'
+                ], 201);
             }
         } catch (\Throwable $th) {
             DB::rollback();
             \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
-            return response()->json(['message' => $th->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 

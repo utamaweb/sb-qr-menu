@@ -61,7 +61,9 @@ class CustomMessageController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        // Get custom message
+        $custom_message = CustomMessage::findOrFail($id);
+        return $custom_message;
     }
 
     /**
@@ -69,7 +71,22 @@ class CustomMessageController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Get custom message
+        $custom_message = CustomMessage::findOrFail($id);
+        try {
+            DB::beginTransaction();
+
+            $custom_message->key = strtoupper(str_replace(' ', '_', $request->key));
+            $custom_message->value = $request->value;
+
+            $custom_message->save();
+
+            DB::commit();
+            return redirect()->route('custom-message.index')->with('message', 'Data berhasil disimpan');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->route('custom-message.index')->with('error', 'Data gagal disimpan');
+        }
     }
 
     /**

@@ -26,7 +26,7 @@
                                     <td style="width: 30%">{{ $item->key }}</td>
                                     <td>{{ $item->value }}</td>
                                     <td style="width: 20%">
-                                        <a href="{{ route('custom-message.edit', $item->id) }}" class="btn btn-sm btn-primary"><i class="dripicons-pencil"></i> Edit</a>
+                                        <button type="button" class="btn btn-sm btn-success" onclick="edit('{{ $item->id }}')"><i class="dripicons-pencil"></i> Edit</button>
                                         <a href="#" class="btn btn-sm btn-danger" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Delete</a>
                                     </td>
                                 </tr>
@@ -41,6 +41,10 @@
     {{-- Create modal --}}
     @include('backend.custom_message.createModal')
     {{-- End of create modal --}}
+
+    {{-- Edit modal --}}
+    @include('backend.custom_message.editModal')
+    {{-- End of edit modal --}}
 
 @endsection
 
@@ -102,5 +106,29 @@
             ],
         });
     });
+</script>
+
+<script>
+    function edit(id) {
+        // Set form edit action
+        $url = "{{ route('custom-message.update', '__id__') }}".replace('__id__', id);
+        $('#edit-form').attr('action', $url);
+
+        // Get custom message
+        $.ajax({
+            url: "{{ route('custom-message.edit', '__id__') }}".replace('__id__', id),
+            method: 'GET',
+            success: function(response) {
+                // Set key and value
+                $('#key-edit').val(response.key);
+                $('#value-edit').val(response.value);
+
+                $('#editModal').modal('show');
+            },
+            error: function(error) {
+                console.error('Error fetching custom message:', error);
+            }
+        });
+    }
 </script>
 @endpush

@@ -80,6 +80,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::post('transaction', [TransactionController::class, 'store']);
     Route::put('transaction/{id}/cancel', [TransactionController::class, 'cancel']);
     Route::delete('transaction/product/delete/{id}', [TransactionController::class, 'deleteTransactionProducts']);
+    Route::post('transaction/cancel-request', [TransactionController::class, 'transactionCancellationRequest']);
 
     // Shift / Close Cashier
     Route::post('shift/open', [ShiftController::class, 'open']);

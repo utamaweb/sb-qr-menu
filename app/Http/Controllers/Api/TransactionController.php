@@ -835,7 +835,9 @@ class TransactionController extends Controller
             $transaction->cancelation_reason = $request->reason;
             $transaction->save();
 
-            $message = "Kode pembatalan : *" . $otp . "*\nAlasan : " . $request->reason;
+            $message = "*Permintaan Pembatalan Pesanan*";
+            $message .= "\n\nKode pembatalan : *" . $otp . "*";
+            $message .= "\nAlasan : " . $request->reason;
             $message .= "\n\nOutlet : " . auth()->user()->warehouse->name;
             $message .= "\nShift : " . $transaction->shift->shift_number;
             $message .= "\nNomor Antrian : " . $transaction->sequence_number;

@@ -59,6 +59,8 @@ class WarehouseController extends Controller
 
         if($checkNumber == true) {
             $is_wa_active = 1;
+        } else {
+            $is_wa_active = 0;
         }
 
         $warehouse = Warehouse::create([
@@ -112,6 +114,8 @@ class WarehouseController extends Controller
 
         if($checkNumber == true) {
             $is_wa_active = 1;
+        } else {
+            $is_wa_active = 0;
         }
 
         $lims_warehouse_data->update([

@@ -22,6 +22,7 @@ use App\Events\TransactionPaid;
 use App\Events\TransactionCancelled;
 use App\Events\RefreshTransactions;
 use App\Services\WhatsappService;
+use GuzzleHttp\Client;
 
 
 class TransactionController extends Controller
@@ -830,39 +831,47 @@ class TransactionController extends Controller
         // Get transaction
         $transaction = Transaction::with('shift', 'transaction_details')->find($request->id);
 
-        if($this->checkWhatsappConnection()) {
-            $transaction->cancelation_otp = $otp;
-            $transaction->cancelation_reason = $request->reason;
-            $transaction->save();
+        if(auth()->user()->warehouse->is_whatsapp_active == 1) {
+            if($this->checkWhatsappConnection()) {
+                $transaction->cancelation_otp = $otp;
+                $transaction->cancelation_reason = $request->reason;
+                $transaction->save();
 
-            $message = "*Permintaan Pembatalan Pesanan*";
-            $message .= "\n\nKode pembatalan : *" . $otp . "*";
-            $message .= "\nAlasan : " . $request->reason;
-            $message .= "\n\nOutlet : " . auth()->user()->warehouse->name;
-            $message .= "\nShift : " . $transaction->shift->shift_number;
-            $message .= "\nNomor Antrian : " . $transaction->sequence_number;
-            $message .= "\n\nProduk : ";
+                $message = "*Permintaan Pembatalan Pesanan*";
+                $message .= "\n\nKode pembatalan : *" . $otp . "*";
+                $message .= "\nAlasan : " . $request->reason;
+                $message .= "\n\nOutlet : " . auth()->user()->warehouse->name;
+                $message .= "\nShift : " . $transaction->shift->shift_number;
+                $message .= "\nNomor Antrian : " . $transaction->sequence_number;
+                $message .= "\n\nProduk : ";
 
-            foreach($transaction->transaction_details as $detail) {
-                $message .= "\n- " . $detail->product_name . " (" . $detail->qty . ")";
+                foreach($transaction->transaction_details as $detail) {
+                    $message .= "\n- " . $detail->product_name . " (" . $detail->qty . ")";
+                }
+
+                $message .= "\n\nJumlah : Rp. " . number_format($transaction->total_amount, 0, ',', '.');
+
+                $message .= "\n\nPesan ini dikirim pada " . Carbon::now()->translatedFormat('l, j F Y H:i:s');
+
+                $this->whatsapp->sendMessage('62' . auth()->user()->warehouse->whatsapp, $message);
+
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'OTP berhasil dikirim!'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Tidak ada akun Whatsapp terhubung!'
+                ], 201);
             }
-
-            $message .= "\n\nJumlah : Rp. " . number_format($transaction->total_amount, 0, ',', '.');
-
-            $message .= "\n\nPesan ini dikirim pada " . Carbon::now()->translatedFormat('l, j F Y H:i:s');
-
-            $this->whatsapp->sendMessage('62' . auth()->user()->warehouse->whatsapp, $message);
-
-            return response()->json([
-                'status' => 'success',
-                'message' => 'OTP berhasil dikirim!'
-            ], 200);
         } else {
             return response()->json([
-                'status' => 'error',
-                'message' => 'Tidak ada akun Whatsapp terhubung!'
-            ], 200);
+                'status'  => 'error',
+                'message' => 'Outlet ini tidak memiliki akun Whatsapp terhubung!'
+            ], 201);
         }
+
     }
 
 

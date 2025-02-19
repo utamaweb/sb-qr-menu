@@ -887,7 +887,7 @@ class TransactionController extends Controller
                     DB::commit();
 
                     // Send whatsapp message
-                    $message = "Pembatalan pesanan dengan kode pebatalan *" . $request->otp . "* berhasil!";
+                    $message = "Pembatalan pesanan dengan kode pembatalan *" . $request->otp . "* berhasil!";
                     $this->whatsapp->sendMessage('62' . auth()->user()->warehouse->whatsapp, $message);
 
                     return response()->json([

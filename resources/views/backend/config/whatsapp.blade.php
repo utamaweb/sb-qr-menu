@@ -78,7 +78,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" onclick="refreshProcess()">Refresh</button>
                 <button type="button" class="btn btn-danger" onclick="logoutProcess()" style="display: none" id="logoutButton">Logout</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

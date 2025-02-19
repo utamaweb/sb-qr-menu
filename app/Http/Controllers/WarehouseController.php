@@ -11,9 +11,17 @@ use Illuminate\Support\Str;
 use Keygen;
 use Auth;
 use DB;
+use App\Services\WhatsappService;
 
 class WarehouseController extends Controller
 {
+    protected $whatsapp;
+
+    public function __construct()
+    {
+        $this->whatsapp = new WhatsappService();
+    }
+
     public function index()
     {
         if(auth()->user()->hasRole('Superadmin')){
@@ -44,6 +52,15 @@ class WarehouseController extends Controller
         } else{
             $business_id = auth()->user()->business_id;
         }
+
+        $is_wa_active = $request->active_wa_number;
+
+        $checkNumber = $this->whatsapp->checkNumber('62' . $request->whatsapp)->getData()->data;
+
+        if($checkNumber == true) {
+            $is_wa_active = 1;
+        }
+
         $warehouse = Warehouse::create([
             'name'               => $request->name,
             'is_active'          => 1,
@@ -53,7 +70,7 @@ class WarehouseController extends Controller
             'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
             'expired_at'         => $request->expired_at,
             'whatsapp'           => $request->whatsapp,
-            'is_whatsapp_active' => $request->active_wa_number
+            'is_whatsapp_active' => $is_wa_active
         ]);
 
         if($warehouse) {
@@ -88,6 +105,15 @@ class WarehouseController extends Controller
         } else {
             $imageName = $lims_warehouse_data->logo;
         }
+
+        $is_wa_active = $request->active_wa_number;
+
+        $checkNumber = $this->whatsapp->checkNumber('62' . $request->whatsapp)->getData()->data;
+
+        if($checkNumber == true) {
+            $is_wa_active = 1;
+        }
+
         $lims_warehouse_data->update([
             'name'               => $request->name,
             'address'            => $request->address,
@@ -96,7 +122,7 @@ class WarehouseController extends Controller
             'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
             'expired_at'         => $request->expired_at,
             'whatsapp'           => $request->whatsapp,
-            'is_whatsapp_active' => $request->active_wa_number
+            'is_whatsapp_active' => $is_wa_active
         ]);
         return redirect()->back()->with('message', 'Data Berhasil Diubah');
     }

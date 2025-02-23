@@ -831,6 +831,13 @@ class TransactionController extends Controller
         // Get transaction
         $transaction = Transaction::with('shift', 'transaction_details')->find($request->id);
 
+        if(!$transaction){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data transaksi tidak ditemukan.'
+            ], 404);
+        }
+
         if(auth()->user()->warehouse->is_whatsapp_active == 1) {
             if($this->checkWhatsappConnection()) {
                 $transaction->cancelation_otp = $otp;

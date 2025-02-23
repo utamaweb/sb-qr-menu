@@ -835,7 +835,7 @@ class TransactionController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Data transaksi tidak ditemukan.'
-            ], 404);
+            ], 500);
         }
 
         if(auth()->user()->warehouse->is_whatsapp_active == 1) {

@@ -30,10 +30,10 @@ class SubscriptionController extends Controller
 
             if($difference_days > 3 && $isGreater) {
                 $status = 'Aktif';
-            } elseif($difference_days <= 3 && $isGreater) {
+            } elseif($difference_days <= 2 && $isGreater) {
                 $status = 'Akan segera berakhir';
                 $isExpired = true;
-                $message = 'Outlet ini akan segera berakhir dalam ' . $difference_days . ' hari. Segera perpanjang sebelum expired. Terima kasih.';
+                $message = 'Outlet ini akan segera berakhir dalam ' . $difference_days + 1 . ' hari. Segera perpanjang sebelum expired. Terima kasih.';
             } elseif(!$isGreater) {
                 $status = 'Berakhir';
                 $isExpired = true;

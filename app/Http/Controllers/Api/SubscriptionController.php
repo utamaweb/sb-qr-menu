@@ -15,7 +15,7 @@ class SubscriptionController extends Controller
     public function getStatus() {
         $outlet = Warehouse::find(auth()->user()->warehouse_id);
 
-        $status = 'Aktif';
+        $status = '';
         $isExpired = false;
         $message = '';
 

@@ -27,10 +27,11 @@ class SubscriptionController extends Controller
             $expired_at = date('d M Y', strtotime($outlet->expired_at));
             $message = '';
 
-            if($difference_days > 5 && $isGreater) {
+            if($difference_days > 3 && $isGreater) {
                 $status = 'Aktif';
-            } elseif($difference_days <= 5 && $isGreater) {
+            } elseif($difference_days <= 3 && $isGreater) {
                 $status = 'Akan segera berakhir';
+                $isExpired = true;
             } elseif(!$isGreater) {
                 $status = 'Berakhir';
                 $isExpired = true;

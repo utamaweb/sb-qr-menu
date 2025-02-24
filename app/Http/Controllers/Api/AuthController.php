@@ -45,6 +45,15 @@ class AuthController extends Controller
                 return response()->json(['message' => 'Login credentials are invalid'], 500);
             }
 
+            // check isExpired in warehouse
+            $dateNow = \Carbon\Carbon::now()->format('Y-m-d');
+            if($dateNow >= $warehouse->expired_at){
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Outlet sudah memasuki masa expired penggunaan SB POS. Silakan melakukan pembayaran untuk menggunakan aplikasi. Terima kasih.'
+                ], 500);
+            }
+
             $user = getUser($request->email);
             // $userResponse->token = $token;
             // $user->token_expires_in = auth()->factory()->getTTL() * 60;

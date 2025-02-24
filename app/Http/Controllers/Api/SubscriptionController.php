@@ -17,6 +17,7 @@ class SubscriptionController extends Controller
 
         $status = '';
         $isExpired = false;
+        $message = '';
 
         if($outlet->expired_at != null) {
             $expired_date = Carbon::parse($outlet->expired_at);

@@ -37,16 +37,16 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('currency', function ( $expression ) { return "Rp. <?php echo number_format($expression,0,',','.'); ?>"; });
 
         // Custom configs
-        $configs = Config::all();
-        $customMessages = CustomMessage::all();
+        // $configs = Config::all();
+        // $customMessages = CustomMessage::all();
 
-        foreach ($configs as $config) {
-            config()->set('app_config.' . $config->key, $config->value);
-        }
+        // foreach ($configs as $config) {
+        //     config()->set('app_config.' . $config->key, $config->value);
+        // }
 
-        foreach ($customMessages as $customMessage) {
-            config()->set('custom_message.' . $customMessage->key, $customMessage->value);
-        }
+        // foreach ($customMessages as $customMessage) {
+        //     config()->set('custom_message.' . $customMessage->key, $customMessage->value);
+        // }
 
         // Set carbon locale
         Carbon::setLocale('id');

@@ -927,6 +927,44 @@ class TransactionController extends Controller
     }
 
     /**
+     * Old cancel method
+     */
+    public function cancelOld($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Get transaction by id
+            $transaction = Transaction::findOrFail($id);
+
+            // If transaction exists change status to batal
+            if($transaction) {
+                $transaction->status = 'Batal';
+                $transaction->save();
+
+                DB::commit();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Transaksi berhasil dibatalkan'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Data transaksi tidak ada'
+                ], 201);
+            }
+        } catch (\Throwable $th) {
+            DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Display the specified resource.
      */
     public function orderType()

@@ -47,7 +47,7 @@ class AuthController extends Controller
 
             // check isExpired in warehouse
             $dateNow = \Carbon\Carbon::now()->format('Y-m-d');
-            if($dateNow >= $warehouse->expired_at){
+            if($dateNow >= $warehouse->expired_at && $warehouse->expired_at != null) {
                 return response()->json([
                     'status' => false,
                     'message' => 'Outlet sudah memasuki masa expired penggunaan SB POS. Silakan melakukan pembayaran untuk menggunakan aplikasi. Terima kasih.'

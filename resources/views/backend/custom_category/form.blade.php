@@ -36,7 +36,7 @@
 
                                 <div class="mb-3">
                                     <label for="custom">Kategori Custom</label>
-                                    <input type="text" name="custom" id="custom" class="form-control" value="{{ ($errors->has('custom')) ? @old('custom') : $category->custom }}">
+                                    <input type="text" name="custom" id="custom" class="form-control" value="{{ ($errors->has('custom')) ? @old('custom') : (($category->customCategory->count() > 0) ? $category->customCategory->first()->name : '') }}" placeholder="Kategori Custom">
                                 </div>
 
                                 <div class="mb-3">

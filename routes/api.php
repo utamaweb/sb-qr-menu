@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\StockController;
 use App\Http\Controllers\Api\ExpenseController;
 use App\Http\Controllers\Api\OjolController;
 use App\Http\Controllers\Api\ServiceController;
+use App\Http\Controllers\Api\SubscriptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,8 +78,10 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('transaction/not-paid', [TransactionController::class, 'notPaid']);
     Route::get('transaction/order-types', [TransactionController::class, 'orderType']);
     Route::post('transaction', [TransactionController::class, 'store']);
-    Route::delete('transaction/{id}/cancel', [TransactionController::class, 'cancel']);
+    // Route::put('transaction/{id}/cancel', [TransactionController::class, 'cancel']); // New cancel method
+    Route::delete('transaction/{id}/cancel', [TransactionController::class, 'cancelOld']); // Old cancel method
     Route::delete('transaction/product/delete/{id}', [TransactionController::class, 'deleteTransactionProducts']);
+    Route::post('transaction/cancel-request', [TransactionController::class, 'transactionCancellationRequest']);
 
     // Shift / Close Cashier
     Route::post('shift/open', [ShiftController::class, 'open']);
@@ -99,6 +102,11 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     // CustomC Category Parent
     Route::controller(CustomCategoryController::class)->group(function() {
         Route::get('/customCategories', 'index');
+    });
+
+    // Subscription
+    Route::controller(SubscriptionController::class)->group(function() {
+        Route::get('subscription/status', 'getStatus');
     });
 });
 

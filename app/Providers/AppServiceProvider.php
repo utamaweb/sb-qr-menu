@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\View;
 use DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Blade;
+use App\Models\Config;
+use App\Models\CustomMessage;
+use Carbon\Carbon;
 
 
 class AppServiceProvider extends ServiceProvider
@@ -32,6 +35,21 @@ class AppServiceProvider extends ServiceProvider
     {
         // Schema::defaultStringLength(191);
         Blade::directive('currency', function ( $expression ) { return "Rp. <?php echo number_format($expression,0,',','.'); ?>"; });
+
+        // Custom configs
+        // $configs = Config::all();
+        // $customMessages = CustomMessage::all();
+
+        // foreach ($configs as $config) {
+        //     config()->set('app_config.' . $config->key, $config->value);
+        // }
+
+        // foreach ($customMessages as $customMessage) {
+        //     config()->set('custom_message.' . $customMessage->key, $customMessage->value);
+        // }
+
+        // Set carbon locale
+        Carbon::setLocale('id');
 
     }
 }

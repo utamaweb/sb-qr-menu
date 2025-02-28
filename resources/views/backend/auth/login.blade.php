@@ -9,29 +9,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="all,follow">
     <link rel="manifest" href="{{url('manifest.json')}}">
-    @if(!config('database.connections.saleprosaas_landlord'))
     <link rel="icon" type="image/png" href="{{ Storage::url('images/logo/'. $general_setting->site_logo) }}" />
-    <!-- Bootstrap CSS-->
     <link rel="stylesheet" href="<?php echo asset('vendor/bootstrap/css/bootstrap.min.css') ?>" type="text/css">
-    <!-- login stylesheet-->
     <link rel="stylesheet" href="<?php echo asset('css/auth.css') ?>" id="theme-stylesheet" type="text/css">
-    <!-- Google fonts - Roboto -->
     <link rel="preload" href="https://fonts.googleapis.com/css?family=Nunito:400,500,700" as="style"
         onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
         <link href="https://fonts.googleapis.com/css?family=Nunito:400,500,700" rel="stylesheet"></noscript>
-    @else
-    <link rel="icon" type="image/png" href="{{url('../../logo', $general_setting->site_logo)}}" />
-    <!-- Bootstrap CSS-->
-    <link rel="stylesheet" href="<?php echo asset('../../vendor/bootstrap/css/bootstrap.min.css') ?>" type="text/css">
-    <!-- login stylesheet-->
-    <link rel="stylesheet" href="<?php echo asset('../../css/auth.css') ?>" id="theme-stylesheet" type="text/css">
-    <!-- Google fonts - Roboto -->
-    <link rel="preload" href="https://fonts.googleapis.com/css?family=Nunito:400,500,700" as="style"
-        onload="this.onload=null;this.rel='stylesheet'">
-    <noscript>
-        <link href="https://fonts.googleapis.com/css?family=Nunito:400,500,700" rel="stylesheet"></noscript>
-    @endif
 </head>
 
 <body>
@@ -87,61 +71,8 @@
 <script type="text/javascript" src="<?php echo asset('../../vendor/jquery/jquery.min.js') ?>"></script>
 @endif
 <script>
-
-    //switch theme code
-    var theme = < ? php echo json_encode($theme); ? > ;
-    if (theme == 'dark') {
-        $('body').addClass('dark-mode');
-        $('#switch-theme i').addClass('dripicons-brightness-low');
-    } else {
-        $('body').removeClass('dark-mode');
-        $('#switch-theme i').addClass('dripicons-brightness-max');
-    }
-    $('.admin-btn').on('click', function () {
-        $("input[name='name']").focus().val('admin');
-        $("input[name='password']").focus().val('admin');
-    });
-sole.log('ServiceWorker registration failed: ', err);
-            });
-        });
-    }
-      $("input[name='password']").focus().val('admin');
-    });
-
-    $('.staff-btn').on('click', function () {
-        $("input[name='name']").focus().val('staff');
-        $("input[name='password']").focus().val('staff');
-    });
-
-    $('.customer-btn').on('click', function () {
-        $("input[name='name']").focus().val('shakalaka');
-        $("input[name='password']").focus().val('shakalaka');
-    });
     // ------------------------------------------------------- //
     // Material Inputs
     // ------------------------------------------------------ //
-
-    var materialInputs = $('input.input-material');
-
-    // activate labels for prefilled values
-    materialInputs.filter(function () {
-        return $(this).val() !== "";
-    }).siblings('.label-material').addClass('active');
-
-    // move label on focus
-    materialInputs.on('focus', function () {
-        $(this).siblings('.label-material').addClass('active');
-    });
-
-    // remove/keep label on blur
-    materialInputs.on('blur', function () {
-        $(this).siblings('.label-material').removeClass('active');
-
-        if ($(this).val() !== '') {
-            $(this).siblings('.label-material').addClass('active');
-        } else {
-            $(this).siblings('.label-material').removeClass('active');
-        }
-    });
 
 </script>

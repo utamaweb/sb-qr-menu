@@ -12,7 +12,7 @@ class ExpenseCategoryController extends Controller
 {
     public function index()
     {
-        $lims_expense_category_all = ExpenseCategory::where('business_id', auth()->user()->business_id)->get();
+        $lims_expense_category_all = ExpenseCategory::with('business')->where('business_id', auth()->user()->business_id)->get();
         return view('backend.expense_category.index', compact('lims_expense_category_all'));
     }
 

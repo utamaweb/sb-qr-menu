@@ -21,9 +21,9 @@ class StockPurchaseController extends Controller
     public function index()
     {
         if (auth()->user()->hasRole(['Superadmin', 'Admin Bisnis'])) {
-            $stockPurchases = StockPurchase::where('total_qty', '>', 0)->get();
+            $stockPurchases = StockPurchase::with('user', 'warehouse')->where('total_qty', '>', 0)->get();
         } else {
-            $stockPurchases = StockPurchase::where('total_qty', '>', 0)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+            $stockPurchases = StockPurchase::with('user', 'warehouse')->where('total_qty', '>', 0)->where('warehouse_id', auth()->user()->warehouse_id)->get();
         }
         return view('backend.stock_purchase.index', compact('stockPurchases'));
     }

@@ -3,86 +3,82 @@
 <section>
     <div class="container-fluid">
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-        @can('tambah-pengeluaran')
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Nama Pengeluaran</a>&nbsp;
-        @endcan
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nama Pengeluaran</th>
-                    <th>Harga Satuan</th>
-                    <th>Bisnis</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($lims_expense_category_all as $key=>$expense_category)
-                <tr data-id="{{$expense_category->id}}">
-                    <td>{{++$key}}</td>
-                    <td>{{ $expense_category->name }}</td>
-                    <td>@currency($expense_category->unit_price)</td>
-                    <td>{{ $expense_category->business->name }}</td>
-                    <td>
-                        @can('ubah-pengeluaran')
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense_category->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
-                        {{-- Edit Modal --}}
-                        <div id="editModal-{{$expense_category->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                            <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title"> Ubah Nama Pengeluaran</h5>
-                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                </div>
-                                <div class="modal-body">
-                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('nama-pengeluaran.update', $expense_category->id)}}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="form-group">
-                                        <div class="form-group">
-                                            <label>Nama Nama Pengeluaran *</label>
-                                            <input type="text" value="{{$expense_category->name}}" name="name" required class="form-control">
+        @include('includes.alerts')
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Master Pengeluaran</span>
+                @can('tambah-pengeluaran')
+                <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Nama Pengeluaran</a>
+                @endcan
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama Pengeluaran</th>
+                                <th>Harga Satuan</th>
+                                <th>Bisnis</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($lims_expense_category_all as $key=>$expense_category)
+                            <tr data-id="{{$expense_category->id}}">
+                                <td>{{++$key}}</td>
+                                <td>{{ $expense_category->name }}</td>
+                                <td>@currency($expense_category->unit_price)</td>
+                                <td>{{ $expense_category->business->name }}</td>
+                                <td>
+                                    @can('ubah-pengeluaran')
+                                    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$expense_category->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
+                                    {{-- Edit Modal --}}
+                                    <div id="editModal-{{$expense_category->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                                        <div role="document" class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 id="exampleModalLabel" class="modal-title"> Ubah Nama Pengeluaran</h5>
+                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                                                <form action="{{route('nama-pengeluaran.update', $expense_category->id)}}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="form-group">
+                                                    <div class="form-group">
+                                                        <label>Nama Nama Pengeluaran *</label>
+                                                        <input type="text" value="{{$expense_category->name}}" name="name" required class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Harga Satuan *</label>
+                                                        <input type="text" value="{{$expense_category->unit_price}}" name="unit_price" required class="form-control price-input-edit" oninput="changeValue(this)">
+                                                    </div>
+                                                    {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
+                                                    </div>
+                                                    <input type="submit" value="Submit" class="btn btn-primary">
+                                                </form>
+                                            </div>
                                         </div>
-                                        <div class="form-group">
-                                            <label>Harga Satuan *</label>
-                                            <input type="text" value="{{$expense_category->unit_price}}" name="unit_price" required class="form-control price-input-edit" oninput="changeValue(this)">
                                         </div>
-                                        {{-- {{Form::text('name',null,array('required' => 'required', 'class' => 'form-control'))}} --}}
-                                        </div>
-                                        <input type="submit" value="Submit" class="btn btn-primary">
-                                    </form>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        @endcan
-                        @can('hapus-pengeluaran')
-                        {{ Form::open(['route' => ['nama-pengeluaran.destroy', $expense_category->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                {{ Form::close() }}
-                        @endcan
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+                                    </div>
+                                    @endcan
+                                    @can('hapus-pengeluaran')
+                                    {{ Form::open(['route' => ['nama-pengeluaran.destroy', $expense_category->id], 'method' => 'DELETE'] ) }}
+                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                            {{ Form::close() }}
+                                    @endcan
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 

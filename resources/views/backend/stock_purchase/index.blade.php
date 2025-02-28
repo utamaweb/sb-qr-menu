@@ -3,56 +3,52 @@
 <section>
     <div class="container-fluid">
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-        @can('tambah-pembelianstok')
-        <a href="{{route('pembelian-stok.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Stok</a>&nbsp;
-        @endcan
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Tanggal</th>
-                    <th>Total Kuantitas</th>
-                    <th>Total Pembayaran</th>
-                    <th>Dibuat Oleh</th>
-                    <th>Outlet</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($stockPurchases as $key=>$stockPurchase)
-                <tr data-id="{{$stockPurchase->id}}">
-                    <td class="text-center">{{++$key}}</td>
-                    <td>{{ $stockPurchase->date }}</td>
-                    <td>{{ $stockPurchase->total_qty}}</td>
-                    <td>@currency($stockPurchase->total_price)</td>
-                    <td>{{ $stockPurchase->user->name}}</td>
-                    <td>{{ $stockPurchase->warehouse->name}}</td>
-                    <td>
-                        <div class="row">
-                        <a href="{{route('pembelian-stok.edit', $stockPurchase->id)}}" class="btn btn-link"><i class="dripicons-pencil"></i> Edit</a>
-                        <a href="{{route('pembelian-stok.show', $stockPurchase->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        @include('includes.alerts')
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Pembelian Stok</span>
+                @can('tambah-pembelianstok')
+                <a href="{{route('pembelian-stok.create')}}" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Stok</a>
+                @endcan
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Tanggal</th>
+                                <th>Total Kuantitas</th>
+                                <th>Total Pembayaran</th>
+                                <th>Dibuat Oleh</th>
+                                <th>Outlet</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($stockPurchases as $key=>$stockPurchase)
+                            <tr data-id="{{$stockPurchase->id}}">
+                                <td class="text-center">{{++$key}}</td>
+                                <td>{{ $stockPurchase->date }}</td>
+                                <td>{{ $stockPurchase->total_qty}}</td>
+                                <td>@currency($stockPurchase->total_price)</td>
+                                <td>{{ $stockPurchase->user->name}}</td>
+                                <td>{{ $stockPurchase->warehouse->name}}</td>
+                                <td>
+                                    <div class="row">
+                                    <a href="{{route('pembelian-stok.edit', $stockPurchase->id)}}" class="btn btn-link"><i class="dripicons-pencil"></i> Edit</a>
+                                    <a href="{{route('pembelian-stok.show', $stockPurchase->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 

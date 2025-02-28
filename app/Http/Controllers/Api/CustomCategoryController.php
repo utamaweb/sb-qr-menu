@@ -14,12 +14,9 @@ class CustomCategoryController extends Controller
         $categories = CategoryParent::all();
 
         foreach($categories as $category) {
-            $checkCustom = CustomCategory::where('warehouse_id', auth()->user()->warehouse_id)->where('category_id', $category->id)->whereNull('deleted_at')->exists();
             $customCategory = CustomCategory::where('warehouse_id', auth()->user()->warehouse_id)->where('category_id', $category->id)->whereNull('deleted_at')->first();
 
-            if($checkCustom) {
-                $category['name'] = $customCategory->name;
-            }
+            $category['name'] = $customCategory ? $customCategory->name : $category->name;
         }
 
         return response()->json([

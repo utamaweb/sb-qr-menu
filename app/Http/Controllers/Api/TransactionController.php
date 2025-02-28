@@ -21,10 +21,19 @@ use App\Events\TransactionNotPaid;
 use App\Events\TransactionPaid;
 use App\Events\TransactionCancelled;
 use App\Events\RefreshTransactions;
+use App\Services\WhatsappService;
+use GuzzleHttp\Client;
 
 
 class TransactionController extends Controller
 {
+    protected $whatsapp;
+
+    public function __construct()
+    {
+        $this->whatsapp = new WhatsappService();
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -773,42 +782,192 @@ class TransactionController extends Controller
         }
     }
 
+    /**
+     * Generate OTP Code 6-digit
+     */
+    public function generateOtp()
+    {
+        $otp = rand(100000, 999999);
+        return $otp;
+    }
 
+    /**
+     * Check warehouse whatsapp number
+     */
+    public function checkWhatsappNumber()
+    {
+        $warehouse = Warehouse::find(auth()->user()->warehouse_id);
+
+        if(!empty($warehouse->whatsapp) && ($warehouse->is_whatsapp_active == 1)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Check whatsapp connection
+     */
+    public function checkWhatsappConnection()
+    {
+        $whatsapp = $this->whatsapp->getSessionDetail();
+        $error = $whatsapp->getData()->error;
+
+        if($error) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    /**
+     * Transaction Cancellation request
+     * @param Request $request
+     */
+    public function transactionCancellationRequest(Request $request)
+    {
+        $otp = $this->generateOtp();
+
+        // Get transaction
+        $transaction = Transaction::with('shift', 'transaction_details')->find($request->id);
+
+        if(!$transaction){
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Data transaksi tidak ditemukan.'
+            ], 500);
+        }
+
+        if(auth()->user()->warehouse->is_whatsapp_active == 1) {
+            if($this->checkWhatsappConnection()) {
+                $transaction->cancelation_otp = $otp;
+                $transaction->cancelation_reason = $request->reason;
+                $transaction->save();
+
+                $message = "*Permintaan Pembatalan Pesanan*";
+                $message .= "\n\nKode pembatalan : *" . $otp . "*";
+                $message .= "\nAlasan : " . $request->reason;
+                $message .= "\n\nOutlet : " . auth()->user()->warehouse->name;
+                $message .= "\nShift : " . $transaction->shift->shift_number;
+                $message .= "\nNomor Antrian : " . $transaction->sequence_number;
+                $message .= "\n\nProduk : ";
+
+                foreach($transaction->transaction_details as $detail) {
+                    $message .= "\n- " . $detail->product_name . " (" . $detail->qty . ")";
+                }
+
+                $message .= "\n\nJumlah : Rp. " . number_format($transaction->total_amount, 0, ',', '.');
+
+                $message .= "\n\nPesan ini dikirim pada " . Carbon::now()->translatedFormat('l, j F Y H:i:s');
+
+                $this->whatsapp->sendMessage('62' . auth()->user()->warehouse->whatsapp, $message);
+
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'OTP berhasil dikirim!'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Tidak ada akun Whatsapp terhubung!'
+                ], 201);
+            }
+        } else {
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Outlet ini tidak memiliki akun Whatsapp terhubung!'
+            ], 201);
+        }
+
+    }
+
+
+    /**
+     * Cancel transaction
+     * @param Request $request
+     * @param $id
+     */
     public function cancel(Request $request, $id)
     {
         DB::beginTransaction();
         try {
             $transaction = Transaction::find($id);
             if ($transaction) {
+                // Check if cancelation otp is not empty and equal to request otp
+                if(!empty($transaction->cancelation_otp) && ($transaction->cancelation_otp == $request->otp)) {
+                    // Update status transaksi menjadi batal
+                    $transaction->update([
+                        'status' => 'Batal',
+                    ]);
 
-                // $shift = Shift::find($transaction->shift_id);
-                // $details = TransactionDetail::where('transaction_id', $id)->get();
-                // Update stock sesuai stok sebelum cancel
-                // foreach($details as $detail){
-                //     $product_id = $detail->product_id;
-                //     $ingredientProducts = IngredientProducts::where('product_id', $product_id)->get();
-                //     foreach($ingredientProducts as $ingredientProduct){
-                //         $stock = Stock::where('ingredient_id', $ingredientProduct->ingredient_id)->where('warehouse_id', $shift->warehouse_id)->where('shift_id', $shift->id)->first();
-                //         $stock->update([
-                //             'stock_used' => $stock->stock_used - $detail->qty,
-                //             'last_stock' => $stock->last_stock + $detail->qty
-                //         ]);
-                //     }
-                // }
-                // Update status transaksi menjadi batal
-                $transaction->update([
-                    'status' => 'Batal',
-                ]);
-                DB::commit();
-                // event(new TransactionCancelled($transaction->id));
-                return response()->json(['message' => 'Transaksi Berhasil Dibatalkan'], 200);
+                    DB::commit();
+
+                    // Send whatsapp message
+                    $message = "Pembatalan pesanan dengan kode pembatalan *" . $request->otp . "* berhasil!";
+                    $this->whatsapp->sendMessage('62' . auth()->user()->warehouse->whatsapp, $message);
+
+                    return response()->json([
+                        'status' => 'success',
+                        'message' => 'Transaksi Berhasil Dibatalkan'
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'OTP transaksi tidak valid'
+                    ], 201);
+                }
+
             } else {
-                return response()->json(['message' => 'Data transaksi tidak ada'], 500);
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Data transaksi tidak ada'
+                ], 201);
             }
         } catch (\Throwable $th) {
             DB::rollback();
             \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
-            return response()->json(['message' => $th->getMessage()], 500);
+            return response()->json([
+                'status' => 'error',
+                'message' => $th->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Old cancel method
+     */
+    public function cancelOld($id)
+    {
+        try {
+            DB::beginTransaction();
+
+            // Get transaction by id
+            $transaction = Transaction::findOrFail($id);
+
+            // If transaction exists change status to batal
+            if($transaction) {
+                $transaction->status = 'Batal';
+                $transaction->save();
+
+                DB::commit();
+
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Transaksi berhasil dibatalkan'
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Data transaksi tidak ada'
+                ], 201);
+            }
+        } catch (\Throwable $th) {
+            DB::rollback();
+            \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => $th->getMessage()
+            ], 500);
         }
     }
 

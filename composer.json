@@ -15,7 +15,7 @@
         "beyondcode/laravel-websockets": "^1.14",
         "doctrine/dbal": "^3.0",
         "gladcodes/keygen": "^2.0.0-alpha",
-        "guzzlehttp/guzzle": "^7.0.1",
+        "guzzlehttp/guzzle": "^7.9",
         "intervention/image": "^2.5",
         "kwn/number-to-words": "^1.12",
         "laravel/framework": "^10.15.0",
@@ -31,7 +31,8 @@
         "srmklive/paypal": "^3.0",
         "stripe/stripe-php": "^7.57",
         "twilio/sdk": "^6.10",
-        "tymon/jwt-auth": "^2.0"
+        "tymon/jwt-auth": "^2.0",
+        "yajra/laravel-datatables": "^10.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.6",

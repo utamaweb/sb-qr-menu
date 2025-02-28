@@ -14,28 +14,58 @@ use Spatie\Permission\Models\Permission;
 use Auth;
 use DB;
 use Carbon\Carbon;
+use Yajra\DataTables\Facades\DataTables; // Pastikan package yajra/laravel-datatables sudah diinstal
+
 
 class ExpenseController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     if(auth()->user()->hasRole('Superadmin')){
+    //         $lims_expense_category_list = ExpenseCategory::get();
+    //         $expenses = Expense::get();
+    //     } elseif(auth()->user()->hasRole('Admin Bisnis')){
+    //         $lims_expense_category_list = ExpenseCategory::where('business_id', auth()->user()->business_id)->get();
+    //         $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+    //         $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->whereIn('warehouse_id', $warehouse_id)->get();
+    //     } else{
+    //         $warehouse = Warehouse::where('id', auth()->user()->warehouse_id)->first();
+    //         $business_id = $warehouse->business_id;
+    //         $lims_expense_category_list = ExpenseCategory::where('business_id', $business_id)->get();
+    //         $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->where('warehouse_id', auth()->user()->warehouse_id)->get();
+    //     }
+    //     $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
+    //     return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list'));
+
+    // }
+
     public function index(Request $request)
     {
-        if(auth()->user()->hasRole('Superadmin')){
-            $lims_expense_category_list = ExpenseCategory::get();
-            $expenses = Expense::get();
-        } elseif(auth()->user()->hasRole('Admin Bisnis')){
-            $lims_expense_category_list = ExpenseCategory::where('business_id', auth()->user()->business_id)->get();
-            $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-            $expenses = Expense::whereIn('warehouse_id', $warehouse_id)->get();
-        } else{
-            $warehouse = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-            $business_id = $warehouse->business_id;
-            $lims_expense_category_list = ExpenseCategory::where('business_id', $business_id)->get();
-            $expenses = Expense::where('warehouse_id', auth()->user()->warehouse_id)->get();
-        }
+        $lims_expense_category_list = ExpenseCategory::get();
         $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
-        return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list'));
 
+        return view('backend.expense.index', compact('lims_expense_category_list', 'lims_warehouse_list'));
     }
+
+    public function getExpenses(Request $request)
+    {
+        $query = Expense::with('expenseCategory', 'warehouse', 'user');
+
+        $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+        $query->whereIn('warehouse_id', $warehouse_id);
+
+        return DataTables::of($query)
+            ->addColumn('DT_RowIndex', function($expense) use ($request) {
+                static $index = 0;
+                return $request->input('start') + ++$index; // Nomor urut otomatis
+            })
+            ->editColumn('created_at', function($expense) {
+                return $expense->created_at->format('d-m-Y H:i:s');
+            })
+            ->rawColumns(['DT_RowIndex'])
+            ->make(true);
+    }
+
 
 
     public function create()

@@ -1,107 +1,101 @@
-@extends('backend.layout.main') @section('content')
+@extends('backend.layout.main') 
+@section('content')
 
-<section>
-    <div class="container-fluid">
+    <section>
+        <div class="container-fluid">
+        
+        @include('includes.alerts')
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-    @can('tambah-tipepesanan')
-        <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Tipe Pesanan</a>&nbsp;
-    @endcan
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Tipe Pesanan</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($orderTypes as $key=>$orderType)
-                <tr data-id="{{$orderType->id}}">
-                    <td class="text-center">{{++$key}}</td>
-                    <td>{{ $orderType->name }}</td>
-                    <td>
-                        @can('ubah-tipepesanan')
-                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$orderType->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
-                        {{-- Edit Modal --}}
-                        <div id="editModal-{{$orderType->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                            <div role="document" class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                <h5 id="exampleModalLabel" class="modal-title">Ubah Tipe Pesanan</h5>
-                                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                </div>
-                                <div class="modal-body">
-                                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                    <form action="{{route('tipe-pesanan.update', $orderType->id)}}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <div class="form-group">
-                                        <div class="form-group">
-                                            <label>Nama *</label>
-                                            <input type="text" value="{{$orderType->name}}" name="name" required class="form-control">
-                                        </div>
-                                        </div>
-                                        <input type="submit" value="Submit" class="btn btn-primary">
-                                    </form>
-                                </div>
-                            </div>
-                            </div>
-                        </div>
-                        @endcan
-
-                        @can('hapus-tipepesanan')
-                        {{ Form::open(['route' => ['tipe-pesanan.destroy', $orderType->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                        {{ Form::close() }}
-                        @endcan
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-</section>
-
-
-<!-- Create Modal -->
-<div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-        <div class="modal-content">
-            {!! Form::open(['route' => 'tipe-pesanan.store', 'method' => 'post']) !!}
-            <div class="modal-header">
-                <h5 id="exampleModalLabel" class="modal-title">Tambah Bahan Baku</h5>
-                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Tipe Pesanan</span>
+                @can('tambah-tipepesanan')
+                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Tipe Pesanan</a>
+                @endcan
             </div>
-            <div class="modal-body">
-                <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                <form>
-                    <div class="form-group">
-                        <label>Nama *</label>
-                        <input type="text" name="name" required class="form-control">
-                    </div>
-                    <input type="submit" value="Submit" class="btn btn-primary">
-            </form>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Tipe Pesanan</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($orderTypes as $key=>$orderType)
+                            <tr data-id="{{$orderType->id}}">
+                                <td class="text-center">{{++$key}}</td>
+                                <td>{{ $orderType->name }}</td>
+                                <td style="display: inline-block">
+                                    @can('ubah-tipepesanan')
+                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#editModal-{{$orderType->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
+                                    {{-- Edit Modal --}}
+                                    <div id="editModal-{{$orderType->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                                        <div role="document" class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 id="exampleModalLabel" class="modal-title">Ubah Tipe Pesanan</h5>
+                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                                                <form action="{{route('tipe-pesanan.update', $orderType->id)}}" method="POST">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <div class="form-group">
+                                                    <div class="form-group">
+                                                        <label>Nama *</label>
+                                                        <input type="text" value="{{$orderType->name}}" name="name" required class="form-control">
+                                                    </div>
+                                                    </div>
+                                                    <input type="submit" value="Submit" class="btn btn-primary">
+                                                </form>
+                                            </div>
+                                        </div>
+                                        </div>
+                                    </div>
+                                    @endcan
+        
+                                    @can('hapus-tipepesanan')
+                                    {{ Form::open(['route' => ['tipe-pesanan.destroy', $orderType->id], 'method' => 'DELETE', 'class' => 'd-inline-block'] ) }}
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                    {{ Form::close() }}
+                                    @endcan
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        {{ Form::close() }}
+    </section>
+
+    <!-- Create Modal -->
+    <div id="createModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+        <div role="document" class="modal-dialog">
+            <div class="modal-content">
+                {!! Form::open(['route' => 'tipe-pesanan.store', 'method' => 'post']) !!}
+                <div class="modal-header">
+                    <h5 id="exampleModalLabel" class="modal-title">Tambah Bahan Baku</h5>
+                    <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+                </div>
+                <div class="modal-body">
+                    <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                    <form>
+                        <div class="form-group">
+                            <label>Nama *</label>
+                            <input type="text" name="name" required class="form-control">
+                        </div>
+                        <input type="submit" value="Submit" class="btn btn-primary">
+                </form>
+            </div>
+            {{ Form::close() }}
+        </div>
     </div>
-</div>
-</div>
 
 @endsection
 

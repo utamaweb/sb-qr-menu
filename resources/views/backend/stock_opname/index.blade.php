@@ -3,55 +3,51 @@
 <section>
     <div class="container-fluid">
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-        @can('tambah-stokopname')
-        <a href="{{route('stock-opname.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Stok Opname</a>&nbsp;
-        @endcan
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Nama Stok Opname</th>
-                    <th>Tanggal</th>
-                    <th>Outlet</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($stockOpnames as $key=>$stockOpname)
-                <tr data-id="{{$stockOpname->id}}">
-                    <td class="text-center">{{++$key}}</td>
-                    <td>{{ $stockOpname->name }}</td>
-                    <td>{{ $stockOpname->created_at}}</td>
-                    <td>{{ $stockOpname->warehouse->name}}</td>
-                    <td>
-                        <div class="row">
-                        <a href="{{route('stock-opname.show', $stockOpname->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
-                        {{-- <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$stockOpname->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button> --}}
-                        {{-- {{ Form::open(['route' => ['stock-opname.destroy', $stockOpname->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
-                                {{ Form::close() }} --}}
-                            </div>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+        @include('includes.alerts')
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Stok Opname</span>
+                @can('tambah-stokopname')
+                <a href="{{route('stock-opname.create')}}" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Stok Opname</a>
+                @endcan
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th>Nama Stok Opname</th>
+                                <th>Tanggal</th>
+                                <th>Outlet</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($stockOpnames as $key=>$stockOpname)
+                            <tr data-id="{{$stockOpname->id}}">
+                                <td class="text-center">{{++$key}}</td>
+                                <td>{{ $stockOpname->name }}</td>
+                                <td>{{ $stockOpname->created_at}}</td>
+                                <td>{{ $stockOpname->warehouse->name}}</td>
+                                <td>
+                                    <div class="row">
+                                    <a href="{{route('stock-opname.show', $stockOpname->id)}}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>
+                                    {{-- <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$stockOpname->id}}"><i class="dripicons-document-edit"></i> {{trans('file.edit')}}</button> --}}
+                                    {{-- {{ Form::open(['route' => ['stock-opname.destroy', $stockOpname->id], 'method' => 'DELETE'] ) }}
+                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> {{trans('file.delete')}}</button>
+                                            {{ Form::close() }} --}}
+                                        </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 </section>
 @endsection

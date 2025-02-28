@@ -11,48 +11,68 @@ use Illuminate\Support\Str;
 use Keygen;
 use Auth;
 use DB;
+use App\Services\WhatsappService;
 
 class WarehouseController extends Controller
 {
+    protected $whatsapp;
+
+    public function __construct()
+    {
+        $this->whatsapp = new WhatsappService();
+    }
+
     public function index()
     {
         if(auth()->user()->hasRole('Superadmin')){
-            $lims_warehouse_all = Warehouse::where('is_active', true)->get();
+            $lims_warehouse_all = Warehouse::with('business')->where('is_active', true)->get();
             $business = Business::get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
-            $business = Business::where('id', auth()->user()->business_id)->get();
-            $lims_warehouse_all = Warehouse::where('is_active', true)->where('business_id', auth()->user()->business_id)->get();
+            $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->business_id)->firstOrFail();
+            $lims_warehouse_all = $business->warehouse;
         } else{
-            $business = Business::where('id', auth()->user()->warehouse->business_id)->get();
-            $lims_warehouse_all = Warehouse::where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
+            $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->warehouse->business_id)->first();
+            $lims_warehouse_all = $business->warehouse;
         }
-        $numberOfWarehouse = Warehouse::where('is_active', true)->count();
-        return view('backend.warehouse.create', compact('lims_warehouse_all', 'numberOfWarehouse','business'));
+        $numberOfWarehouse = $lims_warehouse_all->count();
+        return view('backend.warehouse.index', compact('lims_warehouse_all', 'numberOfWarehouse','business'));
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required|max:255',
+            'name'        => 'required|max:255',
             'business_id' => 'required',
-            'address' => 'required',
-            'service' => 'required'
+            'address'     => 'required',
+            'service'     => 'required'
         ]);
         $input['is_active'] = true;
-        // $image = $request->image;
-        // $imageName = Str::slug($request->name) . '-' . Str::random(10).'.'.$image->extension();
-        // $uploadImage = $image->storeAs('public/outlet_logo', $imageName);
         if(auth()->user()->hasRole('Superadmin')){
             $business_id = $request->business_id;
         } else{
             $business_id = auth()->user()->business_id;
         }
+
+        $is_wa_active = $request->active_wa_number;
+
+        $checkNumber = $this->whatsapp->checkNumber('62' . $request->whatsapp)->getData()->data;
+
+        if($checkNumber == true) {
+            $is_wa_active = 1;
+        } else {
+            $is_wa_active = 0;
+        }
+
         $warehouse = Warehouse::create([
-            'name' => $request->name,
-            'is_active' => 1,
-            'address' => $request->address,
-            'business_id' => $request->business_id,
-            'is_self_service' => $request->service
+            'name'               => $request->name,
+            'is_active'          => 1,
+            'address'            => $request->address,
+            'business_id'        => $request->business_id,
+            'is_self_service'    => $request->service,
+            'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
+            'expired_at'         => $request->expired_at,
+            'whatsapp'           => $request->whatsapp,
+            'is_whatsapp_active' => $is_wa_active
         ]);
 
         if($warehouse) {
@@ -72,10 +92,10 @@ class WarehouseController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name' => 'max:255',
+            'name'        => 'max:255',
             'business_id' => 'required',
-            'address' => 'required',
-            'service' => 'required'
+            'address'     => 'required',
+            'service'     => 'required'
         ]);
         $input = $request->all();
         $lims_warehouse_data = Warehouse::find($id);
@@ -87,55 +107,28 @@ class WarehouseController extends Controller
         } else {
             $imageName = $lims_warehouse_data->logo;
         }
+
+        $is_wa_active = $request->active_wa_number;
+
+        $checkNumber = $this->whatsapp->checkNumber('62' . $request->whatsapp)->getData()->data;
+
+        if($checkNumber == true) {
+            $is_wa_active = 1;
+        } else {
+            $is_wa_active = 0;
+        }
+
         $lims_warehouse_data->update([
-            'name' => $request->name,
-            'address' => $request->address,
-            'business_id' => $request->business_id,
-            'is_self_service' => $request->service
-            // 'logo' => $imageName,
+            'name'               => $request->name,
+            'address'            => $request->address,
+            'business_id'        => $request->business_id,
+            'is_self_service'    => $request->service,
+            'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
+            'expired_at'         => $request->expired_at,
+            'whatsapp'           => $request->whatsapp,
+            'is_whatsapp_active' => $is_wa_active
         ]);
         return redirect()->back()->with('message', 'Data Berhasil Diubah');
-    }
-
-    public function importWarehouse(Request $request)
-    {
-        //get file
-        $upload=$request->file('file');
-        $ext = pathinfo($upload->getClientOriginalName(), PATHINFO_EXTENSION);
-        if($ext != 'csv')
-            return redirect()->back()->with('not_permitted', 'Please upload a CSV file');
-        $filename =  $upload->getClientOriginalName();
-        $upload=$request->file('file');
-        $filePath=$upload->getRealPath();
-        //open and read
-        $file=fopen($filePath, 'r');
-        $header= fgetcsv($file);
-        $escapedHeader=[];
-        //validate
-        foreach ($header as $key => $value) {
-            $lheader=strtolower($value);
-            $escapedItem=preg_replace('/[^a-z]/', '', $lheader);
-            array_push($escapedHeader, $escapedItem);
-        }
-        //looping through othe columns
-        while($columns=fgetcsv($file))
-        {
-            if($columns[0]=="")
-                continue;
-            foreach ($columns as $key => $value) {
-                $value=preg_replace('/\D/','',$value);
-            }
-           $data= array_combine($escapedHeader, $columns);
-
-           $warehouse = Warehouse::firstOrNew([ 'name'=>$data['name'], 'is_active'=>true ]);
-           $warehouse->name = $data['name'];
-           $warehouse->phone = $data['phone'];
-           $warehouse->email = $data['email'];
-           $warehouse->address = $data['address'];
-           $warehouse->is_active = true;
-           $warehouse->save();
-        }
-        return redirect()->back()->with('message', 'Warehouse imported successfully');
     }
 
     public function deleteBySelection(Request $request)
@@ -198,6 +191,38 @@ class WarehouseController extends Controller
             return redirect()->route('maxShiftPage')->with('message', 'Jumlah Shift Maksimal Berhasil diubah!');
         } else {
             return redirect()->route('maxShiftPage')->with('message', 'Jumlah Shift Maksimal Gagal diubah!');
+        }
+    }
+
+    /**
+     * Get outlet by id
+     */
+    public function getOutletById($id) {
+        $outlet = Warehouse::with('business')->find($id);
+
+        return response()->json($outlet);
+    }
+
+    /**
+     * Renew outlet subscription
+     */
+    public function renewal(Request $request, $id) {
+        // Find outlet by id
+        $outlet = Warehouse::find($id);
+
+        try {
+            DB::beginTransaction();
+
+            // Update outlet subscription
+            $outlet->update([
+                'expired_at' => $request->expired_at,
+            ]);
+
+            DB::commit();
+            return redirect()->route('outlet.index')->with('message', 'Berhasil menyelesaikan pembayaran tagihan!');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return redirect()->route('outlet.index')->with('message', 'Gagal menyelesaikan pembayaran tagihan!');
         }
     }
 }

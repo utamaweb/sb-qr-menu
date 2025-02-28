@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Transaction extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable =['shift_id','transaction_code', 'sequence_number','warehouse_id','order_type_id','category_order','user_id','payment_method','notes','total_amount','total_qty','paid_amount','change_money','date', 'status'];
+    protected $fillable =['shift_id','transaction_code', 'sequence_number','warehouse_id','order_type_id','category_order','user_id','payment_method','notes','total_amount','total_qty','paid_amount','change_money','date', 'status', 'cancelation_otp', 'cancelation_reason'];
 
     public function warehouse()
     {

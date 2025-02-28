@@ -15,4 +15,9 @@ class CategoryParent extends Model
     {
     	return $this->hasMany('App\Models\Category');
     }
+
+    public function customCategory()
+    {
+    	return $this->hasMany('App\Models\CustomCategory', 'category_id', 'id')->where('warehouse_id', auth()->user()->warehouse_id);
+    }
 }

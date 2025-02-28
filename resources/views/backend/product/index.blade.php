@@ -3,73 +3,69 @@
 <section>
     <div class="container-fluid">
 
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
+    @include('includes.alerts')
 
-        @can('tambah-produk')
-            <a href="{{route('produk.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> Tambah Produk</a>
-            {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
-        @endcan
-    </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Gambar</th>
-                    <th>Nama</th>
-                    <th>Kode</th>
-                    <th>Kategori</th>
-                    <th>Unit</th>
-                    <th>Bahan Baku (qty)</th>
-                    <th>Harga</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($products as $key=>$product)
-                <tr data-id="{{$product->id}}">
-                    <td class="text-center">{{++$key}}</td>
-                    <td><img src="{{Storage::url('product_images/'.$product->image)}}" loading="lazy"></td>
-                    <td>{{ $product->name }}</td>
-                    <td>{{ $product->code }}</td>
-                    <td>{{ $product->category_name }}</td>
-                    <td>{{ $product->unit_name }}</td>
-                    <td>@foreach($product->ingredient as $ingredient)
-                        {{$ingredient->name}}
-                        @if( !$loop->last)
-                        ,
-                        @endif
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span>Produk</span>
+            @can('tambah-produk')
+                <a href="{{route('produk.create')}}" class="btn btn-info add-product-btn"><i class="dripicons-plus"></i> Tambah Produk</a>
+            @endcan
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="ingredient-table" class="table">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>Gambar</th>
+                            <th>Nama</th>
+                            <th>Kode</th>
+                            <th>Kategori</th>
+                            <th>Unit</th>
+                            <th>Bahan Baku (qty)</th>
+                            <th>Harga</th>
+                            <th class="not-exported">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($products as $key=>$product)
+                        <tr data-id="{{$product->id}}">
+                            <td class="text-center">{{++$key}}</td>
+                            <td><img src="{{Storage::url('product_images/'.$product->image)}}" loading="lazy"></td>
+                            <td>{{ $product->name }}</td>
+                            <td>{{ $product->code }}</td>
+                            <td>{{ $product->category_name }}</td>
+                            <td>{{ $product->unit_name }}</td>
+                            <td>@foreach($product->ingredient as $ingredient)
+                                {{$ingredient->name}}
+                                @if( !$loop->last)
+                                ,
+                                @endif
+                                @endforeach
+                            </td>
+
+                            <td>Rp. {{ number_format($product->price, 0, ',', '.') }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
+                            <td>
+                                @can('ubah-produk')
+                                <a href={{route('produk.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> Edit</a>
+                                @endcan
+                                @can('hapus-produk')
+                                {{ Form::open(['route' => ['produk.destroy', $product->id], 'method' => 'DELETE'] ) }}
+                                            <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                        {{ Form::close() }}
+                                @endcan
+                            </td>
+                        </tr>
                         @endforeach
-                    </td>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-                    <td>Rp. {{ number_format($product->price, 0, ',', '.') }} @if($product->is_diffPrice) (Harga Tiap Outlet Berbeda) @endif</td>
-                    <td>
-                        @can('ubah-produk')
-                        <a href={{route('produk.edit', $product->id)}} class="btn btn-link"><i class="dripicons-document-edit"></i> Edit</a>
-                        @endcan
-                        @can('hapus-produk')
-                        {{ Form::open(['route' => ['produk.destroy', $product->id], 'method' => 'DELETE'] ) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                {{ Form::close() }}
-                        @endcan
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
+
     </div>
 </section>
 

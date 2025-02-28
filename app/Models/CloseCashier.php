@@ -59,4 +59,8 @@ class CloseCashier extends Model
         return $this->hasMany('App\Models\OjolCloseCashier', 'close_cashier_id');
     }
 
+    public function closeCashierProductSold() {
+        return $this->hasMany('App\Models\CloseCashierProductSold', 'close_cashier_id');
+    }
+
 }

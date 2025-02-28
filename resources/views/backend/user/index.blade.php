@@ -2,91 +2,88 @@
 
 <section>
     <div class="container-fluid">
-    @if($errors->has('name'))
-    <div class="alert alert-danger alert-dismissible text-center">
-        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
-    </div>
-    @endif
-    @if(session()->has('message'))
-    <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-    @endif
-    @if(session()->has('not_permitted'))
-    <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-            aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-    @endif
-    @can('tambah-user')
-        <a href="{{route('user.create')}}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah User</a>
-            {{-- <a href="#" data-toggle="modal" data-target="#importProduct" class="btn btn-primary add-product-btn"><i class="dripicons-copy"></i> {{__('file.import_product')}}</a> --}}
-    @endcan
+        @include('includes.alerts')
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>User</span>
+                @can('tambah-user')
+                    <a href="{{route('user.create')}}" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah User</a>
+                @endcan
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ingredient-table" class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nama</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>No. Telp</th>
+                                <th>Hak Akses</th>
+                                <th>Outlet / Bisnis</th>
+                                <th>Status</th>
+                                <th class="not-exported">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($lims_user_list as $key=>$user)
+                            <tr data-id="{{$user->id}}">
+                                <td>{{++$key}}</td>
+                                <td>{{ $user->name }}</td>
+                                <td>{{ $user->username }}</td>
+                                <td>{{ $user->email}}</td>
+                                <td>{{ $user->phone}}</td>
+                                @php
+                                    $role = $user->roles()->first()->name;
+                                @endphp
+                                <td>{{ $role }}</td>
+                                @if($role == 'Superadmin')
+                                <td></td>
+                                @elseif($role == 'Admin Bisnis')
+                                <td>{{$user->business->name}}</td>
+                                @else
+                                <td>{{$user->warehouse->name}}</td>
+                                @endif
+                                @if($user->is_active)
+                                <td><div class="badge badge-success">Aktif</div></td>
+                                @else
+                                <td><div class="badge badge-danger">Tidak Aktif</div></td>
+                                @endif
+                                <td>
+                                    @canany(['ubah-user', 'hapus-user'])
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
+                                            <span class="caret"></span>
+                                            <span class="sr-only">Toggle Dropdown</span>
+                                        </button>
+                                        <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
+                                            @can('ubah-user')
+                                            <li>
+                                                <a href="{{ route('user.edit', $user->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
+                                            </li>
+                                            @endcan
+                                            <li class="divider"></li>
+                                            @can('hapus-user')
+                                            {{ Form::open(['route' => ['user.destroy', $user->id], 'method' => 'DELETE'] ) }}
+                                            <li>
+                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                            </li>
+                                            {{ Form::close() }}
+                                            @endcan
+                                        </ul>
+                                    </div>
+                                    @endcanany
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    <div class="table-responsive">
-        <table id="ingredient-table" class="table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Nama</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>No. Telp</th>
-                    <th>Hak Akses</th>
-                    <th>Outlet / Bisnis</th>
-                    <th>Status</th>
-                    <th class="not-exported">Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($lims_user_list as $key=>$user)
-                <tr data-id="{{$user->id}}">
-                    <td>{{++$key}}</td>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->username }}</td>
-                    <td>{{ $user->email}}</td>
-                    <td>{{ $user->phone}}</td>
-                    <?php $role = DB::table('roles')->find($user->role_id);?>
-                    <td>{{ $role->name }}</td>
-                    @if($user->hasRole('Superadmin'))
-                    <td></td>
-                    @elseif($user->hasRole('Admin Bisnis'))
-                    <td>{{$user->business->name}}</td>
-                    @else
-                    <td>{{$user->warehouse->name}}</td>
-                    @endif
-                    @if($user->is_active)
-                    <td><div class="badge badge-success">Aktif</div></td>
-                    @else
-                    <td><div class="badge badge-danger">Tidak Aktif</div></td>
-                    @endif
-                    <td>
-                        @canany(['ubah-user', 'hapus-user'])
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aksi
-                                <span class="caret"></span>
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
-                                @can('ubah-user')
-                                <li>
-                                	<a href="{{ route('user.edit', $user->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Ubah</a>
-                                </li>
-                                @endcan
-                                <li class="divider"></li>
-                                @can('hapus-user')
-                                {{ Form::open(['route' => ['user.destroy', $user->id], 'method' => 'DELETE'] ) }}
-                                <li>
-                                    <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                </li>
-                                {{ Form::close() }}
-                                @endcan
-                            </ul>
-                        </div>
-                        @endcanany
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
     </div>
 </section>
 

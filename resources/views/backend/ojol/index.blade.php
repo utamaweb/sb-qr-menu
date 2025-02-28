@@ -4,58 +4,54 @@
 <section>
     <div class="container-fluid">
 
-        @if($errors->has('name'))
-        <div class="alert alert-danger alert-dismissible text-center">
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span
-                    aria-hidden="true">&times;</span></button>{{ $errors->first('name') }}
+        @include('includes.alerts')
+
+        <div class="card">
+            <div class="card-header d-flex justify-content-between">
+                <span>Ojek Online</span>
+                {{-- @can('tambah-ojol') --}}
+                    <a href="{{ route('ojol.create') }}" class="btn btn-sm btn-info"><i class="dripicons-plus"></i> Tambah Ojol</a>
+                {{-- @endcan --}}
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="ojol-table" class="table">
+                        <thead>
+                            <th class="text-center">#</th>
+                            <th>Nama</th>
+                            <th>Persen</th>
+                            <th>Harga Tambahan</th>
+                            <th>Aksi</th>
+                        </thead>
+                        <tbody>
+                            @foreach ($ojols as $key=>$ojol)
+                                <tr data-id="{{ $ojol->id }}">
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $ojol->name }}</td>
+                                    <td>{{ $ojol->percent }}%</td>
+                                    <td>Rp. {{ number_format($ojol->extra_price, 0, '', '.') }}</td>
+                                    <td>
+                                        {{-- @can('ubah-ojol') --}}
+                                            <a href="{{ route('ojol.edit', $ojol->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Edit</a>
+                                        {{-- @endcan --}}
+
+                                        {{-- @can('hapus-ojol') --}}
+                                            {{ Form::open(['route' => ['ojol.destroy', $ojol->id], 'method' => 'DELETE']) }}
+                                                <button type="submit" class="btn btn-link" onclick="return confirm('Hapus data ojol?')"><i class="dripicons-trash"></i> Hapus</button>
+                                            {{ Form::close() }}
+                                        {{-- @endcan --}}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        @endif
-        @if(session()->has('message'))
-        <div class="alert alert-success alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('message') }}</div>
-        @endif
-        @if(session()->has('not_permitted'))
-        <div class="alert alert-danger alert-dismissible text-center"><button type="button" class="close" data-dismiss="alert"
-                aria-label="Close"><span aria-hidden="true">&times;</span></button>{{ session()->get('not_permitted') }}</div>
-        @endif
 
-        {{-- @can('tambah-ojol') --}}
-            <a href="{{ route('ojol.create') }}" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Ojol</a>
-        {{-- @endcan --}}
     </div>
 
-    <div class="table-responsive">
-        <table id="ojol-table" class="table">
-            <thead>
-                <th class="text-center">#</th>
-                <th>Nama</th>
-                <th>Persen</th>
-                <th>Harga Tambahan</th>
-                <th>Aksi</th>
-            </thead>
-            <tbody>
-                @foreach ($ojols as $key=>$ojol)
-                    <tr data-id="{{ $ojol->id }}">
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $ojol->name }}</td>
-                        <td>{{ $ojol->percent }}%</td>
-                        <td>Rp. {{ number_format($ojol->extra_price, 0, '', '.') }}</td>
-                        <td>
-                            {{-- @can('ubah-ojol') --}}
-                                <a href="{{ route('ojol.edit', $ojol->id) }}" class="btn btn-link"><i class="dripicons-document-edit"></i> Edit</a>
-                            {{-- @endcan --}}
-
-                            {{-- @can('hapus-ojol') --}}
-                                {{ Form::open(['route' => ['ojol.destroy', $ojol->id], 'method' => 'DELETE']) }}
-                                    <button type="submit" class="btn btn-link" onclick="return confirm('Hapus data ojol?')"><i class="dripicons-trash"></i> Hapus</button>
-                                {{ Form::close() }}
-                            {{-- @endcan --}}
-                        </td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
 </section>
 @endsection
 

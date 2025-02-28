@@ -21,7 +21,7 @@ class BusinessStockController extends Controller
         $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
 
         // Get stocks by warehouse
-        $stocks = Stock::where('warehouse_id', $warehouseId)->orderBy('id', 'DESC')->groupBy('ingredient_id')->get();
+        $stocks = Stock::with('ingredient', 'ingredient.unit')->where('warehouse_id', $warehouseId)->orderBy('id', 'DESC')->groupBy('ingredient_id')->get();
 
         return view('backend.stok.business', compact('warehouses', 'stocks'));
     }

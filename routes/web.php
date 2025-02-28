@@ -26,6 +26,8 @@ use App\Http\Controllers\OjolController;
 use App\Http\Controllers\OjolWarehouseController;
 use App\Http\Controllers\BusinessStockController;
 use App\Http\Controllers\CustomCategoryController;
+use App\Http\Controllers\WhatsappController;
+use App\Http\Controllers\CustomMessageController;
 
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Artisan;
@@ -70,6 +72,24 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('/', 'index');
             Route::get('/dashboard', 'dashboard')->name('admin.dashboard');
             Route::get('my-transactions/{year}/{month}', 'myTransaction');
+        });
+
+        // Route for whatsapp
+        Route::controller(WhatsappController::class)->name('whatsapp.')->group(function() {
+            Route::get('/whatsapp', 'index')->name('index');
+            Route::post('/whatsapp/store', 'store')->name('store');
+            Route::get('/whatsapp/sessions', 'sessions')->name('sessions');
+            Route::get('/whatsapp/session-details', 'sessionDetails')->name('sessionDetails');
+            Route::get('/whatsapp/create-session', 'createSession')->name('createSession');
+            Route::get('/whatsapp/logout', 'logout')->name('logout');
+            Route::get('/whatsapp/check-connection', 'checkConnection')->name('checkConnection');
+            Route::get('/whatsapp/check-number/{number}', 'checkNumber')->name('checkNumber');
+            Route::post('/whatsapp/send-message/{number}/{message}', 'sendMessage')->name('sendMessage');
+        });
+
+        // Route for custom message
+        Route::controller(CustomMessageController::class)->group(function() {
+            Route::resource('custom-message', CustomMessageController::class);
         });
 
 
@@ -117,6 +137,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('warehouse/deletebyselection', 'deleteBySelection');
             Route::get('warehouse/lims_warehouse_search', 'limsWarehouseSearch')->name('warehouse.search');
             Route::get('warehouse/all', 'warehouseAll')->name('warehouse.all');
+            Route::get('outlet/get-outlet-by-id/{id}', 'getOutletById')->name('outlet.getById');
+            Route::put('outlet/renewal/{id}', 'renewal')->name('outlet.renewal');
         });
         Route::resource('outlet', WarehouseController::class)->except('show');
 
@@ -268,6 +290,8 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('expenses/deletebyselection', 'deleteBySelection');
         });
         Route::resource('pengeluaran', ExpenseController::class);
+        Route::get('/expenses/data', [ExpenseController::class, 'getExpenses'])->name('expenses.data');
+
 
         // Route for Ojol
         Route::controller(OjolController::class)->name('ojol.')->group(function () {

@@ -19,7 +19,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = Category::where('business_id', auth()->user()->business_id)->get();
+        $categories = Category::with('category_parent')->where('business_id', auth()->user()->business_id)->get();
         $categoryParents = CategoryParent::get();
         return view('backend.category.create', compact('categories','categoryParents'));
     }

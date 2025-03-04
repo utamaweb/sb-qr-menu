@@ -12,7 +12,7 @@ use App\Models\Config;
 use App\Models\CustomMessage;
 use Carbon\Carbon;
 
-
+// test commit to merge branch
 class AppServiceProvider extends ServiceProvider
 {
     /**

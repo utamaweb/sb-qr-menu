@@ -14,6 +14,7 @@ use App\Models\OrderType;
 use App\Models\Warehouse;
 use App\Models\TransactionDetail;
 use App\Models\TransactionInOut;
+use App\Models\Product_Warehouse;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -345,6 +346,33 @@ class TransactionController extends Controller
                 // Get stocks
                 $stocks = Stock::where('shift_id', $shift->id)->get();
 
+                // Delete old transaction details
+                DB::delete("DELETE FROM transaction_details WHERE transaction_id = " . $request->transaction_id);
+
+                // Get product ids
+                $product_ids = collect($request->payment_details)->pluck('product_id')->toArray();
+
+                // Get products
+                $warehouseProductData = DB::select("SELECT p.name AS product_name, pw.* FROM product_warehouse AS pw LEFT JOIN products AS p ON pw.product_id = p.id WHERE pw.warehouse_id = " . auth()->user()->warehouse_id . " AND pw.product_id IN (" . implode(',', $product_ids) . ") AND pw.deleted_at IS NULL");
+
+                // Create new transaction details
+                $transactionDetailsData = [];
+
+                foreach($request->payment_details as $detail) {
+                    $product = collect($warehouseProductData)->where('product_id', $detail['product_id'])->first();
+                    $transactionDetailsData[] = [
+                        'transaction_id' => $request->transaction_id,
+                        'product_id'     => $detail['product_id'],
+                        'qty'            => $detail['qty'],
+                        'subtotal'       => $detail['subtotal'],
+                        'product_name'   => $product->product_name,
+                        'product_price'  => $product->price,
+                    ];
+                }
+
+                // Insert new transaction details
+                DB::table('transaction_details')->insert($transactionDetailsData);
+
                 // Get transaction
                 $transaction = Transaction::with('transaction_details', 'transaction_details.product', 'transaction_details.product.ingredient')->findOrFail($request->transaction_id);
 
@@ -354,8 +382,6 @@ class TransactionController extends Controller
 
                 // Get product ingredients
                 $productIngredients = IngredientProducts::whereIn('product_id', $products->pluck('id'))->get();
-
-                // return response()->json($producIngredients, 200);
 
                 // Variables
                 $transactionDetailsWithProducts = [];
@@ -421,10 +447,6 @@ class TransactionController extends Controller
 
                     // Menambahkan data detail produk ke array
                     $transactionDetailsWithProducts[] = $productDetail;
-                    $detail->update([
-                        'qty' => $detail['qty'],
-                        'subtotal' => $detail['subtotal']
-                    ]);
                 }
 
                 if (!empty($outOfStockIngredients)) {
@@ -459,7 +481,8 @@ class TransactionController extends Controller
         } catch (\Throwable $th) {
             DB::rollback();
             \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
-            return response()->json(['message' => $th->getMessage()], 500);
+            return response()->json(['message' => "Pembayaran pesanan gagal!"], 500);
+            // return response()->json(['message' => $th->getMessage(), 'line' => $th->getLine()], 500);
         }
     }
 

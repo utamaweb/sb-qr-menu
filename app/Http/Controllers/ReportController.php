@@ -4770,5 +4770,29 @@ class ReportController extends Controller
         // return view('backend.report.remaining_stock_report_pdf', compact('month', 'year', 'stocks', 'warehouse_ids', 'warehouses','formattedStocks'));
     }
 
+    /**
+     * Laporan omset per-produk per-bulan
+     */
+    public function productsOmzetByMonth() {
+        // Var initialization
+        $data = null;
+        $outlets = null;
+
+        // Check request
+        if(request()->has('month')) {
+            $month = request()->month;
+
+            if(auth()->user()->hasRole('Admin Bisnis')) {
+                $outlet = request()->outlet;
+            }
+        }
+
+        if(auth()->user()->hasRole('Admin Bisnis')) {
+            $outlets = Warehouse::where('business_id', auth()->user()->business_id)->get();
+        }
+
+        return view('backend.report.product_omzet_by_month', compact('data', 'outlets'));
+    }
+
 
 }

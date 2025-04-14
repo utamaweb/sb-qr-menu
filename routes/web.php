@@ -235,6 +235,7 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('customer-due-report-data', 'customerDueReportData');
                 Route::post('supplier-due-report', 'supplierDueReportByDate')->name('report.supplierDueByDate');
                 Route::post('supplier-due-report-data', 'supplierDueReportData');
+                Route::get('products-omzet-by-month', 'productsOmzetByMonth')->name('report.productsOmzetByMonth');
             });
         });
 

@@ -4794,7 +4794,7 @@ class ReportController extends Controller
             }
 
             // Get outlet products
-            $products = collect(DB::select("SELECT pw.product_id, p.name
+            $data = collect(DB::select("SELECT pw.product_id, p.name
                 FROM product_warehouse AS pw
                     JOIN products AS p
                         ON pw.product_id = p.id

@@ -42,6 +42,33 @@
             </div>
         </div>
         {{-- End of filter --}}
+
+        {{-- Content --}}
+        @if (!empty($data))
+        <div class="card">
+            <div class="card-header">
+                <span>Produk</span>
+            </div>
+
+            <div class="card-body">
+                <table class="table table-bordered table-hover" id="product-table">
+                    <thead>
+                        <th>#</th>
+                        <th>Produk</th>
+                    </thead>
+                    <tbody>
+                        @foreach ($data as $item)
+                            <tr>
+                                <td width="5%">{{ $loop->iteration }}</td>
+                                <td>{{ $item->name }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @endif
+        {{-- End of content --}}
     </div>
 </section>
 @endsection
@@ -56,6 +83,7 @@
         $('.selectpicker').selectpicker();
         $(document).ready(function() {
             $('.selectpicker').selectpicker();
+            $('#product-table').DataTable();
         });
     </script>
 @endpush

@@ -4793,9 +4793,13 @@ class ReportController extends Controller
                 $outlet = auth()->user()->warehouse_id;
             }
 
-            $data = $this->getProductsByMonth($month, $year, $outlet);
-
-            dd($data[0]);
+            // Get outlet products
+            $products = collect(DB::select("SELECT pw.product_id, p.name
+                FROM product_warehouse AS pw
+                    JOIN products AS p
+                        ON pw.product_id = p.id
+                WHERE pw.warehouse_id = $outlet
+                    AND pw.deleted_at IS NULL"));
         }
 
         if(auth()->user()->hasRole('Admin Bisnis')) {
@@ -4808,7 +4812,7 @@ class ReportController extends Controller
     /**
      * Get data for Laporan Omset Produk Per Bulan
      */
-    private function getProductsByMonth($month, $year, $outlet) {
+    private function getProductsByMonth($month, $year, $outlet, $productId, $productName) {
         // Get outlet
         $outlet = Warehouse::find($outlet);
 
@@ -4818,16 +4822,8 @@ class ReportController extends Controller
         // Get ojols by outlet business_id
         $ojols = Ojol::where('business_id', $outlet->business_id)->get();
 
-        // Get outlet products
-        $products = collect(DB::select("SELECT pw.product_id, p.name
-            FROM product_warehouse AS pw
-                JOIN products AS p
-                    ON pw.product_id = p.id
-            WHERE pw.warehouse_id = $outlet->id 
-                AND pw.deleted_at IS NULL"));
-
         // Get outlet transactions
-        $transactions = collect(DB::select("SELECT t.id, s.shift_number, t.payment_method, t.total_amount  
+        $transactions = collect(DB::select("SELECT t.id, s.shift_number, t.payment_method, t.total_amount, t.date  
             FROM transactions AS t
                 LEFT JOIN shifts AS s ON t.shift_id = s.id
             WHERE t.warehouse_id = $outlet->id 
@@ -4837,39 +4833,66 @@ class ReportController extends Controller
                 AND t.status = 'Lunas'"));
 
         // Get transactions details
-        $transactionDetails = TransactionDetail::whereIn('transaction_id', $transactions->pluck('id'))->get();
+        $transactionDetails = TransactionDetail::whereIn('transaction_id', $transactions->pluck('id'))->where('product_id', $productId)->get();
 
-        $mappedData = [];
+        // Loop every day of the month
+        $startDate = Carbon::create($year, $month, 1);
 
-        foreach ($products as $item) {
-            // Loop every day of the month
-            $startDate = Carbon::create($year, $month, 1);
+        $row = [];
+        $row['product_id'] = $productId;
+        $row['product_name'] = $productName;
+        
+        // Date loop
+        for ($i = 1; $i <= $startDate->daysInMonth; $i++) {
+            $date_row = [];
+            $date_row['date'] = Carbon::create($year, $month, $i)->translatedFormat('j');
+            $date_row['day'] = Carbon::create($year, $month, $i)->translatedFormat('l');
+            $date_row['omzet'] = $transactionDetails
+                ->whereIn('transaction_id', $transactions
+                    ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))
+                    ->pluck('id'))
+                ->sum('subtotal');
 
-            $row = [];
-            $row['product_id'] = $item->product_id;
-            $row['product_name'] = $item->name;
-            
-            // Date loop
-            for ($i = 1; $i <= $startDate->daysInMonth; $i++) {
-                $date_row = [];
-                $date_row['date'] = Carbon::create($year, $month, $i)->translatedFormat('j');
-                $date_row['day'] = Carbon::create($year, $month, $i)->translatedFormat('l');
+            // Shifts loop
+            for ($j = 1; $j <= $maxShiftsCount; $j++) {
+                $shift_row = [];
+                $shift_row['shift_number'] = $j;
 
-                // Shifts loop
-                for ($j = 1; $j <= $maxShiftsCount; $j++) {
-                    $shift_row = [];
-                    $shift_row['shift_number'] = $j;
+                // Dine In
+                $shift_row['dine_in'] = $transactionDetails
+                    ->whereIn('transaction_id', collect($transactions)
+                        ->where('shift_number', $j)
+                        ->whereIn('payment_method', ['Tunai', 'Transfer'])
+                        ->pluck('id'))
+                    ->sum('qty');
 
-                    $date_row['shifts'][] = $shift_row;
+                    
+                // Ojol loop
+                foreach ($ojols as $ojol) {
+                    $shift_row[$ojol->name] = $transactionDetails
+                        ->whereIn('transaction_id', collect($transactions)
+                            ->where('shift_number', $j)
+                            ->where('payment_method', $ojol->name)
+                            ->pluck('id'))
+                        ->sum('qty');
                 }
 
-                $row['transactions'][] = $date_row;
+                // Total
+                $shift_row['total'] = $transactionDetails
+                    ->whereIn('transaction_id', collect($transactions)
+                        ->where('shift_number', $j)
+                        ->pluck('id'))
+                    ->sum('qty');
+
+                $date_row['shifts'][] = $shift_row;
             }
 
-            $mappedData[] = $row;
+            $row['transactions'][] = $date_row;
         }
 
-        return $mappedData;
+        $row;
+
+        return $row;
     }
 
 

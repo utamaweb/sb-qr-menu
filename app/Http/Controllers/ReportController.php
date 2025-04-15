@@ -26,6 +26,7 @@ use App\Models\Transaction;
 use App\Models\Product_Sale;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
+use App\Models\Ojol;
 use App\Models\ProductReturn;
 use App\Models\ProductVariant;
 use App\Models\ReturnPurchase;
@@ -36,6 +37,8 @@ use App\Models\Product_Warehouse;
 use App\Models\TransactionDetail;
 use Spatie\Permission\Models\Role;
 use App\Models\PurchaseProductReturn;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB as FacadesDB;
 use Spatie\Permission\Models\Permission;
 
 class ReportController extends Controller
@@ -4780,11 +4783,19 @@ class ReportController extends Controller
 
         // Check request
         if(request()->has('month')) {
-            $month = request()->month;
+            $date = explode('-', request()->month);
+            $month = $date[1];
+            $year = $date[0];
 
             if(auth()->user()->hasRole('Admin Bisnis')) {
                 $outlet = request()->outlet;
+            } else {
+                $outlet = auth()->user()->warehouse_id;
             }
+
+            $data = $this->getProductsByMonth($month, $year, $outlet);
+
+            dd($data[0]);
         }
 
         if(auth()->user()->hasRole('Admin Bisnis')) {
@@ -4792,6 +4803,73 @@ class ReportController extends Controller
         }
 
         return view('backend.report.product_omzet_by_month', compact('data', 'outlets'));
+    }
+
+    /**
+     * Get data for Laporan Omset Produk Per Bulan
+     */
+    private function getProductsByMonth($month, $year, $outlet) {
+        // Get outlet
+        $outlet = Warehouse::find($outlet);
+
+        // Get outlet max shifts count
+        $maxShiftsCount = $outlet->max_shift_count;
+
+        // Get ojols by outlet business_id
+        $ojols = Ojol::where('business_id', $outlet->business_id)->get();
+
+        // Get outlet products
+        $products = collect(DB::select("SELECT pw.product_id, p.name
+            FROM product_warehouse AS pw
+                JOIN products AS p
+                    ON pw.product_id = p.id
+            WHERE pw.warehouse_id = $outlet->id 
+                AND pw.deleted_at IS NULL"));
+
+        // Get outlet transactions
+        $transactions = collect(DB::select("SELECT t.id, s.shift_number, t.payment_method, t.total_amount  
+            FROM transactions AS t
+                LEFT JOIN shifts AS s ON t.shift_id = s.id
+            WHERE t.warehouse_id = $outlet->id 
+                AND t.deleted_at IS NULL 
+                AND MONTH(t.date) = '$month' 
+                AND YEAR(t.date) = '$year'
+                AND t.status = 'Lunas'"));
+
+        // Get transactions details
+        $transactionDetails = TransactionDetail::whereIn('transaction_id', $transactions->pluck('id'))->get();
+
+        $mappedData = [];
+
+        foreach ($products as $item) {
+            // Loop every day of the month
+            $startDate = Carbon::create($year, $month, 1);
+
+            $row = [];
+            $row['product_id'] = $item->product_id;
+            $row['product_name'] = $item->name;
+            
+            // Date loop
+            for ($i = 1; $i <= $startDate->daysInMonth; $i++) {
+                $date_row = [];
+                $date_row['date'] = Carbon::create($year, $month, $i)->translatedFormat('j');
+                $date_row['day'] = Carbon::create($year, $month, $i)->translatedFormat('l');
+
+                // Shifts loop
+                for ($j = 1; $j <= $maxShiftsCount; $j++) {
+                    $shift_row = [];
+                    $shift_row['shift_number'] = $j;
+
+                    $date_row['shifts'][] = $shift_row;
+                }
+
+                $row['transactions'][] = $date_row;
+            }
+
+            $mappedData[] = $row;
+        }
+
+        return $mappedData;
     }
 
 

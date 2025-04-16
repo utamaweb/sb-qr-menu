@@ -34,6 +34,10 @@
                     @endif
                     {{-- End of outlet input --}}
 
+                    {{-- Outlet input --}}
+                    <input type="hidden" name="outlet" id="outlet-input" value="{{ request()->outlet ?? auth()->user()->warehouse_id }}">
+                    {{-- End of outlet input --}}
+
                     {{-- Submit button --}}
                     <button type="submit" class="btn btn-sm btn-primary">Filter</button>
                     {{-- End of submit button --}}
@@ -46,8 +50,9 @@
         {{-- Content --}}
         @if (!empty($data))
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <span>Produk</span>
+                <button type="button" class="btn btn-sm btn-success" onclick="exportExcel()">Export Excel</button>
             </div>
 
             <div class="card-body">
@@ -55,12 +60,14 @@
                     <thead>
                         <th>#</th>
                         <th>Produk</th>
+                        <th>Check</th>
                     </thead>
                     <tbody>
                         @foreach ($data as $item)
                             <tr>
                                 <td width="5%">{{ $loop->iteration }}</td>
                                 <td>{{ $item->name }}</td>
+                                <td><input type="checkbox" name="check[]" value="{{ $item->product_id }}"></td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -85,5 +92,31 @@
             $('.selectpicker').selectpicker();
             $('#product-table').DataTable();
         });
+
+        function exportExcel() {
+            // Get product IDs
+            var productIDs = [];
+            let table = $('#product-table').DataTable();
+            let document = table.$('input[name="check[]"]:checked').serializeArray();
+            productIDs = document.map(function(item) {
+                return item.value;
+            });
+
+            if(productIDs.length == 0) {
+                alert('Tidak ada produk yang dipilih');
+            } else {
+                // Separate month and year
+                var month = $('#month-input').val().split('-')[1];
+                var year = $('#month-input').val().split('-')[0];
+    
+                let url = "{{  route('report.productsOmzetByMonthExcel') }}";
+                url += '?month=' + month;
+                url += '&year=' + year;
+                url += '&outlet=' + $('#outlet-input').val();
+                url += '&productIDs=' + productIDs.join(',');
+    
+                window.open(url);
+            }
+        }
     </script>
 @endpush

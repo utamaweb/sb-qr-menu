@@ -39,7 +39,14 @@ use Spatie\Permission\Models\Role;
 use App\Models\PurchaseProductReturn;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB as FacadesDB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Spatie\Permission\Models\Permission;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 
 class ReportController extends Controller
 {
@@ -4807,6 +4814,132 @@ class ReportController extends Controller
         }
 
         return view('backend.report.product_omzet_by_month', compact('data', 'outlets'));
+    }
+
+    /**
+     * Laporan omset per-produk per-bulan export excel
+     */
+    public function productsOmzetByMonthExcel() {
+        // Create shpreadsheet
+        $spreadsheet = new Spreadsheet();
+
+        // Get product IDs
+        $productIDs = explode(',', request()->productIDs);
+
+        // Get outlet name
+        $outlet = Warehouse::find(request()->outlet);
+        
+        // Get ojol by outlet business_id
+        $ojols = Ojol::where('business_id', $outlet->business_id)->get()->count();
+        $numberOfColumn = ($outlet->max_shift_count * ($ojols + 2)) - 1;
+        $endColumn = $this->shiftAlphabet('D', $numberOfColumn);
+
+        // dd([$ojols, $numberOfColumn, $endColumn]);
+
+        // Product loop
+        foreach ($productIDs as $index => $productID) {
+            // Get product
+            $product = Product::find($productID);
+
+            // Get data for Laporan Omset Produk Per Bulan
+            $data = $this->getProductsByMonth(request()->month, request()->year, request()->outlet, $productID, $product->name);
+
+            // Create new sheet
+            $newSheet = $spreadsheet->createSheet();
+            $newSheet->setTitle($product->name);
+
+            $spreadsheet->setActiveSheetIndex($index + 1);
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Titles
+            $monthTitle = Carbon::create(request()->year, request()->month, 1)->translatedFormat('F Y');
+            $productTitle = $product->name;
+
+            // Title rows
+            $sheet->setCellValue('A1', $monthTitle);
+            $sheet->mergeCells('A1:C1');
+            $sheet->getStyle('A1:C1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A1:C1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+            $sheet->setCellValue('D1', $productTitle);
+            $sheet->mergeCells('D1:'.$endColumn.'1');
+            $sheet->getStyle('D1:'.$endColumn.'1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('D1:'.$endColumn.'1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('D1:'.$endColumn.'1')->getFont()->setBold(true)->setSize(16);
+
+            // Set product title color to red and font color white
+            $sheet->getStyle('D1:'.$endColumn.'1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
+            $sheet->getStyle('D1:'.$endColumn.'1')->getFont()->setColor(new Color('FFFFFF'));
+
+            // set row 1 height
+            $sheet->getRowDimension(1)->setRowHeight(30);
+
+            // Set header
+            $sheet->setCellValue("A2", "Tanggal");
+            $sheet->mergeCells("A2:A5");
+            $sheet->setCellValue("B2", "Hari");
+            $sheet->mergeCells("B2:B5");
+            $sheet->setCellValue("C2", "Omset");
+            $sheet->mergeCells("C2:C5");
+
+            // Set header style
+            $sheet->getStyle('A2:C2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A2:C2')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('A2:C2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
+            $sheet->getStyle('A2:C2')->getFont()->setColor(new Color('FFFFFF'));
+            
+            $lastEndColumn = $this->shiftAlphabet('D', ($ojols + 2) - 1);
+
+            // Shift loop
+            for ($i = 1; $i <= $outlet->max_shift_count; $i++) {
+                if($i == 1) {
+                    $sheet->setCellValue("D2", "Shift " . $i);
+                    $sheet->mergeCells("D2:" . $lastEndColumn . "2");
+                    $lastEndColumn = $this->shiftAlphabet($lastEndColumn, 1);
+                } else {
+                    $sheet->setCellValue(($lastEndColumn) . "2", "Shift " . $i);
+                    $sheet->mergeCells(($lastEndColumn) . "2:" . ($this->shiftAlphabet($lastEndColumn, ($ojols + 2) - 1)) . "2");
+                    $lastEndColumn = $this->shiftAlphabet($lastEndColumn, ($ojols + 3) - 1);
+                }
+            }
+
+            // Set shift style
+            $sheet->getStyle('D2:' . $lastEndColumn . '2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('D2:' . $lastEndColumn . '2')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+        }
+
+        $spreadsheet->removeSheetByIndex(0);
+
+        // Download excel
+        $writer = new Xlsx($spreadsheet);
+        $filename = "Laporan Omset Per-Produk Outlet " .$outlet->name. " " . Carbon::now()->translatedFormat('l j F Y H:i') . ".xlsx";
+
+        $tempFilePath = tempnam(sys_get_temp_dir(), $filename);
+        $writer->save($tempFilePath);
+
+        return Response::download($tempFilePath, $filename)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Shift alphabet
+     */
+    private function shiftAlphabet($char, $shift) {
+        // Memeriksa apakah input adalah karakter alfabet
+        if (!ctype_alpha($char)) {
+            return "Error: Input pertama harus berupa karakter alfabet.";
+        }
+
+        // Menentukan apakah karakter adalah huruf besar atau kecil
+        $asciiOffset = ctype_upper($char) ? ord('A') : ord('a');
+
+        // Menghitung posisi baru dengan wrap-around
+        $newPosition = (ord($char) - $asciiOffset + $shift) % 26;
+        if ($newPosition < 0) {
+            $newPosition += 26; // Mengatasi kasus shift negatif
+        }
+
+        // Mengembalikan karakter hasil pergeseran
+        return chr($asciiOffset + $newPosition);
     }
 
     /**

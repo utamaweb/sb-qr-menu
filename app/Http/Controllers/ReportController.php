@@ -4830,11 +4830,14 @@ class ReportController extends Controller
         $outlet = Warehouse::find(request()->outlet);
         
         // Get ojol by outlet business_id
-        $ojols = Ojol::where('business_id', $outlet->business_id)->get()->count();
-        $numberOfColumn = ($outlet->max_shift_count * ($ojols + 2)) - 1;
+        $ojols = Ojol::where('business_id', $outlet->business_id)->get();
+        $ojolCount = $ojols->count();
+
+        // Get number of column
+        $numberOfColumn = ($outlet->max_shift_count * ($ojolCount + 2)) - 1;
         $endColumn = $this->shiftAlphabet('D', $numberOfColumn);
 
-        // dd([$ojols, $numberOfColumn, $endColumn]);
+        // dd([$ojolCount, $numberOfColumn, $endColumn]);
 
         // Product loop
         foreach ($productIDs as $index => $productID) {
@@ -4888,7 +4891,7 @@ class ReportController extends Controller
             $sheet->getStyle('A2:C2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
             $sheet->getStyle('A2:C2')->getFont()->setColor(new Color('FFFFFF'));
             
-            $lastEndColumn = $this->shiftAlphabet('D', ($ojols + 2) - 1);
+            $lastEndColumn = $this->shiftAlphabet('D', ($ojolCount + 2) - 1);
 
             // Shift loop
             for ($i = 1; $i <= $outlet->max_shift_count; $i++) {
@@ -4896,16 +4899,48 @@ class ReportController extends Controller
                     $sheet->setCellValue("D2", "Shift " . $i);
                     $sheet->mergeCells("D2:" . $lastEndColumn . "2");
                     $lastEndColumn = $this->shiftAlphabet($lastEndColumn, 1);
+
+                    // Order type row
+                    $sheet->setCellValue("D3", "Dine In");
+                    
+                    foreach($ojols as $index => $ojol) {
+                        $sheet->setCellValue(($this->shiftAlphabet('D', $index + 1)) . "3", $ojol->name);
+                    }
+
+                    $sheet->setCellValue(($this->shiftAlphabet('D', $ojolCount + 1)) . "3", "Total S" . $i);
                 } else {
                     $sheet->setCellValue(($lastEndColumn) . "2", "Shift " . $i);
-                    $sheet->mergeCells(($lastEndColumn) . "2:" . ($this->shiftAlphabet($lastEndColumn, ($ojols + 2) - 1)) . "2");
-                    $lastEndColumn = $this->shiftAlphabet($lastEndColumn, ($ojols + 3) - 1);
+                    $sheet->mergeCells(($lastEndColumn) . "2:" . ($this->shiftAlphabet($lastEndColumn, ($ojolCount + 2) - 1)) . "2");
+                    
+                    // Order type row
+                    $sheet->setCellValue(($lastEndColumn) . "3", "Dine In");
+                    
+                    foreach($ojols as $index => $ojol) {
+                        $sheet->setCellValue(($this->shiftAlphabet($lastEndColumn, $index + 1)) . "3", $ojol->name);
+                    }
+                    
+                    $sheet->setCellValue(($this->shiftAlphabet($lastEndColumn, $ojolCount + 1)) . "3", "Total S" . $i);
+
+                    $lastEndColumn = $this->shiftAlphabet($lastEndColumn, ($ojolCount + 3) - 1);
                 }
             }
 
             // Set shift style
-            $sheet->getStyle('D2:' . $lastEndColumn . '2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('D2:' . $lastEndColumn . '2')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle('D2:' . $endColumn . '3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('D2:' . $endColumn . '3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+            // Order type row fill red
+            $sheet->getStyle('D3:' . $endColumn . '3')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
+            $sheet->getStyle('D3:' . $endColumn . '3')->getFont()->setColor(new Color('FFFFFF'));
+
+            // Set column auto width
+            $sheet->getColumnDimension('D')->setAutoSize(true);
+            $sheet->mergeCells('D3:D4');
+            for($k = 1; $k <= $numberOfColumn; $k++) {
+                $sheet->getColumnDimension($this->shiftAlphabet('D', $k))->setAutoSize(true);
+                $sheet->mergeCells($this->shiftAlphabet('D', $k) . "3:" . $this->shiftAlphabet('D', $k) . "4");
+            }
+
         }
 
         $spreadsheet->removeSheetByIndex(0);

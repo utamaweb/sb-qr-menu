@@ -4946,6 +4946,19 @@ class ReportController extends Controller
 
             // Data loop
             $startRow = 6;
+            $totals = [];
+            $totals['dine_in'] = [];
+            $totals['total'] = [];
+
+            foreach($ojols as $ojol) {
+                $totals[$ojol->name] = [];
+            }
+
+            foreach($totals as $key => $value) {
+                for($m = 1; $m <= $outlet->max_shift_count; $m++) {
+                    $totals[$key][$m] = 0;
+                }
+            }
 
             foreach($data['transactions'] as $indexData => $item) {
                 $row = [];
@@ -4958,19 +4971,52 @@ class ReportController extends Controller
                 // Item shifts loop
                 foreach($item['shifts'] as $indexShift => $shift) {
                     $row[$lastRowEnd + $indexShift] = number_format($shift['dine_in'], 0, ',', '.');
+                    $totals['dine_in'][$shift['shift_number']] += $shift['dine_in'];
 
                     // Item ojol loop
                     foreach($ojols as $indexOjol => $ojol) {
                         $row[$lastRowEnd + $indexShift + $indexOjol + 1] = number_format($shift[$ojol->name], 0, ',', '.');
+                        $totals[$ojol->name][$shift['shift_number']] += $shift[$ojol->name];
                     }
 
                     $row[$lastRowEnd + $indexShift + $ojolCount + 1] = number_format($shift['total'], 0, ',', '.');
+                    $totals['total'][$shift['shift_number']] += $shift['total'];
 
                     $lastRowEnd += $ojolCount + 2;
                 }
 
                 $sheet->fromArray($row, NULL, "A" . $startRow + $indexData);
             }
+            // End of data loop
+
+            $newLastEndColumn = $this->shiftAlphabet('D', ($ojolCount + 2) - 1);
+
+            for ($i = 1; $i <= $outlet->max_shift_count; $i++) {
+                if($i == 1) {
+                    $newLastEndColumn = $this->shiftAlphabet($newLastEndColumn, 1);
+
+                    // Order type row
+                    $sheet->setCellValue("D5", $totals['dine_in'][$i]);
+                    
+                    foreach($ojols as $index => $ojol) {
+                        $sheet->setCellValue(($this->shiftAlphabet('D', $index + 1)) . "5", $totals[$ojol->name][$i]);
+                    }
+
+                    $sheet->setCellValue(($this->shiftAlphabet('D', $ojolCount + 1)) . "5", $totals['total'][$i]);
+                } else {
+                    // Order type row
+                    $sheet->setCellValue(($newLastEndColumn) . "5", $totals['dine_in'][$i]);
+                    
+                    foreach($ojols as $index => $ojol) {
+                        $sheet->setCellValue(($this->shiftAlphabet($newLastEndColumn, $index + 1)) . "5", $totals[$ojol->name][$i]);
+                    }
+                    
+                    $sheet->setCellValue(($this->shiftAlphabet($newLastEndColumn, $ojolCount + 1)) . "5", $totals['total'][$i]);
+
+                    $newLastEndColumn = $this->shiftAlphabet($newLastEndColumn, ($ojolCount + 3) - 1);
+                }
+            }
+
         }
 
         $spreadsheet->removeSheetByIndex(0);

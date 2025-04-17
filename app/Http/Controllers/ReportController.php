@@ -5058,7 +5058,8 @@ class ReportController extends Controller
 
                 // Dine In
                 $shift_row['dine_in'] = $transactionDetails
-                    ->whereIn('transaction_id', collect($transactions)
+                    ->whereIn('transaction_id', $transactions
+                        ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))
                         ->where('shift_number', $j)
                         ->whereIn('payment_method', ['Tunai', 'Transfer'])
                         ->pluck('id'))
@@ -5068,7 +5069,8 @@ class ReportController extends Controller
                 // Ojol loop
                 foreach ($ojols as $ojol) {
                     $shift_row[$ojol->name] = $transactionDetails
-                        ->whereIn('transaction_id', collect($transactions)
+                        ->whereIn('transaction_id', $transactions
+                            ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))
                             ->where('shift_number', $j)
                             ->where('payment_method', $ojol->name)
                             ->pluck('id'))
@@ -5077,7 +5079,8 @@ class ReportController extends Controller
 
                 // Total
                 $shift_row['total'] = $transactionDetails
-                    ->whereIn('transaction_id', collect($transactions)
+                    ->whereIn('transaction_id', $transactions
+                        ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))
                         ->where('shift_number', $j)
                         ->pluck('id'))
                     ->sum('qty');

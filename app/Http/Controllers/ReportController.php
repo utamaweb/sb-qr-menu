@@ -4957,14 +4957,14 @@ class ReportController extends Controller
 
                 // Item shifts loop
                 foreach($item['shifts'] as $indexShift => $shift) {
-                    $row[$lastRowEnd + $indexShift] = $shift['dine_in'];
+                    $row[$lastRowEnd + $indexShift] = number_format($shift['dine_in'], 0, ',', '.');
 
                     // Item ojol loop
                     foreach($ojols as $indexOjol => $ojol) {
-                        $row[$lastRowEnd + $indexShift + $indexOjol + 1] = $shift[$ojol->name];
+                        $row[$lastRowEnd + $indexShift + $indexOjol + 1] = number_format($shift[$ojol->name], 0, ',', '.');
                     }
 
-                    $row[$lastRowEnd + $indexShift + $ojolCount + 1] = $shift['total'];
+                    $row[$lastRowEnd + $indexShift + $ojolCount + 1] = number_format($shift['total'], 0, ',', '.');
 
                     $lastRowEnd += $ojolCount + 2;
                 }

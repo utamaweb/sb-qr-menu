@@ -4949,6 +4949,7 @@ class ReportController extends Controller
             $totals = [];
             $totals['dine_in'] = [];
             $totals['total'] = [];
+            $totalOmzet = 0;
 
             foreach($ojols as $ojol) {
                 $totals[$ojol->name] = [];
@@ -4964,7 +4965,9 @@ class ReportController extends Controller
                 $row = [];
                 $row[0] = $item['date'];
                 $row[1] = $item['day'];
-                $row[2] = "Rp. " . number_format($item['omzet'], 0, ',', '.');
+                $row[2] = number_format($item['omzet'], 0, ',', '.');
+
+                $totalOmzet += $item['omzet'];
 
                 $lastRowEnd = 3;
 
@@ -5016,6 +5019,17 @@ class ReportController extends Controller
                     $newLastEndColumn = $this->shiftAlphabet($newLastEndColumn, ($ojolCount + 3) - 1);
                 }
             }
+
+            $sheet->getStyle('A'.($startRow - 1).':'.$endColumn. (count($data['transactions']) + ($startRow)))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+            $sheet->getStyle('A'.($startRow - 1).':'.$endColumn. (count($data['transactions']) + ($startRow)))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
+
+            // Total omzet
+            $sheet->setCellValue("A".(count($data['transactions']) + $startRow), "Total Omset");
+            $sheet->mergeCells("A".(count($data['transactions']) + $startRow).":B".(count($data['transactions']) + $startRow));
+            $sheet->setCellValue("C".(count($data['transactions']) + $startRow), number_format($totalOmzet, 0, ',', '.'));
+
+            // Set border
+            $sheet->getStyle('A1:' . $endColumn . (count($data['transactions']) + ($startRow)))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
         }
 

@@ -34,10 +34,6 @@
                     @endif
                     {{-- End of outlet input --}}
 
-                    {{-- Outlet input --}}
-                    <input type="hidden" name="outlet" id="outlet-input" value="{{ request()->outlet ?? auth()->user()->warehouse_id }}">
-                    {{-- End of outlet input --}}
-
                     {{-- Submit button --}}
                     <button type="submit" class="btn btn-sm btn-primary">Filter</button>
                     {{-- End of submit button --}}

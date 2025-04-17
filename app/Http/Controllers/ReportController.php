@@ -47,9 +47,17 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpSpreadsheet\Style\Color;
+use App\Services\DateService;
 
 class ReportController extends Controller
 {
+    protected $dateService;
+
+    public function __construct()
+    {
+        $this->dateService = new DateService();
+    }
+
     public function productQuantityAlert()
     {
         $role = Role::find(Auth::user()->role_id);
@@ -4855,7 +4863,8 @@ class ReportController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Titles
-            $monthTitle = Carbon::create(request()->year, request()->month, 1)->translatedFormat('F Y');
+            $createDate = Carbon::create(request()->year, request()->month, 1);
+            $monthTitle = $this->dateService->changeMonth($createDate->month) . " " . $createDate->year;
             $productTitle = $product->name;
 
             // Title rows
@@ -5037,7 +5046,7 @@ class ReportController extends Controller
 
         // Download excel
         $writer = new Xlsx($spreadsheet);
-        $filename = "Laporan Omset Per-Produk Outlet " .$outlet->name. " " . Carbon::now()->translatedFormat('l j F Y H:i') . ".xlsx";
+        $filename = "Laporan Omset Per-Produk Outlet " .$outlet->name. " " . date('Y-m-d H:i:s') . ".xlsx";
 
         $tempFilePath = tempnam(sys_get_temp_dir(), $filename);
         $writer->save($tempFilePath);
@@ -5103,8 +5112,8 @@ class ReportController extends Controller
         // Date loop
         for ($i = 1; $i <= $startDate->daysInMonth; $i++) {
             $date_row = [];
-            $date_row['date'] = Carbon::create($year, $month, $i)->translatedFormat('j');
-            $date_row['day'] = Carbon::create($year, $month, $i)->translatedFormat('l');
+            $date_row['date'] = Carbon::create($year, $month, $i)->isoFormat('DD');
+            $date_row['day'] = $this->dateService->changeDay(Carbon::create($year, $month, $i)->isoFormat('d'));
             $date_row['omzet'] = $transactionDetails
                 ->whereIn('transaction_id', $transactions
                     ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))

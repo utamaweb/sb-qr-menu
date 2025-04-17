@@ -4934,6 +4934,9 @@ class ReportController extends Controller
             $sheet->getStyle('D3:' . $endColumn . '3')->getFont()->setColor(new Color('FFFFFF'));
 
             // Set column auto width
+            $sheet->getColumnDimension('A')->setAutoSize(true);
+            $sheet->getColumnDimension('B')->setAutoSize(true);
+            $sheet->getColumnDimension('C')->setAutoSize(true);
             $sheet->getColumnDimension('D')->setAutoSize(true);
             $sheet->mergeCells('D3:D4');
             for($k = 1; $k <= $numberOfColumn; $k++) {
@@ -4941,6 +4944,33 @@ class ReportController extends Controller
                 $sheet->mergeCells($this->shiftAlphabet('D', $k) . "3:" . $this->shiftAlphabet('D', $k) . "4");
             }
 
+            // Data loop
+            $startRow = 6;
+
+            foreach($data['transactions'] as $indexData => $item) {
+                $row = [];
+                $row[0] = $item['date'];
+                $row[1] = $item['day'];
+                $row[2] = "Rp. " . number_format($item['omzet'], 0, ',', '.');
+
+                $lastRowEnd = 3;
+
+                // Item shifts loop
+                foreach($item['shifts'] as $indexShift => $shift) {
+                    $row[$lastRowEnd + $indexShift] = $shift['dine_in'];
+
+                    // Item ojol loop
+                    foreach($ojols as $indexOjol => $ojol) {
+                        $row[$lastRowEnd + $indexShift + $indexOjol + 1] = $shift[$ojol->name];
+                    }
+
+                    $row[$lastRowEnd + $indexShift + $ojolCount + 1] = $shift['total'];
+
+                    $lastRowEnd += $ojolCount + 2;
+                }
+
+                $sheet->fromArray($row, NULL, "A" . $startRow + $indexData);
+            }
         }
 
         $spreadsheet->removeSheetByIndex(0);

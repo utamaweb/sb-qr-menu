@@ -57,7 +57,7 @@
             <ul id="report" class="collapse list-unstyled " style="border-radius: 10px;">
                 <li id="laporan-selisih"><a href="{{ route('report.differenceStockReport') }}?warehouse_id=all">Laporan Selisih Stok</a></li>
                 <li id="laporan-sisa"><a href="{{ route('report.remainingStockReport') }}">Laporan Sisa Stok</a></li>
-
+                <li><a href="{{ route('report.productsOmzetByMonth') }}">Laporan Omset Produk</a></li>
             </ul>
         </li>
 

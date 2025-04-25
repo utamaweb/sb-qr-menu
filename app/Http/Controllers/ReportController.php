@@ -4796,18 +4796,32 @@ class ReportController extends Controller
         $data = null;
         $outlets = null;
 
-        // Check request
-        if(request()->has('month')) {
-            $date = explode('-', request()->month);
-            $month = $date[1];
-            $year = $date[0];
+        if(auth()->user()->hasRole('Admin Bisnis')) {
+            $outlet = request()->outlet;
+        } else {
+            $outlet = auth()->user()->warehouse_id;
+        }
 
-            if(auth()->user()->hasRole('Admin Bisnis')) {
-                $outlet = request()->outlet;
-            } else {
-                $outlet = auth()->user()->warehouse_id;
+        // Get data by user role
+        if(auth()->user()->hasRole('Admin Bisnis')) {
+            // Check request
+            if(request()->has('month')) {
+                $date = explode('-', request()->month);
+                $month = $date[1];
+                $year = $date[0];
+    
+                // Get outlet products
+                $data = collect(DB::select("SELECT pw.product_id, p.name
+                    FROM product_warehouse AS pw
+                        JOIN products AS p
+                            ON pw.product_id = p.id
+                    WHERE pw.warehouse_id = $outlet
+                        AND pw.deleted_at IS NULL"));
             }
 
+            // Get outlets
+            $outlets = Warehouse::where('business_id', auth()->user()->business_id)->get();
+        } else {
             // Get outlet products
             $data = collect(DB::select("SELECT pw.product_id, p.name
                 FROM product_warehouse AS pw
@@ -4815,10 +4829,6 @@ class ReportController extends Controller
                         ON pw.product_id = p.id
                 WHERE pw.warehouse_id = $outlet
                     AND pw.deleted_at IS NULL"));
-        }
-
-        if(auth()->user()->hasRole('Admin Bisnis')) {
-            $outlets = Warehouse::where('business_id', auth()->user()->business_id)->get();
         }
 
         return view('backend.report.product_omzet_by_month', compact('data', 'outlets'));

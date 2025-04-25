@@ -31,11 +31,15 @@
                                 @endforeach
                             </select>
                         </div>
+                    @else
+                        <input type="hidden" name="outlet" id="outlet-input" value="{{ auth()->user()->warehouse_id }}">
                     @endif
                     {{-- End of outlet input --}}
 
                     {{-- Submit button --}}
-                    <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    @if (!auth()->user()->hasRole('Admin Outlet'))
+                        <button type="submit" class="btn btn-sm btn-primary">Filter</button>
+                    @endif
                     {{-- End of submit button --}}
 
                 </form>

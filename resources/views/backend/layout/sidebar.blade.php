@@ -88,6 +88,7 @@
                 </li>
                 <li id="laporan-transaksi-produk"><a href="{{ route('report.product') }}">Laporan Transaksi Produk</a>
                 </li>
+                <li><a href="{{ route('report.productsOmzetByMonth') }}">Laporan Omset Produk</a></li>
 
                 {{-- <li id="product-report-menu"> --}}
                 {{-- <a id="report-link" href="{{route('report.product')}}">Laporan Transaksi Produk</a> --}}

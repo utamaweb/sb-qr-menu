@@ -4843,7 +4843,7 @@ class ReportController extends Controller
 
         // Get number of column
         $numberOfColumn = ($outlet->max_shift_count * ($ojolCount + 2)) - 1;
-        $endColumn = $this->shiftAlphabet('D', $numberOfColumn);
+        $endColumn = $this->addExcelColumn('D', $numberOfColumn);
 
         // dd([$ojolCount, $numberOfColumn, $endColumn]);
 
@@ -4900,37 +4900,37 @@ class ReportController extends Controller
             $sheet->getStyle('A2:C2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
             $sheet->getStyle('A2:C2')->getFont()->setColor(new Color('FFFFFF'));
             
-            $lastEndColumn = $this->shiftAlphabet('D', ($ojolCount + 2) - 1);
+            $lastEndColumn = $this->addExcelColumn('D', ($ojolCount + 2) - 1);
 
             // Shift loop
             for ($i = 1; $i <= $outlet->max_shift_count; $i++) {
                 if($i == 1) {
                     $sheet->setCellValue("D2", "Shift " . $i);
                     $sheet->mergeCells("D2:" . $lastEndColumn . "2");
-                    $lastEndColumn = $this->shiftAlphabet($lastEndColumn, 1);
+                    $lastEndColumn = $this->addExcelColumn($lastEndColumn, 1);
 
                     // Order type row
                     $sheet->setCellValue("D3", "Dine In");
                     
                     foreach($ojols as $index => $ojol) {
-                        $sheet->setCellValue(($this->shiftAlphabet('D', $index + 1)) . "3", $ojol->name);
+                        $sheet->setCellValue(($this->addExcelColumn('D', $index + 1)) . "3", $ojol->name);
                     }
 
-                    $sheet->setCellValue(($this->shiftAlphabet('D', $ojolCount + 1)) . "3", "Total S" . $i);
+                    $sheet->setCellValue(($this->addExcelColumn('D', $ojolCount + 1)) . "3", "Total S" . $i);
                 } else {
                     $sheet->setCellValue(($lastEndColumn) . "2", "Shift " . $i);
-                    $sheet->mergeCells(($lastEndColumn) . "2:" . ($this->shiftAlphabet($lastEndColumn, ($ojolCount + 2) - 1)) . "2");
+                    $sheet->mergeCells(($lastEndColumn) . "2:" . ($this->addExcelColumn($lastEndColumn, ($ojolCount + 2) - 1)) . "2");
                     
                     // Order type row
                     $sheet->setCellValue(($lastEndColumn) . "3", "Dine In");
                     
                     foreach($ojols as $index => $ojol) {
-                        $sheet->setCellValue(($this->shiftAlphabet($lastEndColumn, $index + 1)) . "3", $ojol->name);
+                        $sheet->setCellValue(($this->addExcelColumn($lastEndColumn, $index + 1)) . "3", $ojol->name);
                     }
                     
-                    $sheet->setCellValue(($this->shiftAlphabet($lastEndColumn, $ojolCount + 1)) . "3", "Total S" . $i);
+                    $sheet->setCellValue(($this->addExcelColumn($lastEndColumn, $ojolCount + 1)) . "3", "Total S" . $i);
 
-                    $lastEndColumn = $this->shiftAlphabet($lastEndColumn, ($ojolCount + 3) - 1);
+                    $lastEndColumn = $this->addExcelColumn($lastEndColumn, ($ojolCount + 3) - 1);
                 }
             }
 
@@ -4949,8 +4949,8 @@ class ReportController extends Controller
             $sheet->getColumnDimension('D')->setAutoSize(true);
             $sheet->mergeCells('D3:D4');
             for($k = 1; $k <= $numberOfColumn; $k++) {
-                $sheet->getColumnDimension($this->shiftAlphabet('D', $k))->setAutoSize(true);
-                $sheet->mergeCells($this->shiftAlphabet('D', $k) . "3:" . $this->shiftAlphabet('D', $k) . "4");
+                $sheet->getColumnDimension($this->addExcelColumn('D', $k))->setAutoSize(true);
+                $sheet->mergeCells($this->addExcelColumn('D', $k) . "3:" . $this->addExcelColumn('D', $k) . "4");
             }
 
             // Data loop
@@ -5001,31 +5001,31 @@ class ReportController extends Controller
             }
             // End of data loop
 
-            $newLastEndColumn = $this->shiftAlphabet('D', ($ojolCount + 2) - 1);
+            $newLastEndColumn = $this->addExcelColumn('D', ($ojolCount + 2) - 1);
 
             for ($i = 1; $i <= $outlet->max_shift_count; $i++) {
                 if($i == 1) {
-                    $newLastEndColumn = $this->shiftAlphabet($newLastEndColumn, 1);
+                    $newLastEndColumn = $this->addExcelColumn($newLastEndColumn, 1);
 
                     // Order type row
                     $sheet->setCellValue("D5", $totals['dine_in'][$i]);
                     
                     foreach($ojols as $index => $ojol) {
-                        $sheet->setCellValue(($this->shiftAlphabet('D', $index + 1)) . "5", $totals[$ojol->name][$i]);
+                        $sheet->setCellValue(($this->addExcelColumn('D', $index + 1)) . "5", $totals[$ojol->name][$i]);
                     }
 
-                    $sheet->setCellValue(($this->shiftAlphabet('D', $ojolCount + 1)) . "5", $totals['total'][$i]);
+                    $sheet->setCellValue(($this->addExcelColumn('D', $ojolCount + 1)) . "5", $totals['total'][$i]);
                 } else {
                     // Order type row
                     $sheet->setCellValue(($newLastEndColumn) . "5", $totals['dine_in'][$i]);
                     
                     foreach($ojols as $index => $ojol) {
-                        $sheet->setCellValue(($this->shiftAlphabet($newLastEndColumn, $index + 1)) . "5", $totals[$ojol->name][$i]);
+                        $sheet->setCellValue(($this->addExcelColumn($newLastEndColumn, $index + 1)) . "5", $totals[$ojol->name][$i]);
                     }
                     
-                    $sheet->setCellValue(($this->shiftAlphabet($newLastEndColumn, $ojolCount + 1)) . "5", $totals['total'][$i]);
+                    $sheet->setCellValue(($this->addExcelColumn($newLastEndColumn, $ojolCount + 1)) . "5", $totals['total'][$i]);
 
-                    $newLastEndColumn = $this->shiftAlphabet($newLastEndColumn, ($ojolCount + 3) - 1);
+                    $newLastEndColumn = $this->addExcelColumn($newLastEndColumn, ($ojolCount + 3) - 1);
                 }
             }
 
@@ -5074,6 +5074,38 @@ class ReportController extends Controller
 
         // Mengembalikan karakter hasil pergeseran
         return chr($asciiOffset + $newPosition);
+    }
+
+    /**
+     * Int to excel column
+     */
+    private function intToExcelColumn($num) {
+        $columnName = '';
+        while ($num > 0) {
+            $remainder = ($num - 1) % 26;
+            $columnName = chr(65 + $remainder) . $columnName;
+            $num = intval(($num - 1) / 26);
+        }
+        return $columnName;
+    }
+
+    /**
+     * Add excel column
+     */
+    private function addExcelColumn($column, $add) {
+        // Konversi nama kolom ke angka
+        $num = 0;
+        $length = strlen($column);
+        for ($i = 0; $i < $length; $i++) {
+            // ord('A')=65 jadi dikurangi agar A=1
+            $num = $num * 26 + (ord($column[$i]) - ord('A') + 1);
+        }
+    
+        // Tambahkan nilai offset
+        $num += $add;
+    
+        // Konversi kembali ke nama kolom Excel
+        return $this->intToExcelColumn($num);
     }
 
     /**

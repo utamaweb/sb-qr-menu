@@ -27,8 +27,8 @@ class UserController extends Controller
         if(auth()->user()->hasRole('Superadmin')){
             $lims_user_list = User::with('business', 'warehouse')->get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
-            $outlet = Warehouse::with('users', 'users.business', 'users.warehouse')->where('business_id', auth()->user()->business_id)->first();
-            $lims_user_list = $outlet->users;
+            $outlet = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
+            $lims_user_list = User::where('business_id', auth()->user()->business_id)->orWhereIn('warehouse_id', $outlet)->get();
         } else{
             $lims_user_list = User::with('business', 'warehouse')->where('is_active', true)->where('warehouse_id', auth()->user()->warehouse_id)->get();
         }

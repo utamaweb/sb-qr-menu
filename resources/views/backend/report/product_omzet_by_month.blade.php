@@ -3,15 +3,15 @@
 @section('content')
 <section>
     <div class="container-fluid">
-    
+
         @include('includes.alerts')
-    
+
         {{-- Filter --}}
         <div class="card">
             <div class="card-header">
                 <h3 class="text-center">Laporan Omset Produk Per Bulan</h3>
             </div>
-    
+
             <div class="card-body">
                 <form action="" method="GET">
                     {{-- Month input --}}
@@ -87,6 +87,10 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
+        $("ul#report").siblings('a').attr('aria-expanded','true');
+        $("ul#report").addClass("show");
+        $("ul#report li#product-omzet-by-month").addClass("active");
+
         $('.selectpicker').selectpicker();
         $(document).ready(function() {
             $('.selectpicker').selectpicker();
@@ -108,13 +112,13 @@
                 // Separate month and year
                 var month = $('#month-input').val().split('-')[1];
                 var year = $('#month-input').val().split('-')[0];
-    
+
                 let url = "{{  route('report.productsOmzetByMonthExcel') }}";
                 url += '?month=' + month;
                 url += '&year=' + year;
                 url += '&outlet=' + $('#outlet-input').val();
                 url += '&productIDs=' + productIDs.join(',');
-    
+
                 window.open(url);
             }
         }

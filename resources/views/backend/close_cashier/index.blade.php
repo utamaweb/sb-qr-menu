@@ -19,6 +19,8 @@
                                     <th>Modal Awal</th>
                                     <th>Total Tunai</th>
                                     <th>Total Non Tunai</th>
+                                    <th>Uang Laci</th>
+                                    <th>Selisih</th>
                                     <th class="not-exported">Aksi</th>
                                 </tr>
                             </thead>
@@ -35,6 +37,8 @@
                                         <td>@currency($closeCashier->initial_balance)</td>
                                         <td>@currency($closeCashier->total_cash)</td>
                                         <td>@currency($closeCashier->total_non_cash)</td>
+                                        <td>@currency($closeCashier->cash_in_drawer)</td>
+                                        <td>@currency($closeCashier->difference)</td>
                                         <td>
                                             <div class="row">
                                                 <a href="{{ route('close-cashier.show', $closeCashier->id) }}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>

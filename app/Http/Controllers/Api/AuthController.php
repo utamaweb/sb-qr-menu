@@ -50,7 +50,7 @@ class AuthController extends Controller
             if($dateNow >= $warehouse->expired_at && $warehouse->expired_at != null) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Outlet sudah memasuki masa expired penggunaan SB POS. Silakan melakukan pembayaran untuk menggunakan aplikasi. Terima kasih.'
+                    'message' => config('custom_message.EXPIRE_MESSAGE')
                 ], 500);
             }
 

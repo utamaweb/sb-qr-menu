@@ -26,6 +26,8 @@ class SubscriptionController extends Controller
             $isGreater = $expired_date->gt($today_date);
 
             $expired_at = date('d M Y', strtotime($outlet->expired_at));
+            // minus 1 day from expired at
+            $before_expired_at = date('d M Y', strtotime($outlet->expired_at) - 86400);
             $message = '';
 
             if($difference_days > 3 && $isGreater) {
@@ -33,7 +35,7 @@ class SubscriptionController extends Controller
             } elseif($difference_days <= 2 && $isGreater) {
                 $status = 'Akan segera berakhir';
                 $isExpired = true;
-                $message = 'Outlet ini akan segera berakhir dalam ' . $difference_days + 1 . ' hari. Segera perpanjang sebelum expired. Terima kasih.';
+                $message = 'Paket berlangganan aplikasi SB POS Anda memasuki masa tenggang dan akan berakhir pada tanggal '. $before_expired_at . ' jam 23:59 WIB. Silahkan membayar sebelum batas waktu tersebut';
             } elseif(!$isGreater) {
                 $status = 'Berakhir';
                 $isExpired = true;

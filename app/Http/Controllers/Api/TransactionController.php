@@ -897,13 +897,13 @@ class TransactionController extends Controller
                 return response()->json([
                     'status'  => 'error',
                     'message' => 'Tidak ada akun Whatsapp terhubung!'
-                ], 201);
+                ], 500);
             }
         } else {
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Outlet ini tidak memiliki akun Whatsapp terhubung!'
-            ], 201);
+            ], 500);
         }
 
     }
@@ -941,14 +941,14 @@ class TransactionController extends Controller
                     return response()->json([
                         'status' => 'error',
                         'message' => 'OTP transaksi tidak valid'
-                    ], 201);
+                    ], 500);
                 }
 
             } else {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Data transaksi tidak ada'
-                ], 201);
+                ], 500);
             }
         } catch (\Throwable $th) {
             DB::rollback();
@@ -986,7 +986,7 @@ class TransactionController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Data transaksi tidak ada'
-                ], 201);
+                ], 500);
             }
         } catch (\Throwable $th) {
             DB::rollback();

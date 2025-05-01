@@ -291,6 +291,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('expenses/expense-data', 'expenseData')->name('expenses.data');
             Route::post('expenses/deletebyselection', 'deleteBySelection');
         });
+        Route::get('/expense/export/{warehouse_id}', [ExpenseController::class, 'export'])->name('expense.export');
         Route::resource('pengeluaran', ExpenseController::class);
         Route::get('/expenses/data', [ExpenseController::class, 'getExpenses'])->name('expenses.data');
 

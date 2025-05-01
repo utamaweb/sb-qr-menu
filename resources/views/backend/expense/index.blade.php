@@ -15,9 +15,12 @@
                             <div class="form-group">
                                 <label for=""><strong>Pilih Tanggal</strong></label>
                                 <div class="input-group">
-                                    <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
+                                    <input type="text" name="start_date" id="start_date" class="form-control date" required value="{{ $start_date }}">
                                     <span class="input-group-text">s/d</span>
-                                    <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
+                                    <input type="text" name="end_date" id="end_date" class="form-control date" required value="{{ $end_date }}">
+                                </div>
+                                <div id="dateError" class="text-danger mt-2" style="display: none;">
+                                    Rentang tanggal tidak boleh lebih dari 30 hari!
                                 </div>
                             </div>
 
@@ -42,11 +45,12 @@
             </div>
         </div>
 
+        @if($warehouseId)
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Pengeluaran Outlet: {{ $warehouse->name }}</span>
+                        <span>Pengeluaran Outlet</span>
                         <a href="{{ route('expense.export', $warehouse->id) }}?start_date={{ $start_date }}&end_date={{ $end_date }}" class="btn btn-sm btn-success">Export Excel</a>
                     </div>
                     <div class="card-body">
@@ -86,6 +90,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </section>
 
@@ -137,6 +142,59 @@ $('#ingredient-table').DataTable( {
         // Event listener untuk perubahan pada input tanggal
         $("input[name='start_date'], input[name='end_date']").on("change", function() {
             validateDates();
+        });
+    });
+    </script>
+   <script>
+    $(function() {
+        // Inisialisasi datepicker
+        $("#start_date, #end_date").datepicker({
+            dateFormat: 'yy-mm-dd', // Format sesuai dengan backend
+            onSelect: function(selectedDate) {
+                var startDate = $("#start_date").datepicker("getDate");
+                var endDate = $("#end_date").datepicker("getDate");
+
+                // Jika start_date dipilih, set maxDate di end_date
+                if (this.id == "start_date") {
+                    $("#end_date").datepicker("option", "minDate", startDate);
+                    if (startDate) {
+                        var maxEndDate = new Date(startDate);
+                        maxEndDate.setDate(maxEndDate.getDate() + 30);
+                        $("#end_date").datepicker("option", "maxDate", maxEndDate);
+                    }
+                }
+
+                // Reset maxDate jika end_date diubah
+                if (this.id == "end_date" && !$("#start_date").val()) {
+                    $("#end_date").datepicker("option", "maxDate", null);
+                }
+            }
+        });
+
+        // Validasi form sebelum submit
+        $("form").on("submit", function(e) {
+            var startDate = $("#start_date").datepicker("getDate");
+            var endDate = $("#end_date").datepicker("getDate");
+            var errorDiv = $("#dateError");
+
+            errorDiv.hide(); // Reset error
+
+            if (!startDate || !endDate) {
+                alert("Silakan pilih tanggal mulai dan akhir.");
+                e.preventDefault();
+                return false;
+            }
+
+            var diffTime = Math.abs(endDate - startDate);
+            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 30) {
+                errorDiv.show();
+                e.preventDefault(); // Cegah submit
+                return false;
+            }
+
+            return true;
         });
     });
     </script>

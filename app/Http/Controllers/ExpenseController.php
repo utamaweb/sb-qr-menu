@@ -55,13 +55,18 @@ class ExpenseController extends Controller
             $end_date = date("Y-m-d");
         }
 
-        // get warehouse data
-        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
-        $warehouseId = $request->get('warehouse_id');
-        $warehouse = Warehouse::findOrFail($warehouseId);
+        // get warehouse data and expense data
+        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->where('is_active', true)->get();
 
+        // condition for user access
+        if(auth()->user()->hasRole('Admin Bisnis')){
+            $warehouseId = $request->get('warehouse_id') ?? null;
+        } else {
+            $warehouseId = auth()->user()->warehouse_id;
+        }
+
+        $warehouse = Warehouse::where('id', $warehouseId)->first();
         $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->where('warehouse_id', $warehouseId)->whereBetween('created_at', [$start_date, $end_date])->orderBy('id', 'desc')->get();
-
         return view('backend.expense.index', compact('start_date', 'end_date', 'expenses', 'warehouseId', 'warehouse', 'warehouses'));
     }
 

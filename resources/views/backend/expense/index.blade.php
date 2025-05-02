@@ -51,7 +51,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>Pengeluaran Outlet</span>
-                        <a href="{{ route('expense.export', $warehouse->id) }}?start_date={{ $start_date }}&end_date={{ $end_date }}" class="btn btn-sm btn-success">Export Excel</a>
+                        <a href="{{ route('expense.export', $warehouseId) }}?start_date={{ $start_date }}&end_date={{ $end_date }}" class="btn btn-sm btn-success">Export Excel</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

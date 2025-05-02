@@ -66,7 +66,13 @@ class ExpenseController extends Controller
         }
 
         $warehouse = Warehouse::where('id', $warehouseId)->first();
-        $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->where('warehouse_id', $warehouseId)->whereBetween('created_at', [$start_date, $end_date])->orderBy('id', 'desc')->get();
+        $expenses = Expense::with('expenseCategory', 'warehouse', 'user')
+            ->where('warehouse_id', $warehouseId)
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->orderBy('id', 'desc')
+            ->get();
+
         return view('backend.expense.index', compact('start_date', 'end_date', 'expenses', 'warehouseId', 'warehouse', 'warehouses'));
     }
 
@@ -163,7 +169,12 @@ class ExpenseController extends Controller
     public function export($warehouseId){
         $start_date = request()->start_date;
         $end_date = request()->end_date;
-        $query = Expense::with('expenseCategory', 'warehouse', 'user')->where('warehouse_id', $warehouseId)->whereBetween('created_at', [$start_date, $end_date])->orderBy('id', 'desc');
+        $query = Expense::with('expenseCategory', 'warehouse', 'user')
+            ->where('warehouse_id', $warehouseId)
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->orderBy('id', 'desc');
+
         $totalCost = $query->sum('amount');
         $warehouse = Warehouse::findOrFail($warehouseId);
 

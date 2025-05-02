@@ -99,9 +99,9 @@
 @push('scripts')
 <script type="text/javascript">
 $('.selectpicker').selectpicker();
-$("ul#report").siblings('a').attr('aria-expanded','true');
-$("ul#report").addClass("show");
-$("ul#report #laporan-selisih").addClass("active");
+$("ul#expense").siblings('a').attr('aria-expanded','true');
+$("ul#expense").addClass("show");
+$("ul#expense #exp-cat-menu").addClass("active");
 
 $('.selectpicker').selectpicker('refresh');
 

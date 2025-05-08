@@ -1,127 +1,87 @@
 @extends('backend.layout.main')
 @section('content')
 <section>
-	<div class="container-fluid">
-		<div class="card">
-			<div class="card-body">
-				{{-- {{ Form::open(['route' => ['report.dailySaleByWarehouse', $year, $month], 'method' => 'post', 'id' => 'report-form']) }}
-				<input type="hidden" name="warehouse_id_hidden" value="{{$warehouse_id}}"> --}}
-				<h4 class="text-center">Laporan Penjualan Harian &nbsp;&nbsp;
-				{{-- <select class="selectpicker" id="warehouse_id" name="warehouse_id">
-					<option value="0">Semua Cabang</option>
-					@foreach($lims_warehouse_list as $warehouse)
-					<option value="{{$warehouse->id}}">{{$warehouse->name}}</option>
-					@endforeach
-				</select>
-				</h4>
-				{{ Form::close() }} --}}
-				<div class="table-responsive mt-4">
-					<table class="table table-bordered" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
-						<thead>
-							<tr>
-								<th><a href="{{url('admin/report/daily_sale/'.$prev_year.'/'.$prev_month)}}"><i class="fa fa-arrow-left"></i> {{trans('file.Previous')}}</a></th>
-						    	<th colspan="5" class="text-center">{{date("F", strtotime($year.'-'.$month.'-01')).' ' .$year}}</th>
-						    	<th><a href="{{url('admin/report/daily_sale/'.$next_year.'/'.$next_month)}}">{{trans('file.Next')}} <i class="fa fa-arrow-right"></i></a></th>
-						    </tr>
-						</thead>
-					    <tbody>
-						    <tr>
-							    <td><strong>Minggu</strong></td>
-							    <td><strong>Senin</strong></td>
-							    <td><strong>Selasa</strong></td>
-							    <td><strong>Rabu</strong></td>
-							    <td><strong>Kamis</strong></td>
-							    <td><strong>Jum'at</strong></td>
-							    <td><strong>Sabtu</strong></td>
-						    </tr>
-						    <?php
-						    	$i = 1;
-						    	$flag = 0;
-						    	while ($i <= $number_of_day) {
-						    		echo '<tr>';
-						    		for($j=1 ; $j<=7 ; $j++){
-						    			if($i > $number_of_day)
-						    				break;
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-body">
 
-						    			if($flag){
-						    				if($year.'-'.$month.'-'.$i == date('Y').'-'.date('m').'-'.(int)date('d'))
-						    					echo '<td><p style="color:green"><strong>'.$i.'</strong></p>';
-						    				else
-						    					echo '<td><p><strong>'.$i.'</strong></p>';
+                <h4 class="text-center mb-4">Laporan Penjualan Harian</h4>
 
-						    				if($total_qty[$i]){
-						    					echo '<strong>'."Total Produk Terjual".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
-						    				}
-						    				// if($total_paid_amount[$i]){
-						    				// 	echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>Rp. '.number_format($total_paid_amount[$i], 0, '', '.').'</span><br><br>';
-						    				// }
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered text-center" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
+                        <thead>
+                            <tr>
+                                <th><a href="{{ url("admin/report/daily_sale/$prev_year/$prev_month") }}"><i class="fa fa-arrow-left"></i> Previous</a></th>
+                                <th colspan="5" class="text-center">{{ date("F Y", strtotime("$year-$month-01")) }}</th>
+                                <th><a href="{{ url("admin/report/daily_sale/$next_year/$next_month") }}">Next <i class="fa fa-arrow-right"></i></a></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Minggu</strong></td>
+                                <td><strong>Senin</strong></td>
+                                <td><strong>Selasa</strong></td>
+                                <td><strong>Rabu</strong></td>
+                                <td><strong>Kamis</strong></td>
+                                <td><strong>Jum'at</strong></td>
+                                <td><strong>Sabtu</strong></td>
+                            </tr>
 
-                                            if($total_transaction[$i]){
-						    					echo '<strong>'."Jumlah Transaksi".'</strong><br><span>'.number_format($total_transaction[$i], 0, '', '.').'</span><br><br>';
-						    				}
+                            @php
+                                $currentDay = 1;
+                                $flag = false;
+                            @endphp
 
-						    				if($total_amount[$i]){
-						    					echo '<strong>'."Total Pendapatan".'</strong><br><span>Rp. '.number_format($total_amount[$i], 0, '', '.').'</span><br><br>';
-						    				}
+                            @while ($currentDay <= $number_of_day)
+                                <tr>
+                                    @for ($weekDay = 1; $weekDay <= 7; $weekDay++)
+                                        @if ($currentDay > $number_of_day)
+                                            <td></td>
+                                            @continue
+                                        @endif
 
-						    				echo '</td>';
-						    				$i++;
-						    			}
-						    			elseif($j == $start_day){
-						    				if($year.'-'.$month.'-'.$i == date('Y').'-'.date('m').'-'.(int)date('d'))
-						    					echo '<td><p style="color:green"><strong>'.$i.'</strong></p>';
-						    				else
-						    					echo '<td><p><strong>'.$i.'</strong></p>';
+                                        @if (!$flag && $weekDay != $start_day)
+                                            <td></td>
+                                            @continue
+                                        @else
+                                            @php $flag = true; @endphp
+                                        @endif
 
-                                            if($total_qty[$i]){
-						    					echo '<strong>'."Total Produk Terjual".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
-						    				}
-						    				// if($total_paid_amount[$i]){
-						    				// 	echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>Rp. '.number_format($total_paid_amount[$i], 0, '', '.').'</span><br><br>';
-						    				// }
+                                        <td class="{{ ($year.'-'.$month.'-'.$currentDay == date('Y-m-d')) ? 'bg-success text-white' : '' }}">
+                                            <p><strong>{{ $currentDay }}</strong></p>
 
-                                            if($total_transaction[$i]){
-                                                echo '<strong>'."Jumlah Transaksi".'</strong><br><span>'.number_format($total_transaction[$i], 0, '', '.').'</span><br><br>';
-                                            }
+                                            @if ($dailyData[$currentDay]['qty'] > 0)
+                                                <strong>Total Produk Terjual</strong><br>
+                                                <span>{{ number_format($dailyData[$currentDay]['qty'], 0, '', '.') }}</span><br><br>
+                                            @endif
 
-						    				if($total_amount[$i]){
-						    					echo '<strong>'."Total Pendapatan".'</strong><br><span>Rp. '.number_format($total_amount[$i], 0, '', '.').'</span><br><br>';
-						    				}
+                                            @if ($dailyData[$currentDay]['transaction'] > 0)
+                                                <strong>Jumlah Transaksi Lunas</strong><br>
+                                                <span>{{ number_format($dailyData[$currentDay]['transaction'], 0, '', '.') }}</span><br><br>
+                                            @endif
 
-						    				echo '</td>';
-						    				$flag = 1;
-						    				$i++;
-						    				continue;
-						    			}
-						    			else {
-						    				echo '<td></td>';
-						    			}
-						    		}
-						    	    echo '</tr>';
-						    	}
-						    ?>
-					    </tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+                                            @if ($dailyData[$currentDay]['amount'] > 0)
+                                                <strong>Total Pendapatan</strong><br>
+                                                <span>Rp. {{ number_format($dailyData[$currentDay]['amount'], 0, '', '.') }}</span><br><br>
+                                            @endif
+                                        </td>
+                                        @php $currentDay++; @endphp
+                                    @endfor
+                                </tr>
+                            @endwhile
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
-
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
-
-	$("ul#report").siblings('a').attr('aria-expanded','true');
+    $("ul#report").siblings('a').attr('aria-expanded','true');
     $("ul#report").addClass("show");
     $("ul#report #daily-sale-report-menu").addClass("active");
-
-	$('#warehouse_id').val($('input[name="warehouse_id_hidden"]').val());
-	$('.selectpicker').selectpicker('refresh');
-
-	$('#warehouse_id').on("change", function(){
-		$('#report-form').submit();
-	});
 </script>
 @endpush

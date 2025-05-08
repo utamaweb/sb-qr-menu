@@ -226,13 +226,15 @@ class ReportController extends Controller
             $query1 = array(
                 'SUM(total_qty) AS total_qty',
                 'SUM(paid_amount) AS total_paid_amount',
-                'SUM(total_amount) AS total_amount'
+                'SUM(total_amount) AS total_amount',
+                'COUNT(*) AS total_transaction'
             );
             // $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
             $sale_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->where('date', $date)->selectRaw(implode(',', $query1))->get();
             $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
             $total_qty[$start] = $sale_data[0]->total_qty;
             $total_amount[$start] = $sale_data[0]->total_amount;
+            $total_transaction[$start] = $sale_data[0]->total_transaction;
             $start++;
         }
         $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
@@ -242,7 +244,7 @@ class ReportController extends Controller
         $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         $warehouse_id = 0;
-        return view('backend.report.daily_sale', compact('total_paid_amount','total_qty', 'total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+        return view('backend.report.daily_sale', compact('total_paid_amount','total_qty', 'total_amount', 'total_transaction', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
     }
 
     public function dailySaleByWarehouse(Request $request,$year,$month)
@@ -261,7 +263,7 @@ class ReportController extends Controller
             $query1 = array(
                 'SUM(total_qty) AS total_qty',
                 'SUM(paid_amount) AS total_paid_amount',
-                'SUM(total_amount) AS total_amount'
+                'SUM(total_amount) AS total_amount',
             );
             // $sale_data = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
             $sale_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $data['warehouse_id'])->where('date', $date)->selectRaw(implode(',', $query1))->get();
@@ -4809,7 +4811,7 @@ class ReportController extends Controller
                 $date = explode('-', request()->month);
                 $month = $date[1];
                 $year = $date[0];
-    
+
                 // Get outlet products
                 $data = collect(DB::select("SELECT pw.product_id, p.name
                     FROM product_warehouse AS pw
@@ -4846,7 +4848,7 @@ class ReportController extends Controller
 
         // Get outlet name
         $outlet = Warehouse::find(request()->outlet);
-        
+
         // Get ojol by outlet business_id
         $ojols = Ojol::where('business_id', $outlet->business_id)->get();
         $ojolCount = $ojols->count();
@@ -4909,7 +4911,7 @@ class ReportController extends Controller
             $sheet->getStyle('A2:C2')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
             $sheet->getStyle('A2:C2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
             $sheet->getStyle('A2:C2')->getFont()->setColor(new Color('FFFFFF'));
-            
+
             $lastEndColumn = $this->addExcelColumn('D', ($ojolCount + 2) - 1);
 
             // Shift loop
@@ -4921,7 +4923,7 @@ class ReportController extends Controller
 
                     // Order type row
                     $sheet->setCellValue("D3", "Dine In");
-                    
+
                     foreach($ojols as $index => $ojol) {
                         $sheet->setCellValue(($this->addExcelColumn('D', $index + 1)) . "3", $ojol->name);
                     }
@@ -4930,14 +4932,14 @@ class ReportController extends Controller
                 } else {
                     $sheet->setCellValue(($lastEndColumn) . "2", "Shift " . $i);
                     $sheet->mergeCells(($lastEndColumn) . "2:" . ($this->addExcelColumn($lastEndColumn, ($ojolCount + 2) - 1)) . "2");
-                    
+
                     // Order type row
                     $sheet->setCellValue(($lastEndColumn) . "3", "Dine In");
-                    
+
                     foreach($ojols as $index => $ojol) {
                         $sheet->setCellValue(($this->addExcelColumn($lastEndColumn, $index + 1)) . "3", $ojol->name);
                     }
-                    
+
                     $sheet->setCellValue(($this->addExcelColumn($lastEndColumn, $ojolCount + 1)) . "3", "Total S" . $i);
 
                     $lastEndColumn = $this->addExcelColumn($lastEndColumn, ($ojolCount + 3) - 1);
@@ -5019,7 +5021,7 @@ class ReportController extends Controller
 
                     // Order type row
                     $sheet->setCellValue("D5", $totals['dine_in'][$i]);
-                    
+
                     foreach($ojols as $index => $ojol) {
                         $sheet->setCellValue(($this->addExcelColumn('D', $index + 1)) . "5", $totals[$ojol->name][$i]);
                     }
@@ -5028,11 +5030,11 @@ class ReportController extends Controller
                 } else {
                     // Order type row
                     $sheet->setCellValue(($newLastEndColumn) . "5", $totals['dine_in'][$i]);
-                    
+
                     foreach($ojols as $index => $ojol) {
                         $sheet->setCellValue(($this->addExcelColumn($newLastEndColumn, $index + 1)) . "5", $totals[$ojol->name][$i]);
                     }
-                    
+
                     $sheet->setCellValue(($this->addExcelColumn($newLastEndColumn, $ojolCount + 1)) . "5", $totals['total'][$i]);
 
                     $newLastEndColumn = $this->addExcelColumn($newLastEndColumn, ($ojolCount + 3) - 1);
@@ -5110,10 +5112,10 @@ class ReportController extends Controller
             // ord('A')=65 jadi dikurangi agar A=1
             $num = $num * 26 + (ord($column[$i]) - ord('A') + 1);
         }
-    
+
         // Tambahkan nilai offset
         $num += $add;
-    
+
         // Konversi kembali ke nama kolom Excel
         return $this->intToExcelColumn($num);
     }
@@ -5132,12 +5134,12 @@ class ReportController extends Controller
         $ojols = Ojol::where('business_id', $outlet->business_id)->get();
 
         // Get outlet transactions
-        $transactions = collect(DB::select("SELECT t.id, s.shift_number, t.payment_method, t.total_amount, t.date  
+        $transactions = collect(DB::select("SELECT t.id, s.shift_number, t.payment_method, t.total_amount, t.date
             FROM transactions AS t
                 LEFT JOIN shifts AS s ON t.shift_id = s.id
-            WHERE t.warehouse_id = $outlet->id 
-                AND t.deleted_at IS NULL 
-                AND MONTH(t.date) = '$month' 
+            WHERE t.warehouse_id = $outlet->id
+                AND t.deleted_at IS NULL
+                AND MONTH(t.date) = '$month'
                 AND YEAR(t.date) = '$year'
                 AND t.status = 'Lunas'"));
 
@@ -5150,7 +5152,7 @@ class ReportController extends Controller
         $row = [];
         $row['product_id'] = $productId;
         $row['product_name'] = $productName;
-        
+
         // Date loop
         for ($i = 1; $i <= $startDate->daysInMonth; $i++) {
             $date_row = [];
@@ -5176,7 +5178,7 @@ class ReportController extends Controller
                         ->pluck('id'))
                     ->sum('qty');
 
-                    
+
                 // Ojol loop
                 foreach ($ojols as $ojol) {
                     $shift_row[$ojol->name] = $transactionDetails

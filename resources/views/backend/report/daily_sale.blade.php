@@ -26,13 +26,13 @@
 						</thead>
 					    <tbody>
 						    <tr>
-							    <td><strong>Sunday</strong></td>
-							    <td><strong>Monday</strong></td>
-							    <td><strong>Tuesday</strong></td>
-							    <td><strong>Wednesday</strong></td>
-							    <td><strong>Thrusday</strong></td>
-							    <td><strong>Friday</strong></td>
-							    <td><strong>Saturday</strong></td>
+							    <td><strong>Minggu</strong></td>
+							    <td><strong>Senin</strong></td>
+							    <td><strong>Selasa</strong></td>
+							    <td><strong>Rabu</strong></td>
+							    <td><strong>Kamis</strong></td>
+							    <td><strong>Jum'at</strong></td>
+							    <td><strong>Sabtu</strong></td>
 						    </tr>
 						    <?php
 						    	$i = 1;
@@ -45,37 +45,49 @@
 
 						    			if($flag){
 						    				if($year.'-'.$month.'-'.$i == date('Y').'-'.date('m').'-'.(int)date('d'))
-						    					echo '<td><p style="color:red"><strong>'.$i.'</strong></p>';
+						    					echo '<td><p style="color:green"><strong>'.$i.'</strong></p>';
 						    				else
 						    					echo '<td><p><strong>'.$i.'</strong></p>';
 
 						    				if($total_qty[$i]){
-						    					echo '<strong>'."Total Kuantitas".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
+						    					echo '<strong>'."Total Produk Terjual".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
 						    				}
 						    				// if($total_paid_amount[$i]){
 						    				// 	echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>Rp. '.number_format($total_paid_amount[$i], 0, '', '.').'</span><br><br>';
 						    				// }
+
+                                            if($total_transaction[$i]){
+						    					echo '<strong>'."Jumlah Transaksi".'</strong><br><span>'.number_format($total_transaction[$i], 0, '', '.').'</span><br><br>';
+						    				}
+
 						    				if($total_amount[$i]){
 						    					echo '<strong>'."Total Pendapatan".'</strong><br><span>Rp. '.number_format($total_amount[$i], 0, '', '.').'</span><br><br>';
 						    				}
+
 						    				echo '</td>';
 						    				$i++;
 						    			}
 						    			elseif($j == $start_day){
 						    				if($year.'-'.$month.'-'.$i == date('Y').'-'.date('m').'-'.(int)date('d'))
-						    					echo '<td><p style="color:red"><strong>'.$i.'</strong></p>';
+						    					echo '<td><p style="color:green"><strong>'.$i.'</strong></p>';
 						    				else
 						    					echo '<td><p><strong>'.$i.'</strong></p>';
 
-                                                    if($total_qty[$i]){
-						    					echo '<strong>'."Total Kuantitas".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
+                                            if($total_qty[$i]){
+						    					echo '<strong>'."Total Produk Terjual".'</strong><br><span>'.number_format($total_qty[$i], 0, '', '.').'</span><br><br>';
 						    				}
-						    				if($total_paid_amount[$i]){
-						    					echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>Rp. '.number_format($total_paid_amount[$i], 0, '', '.').'</span><br><br>';
-						    				}
+						    				// if($total_paid_amount[$i]){
+						    				// 	echo '<strong>'."Total Pelanggan Bayar".'</strong><br><span>Rp. '.number_format($total_paid_amount[$i], 0, '', '.').'</span><br><br>';
+						    				// }
+
+                                            if($total_transaction[$i]){
+                                                echo '<strong>'."Jumlah Transaksi".'</strong><br><span>'.number_format($total_transaction[$i], 0, '', '.').'</span><br><br>';
+                                            }
+
 						    				if($total_amount[$i]){
 						    					echo '<strong>'."Total Pendapatan".'</strong><br><span>Rp. '.number_format($total_amount[$i], 0, '', '.').'</span><br><br>';
 						    				}
+
 						    				echo '</td>';
 						    				$flag = 1;
 						    				$i++;

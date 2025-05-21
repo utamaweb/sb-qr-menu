@@ -211,42 +211,6 @@ class ReportController extends Controller
 
     }
 
-    // public function dailySale($year, $month)
-    // {
-    //     $role = Role::find(Auth::user()->role_id);
-    //     $start = 1;
-    //     $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
-    //     $warehouse_id = auth()->user()->warehouse_id;
-    //     while($start <= $number_of_day)
-    //     {
-    //         if($start < 10)
-    //             $date = $year.'-'.$month.'-0'.$start;
-    //         else
-    //             $date = $year.'-'.$month.'-'.$start;
-    //         $query1 = array(
-    //             'SUM(total_qty) AS total_qty',
-    //             'SUM(paid_amount) AS total_paid_amount',
-    //             'SUM(total_amount) AS total_amount',
-    //             'COUNT(*) AS total_transaction'
-    //         );
-    //         // $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-    //         $sale_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->where('date', $date)->selectRaw(implode(',', $query1))->get();
-    //         $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
-    //         $total_qty[$start] = $sale_data[0]->total_qty;
-    //         $total_amount[$start] = $sale_data[0]->total_amount;
-    //         $total_transaction[$start] = $sale_data[0]->total_transaction;
-    //         $start++;
-    //     }
-    //     $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
-    //     $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-    //     $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-    //     $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-    //     $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-    //     $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-    //     $warehouse_id = 0;
-    //     return view('backend.report.daily_sale', compact('total_paid_amount','total_qty', 'total_amount', 'total_transaction', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
-    // }
-
     public function dailySale($year, $month)
     {
         $warehouse_id = auth()->user()->warehouse_id;
@@ -407,35 +371,6 @@ class ReportController extends Controller
 
         return view('backend.report.daily_purchase', compact('total_discount','order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'grand_total', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
     }
-
-    // public function monthlySale($year)
-    // {
-    //     $role = Role::find(Auth::user()->role_id);
-    //     $start = strtotime($year .'-01-01');
-    //     $end = strtotime($year .'-12-31');
-    //     $warehouse_id = auth()->user()->warehouse_id;
-    //     while($start <= $end)
-    //     {
-    //         $start_date = $year . '-'. date('m', $start).'-'.'01';
-    //         $end_date = $year . '-'. date('m', $start).'-'.'31';
-
-    //         $temp_order_qty = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
-    //         $total_qty[] = number_format((float)$temp_order_qty, config('decimal'), '.', '');
-
-    //         $temp_transaction_count = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->count();
-    //         $total_transaction[] = number_format((float)$temp_transaction_count, config('decimal'), '.', '');
-
-    //         $total_paid_amount = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
-    //         $total_paid[] = number_format((float)$total_paid_amount, config('decimal'), '.', '');
-
-    //         $temp_total = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
-    //         $total_amount[] = number_format((float)$temp_total, config('decimal'), '.', '');
-    //         $start = strtotime("+1 month", $start);
-    //     }
-    //     $lims_warehouse_list = Warehouse::where('is_active',true)->get();
-    //     // $warehouse_id = 0;
-    //     return view('backend.report.monthly_sale', compact('year', 'total_qty', 'total_paid', 'total_amount','lims_warehouse_list', 'warehouse_id', 'total_transaction'));
-    // }
 
     public function monthlySale($year)
     {
@@ -947,7 +882,6 @@ class ReportController extends Controller
             $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')->where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->get();
         }
         return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct'));
-
     }
 
     public function productReportData(Request $request)

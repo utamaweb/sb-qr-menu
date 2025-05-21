@@ -21,6 +21,7 @@
                                     <th>Total Non Tunai</th>
                                     <th>Uang Laci</th>
                                     <th>Selisih</th>
+                                    <th>Total Pengeluaran</th>
                                     <th class="not-exported">Aksi</th>
                                 </tr>
                             </thead>
@@ -39,6 +40,7 @@
                                         <td>@currency($closeCashier->total_non_cash)</td>
                                         <td>@currency($closeCashier->cash_in_drawer)</td>
                                         <td>@currency($closeCashier->difference)</td>
+                                        <td>@currency($closeCashier->total_expense)</td>
                                         <td>
                                             <div class="row">
                                                 <a href="{{ route('close-cashier.show', $closeCashier->id) }}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>

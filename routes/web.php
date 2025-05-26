@@ -1,38 +1,39 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExpenseCategoryController;
-use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\ProductWarehouseController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\IngredientController;
-use App\Http\Controllers\StockOpnameController;
-use App\Http\Controllers\StockPurchaseController;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\ShiftController;
-use App\Http\Controllers\UnitController;
-use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\WarehouseController;
-use App\Http\Controllers\OrderTypeController;
-use App\Http\Controllers\CloseCashierController;
-use App\Http\Controllers\OjolController;
-use App\Http\Controllers\OjolWarehouseController;
-use App\Http\Controllers\BusinessStockController;
-use App\Http\Controllers\CustomCategoryController;
-use App\Http\Controllers\WhatsappController;
-use App\Http\Controllers\CustomMessageController;
-
 use App\Models\Warehouse;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OjolController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RegionalController;
+use App\Http\Controllers\WhatsappController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderTypeController;
+use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\StockOpnameController;
+use App\Http\Controllers\CloseCashierController;
+use App\Http\Controllers\BusinessStockController;
+use App\Http\Controllers\CustomMessageController;
+
+use App\Http\Controllers\OjolWarehouseController;
+use App\Http\Controllers\StockPurchaseController;
+use App\Http\Controllers\CustomCategoryController;
+use App\Http\Controllers\ExpenseCategoryController;
+use App\Http\Controllers\ProductWarehouseController;
 
 Route::fallback(function () {
     return redirect()->route('admin.auth.index');
@@ -131,6 +132,8 @@ Route::group(['prefix' => 'admin'], function () {
         //     Route::post('category/category-data', 'categoryData');
         // });
         Route::resource('kategori', CategoryController::class);
+
+        Route::resource('regional', RegionalController::class);
 
         Route::controller(WarehouseController::class)->group(function () {
             Route::post('importwarehouse', 'importWarehouse')->name('outlet.import');

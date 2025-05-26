@@ -25,7 +25,7 @@
             <a href="{{ route('whatsapp.index') }}"> <i class="dripicons-conversation"></i> <span>Whatsapp</span></a>
         </li>
         <li id="setting"><a href="{{ route('setting.general') }}"> <i
-                    class="dripicons-gear"></i><span>Pengaturan</span></a></li>
+                class="dripicons-gear"></i><span>Pengaturan</span></a></li>
 
         {{-- Menu Admin Bisnis --}}
     @elseif(auth()->user()->hasRole('Admin Bisnis'))
@@ -33,6 +33,8 @@
                     Online</span></a></li>
         <li id="kategori"><a href="{{ route('kategori.index') }}"> <i
                     class="dripicons-user-id"></i><span>Kategori</span></a></li>
+        <li id="regional"><a href="{{ route('regional.index') }}"> <i
+                    class="dripicons-location"></i><span>Regional</span></a></li>
         <li id="produk"><a href="{{ route('produk.index') }}"> <i
                     class="dripicons-user-id"></i><span>Produk</span></a></li>
         <li id="bahan-baku"><a href="{{ route('bahan-baku.index') }}"> <i class="dripicons-user-id"></i><span>Bahan

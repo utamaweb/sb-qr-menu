@@ -23,6 +23,7 @@
                                     <th>Nama Outlet</th>
                                     <th>Tipe</th>
                                     <th>Bisnis</th>
+                                    <th>Regional</th>
                                     <th>Alamat</th>
                                     <th>Tanggal Dibuat</th>
                                     <th>Tagihan</th>
@@ -37,6 +38,7 @@
                                     <td>{{ $warehouse->name }}</td>
                                     <td>{{ ($warehouse->is_self_service == 0) ? 'Hanya Kasir' : 'Self Service' }}</td>
                                     <td>{{ $warehouse->business->name }}</td>
+                                    <td>{{ $warehouse->regional->name ?? '-' }}</td>
                                     <td>{{ $warehouse->address }}</td>
                                     <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
                                     <td>Rp. {{ number_format($warehouse->tagihan, 0, ',', '.') }}</td>

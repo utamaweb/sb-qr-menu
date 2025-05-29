@@ -39,6 +39,18 @@
                     </div>
                     {{-- End of business input --}}
 
+                    {{-- regional input --}}
+                    <div class="form-group">
+                        <label>Regional <span class="text-danger">*</span></label>
+                        <select name="regional_id" class="form-control" id="editRegional">
+                            <option value="">---Pilih Regional---</option>
+                            @foreach($regionals as $regional)
+                                <option value="{{ $regional->id }}">{{ $regional->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    {{-- End of regional input --}}
+
                     {{-- Address input --}}
                     <div class="form-group">
                         <label>Alamat <span class="text-danger">*</span></label>
@@ -166,6 +178,7 @@
                     $('#editAddress').val(data.address);
                     $('#editService').selectpicker('val', data.is_self_service);
                     $('#editBusiness').selectpicker('val', data.business_id);
+                    $('#editRegional').selectpicker('val', data.regional_id);
                     $('#editTagihan').val(formatNumber(data.tagihan == null ? 0 : data.tagihan));
                     $('#editExpiredAt').val(data.expired_at);
                     $('#editExpiredAt').attr('min', new Date().toISOString().split('T')[0]);

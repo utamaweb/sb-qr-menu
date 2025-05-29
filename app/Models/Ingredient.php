@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Ingredient extends Model
 {
     use HasFactory, SoftDeletes;
-    protected $fillable = ['name', 'unit_id', 'business_id'];
+    protected $guarded = [];
 
     public function unit()
     {

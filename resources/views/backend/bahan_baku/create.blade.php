@@ -9,7 +9,7 @@
             <div class="card-header d-flex justify-content-between">
                 <span>Bahan Baku</span>
                 @can('tambah-bahanbaku')
-                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>
+                <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Bahan Baku</a>
                 @endcan
             </div>
 
@@ -20,6 +20,7 @@
                             <tr>
                                 <th class="text-center">#</th>
                                 <th>Nama Bahan Baku</th>
+                                <th>Minimum Stok</th>
                                 <th>Unit</th>
                                 <th class="not-exported">Aksi</th>
                             </tr>
@@ -29,54 +30,59 @@
                             <tr data-id="{{$ingredient->id}}">
                                 <td class="text-center">{{++$key}}</td>
                                 <td>{{ $ingredient->name }}</td>
+                                <td>{{ $ingredient->minimum_stock }}</td>
                                 <td>{{ $ingredient->unit->unit_name }}</td>
                                 <td>
                                     <div class="row">
                                         @can('ubah-bahanbaku')
-                                    <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
-                                    {{-- Edit Modal --}}
-                                    <div id="editModal-{{$ingredient->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                                        <div role="document" class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h5 id="exampleModalLabel" class="modal-title">Ubah Bahan Baku</h5>
-                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                            </div>
-                                            <div class="modal-body">
-                                            <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
-                                                <form action="{{route('bahan-baku.update', $ingredient->id)}}" method="POST">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <div class="form-group">
-                                                    <div class="form-group">
-                                                        <label>Nama Bahan Baku *</label>
-                                                        <input type="text" value="{{$ingredient->name}}" name="name" required class="form-control">
+                                        <button type="button" class="btn btn-link" data-toggle="modal" data-target="#editModal-{{$ingredient->id}}"><i class="dripicons-document-edit"></i> Ubah</button>
+                                        {{-- Edit Modal --}}
+                                        <div id="editModal-{{$ingredient->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+                                            <div role="document" class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 id="exampleModalLabel" class="modal-title">Ubah Bahan Baku</h5>
+                                                        <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
                                                     </div>
-                                                    <div class="form-group">
-                                                        <label>Unit *</label>
-                                                        <select name="unit_id" id="" class="form-control">
-                                                            <option value="---Pilih Unit---"></option>
-                                                            @foreach($units as $unit)
-                                                            <option value="{{$unit->id}}" {{$ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                    </div>
-                                                    <input type="submit" value="Submit" class="btn btn-primary">
-                                                </form>
-                                            </div>
-                                        </div>
-                                        </div>
-                                    </div>
-                                    @endcan
+                                                    <div class="modal-body">
+                                                        <p class="italic"><small>Inputan yang ditandai dengan * wajib diisi.</small></p>
+                                                        <form action="{{route('bahan-baku.update', $ingredient->id)}}" method="POST">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <div class="form-group">
+                                                                <label>Nama Bahan Baku *</label>
+                                                                <input type="text" value="{{$ingredient->name}}" name="name" required class="form-control">
+                                                            </div>
 
-                                    @can('hapus-bahanbaku')
-                                    {{ Form::open(['route' => ['bahan-baku.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
-                                                <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
-                                            {{ Form::close() }}
-                                    @endcan
-                                </td>
-                            </div>
+                                                            <div class="form-group">
+                                                                <label>Minimum Stock *</label>
+                                                                <input type="number" value="{{$ingredient->minimum_stock}}" name="minimum_stock" required class="form-control">
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label>Unit *</label>
+                                                                <select name="unit_id" id="" class="form-control">
+                                                                    <option value="---Pilih Unit---"></option>
+                                                                    @foreach($units as $unit)
+                                                                    <option value="{{$unit->id}}" {{$ingredient->unit_id == $unit->id ? 'selected' : ''}}>{{$unit->unit_name}} ({{$unit->unit_code}})</option>
+                                                                    @endforeach
+                                                                </select>
+                                                            </div>
+                                                            <input type="submit" value="Submit" class="btn btn-primary">
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endcan
+
+                                        @can('hapus-bahanbaku')
+                                        {{ Form::open(['route' => ['bahan-baku.destroy', $ingredient->id], 'method' => 'DELETE'] ) }}
+                                        <button type="submit" class="btn btn-link" onclick="return confirmDelete()"><i class="dripicons-trash"></i> Hapus</button>
+                                        {{ Form::close() }}
+                                        @endcan
+                                    </td>
+                                </div>
                             </tr>
                             @endforeach
                         </tbody>
@@ -99,57 +105,29 @@
             </div>
             <div class="modal-body">
                 <p class="italic"><small>Inputan yang memiliki tanda (*) wajib diisi</small></p>
-                <form>
-                    <div class="form-group">
-                        <label>Nama Bahan Baku *</label>
-                        <input type="text" name="name" required class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Unit *</label>
-                        <select name="unit_id" id="" class="form-control">
-                            <option value="---Pilih Unit---"></option>
-                            @foreach($units as $unit)
-                            <option value="{{$unit->id}}">{{$unit->unit_name}} ({{$unit->unit_code}})</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <input type="submit" value="Submit" class="btn btn-primary">
-            </form>
-        </div>
-        {{ Form::close() }}
-    </div>
-</div>
-</div>
+                <div class="form-group">
+                    <label>Nama Bahan Baku *</label>
+                    <input type="text" name="name" required class="form-control">
+                </div>
 
-<div id="importUnit" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-    <div role="document" class="modal-dialog">
-      <div class="modal-content">
-        {!! Form::open(['route' => 'ingredient.import', 'method' => 'post', 'files' => true]) !!}
-        <div class="modal-header">
-          <h5 id="exampleModalLabel" class="modal-title"> {{trans('file.Import Unit')}}</h5>
-          <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-        </div>
-        <div class="modal-body">
-            <p class="italic"><small>{{trans('file.The field labels marked with * are required input fields')}}.</small></p>
-            <p>{{trans('file.The correct column order is')}} (name*, unit_name*, base_unit [unit code], operator, operation_value) {{trans('file.and you must follow this')}}.</p>
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label>{{trans('file.Upload CSV File')}} *</label>
-                        {{Form::file('file', array('class' => 'form-control','required'))}}
-                    </div>
+                <div class="form-group">
+                    <label>Minimum Stok *</label>
+                    <input type="number" name="minimum_stock" required class="form-control">
                 </div>
-                <div class="col-md-6">
-                    <div class="form-group">
-                        <label> {{trans('file.Sample File')}}</label>
-                        <a href="sample_file/ingredient.csv" class="btn btn-info btn-block btn-md"><i class="dripicons-download"></i>  {{trans('file.Download')}}</a>
-                    </div>
+
+                <div class="form-group">
+                    <label>Unit *</label>
+                    <select name="unit_id" id="" class="form-control">
+                        <option value="---Pilih Unit---"></option>
+                        @foreach($units as $unit)
+                        <option value="{{$unit->id}}">{{$unit->unit_name}} ({{$unit->unit_code}})</option>
+                        @endforeach
+                    </select>
                 </div>
+                <input type="submit" value="Submit" class="btn btn-primary">
             </div>
-            <input type="submit" value="{{trans('file.submit')}}" class="btn btn-primary">
+            {{ Form::close() }}
         </div>
-        {{ Form::close() }}
-      </div>
     </div>
 </div>
 
@@ -169,200 +147,200 @@
     });
 
     $(document).ready(function() {
-    $(document).on('click', '.open-EditUnitDialog', function() {
-        var url = "ingredient/"
-        var id = $(this).data('id').toString();
-        url = url.concat(id).concat("/edit");
+        $(document).on('click', '.open-EditUnitDialog', function() {
+            var url = "ingredient/"
+            var id = $(this).data('id').toString();
+            url = url.concat(id).concat("/edit");
 
-        $.get(url, function(data) {
-            $("input[name='name']").val(data['name']);
-            $("input[name='first_stock']").val(data['first_stock']);
-            $("input[name='unit_id']").val(data['unit_id']);
-            $("input[name='operation_value']").val(data['operation_value']);
-            $("input[name='ingredient_id']").val(data['id']);
-            $("#base_unit_edit").val(data['base_unit']);
-            if(data['base_unit']!=null)
-            {
-                $(".operator").show();
-                $(".operation_value").show();
+            $.get(url, function(data) {
+                $("input[name='name']").val(data['name']);
+                $("input[name='first_stock']").val(data['first_stock']);
+                $("input[name='unit_id']").val(data['unit_id']);
+                $("input[name='operation_value']").val(data['operation_value']);
+                $("input[name='ingredient_id']").val(data['id']);
+                $("#base_unit_edit").val(data['base_unit']);
+                if(data['base_unit']!=null)
+                {
+                    $(".operator").show();
+                    $(".operation_value").show();
+                }
+                else
+                {
+                    $(".operator").hide();
+                    $(".operation_value").hide();
+                }
+                $('.selectpicker').selectpicker('refresh');
+
+            });
+        });
+
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
-            else
-            {
-                $(".operator").hide();
-                $(".operation_value").hide();
+        });
+
+        $( "#select_all" ).on( "change", function() {
+            if ($(this).is(':checked')) {
+                $("tbody input[type='checkbox']").prop('checked', true);
             }
-            $('.selectpicker').selectpicker('refresh');
+            else {
+                $("tbody input[type='checkbox']").prop('checked', false);
+            }
+        });
+
+        $("#export").on("click", function(e){
+            e.preventDefault();
+            var unit = [];
+            $(':checkbox:checked').each(function(i){
+                unit[i] = $(this).val();
+            });
+            $.ajax({
+                type:'POST',
+                url:'/exportunit',
+                data:{
+
+                    unitArray: unit
+                },
+                success:function(data){
+                    alert('Exported to CSV file successfully! Click Ok to download file');
+                    window.location.href = data;
+                }
+            });
+        });
+
+        $('.open-CreateUnitDialog').on('click', function() {
+            $(".operator").hide();
+            $(".operation_value").hide();
 
         });
-    });
 
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $( "#select_all" ).on( "change", function() {
-        if ($(this).is(':checked')) {
-            $("tbody input[type='checkbox']").prop('checked', true);
-        }
-        else {
-            $("tbody input[type='checkbox']").prop('checked', false);
-        }
-    });
-
-    $("#export").on("click", function(e){
-        e.preventDefault();
-        var unit = [];
-        $(':checkbox:checked').each(function(i){
-          unit[i] = $(this).val();
+        $('#base_unit_create').on('change', function() {
+            if($(this).val()){
+                $("#createModal .operator").show();
+                $("#createModal .operation_value").show();
+            }
+            else{
+                $("#createModal .operator").hide();
+                $("#createModal .operation_value").hide();
+            }
         });
-        $.ajax({
-           type:'POST',
-           url:'/exportunit',
-           data:{
 
-                unitArray: unit
-            },
-           success:function(data){
-            alert('Exported to CSV file successfully! Click Ok to download file');
-            window.location.href = data;
-           }
+        $('#base_unit_edit').on('change', function() {
+            if($(this).val()){
+                $("#editModal .operator").show();
+                $("#editModal .operation_value").show();
+            }
+            else{
+                $("#editModal .operator").hide();
+                $("#editModal .operation_value").hide();
+            }
         });
     });
-
-    $('.open-CreateUnitDialog').on('click', function() {
-        $(".operator").hide();
-        $(".operation_value").hide();
-
-    });
-
-    $('#base_unit_create').on('change', function() {
-        if($(this).val()){
-            $("#createModal .operator").show();
-            $("#createModal .operation_value").show();
-        }
-        else{
-            $("#createModal .operator").hide();
-            $("#createModal .operation_value").hide();
-        }
-    });
-
-    $('#base_unit_edit').on('change', function() {
-        if($(this).val()){
-            $("#editModal .operator").show();
-            $("#editModal .operation_value").show();
-        }
-        else{
-            $("#editModal .operator").hide();
-            $("#editModal .operation_value").hide();
-        }
-    });
-});
 
     $('#ingredient-table').DataTable( {
         "order": [],
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
-             "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
+            "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
             "search":  '{{trans("file.Search")}}',
             'paginate': {
-                    'previous': '<i class="dripicons-chevron-left"></i>',
-                    'next': '<i class="dripicons-chevron-right"></i>'
+                'previous': '<i class="dripicons-chevron-left"></i>',
+                'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
         'columnDefs': [
-            // {
-            //     "orderable": false,
-            //     'targets': [0, 2]
-            // },
-            // {
-            //     'render': function(data, type, row, meta){
-            //         if(type === 'display'){
-            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-            //         }
+        // {
+        //     "orderable": false,
+        //     'targets': [0, 2]
+        // },
+        // {
+        //     'render': function(data, type, row, meta){
+        //         if(type === 'display'){
+        //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
+        //         }
 
-            //        return data;
-            //     },
-            //     'checkboxes': {
-            //        'selectRow': true,
-            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-            //     },
-            //     'targets': [0]
-            // }
+        //        return data;
+        //     },
+        //     'checkboxes': {
+        //        'selectRow': true,
+        //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
+        //     },
+        //     'targets': [0]
+        // }
         ],
         'select': { style: 'multi',  selector: 'td:first-child'},
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
         dom: '<"row"lfB>rtip',
         buttons: [
-            {
-                extend: 'pdf',
-                text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
+        {
+            extend: 'pdf',
+            text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
+            exportOptions: {
+                columns: ':visible:Not(.not-exported)',
+                rows: ':visible'
             },
-            {
-                extend: 'excel',
-                text: '<i title="export to excel" class="dripicons-document-new"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
+        },
+        {
+            extend: 'excel',
+            text: '<i title="export to excel" class="dripicons-document-new"></i>',
+            exportOptions: {
+                columns: ':visible:Not(.not-exported)',
+                rows: ':visible'
             },
-            {
-                extend: 'csv',
-                text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
+        },
+        {
+            extend: 'csv',
+            text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
+            exportOptions: {
+                columns: ':visible:Not(.not-exported)',
+                rows: ':visible'
             },
-            {
-                extend: 'print',
-                text: '<i title="print" class="fa fa-print"></i>',
-                exportOptions: {
-                    columns: ':visible:Not(.not-exported)',
-                    rows: ':visible'
-                },
+        },
+        {
+            extend: 'print',
+            text: '<i title="print" class="fa fa-print"></i>',
+            exportOptions: {
+                columns: ':visible:Not(.not-exported)',
+                rows: ':visible'
             },
-            // {
-            //     text: '<i title="delete" class="dripicons-cross"></i>',
-            //     className: 'buttons-delete',
-            //     action: function ( e, dt, node, config ) {
-            //         if(user_verified == '1') {
-            //             ingredient_id.length = 0;
-            //             $(':checkbox:checked').each(function(i){
-            //                 if(i){
-            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
-            //                 }
-            //             });
-            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-            //                 $.ajax({
-            //                     type:'POST',
-            //                     url:'ingredient/deletebyselection',
-            //                     data:{
-            //                         unitIdArray: ingredient_id
-            //                     },
-            //                     success:function(data){
-            //                         alert(data);
-            //                     }
-            //                 });
-            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
-            //             }
-            //             else if(!ingredient_id.length)
-            //                 alert('No unit is selected!');
-            //         }
-            //         else
-            //             alert('This feature is disable for demo!');
-            //     }
-            // },
-            {
-                extend: 'colvis',
-                text: '<i title="column visibility" class="fa fa-eye"></i>',
-                columns: ':gt(0)'
-            },
+        },
+        // {
+        //     text: '<i title="delete" class="dripicons-cross"></i>',
+        //     className: 'buttons-delete',
+        //     action: function ( e, dt, node, config ) {
+        //         if(user_verified == '1') {
+        //             ingredient_id.length = 0;
+        //             $(':checkbox:checked').each(function(i){
+        //                 if(i){
+        //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
+        //                 }
+        //             });
+        //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
+        //                 $.ajax({
+        //                     type:'POST',
+        //                     url:'ingredient/deletebyselection',
+        //                     data:{
+        //                         unitIdArray: ingredient_id
+        //                     },
+        //                     success:function(data){
+        //                         alert(data);
+        //                     }
+        //                 });
+        //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
+        //             }
+        //             else if(!ingredient_id.length)
+        //                 alert('No unit is selected!');
+        //         }
+        //         else
+        //             alert('This feature is disable for demo!');
+        //     }
+        // },
+        {
+            extend: 'colvis',
+            text: '<i title="column visibility" class="fa fa-eye"></i>',
+            columns: ':gt(0)'
+        },
         ],
     } );
 </script>

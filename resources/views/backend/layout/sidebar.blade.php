@@ -60,6 +60,7 @@
                 <li id="laporan-selisih"><a href="{{ route('report.differenceStockReport') }}?warehouse_id=all">Laporan Selisih Stok</a></li>
                 <li id="laporan-sisa"><a href="{{ route('report.remainingStockReport') }}">Laporan Sisa Stok</a></li>
                 <li id="product-omzet-by-month"><a href="{{ route('report.productsOmzetByMonth') }}">Laporan Omset Produk</a></li>
+                <li id="finance-report"><a href="{{ route('financeReport') }}?warehouse_id=all&regional_id=all">Laporan Finance</a></li>
             </ul>
         </li>
 

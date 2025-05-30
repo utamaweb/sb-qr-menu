@@ -34,6 +34,7 @@ use App\Http\Controllers\StockPurchaseController;
 use App\Http\Controllers\CustomCategoryController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ProductWarehouseController;
+use App\Http\Controllers\Report\FinanceReportController;
 
 Route::fallback(function () {
     return redirect()->route('admin.auth.index');
@@ -335,6 +336,11 @@ Route::group(['prefix' => 'admin'], function () {
         // Route for warehouse max shifts count
         Route::get('/max_shifts', [WarehouseController::class, 'maxShiftPage'])->name('maxShiftPage');
         Route::put('/max_shifts', [WarehouseController::class, 'maxShiftUpdate'])->name('maxShiftUpdate');
+
+        // Route for finance report
+        Route::get('/finance-report', [FinanceReportController::class, 'financeReport'])->name('financeReport');
+
+        Route::get('/get-warehouses-by-regional/{regional_id}', [App\Http\Controllers\Report\FinanceReportController::class, 'getWarehousesByRegional'])->name('getWarehousesByRegional');
 
     });
 });

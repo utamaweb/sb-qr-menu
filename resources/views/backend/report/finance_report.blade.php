@@ -20,7 +20,7 @@
                                 </div>
                             </div>
 
-                            @if(auth()->user()->hasRole('Admin Bisnis'))
+                            @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
                                 <div class="form-group">
                                     <label><strong>Pilih Regional</strong></label>
                                     <select id="regional-select" name="regional_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
@@ -118,7 +118,7 @@
 $('.selectpicker').selectpicker();
 $("ul#report").siblings('a').attr('aria-expanded','true');
 $("ul#report").addClass("show");
-$("ul#report #laporan-finance").addClass("active");
+$("ul#report #finance-report").addClass("active");
 
 // Add CSS for the loading indicator
 $('head').append(`

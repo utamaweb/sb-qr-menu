@@ -7,6 +7,52 @@
                 </div>
 
                 <div class="card-body">
+                    @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
+                    <div class="row mb-4">
+                        <div class="col-md-12">
+                            {!! Form::open(['route' => 'close-cashier.index', 'method' => 'get']) !!}
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label><strong>Pilih Outlet</strong></label>
+                                        <select id="warehouse-select" name="warehouse_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins" title="Pilih outlet">
+                                            <option value="all" {{ $warehouse_request == 'all' ? 'selected' : ''}}>Semua Outlet</option>
+                                            @foreach($warehouses as $warehouse)
+                                            <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_request ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for=""><strong>Tanggal Awal</strong></label>
+                                        <div class="input-group">
+                                            <input type="text" name="start_date" class="form-control date" value="{{ $start_date ?? date('Y-m-d') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label for=""><strong>Tanggal Akhir</strong></label>
+                                        <div class="input-group">
+                                            <input type="text" name="end_date" class="form-control date" value="{{ $end_date ?? date('Y-m-d') }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
+                                        <label><strong>&nbsp;</strong></label>
+                                        <div class="input-group">
+                                            <button type="submit" class="btn btn-primary">Filter</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {!! Form::close() !!}
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="table-responsive">
                         <table id="ingredient-table" class="table">
                             <thead>
@@ -63,79 +109,17 @@
         $("ul#report").addClass("show");
         $("ul#report #laporan-tutup-kasir").addClass("active");
 
-        var ingredient_id = [];
-        var user_verified = <?php echo json_encode(env('USER_VERIFIED')); ?>;
+        // Initialize selectpicker and datepicker
+        $('.selectpicker').selectpicker();
 
-        $.ajaxSetup({
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
+        // Initialize date picker
+        $('.date').datepicker({
+            format: 'yyyy-mm-dd',
+            autoclose: true,
+            todayHighlight: true
         });
 
-        $(document).ready(function() {
-
-
-            $.ajaxSetup({
-                headers: {
-                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                }
-            });
-
-            $("#select_all").on("change", function() {
-                if ($(this).is(':checked')) {
-                    $("tbody input[type='checkbox']").prop('checked', true);
-                } else {
-                    $("tbody input[type='checkbox']").prop('checked', false);
-                }
-            });
-
-            $("#export").on("click", function(e) {
-                e.preventDefault();
-                var unit = [];
-                $(':checkbox:checked').each(function(i) {
-                    unit[i] = $(this).val();
-                });
-                $.ajax({
-                    type: 'POST',
-                    url: '/exportunit',
-                    data: {
-
-                        unitArray: unit
-                    },
-                    success: function(data) {
-                        alert('Exported to CSV file successfully! Click Ok to download file');
-                        window.location.href = data;
-                    }
-                });
-            });
-
-            $('.open-CreateUnitDialog').on('click', function() {
-                $(".operator").hide();
-                $(".operation_value").hide();
-
-            });
-
-            $('#base_unit_create').on('change', function() {
-                if ($(this).val()) {
-                    $("#createModal .operator").show();
-                    $("#createModal .operation_value").show();
-                } else {
-                    $("#createModal .operator").hide();
-                    $("#createModal .operation_value").hide();
-                }
-            });
-
-            $('#base_unit_edit').on('change', function() {
-                if ($(this).val()) {
-                    $("#editModal .operator").show();
-                    $("#editModal .operation_value").show();
-                } else {
-                    $("#editModal .operator").hide();
-                    $("#editModal .operation_value").hide();
-                }
-            });
-        });
-
+        // Initialize DataTable
         $('#ingredient-table').DataTable({
             "order": [],
             'language': {

@@ -19,31 +19,11 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use Yajra\DataTables\Facades\DataTables; // Pastikan package yajra/laravel-datatables sudah diinstal
+use Yajra\DataTables\Facades\DataTables;
 
 
 class ExpenseController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     if(auth()->user()->hasRole('Superadmin')){
-    //         $lims_expense_category_list = ExpenseCategory::get();
-    //         $expenses = Expense::get();
-    //     } elseif(auth()->user()->hasRole('Admin Bisnis')){
-    //         $lims_expense_category_list = ExpenseCategory::where('business_id', auth()->user()->business_id)->get();
-    //         $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-    //         $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->whereIn('warehouse_id', $warehouse_id)->get();
-    //     } else{
-    //         $warehouse = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-    //         $business_id = $warehouse->business_id;
-    //         $lims_expense_category_list = ExpenseCategory::where('business_id', $business_id)->get();
-    //         $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->where('warehouse_id', auth()->user()->warehouse_id)->get();
-    //     }
-    //     $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
-    //     return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list'));
-
-    // }
-
     public function index(Request $request)
     {
         // Kondisi untuk filter tanggal
@@ -59,7 +39,7 @@ class ExpenseController extends Controller
         $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->where('is_active', true)->get();
 
         // condition for user access
-        if(auth()->user()->hasRole('Admin Bisnis')){
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
             $warehouseId = $request->get('warehouse_id') ?? null;
         } else {
             $warehouseId = auth()->user()->warehouse_id;

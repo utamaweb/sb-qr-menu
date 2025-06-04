@@ -8,16 +8,42 @@
                     <div class="card-header">
                         <h3 class="text-center">Laporan Transaksi Produk</h3>
                         <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
+                        @if(isset($warehouseId) && $warehouse)
+                            <h5 class="text-center mt-2">Outlet: {{ $warehouse->name }}</h5>
+                        @endif
                     </div>
 
                     <div class="card-body">
                         {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
-                            <div class="form-group">
-                                <label for=""><strong>Pilih Tanggal</strong></label>
-                                <div class="input-group">
-                                    <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
-                                    <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
-                                    <button class="btn btn-primary" type="submit">Submit</button>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label for=""><strong>Pilih Tanggal</strong></label>
+                                        <div class="input-group">
+                                            <input type="text" id="start_date" name="start_date" class="form-control date" required value="{{ $start_date }}">
+                                            <input type="text" id="end_date" name="end_date" class="form-control date" required value="{{ $end_date }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label for="warehouse_id"><strong>Pilih Outlet/Gudang</strong></label>
+                                        <select name="warehouse_id" id="warehouse_id" class="form-control selectpicker" data-live-search="true" required>
+                                            <option value="">Pilih Outlet</option>
+                                            @foreach($warehouses as $w)
+                                                <option value="{{ $w->id }}" {{ (request('warehouse_id') == $w->id) ? 'selected' : '' }}>
+                                                    {{ $w->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                @endif
+                                <div class="col-md-2">
+                                    <div class="form-group" style="margin-top: 28px;">
+                                        <button class="btn btn-primary btn-block" type="submit">Filter</button>
+                                    </div>
                                 </div>
                             </div>
                         {!! Form::close() !!}

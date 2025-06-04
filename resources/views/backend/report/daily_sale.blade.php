@@ -7,13 +7,43 @@
 
                 <h4 class="text-center mb-4">Laporan Penjualan Harian</h4>
 
+                <!-- Add warehouse filter only for Admin Bisnis or Report roles -->
+                @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
+                <div class="row mb-4">
+                    <div class="col-md-6 offset-md-3 text-center">
+                        <form action="{{ url("admin/report/daily_sale/$year/$month") }}" method="GET">
+                            <div class="form-group mb-3">
+                                <select name="warehouse_id" id="warehouse_id" class="form-control selectpicker" data-live-search="true">
+                                    <option value="">Pilih Outlet</option>
+                                    @foreach($lims_warehouse_list as $warehouse_item)
+                                        <option value="{{ $warehouse_item->id }}" {{ ($warehouse_id == $warehouse_item->id) ? 'selected' : '' }}>
+                                            {{ $warehouse_item->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary px-4">Filter</button>
+                        </form>
+                    </div>
+                </div>
+                @endif
+
+                <!-- Show current warehouse information -->
+                @if(isset($warehouse) && $warehouse)
+                    <h5 class="text-center mb-3">Outlet: {{ $warehouse->name }}</h5>
+                @elseif($warehouse_id == '' && auth()->user()->hasRole(['Admin Bisnis', 'Report']))
+                    <h5 class="text-center mb-3">Outlet Belum Dipilih</h5>
+                @elseif(!auth()->user()->hasRole(['Admin Bisnis', 'Report']))
+                    <h5 class="text-center mb-3">Outlet: {{ auth()->user()->warehouse->name ?? 'Tidak Ditemukan' }}</h5>
+                @endif
+
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered text-center" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                         <thead>
                             <tr>
-                                <th><a href="{{ url("admin/report/daily_sale/$prev_year/$prev_month") }}"><i class="fa fa-arrow-left"></i> Previous</a></th>
+                                <th><a href="{{ url("admin/report/daily_sale/$prev_year/$prev_month") }}{{ $warehouse_id ? '?warehouse_id='.$warehouse_id : '' }}"><i class="fa fa-arrow-left"></i> Previous</a></th>
                                 <th colspan="5" class="text-center">{{ date("F Y", strtotime("$year-$month-01")) }}</th>
-                                <th><a href="{{ url("admin/report/daily_sale/$next_year/$next_month") }}">Next <i class="fa fa-arrow-right"></i></a></th>
+                                <th><a href="{{ url("admin/report/daily_sale/$next_year/$next_month") }}{{ $warehouse_id ? '?warehouse_id='.$warehouse_id : '' }}">Next <i class="fa fa-arrow-right"></i></a></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -83,5 +113,10 @@
     $("ul#report").siblings('a').attr('aria-expanded','true');
     $("ul#report").addClass("show");
     $("ul#report #daily-sale-report-menu").addClass("active");
+
+    // Initialize selectpicker if you're using Bootstrap Select
+    $('.selectpicker').selectpicker({
+        style: 'btn-link',
+    });
 </script>
 @endpush

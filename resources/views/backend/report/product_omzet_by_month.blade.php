@@ -22,7 +22,7 @@
                     {{-- End of month input --}}
 
                     {{-- Outlet input --}}
-                    @if (auth()->user()->hasRole('Admin Bisnis'))
+                    @if (auth()->user()->hasRole(['Admin Bisnis', 'Report']))
                         <div class="form-group">
                             <label for="outlet-input" class="form-label">Outlet <span class="text-danger">*</span></label>
                             <select name="outlet" id="outlet-input" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins" title="Pilih Outlet" required>

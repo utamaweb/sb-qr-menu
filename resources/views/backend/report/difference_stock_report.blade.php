@@ -33,7 +33,7 @@
                                 </div>
                             </div>
 
-                            @if(auth()->user()->hasRole('Admin Bisnis'))
+                            @if(auth()->user()->hasRole('Admin Bisnis') || auth()->user()->hasRole('Report'))
                                 <div class="form-group">
                                     <label><strong>Pilih Outlet</strong></label>
                                     <select id="warehouse-select" name="warehouse_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
@@ -46,7 +46,7 @@
                                 </div>
                             @endif
 
-                            <div class="form-group text-right">
+                            <div class="form-group">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         {!! Form::close() !!}

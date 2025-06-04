@@ -34,6 +34,7 @@ use App\Http\Controllers\StockPurchaseController;
 use App\Http\Controllers\CustomCategoryController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ProductWarehouseController;
+use App\Http\Controllers\Report\ProductOmzetController;
 use App\Http\Controllers\Report\FinanceReportController;
 
 Route::fallback(function () {
@@ -191,7 +192,7 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('monthly_sale/{year}', 'monthlySaleByWarehouse')->name('report.monthlySaleByWarehouse');
                 Route::get('daily_purchase/{year}/{month}', 'dailyPurchase');
                 Route::post('daily_purchase/{year}/{month}', 'dailyPurchaseByWarehouse')->name('report.dailyPurchaseByWarehouse');
-                Route::get('monthly_purchase/{year}', 'monthlyPurchase');
+                Route::get('monthly_purchase/{year}', 'monthlyPurchase')->name('report.monthlyPurchase');
                 Route::post('monthly_purchase/{year}', 'monthlyPurchaseByWarehouse')->name('report.monthlyPurchaseByWarehouse');
                 Route::get('best_seller', 'bestSeller');
                 Route::post('best_seller', 'bestSellerByWarehouse')->name('report.bestSellerByWarehouse');
@@ -239,8 +240,6 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('customer-due-report-data', 'customerDueReportData');
                 Route::post('supplier-due-report', 'supplierDueReportByDate')->name('report.supplierDueByDate');
                 Route::post('supplier-due-report-data', 'supplierDueReportData');
-                Route::get('products-omzet-by-month', 'productsOmzetByMonth')->name('report.productsOmzetByMonth');
-                Route::get('products-omzet-by-month-excel', 'productsOmzetByMonthExcel')->name('report.productsOmzetByMonthExcel');
             });
         });
 
@@ -339,8 +338,11 @@ Route::group(['prefix' => 'admin'], function () {
 
         // Route for finance report
         Route::get('/finance-report', [FinanceReportController::class, 'financeReport'])->name('financeReport');
-
         Route::get('/get-warehouses-by-regional/{regional_id}', [App\Http\Controllers\Report\FinanceReportController::class, 'getWarehousesByRegional'])->name('getWarehousesByRegional');
+
+        // Route for product omzet report
+        Route::get('products-omzet-by-month', [ProductOmzetController::class, 'index'])->name('report.productsOmzetByMonth');
+        Route::get('products-omzet-by-month-excel', [ProductOmzetController::class, 'productsOmzetByMonthExcel'])->name('report.productsOmzetByMonthExcel');
 
     });
 });

@@ -20,15 +20,48 @@ use App\Models\CloseCashierProductSold;
 
 class CloseCashierController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $warehouseId = auth()->user()->warehouse_id;
+        $warehouse_request = $request->get('warehouse_id', 'all');
+        $start_date = $request->get('start_date', date('Y-m-d'));
+        $end_date = $request->get('end_date', date('Y-m-d'));
 
-        // Ambil data close_cashiers yang memiliki warehouse_id sesuai dengan pengguna yang login
-        $closeCashiers = CloseCashier::with('warehouse', 'user', 'shift', 'shift.warehouse', 'shift.user')->whereHas('shift', function ($query) use ($warehouseId) {
-            $query->where('warehouse_id', $warehouseId);
-        })->orderBy('id', 'DESC')->get();
-        return view('backend.close_cashier.index', compact('closeCashiers'));
+        $query = CloseCashier::with(['shift.warehouse', 'shift.user']);
+
+        // Apply date range filter
+        $query->whereDate('created_at', '>=', $start_date)
+              ->whereDate('created_at', '<=', $end_date);
+
+        // Apply warehouse filter for admin users
+        if (auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+
+            // If a specific warehouse is selected and it's not 'all'
+            if ($warehouse_request != 'all' && $warehouse_request != null) {
+                $query->whereHas('shift', function($q) use ($warehouse_request) {
+                    $q->where('warehouse_id', $warehouse_request);
+                });
+            }
+        } else {
+            // For regular users, only show data from their warehouse
+            $warehouse_id = auth()->user()->warehouse_id;
+            $query->whereHas('shift', function($q) use ($warehouse_id) {
+                $q->where('warehouse_id', $warehouse_id);
+            });
+
+            // No need to pass warehouses variable for non-admin users
+            $warehouses = collect();
+        }
+
+        $closeCashiers = $query->orderBy('created_at', 'desc')->get();
+
+        return view('backend.close_cashier.index', compact(
+            'closeCashiers',
+            'warehouses',
+            'warehouse_request',
+            'start_date',
+            'end_date'
+        ));
     }
 
     // function show old version (took so long time to show)
@@ -129,7 +162,7 @@ class CloseCashierController extends Controller
         // dd($closeCashier->closeCashierProductSold);
 
         // Ambil business_id berdasarkan warehouse user
-        $business_id = auth()->user()->warehouse->business_id;
+        $business_id = auth()->user()->warehouse->business_id ?? auth()->user()->business_id;
 
         // Ambil nama ojol yang tersedia
         $ojols = Ojol::where('business_id', $business_id)->pluck('name')->toArray();

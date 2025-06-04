@@ -213,40 +213,64 @@ class ReportController extends Controller
 
     public function dailySale($year, $month)
     {
-        $warehouse_id = auth()->user()->warehouse_id;
-        $number_of_day = date('t', strtotime("$year-$month-01"));
-        $start_day = date('w', strtotime("$year-$month-01")) + 1; // +1 karena Minggu = 0 di PHP
+        // Get warehouse ID based on user role or request parameter
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
+        }
 
+        // Calculate calendar parameters
+        $number_of_day = \cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        $start_day = date('w', strtotime("$year-$month-01")) + 1;
+
+        // Generate prev & next month navigation dates
+        $prev_date = date('Y-m', strtotime("$year-$month-01 -1 month"));
+        list($prev_year, $prev_month) = explode('-', $prev_date);
+
+        $next_date = date('Y-m', strtotime("$year-$month-01 +1 month"));
+        list($next_year, $next_month) = explode('-', $next_date);
+
+        // Get warehouse list for dropdown
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
 
-        // Hitung prev & next month/year
-        $prev_date = date_create("$year-$month-01");
-        date_add($prev_date, date_interval_create_from_date_string('-1 month'));
-        $prev_year = date_format($prev_date, 'Y');
-        $prev_month = date_format($prev_date, 'm');
+        // Get current warehouse if one is selected
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
 
-        $next_date = date_create("$year-$month-01");
-        date_add($next_date, date_interval_create_from_date_string('+1 month'));
-        $next_year = date_format($next_date, 'Y');
-        $next_month = date_format($next_date, 'm');
+        // Initialize dailyData with zeros
+        $dailyData = array_fill(1, $number_of_day, [
+            'qty' => 0,
+            'paid' => 0,
+            'amount' => 0,
+            'transaction' => 0,
+        ]);
 
-        // Ambil semua data harian sekaligus
-        $dailyData = [];
-        for ($day = 1; $day <= $number_of_day; $day++) {
-            $date = "$year-" . sprintf('%02d', $month) . '-' . sprintf('%02d', $day);
+        // Only query database if warehouse_id is set
+        if ($warehouse_id) {
+            // Format date string for the whole month
+            $start_date = "$year-" . sprintf('%02d', $month) . "-01";
+            $end_date = "$year-" . sprintf('%02d', $month) . "-$number_of_day";
 
-            $data = Transaction::where('status', 'Lunas')
+            // Use a single query to get all transactions for the month
+            $transactions = Transaction::where('status', 'Lunas')
                 ->where('warehouse_id', $warehouse_id)
-                ->whereDate('date', $date)
-                ->selectRaw('SUM(total_qty) AS total_qty, SUM(paid_amount) AS total_paid_amount, SUM(total_amount) AS total_amount, COUNT(*) AS total_transaction')
-                ->first();
+                ->whereDate('date', '>=', $start_date)
+                ->whereDate('date', '<=', $end_date)
+                ->selectRaw('DAY(date) as day, SUM(total_qty) AS total_qty, SUM(paid_amount) AS total_paid_amount,
+                             SUM(total_amount) AS total_amount, COUNT(*) AS total_transaction')
+                ->groupBy('day')
+                ->get();
 
-            $dailyData[$day] = [
-                'qty' => $data->total_qty ?? 0,
-                'paid' => $data->total_paid_amount ?? 0,
-                'amount' => $data->total_amount ?? 0,
-                'transaction' => $data->total_transaction ?? 0,
-            ];
+            // Fill the data array with actual values
+            foreach ($transactions as $transaction) {
+                $day = (int)$transaction->day;
+                $dailyData[$day] = [
+                    'qty' => $transaction->total_qty ?? 0,
+                    'paid' => $transaction->total_paid_amount ?? 0,
+                    'amount' => $transaction->total_amount ?? 0,
+                    'transaction' => $transaction->total_transaction ?? 0,
+                ];
+            }
         }
 
         return view('backend.report.daily_sale', compact(
@@ -260,7 +284,8 @@ class ReportController extends Controller
             'next_year',
             'next_month',
             'lims_warehouse_list',
-            'warehouse_id'
+            'warehouse_id',
+            'warehouse'
         ));
     }
 
@@ -302,100 +327,118 @@ class ReportController extends Controller
 
     public function dailyPurchase($year, $month)
     {
-        $role = Role::find(Auth::user()->role_id);
+        // Get warehouse ID based on user role or request parameter
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
+        }
+
         $start = 1;
         $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
-        $warehouse_id = auth()->user()->warehouse_id;
-        while($start <= $number_of_day)
-        {
-            if($start < 10)
-                $date = $year.'-'.$month.'-0'.$start;
-            else
-                $date = $year.'-'.$month.'-'.$start;
-            $query1 = array(
-                'SUM(qty) AS total_qty',
-                'SUM(amount) AS total_amount'
-            );
-            $purchase_data = Expense::where('warehouse_id', $warehouse_id)->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $total_qty[$start] = $purchase_data[0]->total_qty;
-            $total_amount[$start] = $purchase_data[0]->total_amount;
-            $start++;
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+
+        // Initialize arrays with zeros
+        $total_qty = array_fill(1, $number_of_day, 0);
+        $total_amount = array_fill(1, $number_of_day, 0);
+
+        // Only query database if warehouse_id is set
+        if ($warehouse_id) {
+            while($start <= $number_of_day)
+            {
+                if($start < 10)
+                    $date = $year.'-'.$month.'-0'.$start;
+                else
+                    $date = $year.'-'.$month.'-'.$start;
+
+                $query1 = array(
+                    'SUM(qty) AS total_qty',
+                    'SUM(amount) AS total_amount'
+                );
+
+                $purchase_data = Expense::where('warehouse_id', $warehouse_id)
+                                        ->whereDate('created_at', $date)
+                                        ->selectRaw(implode(',', $query1))
+                                        ->get();
+
+                $total_qty[$start] = $purchase_data[0]->total_qty ?? 0;
+                $total_amount[$start] = $purchase_data[0]->total_amount ?? 0;
+                $start++;
+            }
         }
+
         $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
         $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
         $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
         $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
         $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        // $warehouse_id = 0;
-        return view('backend.report.daily_purchase', compact('total_qty','total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
-    }
 
-    public function dailyPurchaseByWarehouse(Request $request, $year, $month)
-    {
-        $data = $request->all();
-        if($data['warehouse_id'] == 0)
-            return redirect()->back();
-        $start = 1;
-        $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
-        while($start <= $number_of_day)
-        {
-            if($start < 10)
-                $date = $year.'-'.$month.'-0'.$start;
-            else
-                $date = $year.'-'.$month.'-'.$start;
-            $query1 = array(
-                'SUM(total_discount) AS total_discount',
-                'SUM(order_discount) AS order_discount',
-                'SUM(total_tax) AS total_tax',
-                'SUM(order_tax) AS order_tax',
-                'SUM(shipping_cost) AS shipping_cost',
-                'SUM(grand_total) AS grand_total'
-            );
-            $purchase_data = Purchase::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $total_discount[$start] = $purchase_data[0]->total_discount;
-            $order_discount[$start] = $purchase_data[0]->order_discount;
-            $total_tax[$start] = $purchase_data[0]->total_tax;
-            $order_tax[$start] = $purchase_data[0]->order_tax;
-            $shipping_cost[$start] = $purchase_data[0]->shipping_cost;
-            $grand_total[$start] = $purchase_data[0]->grand_total;
-            $start++;
-        }
-        $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
-        $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-        $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-        $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-        $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $warehouse_id = $data['warehouse_id'];
+        // Get current warehouse if one is selected
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
 
-        return view('backend.report.daily_purchase', compact('total_discount','order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'grand_total', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+        return view('backend.report.daily_purchase', compact(
+            'total_qty',
+            'total_amount',
+            'start_day',
+            'year',
+            'month',
+            'number_of_day',
+            'prev_year',
+            'prev_month',
+            'next_year',
+            'next_month',
+            'lims_warehouse_list',
+            'warehouse_id',
+            'warehouse'
+        ));
     }
 
     public function monthlySale($year)
     {
-        $warehouse_id = auth()->user()->warehouse_id;
+        // Get warehouse ID based on user role or request parameter
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
+        }
+
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
 
-        $total_qty = [];
-        $total_transaction = [];
-        $total_paid = [];
-        $total_amount = [];
+        // Initialize arrays with zeros
+        $total_qty = array_fill(0, 12, 0);
+        $total_transaction = array_fill(0, 12, 0);
+        $total_paid = array_fill(0, 12, 0);
+        $total_amount = array_fill(0, 12, 0);
 
-        for ($month = 1; $month <= 12; $month++) {
-            $startDate = "$year-$month-01";
-            $endDate = date("Y-m-t", strtotime($startDate)); // akhir bulan
-
-            $query = Transaction::where('status', 'Lunas')
+        // Only query database if warehouse_id is set
+        if ($warehouse_id) {
+            // Build a single query for all months instead of looping through each month
+            $monthlyData = Transaction::where('status', 'Lunas')
                 ->where('warehouse_id', $warehouse_id)
-                ->whereDate('created_at', '>=', $startDate)
-                ->whereDate('created_at', '<=', $endDate);
+                ->whereYear('created_at', $year)
+                ->selectRaw('MONTH(created_at) as month,
+                             SUM(total_qty) as total_qty,
+                             COUNT(*) as transaction_count,
+                             SUM(paid_amount) as paid_amount,
+                             SUM(total_amount) as total_amount')
+                ->groupBy('month')
+                ->get()
+                ->keyBy('month');
 
-            $total_qty[] = number_format((float)$query->sum('total_qty'), config('decimal'), '.', '');
-            $total_transaction[] = number_format((float)$query->count(), config('decimal'), '.', '');
-            $total_paid[] = number_format((float)$query->sum('paid_amount'), config('decimal'), '.', '');
-            $total_amount[] = number_format((float)$query->sum('total_amount'), config('decimal'), '.', '');
+            // Fill the arrays with actual data
+            for ($month = 1; $month <= 12; $month++) {
+                if (isset($monthlyData[$month])) {
+                    $data = $monthlyData[$month];
+                    $total_qty[$month-1] = number_format((float)$data->total_qty, config('decimal'), '.', '');
+                    $total_transaction[$month-1] = number_format((float)$data->transaction_count, config('decimal'), '.', '');
+                    $total_paid[$month-1] = number_format((float)$data->paid_amount, config('decimal'), '.', '');
+                    $total_amount[$month-1] = number_format((float)$data->total_amount, config('decimal'), '.', '');
+                }
+            }
         }
+
+        // Get current warehouse if one is selected
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
 
         return view('backend.report.monthly_sale', compact(
             'year',
@@ -404,71 +447,59 @@ class ReportController extends Controller
             'total_amount',
             'lims_warehouse_list',
             'warehouse_id',
-            'total_transaction'
+            'total_transaction',
+            'warehouse'
         ));
-    }
-
-    public function monthlySaleByWarehouse(Request $request, $year)
-    {
-        $data = $request->all();
-        if($data['warehouse_id'] == 0)
-            return redirect()->back();
-
-        $start = strtotime($year .'-01-01');
-        $end = strtotime($year .'-12-31');
-        while($start <= $end)
-        {
-            $start_date = $year . '-'. date('m', $start).'-'.'01';
-            $end_date = $year . '-'. date('m', $start).'-'.'31';
-
-            $temp_total_discount = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_discount');
-            $total_discount[] = number_format((float)$temp_total_discount, config('decimal'), '.', '');
-
-            $temp_order_discount = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('order_discount');
-            $order_discount[] = number_format((float)$temp_order_discount, config('decimal'), '.', '');
-
-            $temp_total_tax = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_tax');
-            $total_tax[] = number_format((float)$temp_total_tax, config('decimal'), '.', '');
-
-            $temp_order_tax = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('order_tax');
-            $order_tax[] = number_format((float)$temp_order_tax, config('decimal'), '.', '');
-
-            $temp_shipping_cost = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('shipping_cost');
-            $shipping_cost[] = number_format((float)$temp_shipping_cost, config('decimal'), '.', '');
-
-            $temp_total = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-            $total[] = number_format((float)$temp_total, config('decimal'), '.', '');
-            $start = strtotime("+1 month", $start);
-        }
-        $lims_warehouse_list = Warehouse::where('is_active',true)->get();
-        $warehouse_id = $data['warehouse_id'];
-        return view('backend.report.monthly_sale', compact('year', 'total_discount', 'order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'total', 'lims_warehouse_list', 'warehouse_id'));
     }
 
     public function monthlyPurchase($year)
     {
-        $role = Role::find(Auth::user()->role_id);
-        $start = strtotime($year .'-01-01');
-        $end = strtotime($year .'-12-31');
-        $warehouse_id = auth()->user()->warehouse_id;
-        while($start <= $end)
-        {
-            $start_date = $year . '-'. date('m', $start).'-'.'01';
-            $end_date = $year . '-'. date('m', $start).'-'.'31';
-
-            $query1 = array(
-                'SUM(qty) AS total_qty',
-                'SUM(amount) AS total_amount'
-            );
-            $purchase_data = Expense::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query1))->get();
-
-            $total_qty[$start] = $purchase_data[0]->total_qty;
-            $total_amount[$start] = $purchase_data[0]->total_amount;
-            $start = strtotime("+1 month", $start);
+        // Get warehouse ID based on user role or request parameter
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
         }
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $warehouse_id = 0;
-        return view('backend.report.monthly_purchase', compact('year', 'total_qty', 'total_amount', 'lims_warehouse_list', 'warehouse_id'));
+
+        $warehouses = Warehouse::where('is_active', true)->get();
+
+        // Initialize arrays with zeros
+        $total_qty = array_fill(0, 12, 0);
+        $total_amount = array_fill(0, 12, 0);
+
+        // Only query database if warehouse_id is set
+        if ($warehouse_id) {
+            for ($month = 1; $month <= 12; $month++) {
+                $startDate = "$year-$month-01";
+                $endDate = date("Y-m-t", strtotime($startDate)); // last day of month
+
+                $query1 = array(
+                    'SUM(qty) AS total_qty',
+                    'SUM(amount) AS total_amount'
+                );
+
+                $purchase_data = Expense::where('warehouse_id', $warehouse_id)
+                    ->whereDate('created_at', '>=', $startDate)
+                    ->whereDate('created_at', '<=', $endDate)
+                    ->selectRaw(implode(',', $query1))
+                    ->get();
+
+                $total_qty[$month-1] = $purchase_data[0]->total_qty ?? 0;
+                $total_amount[$month-1] = $purchase_data[0]->total_amount ?? 0;
+            }
+        }
+
+        // Get current warehouse if one is selected
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
+
+        return view('backend.report.monthly_purchase', compact(
+            'year',
+            'total_qty',
+            'total_amount',
+            'warehouses',
+            'warehouse_id',
+            'warehouse'
+        ));
     }
 
     public function monthlyPurchaseByWarehouse(Request $request, $year)
@@ -840,7 +871,18 @@ class ReportController extends Controller
             $end_date = Carbon::now()->format('Y-m-d');
         }
 
-        $warehouseId = auth()->user()->warehouse_id;
+        // Get warehouse ID based on user role or request
+        if(auth()->user()->hasRole('Admin Outlet')){
+            $warehouseId = auth()->user()->warehouse_id;
+        } else {
+            $warehouseId = $request->input('warehouse_id') ?? auth()->user()->warehouse_id;
+        }
+
+        // Get warehouse list for filter
+        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+            ->where('is_active', true)
+            ->get();
+        $warehouse = Warehouse::find($warehouseId);
 
         // query optimized
         $products = Product::with('category')
@@ -860,7 +902,7 @@ class ReportController extends Controller
             ->selectRaw('COALESCE(transaction_summary.total_qty, 0) as qty, COALESCE(transaction_summary.total_subtotal, 0) as subtotal')
             ->get();
 
-        return view('backend.report.product_report', compact('start_date', 'end_date', 'products'));
+        return view('backend.report.product_report', compact('start_date', 'end_date', 'products', 'warehouses', 'warehouseId', 'warehouse'));
     }
 
 
@@ -875,18 +917,25 @@ class ReportController extends Controller
             $end_date = Carbon::now()->format('Y-m-d');
         }
 
+        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+        if(auth()->user()->hasRole('Admin Outlet')){
+            $warehouseId = auth()->user()->warehouse_id;
+        } else {
+            $warehouseId = $request->input('warehouse_id') ?? null;
+        }
+
         $totalQtyPerProduct = [];
         $totalSubtotalPerProduct = [];
 
         // Query transactions with date filter
         $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')
-            ->where('warehouse_id', auth()->user()->warehouse_id)
+            ->where('warehouse_id', $warehouseId)
             ->whereDate('date', '>=', $start_date)
             ->whereDate('date', '<=', $end_date)
             ->orderBy('id', 'DESC')
             ->get();
 
-        return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct'));
+        return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct', 'warehouses', 'warehouseId'));
     }
 
     public function productReportData(Request $request)
@@ -1787,13 +1836,47 @@ class ReportController extends Controller
 
     public function paymentReportByDate(Request $request)
     {
-        $data = $request->all();
-        $start_date = $data['start_date'];
-        $end_date = $data['end_date'];
-        $warehouse_id = auth()->user()->warehouse_id;
+        // Set date parameters
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
 
-        $lims_payment_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->where('date', '>=' , $start_date)->where('date', '<=' , $end_date)->get();
-        return view('backend.report.payment_report',compact('lims_payment_data', 'start_date', 'end_date'));
+        // Get warehouse ID based on user role
+        if (auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = $request->input('warehouse_id');
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                         ->where('is_active', true)
+                         ->get();
+        } else {
+            // For Admin Outlet, restrict to their assigned warehouse
+            $warehouse_id = auth()->user()->warehouse_id;
+            $warehouses = collect([Warehouse::find($warehouse_id)]);
+        }
+
+        // Initialize payment data as null
+        $lims_payment_data = null;
+
+        // Only query data if warehouse is selected
+        if ($warehouse_id) {
+            // Query for payment data
+            $query = Transaction::where('status', 'Lunas')
+                    ->whereDate('date', '>=', $start_date)
+                    ->whereDate('date', '<=', $end_date)
+                    ->where('warehouse_id', $warehouse_id);
+
+            $lims_payment_data = $query->get();
+        }
+
+        // Get the current warehouse for display
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
+
+        return view('backend.report.payment_report', compact(
+            'lims_payment_data',
+            'start_date',
+            'end_date',
+            'warehouses',
+            'warehouse_id',
+            'warehouse'
+        ));
     }
 
     public function warehouseReport(Request $request)
@@ -4592,82 +4675,50 @@ class ReportController extends Controller
 
     public function differenceStockReport(Request $request)
     {
-        // Kondisi untuk filter tanggal
-        if ($request->input('start_date')) {
-            $start_date = $request->input('start_date');
-            $end_date = $request->input('end_date');
-        } else {
-            $start_date = date("Y-m-d");
-            $end_date = date("Y-m-d");
-        }
+        // Set default dates and filters
+        $start_date = $request->input('start_date', date("Y-m-d"));
+        $end_date = $request->input('end_date', date("Y-m-d"));
+        $shift = $request->shift != "all" ? [(int)$request->shift] : [1, 2, 3];
 
-        // Kondisi untuk shift
-        if($request->shift != "all"){
-            $shift = [(int) $request->shift];
-        } else {
-            $shift = [1,2,3];
-        }
-
-        // Kondisi untuk role admin outlet
+        // Determine warehouse ID based on user role
         if (auth()->user()->hasRole('Admin Outlet')) {
-            $warehouse_id = auth()->user()->warehouse_id;
-
-            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
-            $stocks = Stock::where('stocks.difference_stock', '!=', 0)
-                ->where('stocks.warehouse_id', $warehouse_id)
-                ->whereIn('shifts.shift_number', $shift)
-                ->whereDate('stocks.created_at', '>=', $start_date)
-                ->whereDate('stocks.created_at', '<=', $end_date)
-                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
-                ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
-                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
-                ->select(
-                    'warehouses.name as warehouse_name',
-                    'ingredients.name as ingredient_name',
-                    'shifts.shift_number',
-                    DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
-                )
-                ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
-                ->orderBy('warehouses.name')
-                ->orderBy('ingredients.name')
-                ->orderBy('shifts.shift_number')
-                ->get();
-
-            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift'));
+            $warehouse_id = [auth()->user()->warehouse_id];
         } else {
             $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
-            $warehouse_ids = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-            if($request->warehouse_id != 'all'){
-                $warehouse_id = [(int) $request->warehouse_id];
-            } else {
-                $warehouse_id = $warehouse_ids;
-            }
+            $warehouse_ids = $warehouses->pluck('id');
+            $warehouse_id = $request->warehouse_id != 'all' ? [(int)$request->warehouse_id] : $warehouse_ids->toArray();
             $warehouse_request = $request->get('warehouse_id');
-            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
-            $stocks = Stock::where('stocks.difference_stock', '!=', 0)
-                ->wherein('stocks.warehouse_id', $warehouse_id)
-                ->whereIn('shifts.shift_number', $shift)
-                ->whereDate('stocks.created_at', '>=', $start_date)
-                ->whereDate('stocks.created_at', '<=', $end_date)
-                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
-                ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
-                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
-                ->select(
-                    'warehouses.name as warehouse_name',
-                    'ingredients.name as ingredient_name',
-                    'shifts.shift_number',
-                    DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
-                )
-                ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
-                ->orderBy('warehouses.name')
-                ->orderBy('ingredients.name')
-                ->orderBy('shifts.shift_number')
-                ->get();
-
-            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift', 'warehouse_id', 'warehouses', 'warehouse_request'));
         }
 
-        return view('backend.report.difference_stock_report', compact('start_date', 'end_date'));
+        // Build stock query with common conditions
+        $stocks = Stock::where('stocks.difference_stock', '!=', 0)
+            ->whereIn('stocks.warehouse_id', $warehouse_id)
+            ->whereIn('shifts.shift_number', $shift)
+            ->whereDate('stocks.created_at', '>=', $start_date)
+            ->whereDate('stocks.created_at', '<=', $end_date)
+            ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+            ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
+            ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+            ->select(
+                'warehouses.name as warehouse_name',
+                'ingredients.name as ingredient_name',
+                'shifts.shift_number',
+                DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
+            )
+            ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
+            ->orderBy('warehouses.name')
+            ->orderBy('ingredients.name')
+            ->orderBy('shifts.shift_number')
+            ->get();
+
+        // Prepare view data
+        $viewData = compact('start_date', 'end_date', 'stocks', 'shift');
+
+        if (!auth()->user()->hasRole('Admin Outlet')) {
+            $viewData = array_merge($viewData, compact('warehouse_id', 'warehouses', 'warehouse_request'));
+        }
+
+        return view('backend.report.difference_stock_report', $viewData);
     }
 
     public function remainingStockReport(Request $request)
@@ -4820,425 +4871,4 @@ class ReportController extends Controller
         return $pdf->download('laporan-sisa-stok-'.$month . '-'. $year .'.pdf');
         // return view('backend.report.remaining_stock_report_pdf', compact('month', 'year', 'stocks', 'warehouse_ids', 'warehouses','formattedStocks'));
     }
-
-    /**
-     * Laporan omset per-produk per-bulan
-     */
-    public function productsOmzetByMonth() {
-        // Var initialization
-        $data = null;
-        $outlets = null;
-
-        if(auth()->user()->hasRole('Admin Bisnis')) {
-            $outlet = request()->outlet;
-        } else {
-            $outlet = auth()->user()->warehouse_id;
-        }
-
-        // Get data by user role
-        if(auth()->user()->hasRole('Admin Bisnis')) {
-            // Check request
-            if(request()->has('month')) {
-                $date = explode('-', request()->month);
-                $month = $date[1];
-                $year = $date[0];
-
-                // Get outlet products
-                $data = collect(DB::select("SELECT pw.product_id, p.name
-                    FROM product_warehouse AS pw
-                        JOIN products AS p
-                            ON pw.product_id = p.id
-                    WHERE pw.warehouse_id = $outlet
-                        AND pw.deleted_at IS NULL"));
-            }
-
-            // Get outlets
-            $outlets = Warehouse::where('business_id', auth()->user()->business_id)->get();
-        } else {
-            // Get outlet products
-            $data = collect(DB::select("SELECT pw.product_id, p.name
-                FROM product_warehouse AS pw
-                    JOIN products AS p
-                        ON pw.product_id = p.id
-                WHERE pw.warehouse_id = $outlet
-                    AND pw.deleted_at IS NULL"));
-        }
-
-        return view('backend.report.product_omzet_by_month', compact('data', 'outlets'));
-    }
-
-    /**
-     * Laporan omset per-produk per-bulan export excel
-     */
-    public function productsOmzetByMonthExcel() {
-        // Create shpreadsheet
-        $spreadsheet = new Spreadsheet();
-
-        // Get product IDs
-        $productIDs = explode(',', request()->productIDs);
-
-        // Get outlet name
-        $outlet = Warehouse::find(request()->outlet);
-
-        // Get ojol by outlet business_id
-        $ojols = Ojol::where('business_id', $outlet->business_id)->get();
-        $ojolCount = $ojols->count();
-
-        // Get number of column
-        $numberOfColumn = ($outlet->max_shift_count * ($ojolCount + 2)) - 1;
-        $endColumn = $this->addExcelColumn('D', $numberOfColumn);
-
-        // dd([$ojolCount, $numberOfColumn, $endColumn]);
-
-        // Product loop
-        foreach ($productIDs as $index => $productID) {
-            // Get product
-            $product = Product::find($productID);
-
-            // Get data for Laporan Omset Produk Per Bulan
-            $data = $this->getProductsByMonth(request()->month, request()->year, request()->outlet, $productID, $product->name);
-
-            // Create new sheet
-            $newSheet = $spreadsheet->createSheet();
-            $newSheet->setTitle($product->name);
-
-            $spreadsheet->setActiveSheetIndex($index + 1);
-            $sheet = $spreadsheet->getActiveSheet();
-
-            // Titles
-            $createDate = Carbon::create(request()->year, request()->month, 1);
-            $monthTitle = $this->dateService->changeMonth($createDate->month) . " " . $createDate->year;
-            $productTitle = $product->name;
-
-            // Title rows
-            $sheet->setCellValue('A1', $monthTitle);
-            $sheet->mergeCells('A1:C1');
-            $sheet->getStyle('A1:C1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('A1:C1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-            $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
-            $sheet->setCellValue('D1', $productTitle);
-            $sheet->mergeCells('D1:'.$endColumn.'1');
-            $sheet->getStyle('D1:'.$endColumn.'1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('D1:'.$endColumn.'1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-            $sheet->getStyle('D1:'.$endColumn.'1')->getFont()->setBold(true)->setSize(16);
-
-            // Set product title color to red and font color white
-            $sheet->getStyle('D1:'.$endColumn.'1')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
-            $sheet->getStyle('D1:'.$endColumn.'1')->getFont()->setColor(new Color('FFFFFF'));
-
-            // set row 1 height
-            $sheet->getRowDimension(1)->setRowHeight(30);
-
-            // Set header
-            $sheet->setCellValue("A2", "Tanggal");
-            $sheet->mergeCells("A2:A5");
-            $sheet->setCellValue("B2", "Hari");
-            $sheet->mergeCells("B2:B5");
-            $sheet->setCellValue("C2", "Omset");
-            $sheet->mergeCells("C2:C5");
-
-            // Set header style
-            $sheet->getStyle('A2:C2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('A2:C2')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-            $sheet->getStyle('A2:C2')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
-            $sheet->getStyle('A2:C2')->getFont()->setColor(new Color('FFFFFF'));
-
-            $lastEndColumn = $this->addExcelColumn('D', ($ojolCount + 2) - 1);
-
-            // Shift loop
-            for ($i = 1; $i <= $outlet->max_shift_count; $i++) {
-                if($i == 1) {
-                    $sheet->setCellValue("D2", "Shift " . $i);
-                    $sheet->mergeCells("D2:" . $lastEndColumn . "2");
-                    $lastEndColumn = $this->addExcelColumn($lastEndColumn, 1);
-
-                    // Order type row
-                    $sheet->setCellValue("D3", "Dine In");
-
-                    foreach($ojols as $index => $ojol) {
-                        $sheet->setCellValue(($this->addExcelColumn('D', $index + 1)) . "3", $ojol->name);
-                    }
-
-                    $sheet->setCellValue(($this->addExcelColumn('D', $ojolCount + 1)) . "3", "Total S" . $i);
-                } else {
-                    $sheet->setCellValue(($lastEndColumn) . "2", "Shift " . $i);
-                    $sheet->mergeCells(($lastEndColumn) . "2:" . ($this->addExcelColumn($lastEndColumn, ($ojolCount + 2) - 1)) . "2");
-
-                    // Order type row
-                    $sheet->setCellValue(($lastEndColumn) . "3", "Dine In");
-
-                    foreach($ojols as $index => $ojol) {
-                        $sheet->setCellValue(($this->addExcelColumn($lastEndColumn, $index + 1)) . "3", $ojol->name);
-                    }
-
-                    $sheet->setCellValue(($this->addExcelColumn($lastEndColumn, $ojolCount + 1)) . "3", "Total S" . $i);
-
-                    $lastEndColumn = $this->addExcelColumn($lastEndColumn, ($ojolCount + 3) - 1);
-                }
-            }
-
-            // Set shift style
-            $sheet->getStyle('D2:' . $endColumn . '3')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('D2:' . $endColumn . '3')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-
-            // Order type row fill red
-            $sheet->getStyle('D3:' . $endColumn . '3')->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setARGB('FFFF0000');
-            $sheet->getStyle('D3:' . $endColumn . '3')->getFont()->setColor(new Color('FFFFFF'));
-
-            // Set column auto width
-            $sheet->getColumnDimension('A')->setAutoSize(true);
-            $sheet->getColumnDimension('B')->setAutoSize(true);
-            $sheet->getColumnDimension('C')->setAutoSize(true);
-            $sheet->getColumnDimension('D')->setAutoSize(true);
-            $sheet->mergeCells('D3:D4');
-            for($k = 1; $k <= $numberOfColumn; $k++) {
-                $sheet->getColumnDimension($this->addExcelColumn('D', $k))->setAutoSize(true);
-                $sheet->mergeCells($this->addExcelColumn('D', $k) . "3:" . $this->addExcelColumn('D', $k) . "4");
-            }
-
-            // Data loop
-            $startRow = 6;
-            $totals = [];
-            $totals['dine_in'] = [];
-            $totals['total'] = [];
-            $totalOmzet = 0;
-
-            foreach($ojols as $ojol) {
-                $totals[$ojol->name] = [];
-            }
-
-            foreach($totals as $key => $value) {
-                for($m = 1; $m <= $outlet->max_shift_count; $m++) {
-                    $totals[$key][$m] = 0;
-                }
-            }
-
-            foreach($data['transactions'] as $indexData => $item) {
-                $row = [];
-                $row[0] = $item['date'];
-                $row[1] = $item['day'];
-                $row[2] = "Rp. " . number_format($item['omzet'], 0, ',', '.');
-
-                $totalOmzet += $item['omzet'];
-
-                $lastRowEnd = 3;
-
-                // Item shifts loop
-                foreach($item['shifts'] as $indexShift => $shift) {
-                    $row[$lastRowEnd + $indexShift] = number_format($shift['dine_in'], 0, ',', '.');
-                    $totals['dine_in'][$shift['shift_number']] += $shift['dine_in'];
-
-                    // Item ojol loop
-                    foreach($ojols as $indexOjol => $ojol) {
-                        $row[$lastRowEnd + $indexShift + $indexOjol + 1] = number_format($shift[$ojol->name], 0, ',', '.');
-                        $totals[$ojol->name][$shift['shift_number']] += $shift[$ojol->name];
-                    }
-
-                    $row[$lastRowEnd + $indexShift + $ojolCount + 1] = number_format($shift['total'], 0, ',', '.');
-                    $totals['total'][$shift['shift_number']] += $shift['total'];
-
-                    $lastRowEnd += $ojolCount + 2;
-                }
-
-                $sheet->fromArray($row, NULL, "A" . $startRow + $indexData);
-            }
-            // End of data loop
-
-            $newLastEndColumn = $this->addExcelColumn('D', ($ojolCount + 2) - 1);
-
-            for ($i = 1; $i <= $outlet->max_shift_count; $i++) {
-                if($i == 1) {
-                    $newLastEndColumn = $this->addExcelColumn($newLastEndColumn, 1);
-
-                    // Order type row
-                    $sheet->setCellValue("D5", $totals['dine_in'][$i]);
-
-                    foreach($ojols as $index => $ojol) {
-                        $sheet->setCellValue(($this->addExcelColumn('D', $index + 1)) . "5", $totals[$ojol->name][$i]);
-                    }
-
-                    $sheet->setCellValue(($this->addExcelColumn('D', $ojolCount + 1)) . "5", $totals['total'][$i]);
-                } else {
-                    // Order type row
-                    $sheet->setCellValue(($newLastEndColumn) . "5", $totals['dine_in'][$i]);
-
-                    foreach($ojols as $index => $ojol) {
-                        $sheet->setCellValue(($this->addExcelColumn($newLastEndColumn, $index + 1)) . "5", $totals[$ojol->name][$i]);
-                    }
-
-                    $sheet->setCellValue(($this->addExcelColumn($newLastEndColumn, $ojolCount + 1)) . "5", $totals['total'][$i]);
-
-                    $newLastEndColumn = $this->addExcelColumn($newLastEndColumn, ($ojolCount + 3) - 1);
-                }
-            }
-
-            $sheet->getStyle('A'.($startRow - 1).':'.$endColumn. (count($data['transactions']) + ($startRow)))->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-            $sheet->getStyle('A'.($startRow - 1).':'.$endColumn. (count($data['transactions']) + ($startRow)))->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
-
-            // Total omzet
-            $sheet->setCellValue("A".(count($data['transactions']) + $startRow), "Total Omset");
-            $sheet->mergeCells("A".(count($data['transactions']) + $startRow).":B".(count($data['transactions']) + $startRow));
-            $sheet->setCellValue("C".(count($data['transactions']) + $startRow), "Rp. " . number_format($totalOmzet, 0, ',', '.'));
-
-            // Set border
-            $sheet->getStyle('A1:' . $endColumn . (count($data['transactions']) + ($startRow)))->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
-
-        }
-
-        $spreadsheet->removeSheetByIndex(0);
-
-        // Download excel
-        $writer = new Xlsx($spreadsheet);
-        $filename = "Laporan Omset Per-Produk Outlet " .$outlet->name. " " . date('Y-m-d H:i:s') . ".xlsx";
-
-        $tempFilePath = tempnam(sys_get_temp_dir(), $filename);
-        $writer->save($tempFilePath);
-
-        return Response::download($tempFilePath, $filename)->deleteFileAfterSend(true);
-    }
-
-    /**
-     * Shift alphabet
-     */
-    private function shiftAlphabet($char, $shift) {
-        // Memeriksa apakah input adalah karakter alfabet
-        if (!ctype_alpha($char)) {
-            return "Error: Input pertama harus berupa karakter alfabet.";
-        }
-
-        // Menentukan apakah karakter adalah huruf besar atau kecil
-        $asciiOffset = ctype_upper($char) ? ord('A') : ord('a');
-
-        // Menghitung posisi baru dengan wrap-around
-        $newPosition = (ord($char) - $asciiOffset + $shift) % 26;
-        if ($newPosition < 0) {
-            $newPosition += 26; // Mengatasi kasus shift negatif
-        }
-
-        // Mengembalikan karakter hasil pergeseran
-        return chr($asciiOffset + $newPosition);
-    }
-
-    /**
-     * Int to excel column
-     */
-    private function intToExcelColumn($num) {
-        $columnName = '';
-        while ($num > 0) {
-            $remainder = ($num - 1) % 26;
-            $columnName = chr(65 + $remainder) . $columnName;
-            $num = intval(($num - 1) / 26);
-        }
-        return $columnName;
-    }
-
-    /**
-     * Add excel column
-     */
-    private function addExcelColumn($column, $add) {
-        // Konversi nama kolom ke angka
-        $num = 0;
-        $length = strlen($column);
-        for ($i = 0; $i < $length; $i++) {
-            // ord('A')=65 jadi dikurangi agar A=1
-            $num = $num * 26 + (ord($column[$i]) - ord('A') + 1);
-        }
-
-        // Tambahkan nilai offset
-        $num += $add;
-
-        // Konversi kembali ke nama kolom Excel
-        return $this->intToExcelColumn($num);
-    }
-
-    /**
-     * Get data for Laporan Omset Produk Per Bulan
-     */
-    private function getProductsByMonth($month, $year, $outlet, $productId, $productName) {
-        // Get outlet
-        $outlet = Warehouse::find($outlet);
-
-        // Get outlet max shifts count
-        $maxShiftsCount = $outlet->max_shift_count;
-
-        // Get ojols by outlet business_id
-        $ojols = Ojol::where('business_id', $outlet->business_id)->get();
-
-        // Get outlet transactions
-        $transactions = collect(DB::select("SELECT t.id, s.shift_number, t.payment_method, t.total_amount, t.date
-            FROM transactions AS t
-                LEFT JOIN shifts AS s ON t.shift_id = s.id
-            WHERE t.warehouse_id = $outlet->id
-                AND t.deleted_at IS NULL
-                AND MONTH(t.date) = '$month'
-                AND YEAR(t.date) = '$year'
-                AND t.status = 'Lunas'"));
-
-        // Get transactions details
-        $transactionDetails = TransactionDetail::whereIn('transaction_id', $transactions->pluck('id'))->where('product_id', $productId)->get();
-
-        // Loop every day of the month
-        $startDate = Carbon::create($year, $month, 1);
-
-        $row = [];
-        $row['product_id'] = $productId;
-        $row['product_name'] = $productName;
-
-        // Date loop
-        for ($i = 1; $i <= $startDate->daysInMonth; $i++) {
-            $date_row = [];
-            $date_row['date'] = Carbon::create($year, $month, $i)->isoFormat('DD');
-            $date_row['day'] = $this->dateService->changeDay(Carbon::create($year, $month, $i)->isoFormat('d'));
-            $date_row['omzet'] = $transactionDetails
-                ->whereIn('transaction_id', $transactions
-                    ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))
-                    ->pluck('id'))
-                ->sum('subtotal');
-
-            // Shifts loop
-            for ($j = 1; $j <= $maxShiftsCount; $j++) {
-                $shift_row = [];
-                $shift_row['shift_number'] = $j;
-
-                // Dine In
-                $shift_row['dine_in'] = $transactionDetails
-                    ->whereIn('transaction_id', $transactions
-                        ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))
-                        ->where('shift_number', $j)
-                        ->whereIn('payment_method', ['Tunai', 'Transfer'])
-                        ->pluck('id'))
-                    ->sum('qty');
-
-
-                // Ojol loop
-                foreach ($ojols as $ojol) {
-                    $shift_row[$ojol->name] = $transactionDetails
-                        ->whereIn('transaction_id', $transactions
-                            ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))
-                            ->where('shift_number', $j)
-                            ->where('payment_method', $ojol->name)
-                            ->pluck('id'))
-                        ->sum('qty');
-                }
-
-                // Total
-                $shift_row['total'] = $transactionDetails
-                    ->whereIn('transaction_id', $transactions
-                        ->where('date', Carbon::create($year, $month, $i)->format('Y-m-d'))
-                        ->where('shift_number', $j)
-                        ->pluck('id'))
-                    ->sum('qty');
-
-                $date_row['shifts'][] = $shift_row;
-            }
-
-            $row['transactions'][] = $date_row;
-        }
-
-        $row;
-
-        return $row;
-    }
-
-
 }

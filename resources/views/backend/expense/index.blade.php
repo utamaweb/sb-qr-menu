@@ -24,7 +24,7 @@
                                 </div>
                             </div>
 
-                            @if(auth()->user()->hasRole('Admin Bisnis'))
+                            @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
                                 <div class="form-group">
                                     <label><strong>Pilih Outlet</strong></label>
                                     <select id="warehouse-select" name="warehouse_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"

@@ -67,7 +67,7 @@ class HomeController extends Controller
             $warehouses = Warehouse::pluck('id');
 
             $data = compact('countBusiness', 'countWarehouse', 'countAdminBisnis', 'countAdminOutlet');
-        } elseif ($user->hasRole('Admin Bisnis')) {
+        } elseif ($user->hasRole(['Admin Bisnis', 'Report'])) {
             $business_id = $user->business_id;
             $warehouses = Warehouse::where('business_id', $business_id)->pluck('id');
             $countAdminOutlet = User::where('role_id', 3)->whereIn('warehouse_id', $warehouses)->count();

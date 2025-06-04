@@ -56,8 +56,14 @@ class FinanceReportController extends Controller
         }
 
         // Apply date range and get results
-        $finance = $finance->whereBetween('created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
-            ->orderBy('created_at', 'desc')
+        // Now ordering by warehouse name, then by shift number, then by created_at date
+        $finance = $finance->join('shifts', 'close_cashiers.shift_id', '=', 'shifts.id')
+            ->join('warehouses', 'shifts.warehouse_id', '=', 'warehouses.id')
+            ->select('close_cashiers.*')
+            ->whereBetween('close_cashiers.created_at', [$start_date . ' 00:00:00', $end_date . ' 23:59:59'])
+            ->orderBy('warehouses.name')
+            ->orderBy('shifts.shift_number')
+            ->orderBy('close_cashiers.created_at', 'desc')
             ->get();
 
         // Process canceled transactions data

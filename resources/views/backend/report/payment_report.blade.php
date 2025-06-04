@@ -6,17 +6,36 @@
                 <div class="card">
                     <div class="card-header">
                         <h3 class="text-center">Laporan Pembayaran</h3>
+                        @if(isset($start_date) && isset($end_date))
                         <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
+                        @endif
                     </div>
                     <div class="card-body">
-                        {!! Form::open(['route' => 'report.product', 'method' => 'get']) !!}
+                        {!! Form::open(['route' => 'report.paymentByDate', 'method' => 'post']) !!}
                             <div class="form-group">
                                 <label for=""><strong>Pilih Tanggal</strong></label>
-                                <div class="input-group">
-                                    <input type="text" name="start_date" class="form-control date" required value="{{ $start_date }}">
-                                    <input type="text" name="end_date" class="form-control date" required value="{{ $end_date }}">
-                                    <button class="btn btn-primary" type="submit">Submit</button>
+                                <div class="input-group mb-3">
+                                    <input type="text" name="start_date" class="form-control date" required value="{{ $start_date ?? '' }}">
+                                    <input type="text" name="end_date" class="form-control date" required value="{{ $end_date ?? '' }}">
                                 </div>
+                            </div>
+
+                            @if(auth()->user()->hasRole('Admin Bisnis') || auth()->user()->hasRole('Report'))
+                            <div class="form-group">
+                                <label for="warehouse_id"><strong>Pilih Outlet</strong></label>
+                                <select name="warehouse_id" id="warehouse_id" class="selectpicker form-control" data-live-search="true">
+                                    <option value="0">Pilih Outlet</option>
+                                    @foreach($warehouses as $warehouse)
+                                    <option value="{{$warehouse->id}}" {{ isset($warehouse_id) && $warehouse_id == $warehouse->id ? 'selected' : '' }}>{{$warehouse->name}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            @else
+                                <input type="hidden" name="warehouse_id" value="{{ auth()->user()->warehouse_id }}">
+                            @endif
+
+                            <div class="form-group mt-3">
+                                <button class="btn btn-primary" type="submit">Submit</button>
                             </div>
                         {!! Form::close() !!}
                     </div>
@@ -24,6 +43,7 @@
             </div>
         </div>
 
+        @if(isset($lims_payment_data))
         <div class="row">
             <div class="col-md-12">
                 <div class="card">
@@ -72,6 +92,7 @@
                 </div>
             </div>
         </div>
+        @endif
     </div>
 </section>
 
@@ -94,6 +115,7 @@
         return formattedNumber;
     }
 
+    @if(isset($lims_payment_data))
     $('#report-table').DataTable( {
         "order": [],
         'language': {
@@ -189,6 +211,7 @@
             $( dt_selector.column( 6 ).footer() ).html(dt_selector.column( 6, {page:'current'} ).data().sum().toFixed({{$general_setting->decimal}}));
         }
     }
+    @endif
 
 $(".daterangepicker-field").daterangepicker({
   callback: function(startDate, endDate, period){
@@ -201,5 +224,8 @@ $(".daterangepicker-field").daterangepicker({
   }
 });
 
+// Initialize selectpicker if it exists
+if($('.selectpicker').length)
+    $('.selectpicker').selectpicker();
 </script>
 @endpush

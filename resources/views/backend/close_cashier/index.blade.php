@@ -14,6 +14,17 @@
                             <div class="row">
                                 <div class="col-md-3">
                                     <div class="form-group">
+                                        <label><strong>Pilih Regional</strong></label>
+                                        <select id="regional-select" name="regional_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins" title="Pilih regional">
+                                            <option value="all" {{ $regional_request == 'all' ? 'selected' : ''}}>Semua Regional</option>
+                                            @foreach($regionals as $regional)
+                                            <option value="{{$regional->id}}" {{$regional->id == $regional_request ? 'selected' : ''}}>{{$regional->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="form-group">
                                         <label><strong>Pilih Outlet</strong></label>
                                         <select id="warehouse-select" name="warehouse_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins" title="Pilih outlet">
                                             <option value="all" {{ $warehouse_request == 'all' ? 'selected' : ''}}>Semua Outlet</option>
@@ -117,6 +128,42 @@
             format: 'yyyy-mm-dd',
             autoclose: true,
             todayHighlight: true
+        });
+
+        // Handle Regional-Warehouse dependency
+        $(document).ready(function() {
+            // On regional select change
+            $('#regional-select').change(function() {
+                var regionalId = $(this).val();
+
+                // Disable warehouse select while loading
+                $('#warehouse-select').prop('disabled', true).selectpicker('refresh');
+
+                // Make AJAX request
+                $.ajax({
+                    url: '{{ url("admin/close-cashier/get-warehouses-by-regional") }}/' + regionalId,
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // Clear current options
+                        $('#warehouse-select').empty();
+
+                        // Add "All Outlets" option
+                        $('#warehouse-select').append('<option value="all">Semua Outlet</option>');
+
+                        // Add warehouses from response
+                        $.each(data, function(index, warehouse) {
+                            $('#warehouse-select').append('<option value="' + warehouse.id + '">' + warehouse.name + '</option>');
+                        });
+
+                        // Enable warehouse select and refresh
+                        $('#warehouse-select').prop('disabled', false).selectpicker('refresh');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error("Error fetching warehouses: " + error);
+                    }
+                });
+            });
         });
 
         // Initialize DataTable

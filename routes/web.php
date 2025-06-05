@@ -334,11 +334,12 @@ Route::group(['prefix' => 'admin'], function () {
 
         // Route for warehouse max shifts count
         Route::get('/max_shifts', [WarehouseController::class, 'maxShiftPage'])->name('maxShiftPage');
-        Route::put('/max_shifts', [WarehouseController::class, 'maxShiftUpdate'])->name('maxShiftUpdate');
-
-        // Route for finance report
+        Route::put('/max_shifts', [WarehouseController::class, 'maxShiftUpdate'])->name('maxShiftUpdate');        // Route for finance report
         Route::get('/finance-report', [FinanceReportController::class, 'financeReport'])->name('financeReport');
         Route::get('/get-warehouses-by-regional/{regional_id}', [App\Http\Controllers\Report\FinanceReportController::class, 'getWarehousesByRegional'])->name('getWarehousesByRegional');
+
+        // Route for close cashier report regional filtering
+        Route::get('close-cashier/get-warehouses-by-regional/{regional_id}', [CloseCashierController::class, 'getWarehousesByRegional'])->name('close_cashier.get_warehouses_by_regional');
 
         // Route for product omzet report
         Route::get('products-omzet-by-month', [ProductOmzetController::class, 'index'])->name('report.productsOmzetByMonth');

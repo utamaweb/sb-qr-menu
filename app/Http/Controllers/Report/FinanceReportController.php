@@ -36,6 +36,12 @@ class FinanceReportController extends Controller
         $warehouse_request = $request->get('warehouse_id');
         $regional_request = $request->get('regional_id');
 
+        if($regional_request){
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                ->where('regional_id', $regional_request)
+                ->get();
+        }
+
         // Get finance data with appropriate relationships and filters
         $finance = CloseCashier::with([
                 'shift.warehouse.regional',

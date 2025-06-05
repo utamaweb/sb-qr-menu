@@ -7,6 +7,7 @@ use Auth;
 use App\Models\Ojol;
 use App\Models\Stock;
 use App\Models\Expense;
+use App\Models\Regional;
 use App\Models\Warehouse;
 use App\Models\Transaction;
 use App\Models\CloseCashier;
@@ -17,40 +18,48 @@ use App\Models\TransactionDetail;
 use App\Http\Controllers\Controller;
 use App\Models\CloseCashierProductSold;
 
-
 class CloseCashierController extends Controller
 {
     public function index(Request $request)
     {
         $warehouse_request = $request->get('warehouse_id', 'all');
+        $regional_request = $request->get('regional_id', 'all');
         $start_date = $request->get('start_date', date('Y-m-d'));
         $end_date = $request->get('end_date', date('Y-m-d'));
 
-        $query = CloseCashier::with(['shift.warehouse', 'shift.user']);
+        $query = CloseCashier::with(['shift.warehouse.regional', 'shift.user']);
 
-        // Apply warehouse filter for admin users
         if (auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
-            // Apply date range filter
             $query->whereDate('created_at', '>=', $start_date)
                 ->whereDate('created_at', '<=', $end_date);
 
-            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+            $regionals = Regional::where('business_id', auth()->user()->business_id)->get();
 
-            // If a specific warehouse is selected and it's not 'all'
+            if ($regional_request != 'all' && $regional_request != null) {
+                $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                    ->where('regional_id', $regional_request)
+                    ->get();
+
+                $query->whereHas('shift.warehouse', function($q) use ($regional_request) {
+                    $q->where('regional_id', $regional_request);
+                });
+            } else {
+                $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+            }
+
             if ($warehouse_request != 'all' && $warehouse_request != null) {
                 $query->whereHas('shift', function($q) use ($warehouse_request) {
                     $q->where('warehouse_id', $warehouse_request);
                 });
             }
         } else {
-            // For regular users, only show data from their warehouse
             $warehouse_id = auth()->user()->warehouse_id;
             $query->whereHas('shift', function($q) use ($warehouse_id) {
                 $q->where('warehouse_id', $warehouse_id);
             });
 
-            // No need to pass warehouses variable for non-admin users
             $warehouses = collect();
+            $regionals = collect();
         }
 
         $closeCashiers = $query->orderBy('created_at', 'desc')->get();
@@ -58,123 +67,38 @@ class CloseCashierController extends Controller
         return view('backend.close_cashier.index', compact(
             'closeCashiers',
             'warehouses',
+            'regionals',
             'warehouse_request',
+            'regional_request',
             'start_date',
             'end_date'
         ));
     }
 
-    // function show old version (took so long time to show)
-    public function showOld($id) {
-        // get detail tutup kasir
-        $closeCashier = CloseCashier::find($id);
-
-        // adjust ojols
-        $business_id = Warehouse::find(auth()->user()->warehouse_id)->business_id;
-        $ojols = Ojol::where('business_id', $business_id)->get();
-        $ojolName = ['Tunai','Transfer'];
-        foreach ($ojols as $ojol) {
-            $ojolName[] = $ojol->name;
+    public function getWarehousesByRegional($regional_id)
+    {
+        if ($regional_id == 'all') {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+        } else {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                ->where('regional_id', $regional_id)
+                ->get();
         }
 
-        // get produk terjual di shift tersebut
-        $paymentTransactions = Transaction::whereIn('payment_method', $ojolName)
-            ->where('shift_id', $closeCashier->shift_id)
-            ->get();
-
-        // init transactionDetails dynamically
-        $transactionDetails = [];
-        foreach ($ojolName as $paymentMethod) {
-            $transactionDetails[$paymentMethod] = [];
-        }
-
-        // count products
-        foreach ($paymentTransactions as $transaction) {
-            $details = TransactionDetail::where('transaction_id', $transaction->id)->get();
-            foreach ($details as $detail) {
-                $productName = $detail->product_name;
-                $paymentMethod = $transaction->payment_method;
-
-                // add qty to product
-                if (isset($transactionDetails[$paymentMethod][$productName])) {
-                    $transactionDetails[$paymentMethod][$productName] += $detail->qty;
-                } else {
-                    $transactionDetails[$paymentMethod][$productName] = $detail->qty;
-                }
-            }
-        }
-
-        // formatting array
-        foreach ($transactionDetails as $paymentMethod => $products) {
-            $transactionDetails[$paymentMethod] = array_map(function($productName, $qty) {
-                return ['product_name' => $productName, 'qty' => $qty];
-            }, array_keys($products), $products);
-        }
-
-        // return $transactionDetails;
-
-
-        $closeCashierProductSolds = CloseCashierProductSold::where('close_cashier_id', $id)->get();
-        // get pengeluaran shift tersebut
-        $expenses = Expense::where('shift_id', $closeCashier->shift_id)->get();
-        $sumExpense = Expense::where('shift_id', $closeCashier->shift_id)->sum('amount');
-        // get penambahan stok shift tersebut
-        $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
-        $sumStockPurchase = StockPurchase::where('shift_id', $closeCashier->shift_id)->sum('total_price');
-        // get transaksi lunas shift tersebut
-        $transactionals = Transaction::where('status', 'Lunas')->where('shift_id', $closeCashier->shift_id)->get();
-        // get sisa stok shift tersebut
-        $stocksIngredient = [];
-
-        $stocks = Stock::where('shift_id', $closeCashier->shift_id)->get();
-
-        foreach ($stocks as $stock) {
-            $ingredientStock = Stock::where('shift_id', $closeCashier->shift_id)
-                                    ->where('ingredient_id', $stock['ingredient_id'])
-                                    ->first();
-
-            if ($ingredientStock) {
-                $stockData = [
-                    'ingredient_id' => $stock['ingredient_id'],
-                    'ingredient_name' => $ingredientStock->ingredient->name,
-                    'first_stock' => $ingredientStock->first_stock,
-                    'stock_in' => $ingredientStock->stock_in,
-                    'total_stock' => $ingredientStock->stock_in + $ingredientStock->first_stock,
-                    'used_stock' => $ingredientStock->stock_used,
-                    'last_system_stock' => $ingredientStock->last_stock,
-                    'stock_close_input' => $ingredientStock->stock_close_input,
-                    'difference_stock' => $ingredientStock->difference_stock,
-                ];
-
-                // Konversi $stockData menjadi objek
-                $stocksIngredient[] = (object) $stockData;
-            }
-        }
-        return view('backend.close_cashier.show', compact('closeCashier','closeCashierProductSolds', 'expenses', 'stockPurchases','sumExpense','sumStockPurchase','transactionals', 'stocks', 'stocksIngredient', 'transactionDetails'));
+        return response()->json($warehouses);
     }
 
-
-    // update the function to new version (optimized)
     public function show($id) {
-        // Ambil detail tutup kasir
         $closeCashier = CloseCashier::with('shift', 'shift.warehouse', 'shift.user', 'closeCashierProductSold')->find($id);
-
-        // dd($closeCashier->closeCashierProductSold);
-
-        // Ambil business_id berdasarkan warehouse user
         $business_id = auth()->user()->warehouse->business_id ?? auth()->user()->business_id;
-
-        // Ambil nama ojol yang tersedia
         $ojols = Ojol::where('business_id', $business_id)->pluck('name')->toArray();
         $ojolName = array_merge(['Tunai', 'Transfer'], $ojols);
 
-        // Gunakan eager loading untuk mengurangi jumlah query
         $paymentTransactions = Transaction::with('transaction_details')
             ->whereIn('payment_method', $ojolName)
             ->where('shift_id', $closeCashier->shift_id)
             ->get();
 
-        // Inisialisasi array transaksi
         $transactionDetails = [];
         foreach ($paymentTransactions as $transaction) {
             foreach ($transaction->transaction_details as $detail) {
@@ -193,41 +117,27 @@ class CloseCashierController extends Controller
             }
         }
 
-        // Formatting array
         foreach ($transactionDetails as $paymentMethod => $products) {
             $transactionDetails[$paymentMethod] = array_map(function($productName, $qty) {
                 return ['product_name' => $productName, 'qty' => $qty];
             }, array_keys($products), $products);
         }
 
-
-        // Ambil data produk yang terjual
-        // $closeCashierProductSolds = CloseCashierProductSold::where('close_cashier_id', $id)->get();
         $closeCashierProductSolds = $closeCashier->closeCashierProductSold;
-
-        // Ambil data pengeluaran di shift tersebut
         $expenses = Expense::with('expenseCategory')->where('shift_id', $closeCashier->shift_id)->get();
-        $sumExpense = $expenses->sum('amount'); // Optimasi dengan sum di PHP, bukan query
-
-        // Ambil penambahan stok shift tersebut
+        $sumExpense = $expenses->sum('amount');
         $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
-        $sumStockPurchase = $stockPurchases->sum('total_price'); // Optimasi dengan sum di PHP
-
-        // Ambil transaksi lunas shift tersebut
+        $sumStockPurchase = $stockPurchases->sum('total_price');
         $transactionals = Transaction::where('status', 'Lunas')
             ->where('shift_id', $closeCashier->shift_id)
             ->get();
 
-        // Ambil stok sisa di shift tersebut
         $stocks = Stock::where('shift_id', $closeCashier->shift_id)->get();
         $ingredientIds = $stocks->pluck('ingredient_id');
-
-        // Ambil stok bahan dalam satu query berdasarkan ingredient_id
         $ingredientStocks = Stock::where('shift_id', $closeCashier->shift_id)
-                                 ->whereIn('ingredient_id', $ingredientIds)
-                                 ->get();
+                               ->whereIn('ingredient_id', $ingredientIds)
+                               ->get();
 
-        // Olah stok menjadi array yang dapat digunakan di view
         $stocksIngredient = [];
         foreach ($ingredientStocks as $ingredientStock) {
             $stockData = [
@@ -242,11 +152,9 @@ class CloseCashierController extends Controller
                 'difference_stock' => $ingredientStock->difference_stock,
             ];
 
-            // Konversi $stockData menjadi objek
             $stocksIngredient[] = (object) $stockData;
         }
 
-        // Kirim data ke view
         return view('backend.close_cashier.show', compact(
             'closeCashier',
             'closeCashierProductSolds',
@@ -261,13 +169,8 @@ class CloseCashierController extends Controller
         ));
     }
 
-
-
-    // Method to get CloseCashier Transaction Details
     public function transactionDetails(Transaction $transaction) {
         $details = TransactionDetail::with('product')->where('transaction_id', $transaction->id)->get();
-
         return response()->json($details);
     }
-
 }

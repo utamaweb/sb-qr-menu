@@ -28,12 +28,12 @@ class CloseCashierController extends Controller
 
         $query = CloseCashier::with(['shift.warehouse', 'shift.user']);
 
-        // Apply date range filter
-        $query->whereDate('created_at', '>=', $start_date)
-              ->whereDate('created_at', '<=', $end_date);
-
         // Apply warehouse filter for admin users
         if (auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            // Apply date range filter
+            $query->whereDate('created_at', '>=', $start_date)
+                ->whereDate('created_at', '<=', $end_date);
+
             $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
 
             // If a specific warehouse is selected and it's not 'all'

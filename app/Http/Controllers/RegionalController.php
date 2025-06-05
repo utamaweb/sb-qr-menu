@@ -28,20 +28,6 @@ class RegionalController extends Controller
         return redirect()->back()->with('message', 'Regional Berhasil Ditambah');
     }
 
-    // public function update(Request $request, $id)
-    // {
-    //     $this->validate($request,[
-    //         'name' => 'max:255',
-    //     ]);
-
-    //     $regional = Regional::find($id);
-    //     $regional->update([
-    //         'name' => $request->name,
-    //     ]);
-
-    //     return redirect()->back()->with('message', 'Regional Berhasil Diubah');
-    // }
-
     public function update(Request $request, $id)
     {
         $request->validate([

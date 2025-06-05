@@ -155,9 +155,9 @@
                 <li id="product-omzet-by-month">
                     <a href="{{ route('report.productsOmzetByMonth') }}">Laporan Omset Produk</a>
                 </li>
-                {{-- <li id="finance-report">
+                <li id="finance-report">
                     <a href="{{ route('financeReport') }}?warehouse_id=all&regional_id=all">Laporan Finance</a>
-                </li> --}}
+                </li>
             </ul>
         </li>
 
@@ -298,9 +298,9 @@
                     <a href="{{ route('report.remainingStockReport') }}">Laporan Sisa Stok</a>
                 </li>
 
-                {{-- <li id="finance-report">
+                <li id="finance-report">
                     <a href="{{ route('financeReport') }}?warehouse_id=all&regional_id=all">Laporan Finance</a>
-                </li> --}}
+                </li>
                 <li id="laporan-tutup-kasir">
                     <a href="{{ route('close-cashier.index') }}">Laporan Tutup Kasir</a>
                 </li>

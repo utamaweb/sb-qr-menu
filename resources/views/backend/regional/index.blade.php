@@ -127,7 +127,7 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $("#kategori").addClass("active");
+    $("#regional").addClass("active");
 
 
     $('#ingredient-table').DataTable( {

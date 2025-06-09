@@ -48,6 +48,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Facades\Response;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use App\Services\DateService;
+use App\Models\Regional;
 
 class ReportController extends Controller
 {
@@ -906,36 +907,106 @@ class ReportController extends Controller
     }
 
 
+    // public function listTransaction(Request $request)
+    // {
+    //     // Get date filter from request or use current date as default
+    //     if($request->input('start_date')) {
+    //         $start_date = $request->input('start_date');
+    //         $end_date = $request->input('end_date');
+    //     } else {
+    //         $start_date = Carbon::now()->format('Y-m-d');
+    //         $end_date = Carbon::now()->format('Y-m-d');
+    //     }
+
+    //     $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+    //     if(auth()->user()->hasRole('Admin Outlet')){
+    //         $warehouseId = auth()->user()->warehouse_id;
+    //     } else {
+    //         $warehouseId = $request->input('warehouse_id') ?? null;
+    //     }
+
+    //     $totalQtyPerProduct = [];
+    //     $totalSubtotalPerProduct = [];
+
+    //     $regionals = Regional::where('business_id', auth()->user()->business_id)->get();
+
+    //     $warehouse_request = $request->get('warehouse_id');
+    //     $regional_request = $request->get('regional_id');
+
+
+    //     if($regional_request){
+    //         $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+    //             ->where('regional_id', $regional_request)
+    //             ->get();
+    //     }
+
+    //     // Query transactions with date filter
+    //     $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')
+    //         ->whereDate('date', '>=', $start_date)
+    //         ->whereDate('date', '<=', $end_date)
+    //         ->orderBy('id', 'DESC')
+    //         ->get();
+
+    //     if($regional_request || $warehouse_request) {
+    //         if($regional_request) {
+    //             $transactions = $transactions->where('regional_id', $regional_request);
+    //         }
+    //         if($warehouse_request) {
+    //             $transactions = $transactions->where('warehouse_id', $warehouse_request);
+    //         }
+    //     }
+
+    //     return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct', 'warehouses', 'warehouseId', 'regionals', 'warehouse_request', 'regional_request'));
+    // }
+
     public function listTransaction(Request $request)
     {
-        // Get date filter from request or use current date as default
-        if($request->input('start_date')) {
-            $start_date = $request->input('start_date');
-            $end_date = $request->input('end_date');
+        $warehouse_request = $request->get('warehouse_id', 'all');
+        $regional_request = $request->get('regional_id', 'all');
+        $start_date = $request->get('start_date', date('Y-m-d'));
+        $end_date = $request->get('end_date', date('Y-m-d'));
+
+        $query = Transaction::with(['warehouse', 'order_type', 'transaction_details.product'])
+                ->whereDate('created_at', '>=', $start_date)
+                ->whereDate('created_at', '<=', $end_date);
+
+        if (auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $regionals = Regional::where('business_id', auth()->user()->business_id)->get();
+
+            if ($regional_request != 'all' && $regional_request != null) {
+                $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                    ->where('regional_id', $regional_request)
+                    ->get();
+
+                $query->whereHas('warehouse', function($q) use ($regional_request) {
+                    $q->where('regional_id', $regional_request);
+                });
+            } else {
+                $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+            }
+
+            if ($warehouse_request != 'all' && $warehouse_request != null) {
+                $query->where('warehouse_id', $warehouse_request);
+            }
         } else {
-            $start_date = Carbon::now()->format('Y-m-d');
-            $end_date = Carbon::now()->format('Y-m-d');
+            $warehouse_id = auth()->user()->warehouse_id;
+            $query->where('warehouse_id', $warehouse_id);
+
+            $warehouses = collect();
+            $regionals = collect();
         }
 
-        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
-        if(auth()->user()->hasRole('Admin Outlet')){
-            $warehouseId = auth()->user()->warehouse_id;
-        } else {
-            $warehouseId = $request->input('warehouse_id') ?? null;
-        }
+        $transactions = $query->orderBy('created_at', 'desc')->get();
 
-        $totalQtyPerProduct = [];
-        $totalSubtotalPerProduct = [];
-
-        // Query transactions with date filter
-        $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')
-            ->where('warehouse_id', $warehouseId)
-            ->whereDate('date', '>=', $start_date)
-            ->whereDate('date', '<=', $end_date)
-            ->orderBy('id', 'DESC')
-            ->get();
-
-        return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct', 'warehouses', 'warehouseId'));
+        return view('backend.report.list_transaction', compact(
+            'start_date',
+            'end_date',
+            'transactions',
+            'warehouses',
+            'warehouse_request',
+            'regional_request',
+            'regionals'
+        ));
     }
 
     public function productReportData(Request $request)

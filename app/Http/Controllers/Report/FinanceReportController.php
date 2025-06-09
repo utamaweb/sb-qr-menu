@@ -92,6 +92,7 @@ class FinanceReportController extends Controller
             'regional_request'
         ));
     }
+
     public function getWarehousesByRegional($regional_id)
     {
         if($regional_id == 'all') {

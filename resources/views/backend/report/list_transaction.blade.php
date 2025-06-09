@@ -24,13 +24,25 @@
                                 </div>
                             </div>
 
-                            @if(auth()->user()->hasRole('Admin Bisnis') || auth()->user()->hasRole('Report'))
+                            @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
+                                <div class="form-group">
+                                    <label><strong>Pilih Regional</strong></label>
+                                    <select id="regional-select" name="regional_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
+                                    title="Pilih regional">
+                                        <option value="all" {{ $regional_request == 'all' ? 'selected' : ''}}>Semua Regional</option>
+                                        @foreach($regionals as $regional)
+                                        <option value="{{$regional->id}}" {{$regional->id == $regional_request ? 'selected' : ''}}>{{$regional->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
                                 <div class="form-group">
                                     <label><strong>Pilih Outlet</strong></label>
                                     <select id="warehouse-select" name="warehouse_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
                                     title="Pilih outlet">
+                                        <option value="all" {{ $warehouse_request == 'all' ? 'selected' : ''}}>Semua Outlet</option>
                                         @foreach($warehouses as $warehouse)
-                                        <option value="{{ $warehouse->id }}" {{ $warehouse->id == $warehouseId ? 'selected' : '' }}>{{ $warehouse->name }}</option>
+                                        <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_request ? 'selected' : ''}}>{{$warehouse->name}}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -386,5 +398,89 @@
         });
     }
     // End of Script for transaction detail Modal
+</script>
+
+
+<script>
+
+// Add CSS for the loading indicator
+$('head').append(`
+    <style>
+        .loader-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 30px;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #3498db;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+`);
+
+// Add loading indicator element after warehouse select
+$('#warehouse-select').after('<div class="loader-container"><div class="loader"></div><small class="ml-2">Loading outlets...</small></div>');
+
+// Handle Regional-Warehouse dependency
+$(document).ready(function() {
+    // On regional select change
+    $('#regional-select').change(function() {
+        var regionalId = $(this).val();
+
+        // Show loading indicator
+        $('.loader-container').show();
+
+        // Disable warehouse select while loading
+        $('#warehouse-select').prop('disabled', true).selectpicker('refresh');
+
+        // Make AJAX request
+        $.ajax({
+            url: '{{ route("getWarehousesByRegional", "") }}/' + regionalId,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // Clear current options
+                $('#warehouse-select').empty();
+
+                // Add "All Outlets" option
+                $('#warehouse-select').append('<option value="all">Semua Outlet</option>');
+
+                // Add warehouses from response
+                $.each(data, function(index, warehouse) {
+                    $('#warehouse-select').append('<option value="' + warehouse.id + '">' + warehouse.name + '</option>');
+                });
+
+                // Enable warehouse select and refresh
+                $('#warehouse-select').prop('disabled', false).selectpicker('refresh');
+
+                // Hide loading indicator
+                $('.loader-container').hide();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching warehouses: " + error);
+
+                // Hide loading indicator even on error
+                $('.loader-container').hide();
+
+                // Re-enable warehouse select
+                $('#warehouse-select').prop('disabled', false).selectpicker('refresh');
+
+                // Show error message
+                alert("Error loading outlets. Please try again.");
+            }
+        });
+    });
+});
 </script>
 @endpush

@@ -199,6 +199,7 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('profit_loss', 'profitLoss')->name('report.profitLoss');
                 Route::get('product_report', 'productReport')->name('report.product');
                 Route::get('difference_stock_report', 'differenceStockReport')->name('report.differenceStockReport');
+                Route::get('get-warehouses-by-regional/{regional_id}', 'getWarehousesByRegional')->name('report.get_warehouses_by_regional');
                 Route::get('remaining_stock_report', 'remainingStockReport')->name('report.remainingStockReport');
                 Route::get('remaining_stock_report/print', 'remainingStockReportPrint')->name('report.remainingStockReportPrint');
                 Route::get('list-transaksi', 'listTransaction')->name('report.listTransaction');

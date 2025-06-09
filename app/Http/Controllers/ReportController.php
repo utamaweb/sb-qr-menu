@@ -4744,6 +4744,22 @@ class ReportController extends Controller
         return view('backend.report.supplier_due_report', compact('lims_purchase_data', 'start_date', 'end_date'));
     }
 
+    /**
+     * Get warehouses by regional ID
+     */
+    public function getWarehousesByRegional($regional_id)
+    {
+        if ($regional_id == 'all') {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+        } else {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                ->where('regional_id', $regional_id)
+                ->get();
+        }
+
+        return response()->json($warehouses);
+    }
+
     public function differenceStockReport(Request $request)
     {
         // Set default dates and filters
@@ -4751,26 +4767,59 @@ class ReportController extends Controller
         $end_date = $request->input('end_date', date("Y-m-d"));
         $shift = $request->shift != "all" ? [(int)$request->shift] : [1, 2, 3];
 
+        // Get regionals for the current business
+        $regionals = Regional::where('business_id', auth()->user()->business_id)->get();
+        $regionalId = $request->input('regional_id', 'all');
+
         // Determine warehouse ID based on user role
         if (auth()->user()->hasRole('Admin Outlet')) {
             $warehouse_id = [auth()->user()->warehouse_id];
+            $warehouse_request = auth()->user()->warehouse_id;
+            $warehouses = Warehouse::where('id', auth()->user()->warehouse_id)->get();
         } else {
-            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
-            $warehouse_ids = $warehouses->pluck('id');
-            $warehouse_id = $request->warehouse_id != 'all' ? [(int)$request->warehouse_id] : $warehouse_ids->toArray();
-            $warehouse_request = $request->get('warehouse_id');
+            // Get warehouses based on regional filter
+            if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+                if($regionalId != 'all' && $regionalId != null) {
+                    $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                        ->where('regional_id', $regionalId)
+                        ->get();
+                } else {
+                    $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+                }
+
+                $warehouse_ids = $warehouses->pluck('id');
+                $warehouse_id = $request->warehouse_id != 'all' ? [(int)$request->warehouse_id] : $warehouse_ids->toArray();
+                $warehouse_request = $request->get('warehouse_id');
+            } else {
+                $warehouse_id = [auth()->user()->warehouse_id];
+                $warehouse_request = auth()->user()->warehouse_id;
+                $warehouses = Warehouse::where('id', auth()->user()->warehouse_id)->get();
+            }
         }
 
         // Build stock query with common conditions
-        $stocks = Stock::where('stocks.difference_stock', '!=', 0)
-            ->whereIn('stocks.warehouse_id', $warehouse_id)
-            ->whereIn('shifts.shift_number', $shift)
+        $query = Stock::where('stocks.difference_stock', '!=', 0)
             ->whereDate('stocks.created_at', '>=', $start_date)
             ->whereDate('stocks.created_at', '<=', $end_date)
+            ->whereIn('shifts.shift_number', $shift)
             ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
             ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
-            ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
-            ->select(
+            ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id');
+
+        // Apply warehouse filter
+        if ($request->warehouse_id != 'all') {
+            $query->whereIn('stocks.warehouse_id', $warehouse_id);
+        }
+        // Apply regional filter if no specific warehouse is selected
+        else if ($regionalId != 'all' && $regionalId != null) {
+            $query->where('warehouses.regional_id', $regionalId);
+        }
+        // Otherwise apply business filter
+        else {
+            $query->whereIn('stocks.warehouse_id', $warehouse_id);
+        }
+
+        $stocks = $query->select(
                 'warehouses.name as warehouse_name',
                 'ingredients.name as ingredient_name',
                 'shifts.shift_number',
@@ -4786,7 +4835,7 @@ class ReportController extends Controller
         $viewData = compact('start_date', 'end_date', 'stocks', 'shift');
 
         if (!auth()->user()->hasRole('Admin Outlet')) {
-            $viewData = array_merge($viewData, compact('warehouse_id', 'warehouses', 'warehouse_request'));
+            $viewData = array_merge($viewData, compact('warehouse_id', 'warehouses', 'warehouse_request', 'regionals', 'regionalId'));
         }
 
         return view('backend.report.difference_stock_report', $viewData);

@@ -68,6 +68,16 @@
                     </div>
                     {{-- End of service input --}}
 
+                    {{-- Service input --}}
+                    <div class="form-group">
+                        <label for="editOrder">Bisa Edit Order? <span class="text-danger">*</span></label>
+                        <select name="can_edit_order" id="editOrder" class="form-control">
+                            <option value="1">Bisa Edit</option>
+                            <option value="0">Tidak Bisa</option>
+                        </select>
+                    </div>
+                    {{-- End of service input --}}
+
                     {{-- Tagihan input --}}
                     <div class="form-group">
                         <label for="editTagihan">Tagihan <span class="text-danger">*</span></label>
@@ -177,6 +187,7 @@
                     $('#editName').val(data.name);
                     $('#editAddress').val(data.address);
                     $('#editService').selectpicker('val', data.is_self_service);
+                    $('#editOrder').selectpicker('val', data.can_edit_order);
                     $('#editBusiness').selectpicker('val', data.business_id);
                     $('#editRegional').selectpicker('val', data.regional_id);
                     $('#editTagihan').val(formatNumber(data.tagihan == null ? 0 : data.tagihan));

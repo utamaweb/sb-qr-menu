@@ -56,6 +56,14 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="can_edit_order">Bisa Edit Order? <span class="text-danger">*</span></label>
+                    <select name="can_edit_order" id="can_edit_order" class="form-control">
+                        <option value="1" {{ ($warehouse->can_edit_order == 1) ? 'selected' : '' }}>Bisa Edit</option>
+                        <option value="0" {{ ($warehouse->can_edit_order == 0) ? 'selected' : '' }}>Tidak Bisa</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
                     <label for="tagihan">Tagihan <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text">Rp.</span>

@@ -97,6 +97,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     // Service
     Route::controller(ServiceController::class)->group(function() {
         Route::get('service/check', 'checkService');
+        Route::get('edit-order/check', 'checkEditOrder');
     });
 
     // CustomC Category Parent

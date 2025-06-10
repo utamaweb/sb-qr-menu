@@ -22,6 +22,7 @@
                                     <th>#</th>
                                     <th>Nama Outlet</th>
                                     <th>Tipe</th>
+                                    <th>Bisa Edit Order?</th>
                                     <th>Bisnis</th>
                                     <th>Regional</th>
                                     <th>Alamat</th>
@@ -37,6 +38,7 @@
                                     <td>{{++$key}}</td>
                                     <td>{{ $warehouse->name }}</td>
                                     <td>{{ ($warehouse->is_self_service == 0) ? 'Hanya Kasir' : 'Self Service' }}</td>
+                                    <td>{{ ($warehouse->can_edit_order == 0) ? 'Tidak' : 'Bisa Edit' }}</td>
                                     <td>{{ $warehouse->business->name }}</td>
                                     <td>{{ $warehouse->regional->name ?? '-' }}</td>
                                     <td>{{ $warehouse->address }}</td>

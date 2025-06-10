@@ -221,8 +221,8 @@ class ReportController extends Controller
             $warehouse_id = auth()->user()->warehouse_id;
         }
 
-        // Calculate calendar parameters
-        $number_of_day = \cal_days_in_month(CAL_GREGORIAN, $month, $year);
+        // Calculate calendar parameters without using cal_days_in_month
+        $number_of_day = date('t', strtotime("$year-$month-01"));
         $start_day = date('w', strtotime("$year-$month-01")) + 1;
 
         // Generate prev & next month navigation dates
@@ -872,69 +872,26 @@ class ReportController extends Controller
             $end_date = Carbon::now()->format('Y-m-d');
         }
 
-        $warehouse_request = $request->get('warehouse_id', 'all');
-        $regional_request = $request->get('regional_id', 'all');
-
         // Get warehouse ID based on user role or request
         if(auth()->user()->hasRole('Admin Outlet')){
             $warehouseId = auth()->user()->warehouse_id;
-            $regionals = collect();
         } else {
-            $warehouseId = $warehouse_request;
-            $regionals = Regional::where('business_id', auth()->user()->business_id)->get();
+            $warehouseId = $request->input('warehouse_id') ?? auth()->user()->warehouse_id;
         }
 
         // Get warehouse list for filter
-        if (auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
-            if ($regional_request != 'all' && $regional_request != null) {
-                $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
-                    ->where('regional_id', $regional_request)
-                    ->where('is_active', true)
-                    ->get();
-            } else {
-                $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
-                    ->where('is_active', true)
-                    ->get();
-            }
-        } else {
-            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
-                ->where('is_active', true)
-                ->get();
-        }
+        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+            ->where('is_active', true)
+            ->get();
+        $warehouse = Warehouse::find($warehouseId);
 
-        $warehouse = ($warehouseId != 'all') ? Warehouse::find($warehouseId) : null;        // Build products query
-        $productsQuery = Product::with('category')->select('products.*');
-        $business_id = auth()->user()->business_id;
-
-        if ($warehouseId == 'all') {
-            // If all warehouses selected, get warehouse IDs based on regional filter
-            if ($regional_request != 'all' && $regional_request != null) {
-                // Filter warehouses by selected regional
-                $warehouse_ids = Warehouse::where('business_id', $business_id)
-                    ->where('regional_id', $regional_request)
-                    ->pluck('id');
-                
-                // Log for debugging
-                \Log::info("Product Report - Regional filtered warehouses", [
-                    'regional_id' => $regional_request,
-                    'warehouse_count' => count($warehouse_ids),
-                    'warehouse_ids' => $warehouse_ids
-                ]);
-            } else {
-                // All warehouses in business
-                $warehouse_ids = Warehouse::where('business_id', $business_id)
-                    ->pluck('id');
-                
-                // Log for debugging
-                \Log::info("Product Report - All warehouses", [
-                    'warehouse_count' => count($warehouse_ids)
-                ]);
-            }
-
-            // Join with transaction details for filtered warehouses
-            $productsQuery->leftJoinSub(
+        // query optimized
+        $products = Product::with('category')
+            ->whereIn('id', Product_Warehouse::where('warehouse_id', $warehouseId)->pluck('product_id'))
+            ->select('products.*')
+            ->leftJoinSub(
                 TransactionDetail::selectRaw('product_id, SUM(qty) as total_qty, SUM(subtotal) as total_subtotal')
-                    ->whereIn('transaction_id', Transaction::whereIn('warehouse_id', $warehouse_ids)
+                    ->whereIn('transaction_id', Transaction::where('warehouse_id', $warehouseId)
                         ->whereBetween('date', [$start_date, $end_date])
                         ->pluck('id'))
                     ->groupBy('product_id'),
@@ -942,37 +899,11 @@ class ReportController extends Controller
                 'products.id',
                 '=',
                 'transaction_summary.product_id'
-            );
-        } else {
-            // If specific warehouse selected
-            $productsQuery->whereIn('id', Product_Warehouse::where('warehouse_id', $warehouseId)->pluck('product_id'))
-                ->leftJoinSub(
-                    TransactionDetail::selectRaw('product_id, SUM(qty) as total_qty, SUM(subtotal) as total_subtotal')
-                        ->whereIn('transaction_id', Transaction::where('warehouse_id', $warehouseId)
-                            ->whereBetween('date', [$start_date, $end_date])
-                            ->pluck('id'))
-                        ->groupBy('product_id'),
-                    'transaction_summary',
-                    'products.id',
-                    '=',
-                    'transaction_summary.product_id'
-                );
-        }
-
-        // Select calculated fields and execute query
-        if ($warehouseId == 'all') {
-            // If using 'all' warehouses, we need to also filter the products that exist in those warehouses
-            if ($regional_request != 'all') {
-                // Get product IDs available in the filtered warehouses
-                $product_ids = Product_Warehouse::whereIn('warehouse_id', $warehouse_ids)->pluck('product_id')->unique();
-                $productsQuery->whereIn('products.id', $product_ids);
-            }
-        }
-        
-        $products = $productsQuery->selectRaw('COALESCE(transaction_summary.total_qty, 0) as qty, COALESCE(transaction_summary.total_subtotal, 0) as subtotal')
+            )
+            ->selectRaw('COALESCE(transaction_summary.total_qty, 0) as qty, COALESCE(transaction_summary.total_subtotal, 0) as subtotal')
             ->get();
 
-        return view('backend.report.product_report', compact('start_date', 'end_date', 'products', 'warehouses', 'warehouseId', 'warehouse', 'regionals', 'regional_request'));
+        return view('backend.report.product_report', compact('start_date', 'end_date', 'products', 'warehouses', 'warehouseId', 'warehouse'));
     }
 
 

@@ -42,6 +42,13 @@
                     </div>
                     {{-- End of service input --}}
 
+                    {{-- Service input --}}
+                    <div class="form-group">
+                        <label for="renewalEditOrder">Bisa Edit Order?</label>
+                        <input type="text" name="can_edit_order" id="renewalEditOrder" class="form-control" disabled>
+                    </div>
+                    {{-- End of service input --}}
+
                     {{-- Tagihan input --}}
                     <div class="form-group">
                         <label for="renewalTagihan">Tagihan</label>
@@ -87,6 +94,7 @@
                 $('#renewalName').val(data.name);
                 $('#renewalAddress').val(data.address);
                 $('#renewalService').val(data.is_self_service ? 'Self Service' : 'Hanya Kasir');
+                $('#renewalEditOrder').val(data.can_edit_order ? 'Bisa Edit' : 'Tidak Bisa');
                 $('#renewalBusiness').val(data.business.name);
                 $('#renewalTagihan').val(formatNumber(data.tagihan == null ? 0 : data.tagihan));
                 $('#renewalExpiredAt').val(data.expired_at);

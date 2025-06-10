@@ -45,11 +45,12 @@ class WarehouseController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name'        => 'required|max:255',
-            'business_id' => 'required',
-            'address'     => 'required',
-            'service'     => 'required',
-            'regional_id' => 'required'
+            'name'           => 'required|max:255',
+            'business_id'    => 'required',
+            'address'        => 'required',
+            'service'        => 'required',
+            'can_edit_order' => 'required',
+            'regional_id'    => 'required'
         ]);
         $input['is_active'] = true;
         if(auth()->user()->hasRole('Superadmin')){
@@ -74,6 +75,7 @@ class WarehouseController extends Controller
             'address'            => $request->address,
             'business_id'        => $request->business_id,
             'is_self_service'    => $request->service,
+            'can_edit_order'     => $request->can_edit_order,
             'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
             'expired_at'         => $request->expired_at,
             'whatsapp'           => $request->whatsapp,
@@ -98,11 +100,12 @@ class WarehouseController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name'        => 'max:255',
-            'business_id' => 'required',
-            'address'     => 'required',
-            'service'     => 'required',
-            'regional_id' => 'required',
+            'name'           => 'max:255',
+            'business_id'    => 'required',
+            'address'        => 'required',
+            'service'        => 'required',
+            'can_edit_order' => 'required',
+            'regional_id'    => 'required',
         ]);
         $input = $request->all();
         $lims_warehouse_data = Warehouse::find($id);
@@ -130,6 +133,7 @@ class WarehouseController extends Controller
             'address'            => $request->address,
             'business_id'        => $request->business_id,
             'is_self_service'    => $request->service,
+            'can_edit_order'     => $request->can_edit_order,
             'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
             'expired_at'         => $request->expired_at,
             'whatsapp'           => $request->whatsapp,

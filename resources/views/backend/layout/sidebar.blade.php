@@ -155,6 +155,9 @@
                 <li id="product-omzet-by-month">
                     <a href="{{ route('report.productsOmzetByMonth') }}">Laporan Omset Produk</a>
                 </li>
+                <li id="daily-sale-outlet">
+                    <a href="{{ url('admin/report/daily_sale_outlet/' . encrypt(json_encode(['year' => date('Y'), 'month' => date('m')]))) }}">Laporan Sales</a>
+                </li>
                 <li id="finance-report">
                     <a href="{{ route('financeReport') }}?warehouse_id=all&regional_id=all">Laporan Finance</a>
                 </li>
@@ -238,6 +241,9 @@
                 {{-- <li id="best-seller-report-menu">
                     <a href="{{ url('admin/report/best_seller') }}">{{ trans('file.Best Seller') }}</a>
                 </li> --}}
+                <li id="daily-sale-outlet">
+                    <a href="{{ url('admin/report/daily_sale_outlet/' . encrypt(json_encode(['year' => date('Y'), 'month' => date('m')]))) }}">Laporan Sales</a>
+                </li>
                 <li id="daily-sale-report-menu">
                     <a href="{{ url('admin/report/daily_sale/' . date('Y') . '/' . date('m')) }}">Transaksi Harian</a>
                 </li>
@@ -319,6 +325,9 @@
                 {{-- <li id="best-seller-report-menu">
                     <a href="{{ url('admin/report/best_seller') }}">{{ trans('file.Best Seller') }}</a>
                 </li> --}}
+                <li id="daily-sale-outlet">
+                    <a href="{{ url('admin/report/daily_sale_outlet/' . encrypt(json_encode(['year' => date('Y'), 'month' => date('m')]))) }}">Laporan Sales</a>
+                </li>
                 <li id="daily-sale-report-menu">
                     <a href="{{ url('admin/report/daily_sale/' . date('Y') . '/' . date('m')) }}">Transaksi Harian</a>
                 </li>
@@ -352,6 +361,13 @@
                     <a href="{{ route('pengeluaran.index') }}">Daftar Pengeluaran</a>
                 </li>
             </ul>
+        </li>
+    @elseif(auth()->user()->hasRole('Sales'))
+        <li id="daily-sale-outlet">
+            <a href="{{ url('admin/report/daily_sale_outlet/' . encrypt(json_encode(['year' => date('Y'), 'month' => date('m')]))) }}">
+                <i class="dripicons-document-remove"></i>
+                <span>Laporan Sales</span>
+            </a>
         </li>
     @endif
 </ul>

@@ -45,7 +45,7 @@
                                 @elseif($role == 'Admin Bisnis' || $role == 'Report')
                                 <td>{{$user->business->name}}</td>
                                 @else
-                                <td>{{$user->warehouse->name}}</td>
+                                <td>{{$user->warehouse->name ?? '-'}}</td>
                                 @endif
                                 @if($user->is_active)
                                 <td><div class="badge badge-success">Aktif</div></td>

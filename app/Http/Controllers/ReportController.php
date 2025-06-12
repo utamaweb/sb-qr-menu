@@ -290,6 +290,90 @@ class ReportController extends Controller
         ));
     }
 
+    public function dailySaleOutlet($year = null, $month = null)
+    {
+        if ($year !== null && strpos($year, 'eyJ') === 0 && $month === null) {
+            try {
+                $decrypted = decrypt($year);
+                $params = json_decode($decrypted, true);
+
+                if (!isset($params['year']) || !isset($params['month'])) {
+                    return redirect()->route('admin.dashboard')->with('error', 'Invalid URL format');
+                }
+
+                $year = $params['year'];
+                $month = $params['month'];
+            } catch (\Exception $e) {
+                return redirect()->route('admin.dashboard')->with('error', 'Invalid URL');
+            }
+        }
+
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $lims_warehouse_list = Warehouse::where('is_active', true)->where('business_id', auth()->user()->business_id)->get();
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
+        }
+
+        $number_of_day = date('t', strtotime("$year-$month-01"));
+        $start_day = date('w', strtotime("$year-$month-01")) + 1;
+
+        $prev_date = date('Y-m', strtotime("$year-$month-01 -1 month"));
+        list($prev_year, $prev_month) = explode('-', $prev_date);
+
+        $next_date = date('Y-m', strtotime("$year-$month-01 +1 month"));
+        list($next_year, $next_month) = explode('-', $next_date);
+
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
+
+        $dailyData = array_fill(1, $number_of_day, [
+            'qty' => 0,
+            'paid' => 0,
+            'amount' => 0,
+            'transaction' => 0,
+        ]);
+
+        if ($warehouse_id) {
+            $start_date = "$year-" . sprintf('%02d', $month) . "-01";
+            $end_date = "$year-" . sprintf('%02d', $month) . "-$number_of_day";
+
+            $transactions = Transaction::where('status', 'Lunas')
+                ->where('warehouse_id', $warehouse_id)
+                ->whereDate('date', '>=', $start_date)
+                ->whereDate('date', '<=', $end_date)
+                ->selectRaw('DAY(date) as day, SUM(total_qty) AS total_qty, SUM(paid_amount) AS total_paid_amount,
+                             SUM(total_amount) AS total_amount, COUNT(*) AS total_transaction')
+                ->groupBy('day')
+                ->get();
+
+            foreach ($transactions as $transaction) {
+                $day = (int)$transaction->day;
+                $dailyData[$day] = [
+                    'qty' => $transaction->total_qty ?? 0,
+                    'paid' => $transaction->total_paid_amount ?? 0,
+                    'amount' => $transaction->total_amount ?? 0,
+                    'transaction' => $transaction->total_transaction ?? 0,
+                ];
+            }
+        }
+
+        return view('backend.report.daily_sale_outlet', compact(
+            'dailyData',
+            'start_day',
+            'year',
+            'month',
+            'number_of_day',
+            'prev_year',
+            'prev_month',
+            'next_year',
+            'next_month',
+            'lims_warehouse_list',
+            'warehouse_id',
+            'warehouse'
+        ));
+    }
+
     public function dailySaleByWarehouse(Request $request,$year,$month)
     {
         $data = $request->all();

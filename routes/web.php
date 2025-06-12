@@ -187,6 +187,8 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::get('product-expiry', 'productExpiry')->name('report.productExpiry');
                 Route::get('warehouse_stock', 'warehouseStock')->name('report.warehouseStock');
                 Route::get('daily_sale/{year}/{month}', 'dailySale');
+                // Route::get('daily_sale_outlet/{year}/{month}', 'dailySaleOutlet')->name('report.dailySaleOutlet');
+                Route::get('daily_sale_outlet/{hash}', 'dailySaleOutlet')->name('report.dailySaleOutlet');
                 Route::post('daily_sale/{year}/{month}', 'dailySaleByWarehouse')->name('report.dailySaleByWarehouse');
                 Route::get('monthly_sale/{year}', 'monthlySale');
                 Route::post('monthly_sale/{year}', 'monthlySaleByWarehouse')->name('report.monthlySaleByWarehouse');

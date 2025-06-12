@@ -59,6 +59,40 @@ class ReportController extends Controller
         $this->dateService = new DateService();
     }
 
+    /**
+     * Calculate fictional amount based on specified rules
+     *
+     * - If total sales 0-10jt, multiply by 50%
+     * - If total sales 10.000.001 - 20jt, multiply by 30%
+     * - If total sales 20.000.001 - 40jt, multiply by 20%
+     * - If total sales 40jt and above, multiply by 10%
+     *
+     * @param float $amount Original amount
+     * @return float Fictional amount rounded up to nearest 1000
+     */
+    private function calculateFictionalAmount($amount)
+    {
+        $multiplier = 0;
+
+        if ($amount <= 10000000) {
+            // 0-10jt: multiply by 50%
+            $multiplier = 0.5;
+        } elseif ($amount <= 20000000) {
+            // 10.000.001 - 20jt: multiply by 30%
+            $multiplier = 0.3;
+        } elseif ($amount <= 40000000) {
+            // 20.000.001 - 40jt: multiply by 20%
+            $multiplier = 0.2;
+        } else {
+            // 40jt and above: multiply by 10%
+            $multiplier = 0.1;
+        }
+
+        // Calculate fictional amount and round up to nearest 1000
+        $fictionalAmount = $amount * $multiplier;
+        return ceil($fictionalAmount / 1000) * 1000;
+    }
+
     public function productQuantityAlert()
     {
         $role = Role::find(Auth::user()->role_id);
@@ -345,15 +379,19 @@ class ReportController extends Controller
                 ->selectRaw('DAY(date) as day, SUM(total_qty) AS total_qty, SUM(paid_amount) AS total_paid_amount,
                              SUM(total_amount) AS total_amount, COUNT(*) AS total_transaction')
                 ->groupBy('day')
-                ->get();
-
-            foreach ($transactions as $transaction) {
+                ->get();            foreach ($transactions as $transaction) {
                 $day = (int)$transaction->day;
+                $amount = $transaction->total_amount ?? 0;
+
+                // Apply multiplier based on total sales amount
+                $fictionalAmount = $this->calculateFictionalAmount($amount);
+
                 $dailyData[$day] = [
                     'qty' => $transaction->total_qty ?? 0,
                     'paid' => $transaction->total_paid_amount ?? 0,
-                    'amount' => $transaction->total_amount ?? 0,
+                    'amount' => $fictionalAmount,
                     'transaction' => $transaction->total_transaction ?? 0,
+                    'real_amount' => $amount,
                 ];
             }
         }

@@ -39,49 +39,22 @@
 
                 @php
                     // Initialize totals
-                    $totalMonthlyQty = 0;
-                    $totalMonthlyTransaction = 0;
                     $totalMonthlyAmount = 0;
+                    $totalMonthlyRealAmount = 0;
 
                     // Calculate totals from daily data
                     for ($i = 1; $i <= $number_of_day; $i++) {
-                        $totalMonthlyQty += $dailyData[$i]['qty'];
-                        $totalMonthlyTransaction += $dailyData[$i]['transaction'];
                         $totalMonthlyAmount += $dailyData[$i]['amount'];
+                        $totalMonthlyRealAmount += $dailyData[$i]['real_amount'] ?? $dailyData[$i]['amount'];
                     }
                 @endphp
 
                 <!-- Monthly Summary -->
                 <div class="mb-4">
-                    <div class="card">
-                        <div class="card-body">
-                            <h5 class="text-center mb-3">Total Bulan {{ date("F Y", strtotime("$year-$month-01")) }}</h5>
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm">
-                                        <div class="card-body text-center">
-                                            <h6 class="card-title">Total Produk Terjual</h6>
-                                            <p class="card-text h4 mt-3">{{ number_format($totalMonthlyQty, 0, '', '.') }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm">
-                                        <div class="card-body text-center">
-                                            <h6 class="card-title">Total Transaksi</h6>
-                                            <p class="card-text h4 mt-3">{{ number_format($totalMonthlyTransaction, 0, '', '.') }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card border-0 shadow-sm">
-                                        <div class="card-body text-center">
-                                            <h6 class="card-title">Total Sales</h6>
-                                            <p class="card-text h4 mt-3">Rp. {{ number_format($totalMonthlyAmount, 0, '', '.') }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h5 class="mb-2">Total Sales Bulan {{ date("F Y", strtotime("$year-$month-01")) }}:</h5>
+                            <h4>Rp. {{ number_format($totalMonthlyAmount, 0, '', '.') }}</h4>
                         </div>
                     </div>
                 </div>
@@ -139,8 +112,9 @@
 
                                             @if ($dailyData[$currentDay]['amount'] > 0)
                                                 <strong>Total Sales</strong><br>
-                                                <span>Rp. {{ number_format($dailyData[$currentDay]['amount'], 0, '', '.') }}</span><br><br>
+                                                <span>Rp. {{ number_format($dailyData[$currentDay]['amount'], 0, '', '.') }}</span><br>
                                             @endif
+
                                         </td>
                                         @php $currentDay++; @endphp
                                     @endfor

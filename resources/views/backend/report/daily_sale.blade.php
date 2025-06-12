@@ -37,6 +37,26 @@
                     <h5 class="text-center mb-3">Outlet: {{ auth()->user()->warehouse->name ?? 'Tidak Ditemukan' }}</h5>
                 @endif
 
+                @php
+                    // Initialize totals
+                    $totalMonthlyAmount = 0;
+
+                    // Calculate totals from daily data
+                    for ($i = 1; $i <= $number_of_day; $i++) {
+                        $totalMonthlyAmount += $dailyData[$i]['amount'];
+                    }
+                @endphp
+
+                <!-- Monthly Summary -->
+                <div class="mb-4">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h5 class="mb-2">Total Penjualan Bulan {{ date("F Y", strtotime("$year-$month-01")) }}:</h5>
+                            <h4>Rp. {{ number_format($totalMonthlyAmount, 0, '', '.') }}</h4>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered text-center" style="border-top: 1px solid #dee2e6; border-bottom: 1px solid #dee2e6;">
                         <thead>

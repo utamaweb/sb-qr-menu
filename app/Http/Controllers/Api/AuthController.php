@@ -30,8 +30,8 @@ class AuthController extends Controller
         if(($user->hasRole('Customer')) AND ($warehouse->is_self_service == 0)) {
             return response()->json([
                 'status' => false,
-                'message' => 'User warehouse is not self service'
-            ], 200);
+                'message' => 'Outlet ini hanya melayani kasir reguler. Akun customer tidak perlu login.'
+            ], 500);
         }
 
         if ($validator->fails()) {
@@ -50,7 +50,7 @@ class AuthController extends Controller
             if($dateNow >= $warehouse->expired_at && $warehouse->expired_at != null) {
                 return response()->json([
                     'status' => false,
-                    'message' => 'Outlet sudah memasuki masa expired penggunaan SB POS. Silakan melakukan pembayaran untuk menggunakan aplikasi. Terima kasih.'
+                    'message' => config('custom_message.EXPIRE_MESSAGE')
                 ], 500);
             }
 

@@ -22,6 +22,7 @@
                             <tr>
                                 <th>#</th>
                                 <th>Produk</th>
+                                <th>Kode</th>
                                 <th>Kategori</th>
                                 <th>Outlet</th>
                                 <th>Harga</th>
@@ -33,6 +34,7 @@
                             <tr data-id="{{$productWarehouse->id}}">
                                 <td>{{++$key}}</td>
                                 <td>{{ $productWarehouse->product->name }}</td>
+                                <td>{{ $productWarehouse->product->code }}</td>
                                 <td>{{ $productWarehouse->product->category->name }}</td>
                                 <td>{{ $productWarehouse->warehouse->name}}</td>
                                 <td>@currency($productWarehouse->price)</td>

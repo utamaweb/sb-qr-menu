@@ -39,6 +39,18 @@
                     </div>
                     {{-- End of business input --}}
 
+                    {{-- regional input --}}
+                    <div class="form-group">
+                        <label>Regional <span class="text-danger">*</span></label>
+                        <select name="regional_id" class="form-control" id="editRegional">
+                            <option value="">---Pilih Regional---</option>
+                            @foreach($regionals as $regional)
+                                <option value="{{ $regional->id }}">{{ $regional->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    {{-- End of regional input --}}
+
                     {{-- Address input --}}
                     <div class="form-group">
                         <label>Alamat <span class="text-danger">*</span></label>
@@ -52,6 +64,16 @@
                         <select name="service" id="editService" class="form-control">
                             <option value="1">Self Service</option>
                             <option value="0">Hanya Kasir</option>
+                        </select>
+                    </div>
+                    {{-- End of service input --}}
+
+                    {{-- Service input --}}
+                    <div class="form-group">
+                        <label for="editOrder">Bisa Edit Order? <span class="text-danger">*</span></label>
+                        <select name="can_edit_order" id="editOrder" class="form-control">
+                            <option value="1">Bisa Edit</option>
+                            <option value="0">Tidak Bisa</option>
                         </select>
                     </div>
                     {{-- End of service input --}}
@@ -165,7 +187,9 @@
                     $('#editName').val(data.name);
                     $('#editAddress').val(data.address);
                     $('#editService').selectpicker('val', data.is_self_service);
+                    $('#editOrder').selectpicker('val', data.can_edit_order);
                     $('#editBusiness').selectpicker('val', data.business_id);
+                    $('#editRegional').selectpicker('val', data.regional_id);
                     $('#editTagihan').val(formatNumber(data.tagihan == null ? 0 : data.tagihan));
                     $('#editExpiredAt').val(data.expired_at);
                     $('#editExpiredAt').attr('min', new Date().toISOString().split('T')[0]);

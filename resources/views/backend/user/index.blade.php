@@ -42,7 +42,7 @@
                                 <td>{{ $role }}</td>
                                 @if($role == 'Superadmin')
                                 <td></td>
-                                @elseif($role == 'Admin Bisnis')
+                                @elseif($role == 'Admin Bisnis' || $role == 'Report')
                                 <td>{{$user->business->name}}</td>
                                 @else
                                 <td>{{$user->warehouse->name}}</td>

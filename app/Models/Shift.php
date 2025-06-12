@@ -20,4 +20,9 @@ class Shift extends Model
     {
         return $this->belongsTo('App\Models\User');
     }
+
+    public function transactions()
+    {
+        return $this->hasMany('App\Models\Transaction');
+    }
 }

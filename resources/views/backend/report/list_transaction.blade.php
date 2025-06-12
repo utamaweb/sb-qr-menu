@@ -1,7 +1,64 @@
-@extends('backend.layout.main') @section('content')
+@extends('backend.layout.main')
 
+@section('content')
 <section class="forms">
     <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">List Transaksi Aktual</h3>
+                        <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="" method="GET">
+                            <div class="form-group">
+                                <label for=""><strong>Pilih Tanggal</strong></label>
+                                <div class="input-group">
+                                    <input type="text" name="start_date" id="start_date" class="form-control date" required value="{{ $start_date }}">
+                                    <span class="input-group-text">s/d</span>
+                                    <input type="text" name="end_date" id="end_date" class="form-control date" required value="{{ $end_date }}">
+                                </div>
+                                <div id="dateError" class="text-danger mt-2" style="display: none;">
+                                    Rentang tanggal tidak boleh lebih dari 30 hari!
+                                </div>
+                            </div>
+
+                            @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
+                                <div class="form-group">
+                                    <label><strong>Pilih Regional</strong></label>
+                                    <select id="regional-select" name="regional_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
+                                    title="Pilih regional">
+                                        <option value="all" {{ $regional_request == 'all' ? 'selected' : ''}}>Semua Regional</option>
+                                        @foreach($regionals as $regional)
+                                        <option value="{{$regional->id}}" {{$regional->id == $regional_request ? 'selected' : ''}}>{{$regional->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label><strong>Pilih Outlet</strong></label>
+                                    <select id="warehouse-select" name="warehouse_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
+                                    title="Pilih outlet">
+                                        <option value="all" {{ $warehouse_request == 'all' ? 'selected' : ''}}>Semua Outlet</option>
+                                        @foreach($warehouses as $warehouse)
+                                        <option value="{{$warehouse->id}}" {{$warehouse->id == $warehouse_request ? 'selected' : ''}}>{{$warehouse->name}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Transaction List Card -->
         <div class="card">
             <div class="card-header">
                 <span>List Transaksi</span>
@@ -27,77 +84,34 @@
                         <tbody>
                             @forelse ($transactions as $key => $transaction)
                             <tr>
-                                <td>{{$loop->iteration}}</td>
-                                <td>{{$transaction->date}} | {{$transaction->created_at->format('H:i:s')}}</td>
-                                <td>{{$transaction->warehouse->name}}</td>
-                                <td>{{$transaction->sequence_number}}</td>
-                                <td>{{$transaction->order_type->name}}</td>
-                                <td>{{$transaction->payment_method}} ({{$transaction->category_order}})</td>
-                                <td>Rp. {{number_format($transaction->total_amount, 0, '', '.')}}</td>
-                                <td>{{number_format($transaction->total_qty, 0, '', '.')}}</td>
-                                <td>@if($transaction->status == "Lunas")
-                                    <div class="badge badge-success">Lunas</div>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $transaction->date }} | {{ $transaction->created_at->format('H:i:s') }}</td>
+                                <td>{{ $transaction->warehouse->name }}</td>
+                                <td>{{ $transaction->sequence_number }}</td>
+                                <td>{{ $transaction->order_type->name }}</td>
+                                <td>{{ $transaction->payment_method }} ({{ $transaction->category_order }})</td>
+                                <td>Rp. {{ number_format($transaction->total_amount, 0, '', '.') }}</td>
+                                <td>{{ number_format($transaction->total_qty, 0, '', '.') }}</td>
+                                <td>
+                                    @if($transaction->status == "Lunas")
+                                        <div class="badge badge-success">Lunas</div>
                                     @elseif($transaction->status == "Pending")
-                                    <div class="badge badge-warning">Pending</div>
+                                        <div class="badge badge-warning">Pending</div>
                                     @else
-                                    <div class="badge badge-danger">Batal</div>
+                                        <div class="badge badge-danger">Batal</div>
                                     @endif
                                 </td>
                                 <td>
-                                    <button type="button" class="btn btn-sm btn-success" data-toggle="modal" data-target="#showModal-{{$transaction->id}}">
+                                    <button type="button" class="btn btn-success"
+                                        onclick="getDetails({{ $transaction->id }})">
                                         Detail
                                     </button>
-                                    {{-- Show Modal --}}
-                                    <div id="showModal-{{$transaction->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
-                                        <div role="document" class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                            <h5 id="exampleModalLabel" class="modal-title"> Detail Transaksi </h5>
-                                            <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
-                                            </div>
-                                            <div class="modal-body">
-                                                <table class="table">
-                                                    <thead>
-                                                        <th>#</th>
-                                                        <th>Produk</th>
-                                                        <th>Harga</th>
-                                                        <th>Qty</th>
-                                                        <th>Subtotal</th>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach($transaction->transaction_details as $detail)
-                                                        <tr>
-                                                            <td>{{$loop->iteration}}</td>
-                                                            <td>{{$detail->product_name}}</td>
-                                                            <td>@currency($detail->product_price)</td>
-                                                            <td>{{$detail->qty}}</td>
-                                                            <td>@currency($detail->subtotal)</td>
-                                                        </tr>
-                                                        @endforeach
-                                                    </tbody>
-                                                </table>
-
-                                                <table class="table">
-                                                    <tr class="text-center">
-                                                        <td><h5>Total Qty</h5></td>
-                                                        <td><h5 id="total-qty">{{$transaction->total_qty}}</h5></td>
-                                                    </tr>
-                                                    <tr class="text-center">
-                                                        <td><h5>Total</h5></td>
-                                                        <td><h5 id="total">@currency($transaction->total_amount)</h5></td>
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    </div>
                                 </td>
                             </tr>
                             @empty
-                            <p>No users</p>
+                                <tr>
+                                    <td colspan="10" class="text-center">Tidak ada data transaksi</td>
+                                </tr>
                             @endforelse
                         </tbody>
                     </table>
@@ -107,159 +121,79 @@
     </div>
 </section>
 
+{{-- Modal for transaction detail --}}
+    <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Detail Transaksi</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table" id="transaction-detail">
+                        <thead>
+                            <th>#</th>
+                            <th>Produk</th>
+                            <th>Harga</th>
+                            <th>Qty</th>
+                            <th>Subtotal</th>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+
+                    <table class="table">
+                        <tr class="text-center">
+                            <td>
+                                <h5>Total Qty</h5>
+                            </td>
+                            <td>
+                                <h5 id="total-qty"></h5>
+                            </td>
+                        </tr>
+                        <tr class="text-center">
+                            <td>
+                                <h5>Total</h5>
+                            </td>
+                            <td>
+                                <h5 id="total"></h5>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- End of modal for transaction detail --}}
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
-
+    // Set active menu
     $("#list-transaction").addClass("active");
 
-    var ingredient_id = [];
-    var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $('.selectpicker').selectpicker('refresh');
-
-    $(".daterangepicker-field").daterangepicker({
-      callback: function(startDate, endDate, period){
-        var start_date = startDate.format('YYYY-MM-DD');
-        var end_date = endDate.format('YYYY-MM-DD');
-        var title = start_date + ' To ' + end_date;
-        $(this).val(title);
-        $(".product-report-filter input[name=start_date]").val(start_date);
-        $(".product-report-filter input[name=end_date]").val(end_date);
-      }
-    });
-
-    $(document).ready(function() {
-    $(document).on('click', '.open-EditUnitDialog', function() {
-        var url = "ingredient/"
-        var id = $(this).data('id').toString();
-        url = url.concat(id).concat("/edit");
-
-        $.get(url, function(data) {
-            $("input[name='name']").val(data['name']);
-            $("input[name='first_stock']").val(data['first_stock']);
-            $("input[name='unit_id']").val(data['unit_id']);
-            $("input[name='operation_value']").val(data['operation_value']);
-            $("input[name='ingredient_id']").val(data['id']);
-            $("#base_unit_edit").val(data['base_unit']);
-            if(data['base_unit']!=null)
-            {
-                $(".operator").show();
-                $(".operation_value").show();
-            }
-            else
-            {
-                $(".operator").hide();
-                $(".operation_value").hide();
-            }
-            $('.selectpicker').selectpicker('refresh');
-
-        });
-    });
-
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-
-    $( "#select_all" ).on( "change", function() {
-        if ($(this).is(':checked')) {
-            $("tbody input[type='checkbox']").prop('checked', true);
-        }
-        else {
-            $("tbody input[type='checkbox']").prop('checked', false);
-        }
-    });
-
-    $("#export").on("click", function(e){
-        e.preventDefault();
-        var unit = [];
-        $(':checkbox:checked').each(function(i){
-          unit[i] = $(this).val();
-        });
-        $.ajax({
-           type:'POST',
-           url:'/exportunit',
-           data:{
-
-                unitArray: unit
-            },
-           success:function(data){
-            alert('Exported to CSV file successfully! Click Ok to download file');
-            window.location.href = data;
-           }
-        });
-    });
-
-    $('.open-CreateUnitDialog').on('click', function() {
-        $(".operator").hide();
-        $(".operation_value").hide();
-
-    });
-
-    $('#base_unit_create').on('change', function() {
-        if($(this).val()){
-            $("#createModal .operator").show();
-            $("#createModal .operation_value").show();
-        }
-        else{
-            $("#createModal .operator").hide();
-            $("#createModal .operation_value").hide();
-        }
-    });
-
-    $('#base_unit_edit').on('change', function() {
-        if($(this).val()){
-            $("#editModal .operator").show();
-            $("#editModal .operation_value").show();
-        }
-        else{
-            $("#editModal .operator").hide();
-            $("#editModal .operation_value").hide();
-        }
-    });
-});
-
-    $('#ingredient-table').DataTable( {
+    // Initialize DataTable
+    $('#ingredient-table').DataTable({
         "order": [],
         'language': {
             'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
-             "info":      '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
-            "search":  'Cari',
+            "info": '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
+            "search": 'Cari',
             'paginate': {
-                    'previous': '<i class="dripicons-chevron-left"></i>',
-                    'next': '<i class="dripicons-chevron-right"></i>'
+                'previous': '<i class="dripicons-chevron-left"></i>',
+                'next': '<i class="dripicons-chevron-right"></i>'
             }
         },
-        'columnDefs': [
-            // {
-            //     "orderable": false,
-            //     'targets': [0, 2]
-            // },
-            // {
-            //     'render': function(data, type, row, meta){
-            //         if(type === 'display'){
-            //             data = '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>';
-            //         }
-
-            //        return data;
-            //     },
-            //     'checkboxes': {
-            //        'selectRow': true,
-            //        'selectAllRender': '<div class="checkbox"><input type="checkbox" class="dt-checkboxes"><label></label></div>'
-            //     },
-            //     'targets': [0]
-            // }
-        ],
-        'select': { style: 'multi',  selector: 'td:first-child'},
+        'columnDefs': [],
+        'select': {
+            style: 'multi',
+            selector: 'td:first-child'
+        },
         'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
         dom: '<"row"lfB>rtip',
         buttons: [
@@ -295,39 +229,258 @@
                     rows: ':visible'
                 },
             },
-            // {
-            //     text: '<i title="delete" class="dripicons-cross"></i>',
-            //     className: 'buttons-delete',
-            //     action: function ( e, dt, node, config ) {
-            //             ingredient_id.length = 0;
-            //             $(':checkbox:checked').each(function(i){
-            //                 if(i){
-            //                     ingredient_id[i-1] = $(this).closest('tr').data('id');
-            //                 }
-            //             });
-            //             if(ingredient_id.length && confirm("Are you sure want to delete?")) {
-            //                 $.ajax({
-            //                     type:'POST',
-            //                     url:'ingredient/deletebyselection',
-            //                     data:{
-            //                         unitIdArray: ingredient_id
-            //                     },
-            //                     success:function(data){
-            //                         alert(data);
-            //                     }
-            //                 });
-            //                 dt.rows({ page: 'current', selected: true }).remove().draw(false);
-            //             }
-            //             else if(!ingredient_id.length)
-            //                 alert('No unit is selected!');
-            //     }
-            // },
             {
                 extend: 'colvis',
                 text: '<i title="column visibility" class="fa fa-eye"></i>',
                 columns: ':gt(0)'
             },
         ],
-    } );
+    });
+</script>
+
+<script>
+    $(document).ready(function() {
+        // Fungsi untuk memeriksa tanggal
+        function validateDates() {
+            var startDate = new Date($("input[name='start_date']").val());
+            var endDate = new Date($("input[name='end_date']").val());
+
+            // Jika tanggal mulai lebih besar dari tanggal selesai
+            if (startDate > endDate) {
+                alert("Tanggal Mulai tidak boleh lebih besar dari Tanggal Selesai.");
+                $("input[name='start_date']").val(''); // Mengosongkan input tanggal mulai
+                $("input[name='end_date']").val(''); // Mengosongkan input tanggal selesai
+            }
+        }
+
+        // Event listener untuk perubahan pada input tanggal
+        $("input[name='start_date'], input[name='end_date']").on("change", function() {
+            validateDates();
+        });
+    });
+    </script>
+   <script>
+    $(function() {
+        // Inisialisasi datepicker
+        $("#start_date, #end_date").datepicker({
+            dateFormat: 'yy-mm-dd', // Format sesuai dengan backend
+            onSelect: function(selectedDate) {
+                var startDate = $("#start_date").datepicker("getDate");
+                var endDate = $("#end_date").datepicker("getDate");
+
+                // Jika start_date dipilih, set maxDate di end_date
+                if (this.id == "start_date") {
+                    $("#end_date").datepicker("option", "minDate", startDate);
+                    if (startDate) {
+                        var maxEndDate = new Date(startDate);
+                        maxEndDate.setDate(maxEndDate.getDate() + 30);
+                        $("#end_date").datepicker("option", "maxDate", maxEndDate);
+                    }
+                }
+
+                // Reset maxDate jika end_date diubah
+                if (this.id == "end_date" && !$("#start_date").val()) {
+                    $("#end_date").datepicker("option", "maxDate", null);
+                }
+            }
+        });
+
+        // Validasi form sebelum submit
+        $("form").on("submit", function(e) {
+            var startDate = $("#start_date").datepicker("getDate");
+            var endDate = $("#end_date").datepicker("getDate");
+            var errorDiv = $("#dateError");
+
+            errorDiv.hide();
+
+            if (!startDate || !endDate) {
+                alert("Silakan pilih tanggal mulai dan akhir.");
+                e.preventDefault();
+                return false;
+            }
+
+            var diffTime = Math.abs(endDate - startDate);
+            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 30) {
+                errorDiv.show();
+                e.preventDefault();
+                return false;
+            }
+
+            return true;
+        });
+    });
+
+    // Add validation to check if end date is before start date
+    $("#end_date").on("change", function() {
+        var startDate = new Date($("#start_date").val());
+        var endDate = new Date($(this).val());
+
+        if (endDate < startDate) {
+            alert("Tanggal akhir tidak boleh sebelum tanggal mulai.");
+            $(this).val('');
+            return false;
+        }
+    });
+
+    // Also validate when form is submitted
+    $("form").on("submit", function(e) {
+        var startDate = new Date($("#start_date").val());
+        var endDate = new Date($("#end_date").val());
+
+        if (endDate < startDate) {
+            alert("Tanggal akhir tidak boleh sebelum tanggal mulai.");
+            $("#end_date").val('');
+            e.preventDefault();
+            return false;
+        }
+    });
+    </script>
+
+
+<script>
+    // Function to format number into number format
+        function formatNumber(number) {
+            // Remove non-digit characters
+            var numericValue = number.toString().replace(/\D/g, "");
+
+            // Add thousand separators
+            var formattedNumber = numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+            return formattedNumber;
+        }
+
+    // Script for transaction detail Modal
+    function getDetails(id) {
+        // Show modal first with loading indicator
+        $('#transaction-detail tbody').html('<tr><td colspan="5" class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading data...</td></tr>');
+        $('#total-qty').html('<i class="fa fa-spinner fa-spin"></i>');
+        $('#total').html('<i class="fa fa-spinner fa-spin"></i>');
+        $('#detailModal').modal('show');
+
+        // Then fetch the data
+        $.ajax({
+            type: "GET",
+            url: `/admin/close-cashier/transaction/${id}`,
+            success: function(data) {
+                // Delete table body items
+                $('#transaction-detail tbody').empty();
+                let total = 0;
+                let totalQty = 0;
+                // Loop for each data
+                $.each(data, function(key, value) {
+                    // Append table body items
+                    $('#transaction-detail tbody').append(`
+                        <tr>
+                            <td>${key + 1}</td>
+                            <td>${value.product_name}</td>
+                            <td>Rp. ${formatNumber(value.product_price)}</td>
+                            <td>${value.qty}</td>
+                            <td>Rp. ${formatNumber(value.subtotal)}</td>
+                        </tr>
+                    `);
+
+                    // Count total
+                    total += parseInt(value.subtotal);
+                    totalQty += parseInt(value.qty);
+                });
+
+                $('#total-qty').html(totalQty);
+                $('#total').html(`Rp. ${formatNumber(total)}`);
+            },
+            error: function(xhr, status, error) {
+                $('#transaction-detail tbody').html('<tr><td colspan="5" class="text-center text-danger">Error: Failed to load data</td></tr>');
+                $('#total-qty').html('-');
+                $('#total').html('-');
+                console.error('Error dalam pengambilan data:', status, error);
+            }
+        });
+    }
+    // End of Script for transaction detail Modal
+</script>
+
+
+<script>
+
+// Add CSS for the loading indicator
+$('head').append(`
+    <style>
+        .loader-container {
+            display: none;
+            position: relative;
+            width: 100%;
+            height: 30px;
+            text-align: center;
+            margin-top: 5px;
+        }
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            border-top-color: #3498db;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+`);
+
+// Add loading indicator element after warehouse select
+$('#warehouse-select').after('<div class="loader-container"><div class="loader"></div><small class="ml-2">Loading outlets...</small></div>');
+
+// Handle Regional-Warehouse dependency
+$(document).ready(function() {
+    // On regional select change
+    $('#regional-select').change(function() {
+        var regionalId = $(this).val();
+
+        // Show loading indicator
+        $('.loader-container').show();
+
+        // Disable warehouse select while loading
+        $('#warehouse-select').prop('disabled', true).selectpicker('refresh');
+
+        // Make AJAX request
+        $.ajax({
+            url: '{{ route("getWarehousesByRegional", "") }}/' + regionalId,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data) {
+                // Clear current options
+                $('#warehouse-select').empty();
+
+                // Add "All Outlets" option
+                $('#warehouse-select').append('<option value="all">Semua Outlet</option>');
+
+                // Add warehouses from response
+                $.each(data, function(index, warehouse) {
+                    $('#warehouse-select').append('<option value="' + warehouse.id + '">' + warehouse.name + '</option>');
+                });
+
+                // Enable warehouse select and refresh
+                $('#warehouse-select').prop('disabled', false).selectpicker('refresh');
+
+                // Hide loading indicator
+                $('.loader-container').hide();
+            },
+            error: function(xhr, status, error) {
+                console.error("Error fetching warehouses: " + error);
+
+                // Hide loading indicator even on error
+                $('.loader-container').hide();
+
+                // Re-enable warehouse select
+                $('#warehouse-select').prop('disabled', false).selectpicker('refresh');
+
+                // Show error message
+                alert("Error loading outlets. Please try again.");
+            }
+        });
+    });
+});
 </script>
 @endpush

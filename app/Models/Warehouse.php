@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Warehouse extends Model
 {
     use SoftDeletes;
-    protected $fillable = [
-        "name", "phone", "email", "address", "is_self_service", "is_active", "business_id", "max_shift_count", "tagihan", "expired_at", "whatsapp", "is_whatsapp_active"
-    ];
+    protected $guarded = [];
 
     public function product()
     {
@@ -28,5 +26,10 @@ class Warehouse extends Model
 
     public function users() {
         return $this->hasMany(User::class);
+    }
+
+    public function regional()
+    {
+        return $this->belongsTo('App\Models\Regional');
     }
 }

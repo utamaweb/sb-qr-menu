@@ -78,8 +78,8 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     Route::get('transaction/not-paid', [TransactionController::class, 'notPaid']);
     Route::get('transaction/order-types', [TransactionController::class, 'orderType']);
     Route::post('transaction', [TransactionController::class, 'store']);
-    // Route::put('transaction/{id}/cancel', [TransactionController::class, 'cancel']); // New cancel method
-    Route::delete('transaction/{id}/cancel', [TransactionController::class, 'cancelOld']); // Old cancel method
+    Route::put('transaction/{id}/cancel', [TransactionController::class, 'cancel']); // New cancel method
+    // Route::delete('transaction/{id}/cancel', [TransactionController::class, 'cancelOld']); // Old cancel method
     Route::delete('transaction/product/delete/{id}', [TransactionController::class, 'deleteTransactionProducts']);
     Route::post('transaction/cancel-request', [TransactionController::class, 'transactionCancellationRequest']);
 
@@ -97,6 +97,7 @@ Route::group(['middleware' => ['jwt.verify', 'api']], function ($router) {
     // Service
     Route::controller(ServiceController::class)->group(function() {
         Route::get('service/check', 'checkService');
+        Route::get('edit-order/check', 'checkEditOrder');
     });
 
     // CustomC Category Parent

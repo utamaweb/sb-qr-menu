@@ -35,4 +35,12 @@ class Transaction extends Model
     {
         return $this->hasMany('App\Models\TransactionDetail');
     }
+
+    /**
+     * Relation with MultiPayment
+     */
+    public function multi_payments()
+    {
+        return $this->hasMany('App\Models\MultiPayment');
+    }
 }

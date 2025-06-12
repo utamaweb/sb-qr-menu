@@ -156,7 +156,7 @@ document.querySelector('select[name="role_id"]').addEventListener('change', func
             // Tampilkan hanya opsi bisnis
             document.querySelector('.bisnis-select').style.display = 'none';
             document.querySelector('.warehouse-select').style.display = 'none';
-        } else if (selectedRole == 2) {
+        } else if (selectedRole == 2 || selectedRole == 6) {
             // Tampilkan hanya opsi outlet
             document.querySelector('.bisnis-select').style.display = 'block';
             document.querySelector('.warehouse-select').style.display = 'none';
@@ -173,55 +173,25 @@ $("ul#outlet").siblings('a').attr('aria-expanded','true');
     $("#user").addClass("active");
 
     $('#warehouseId').hide();
-    $('#biller-id').hide();
     $('.customer-section').hide();
 
     $('.selectpicker').selectpicker({
       style: 'btn-link',
     });
 
-    @if(config('database.connections.saleprosaas_landlord'))
-        numberOfUserAccount = <?php echo json_encode($numberOfUserAccount)?>;
-        $.ajax({
-            type: 'GET',
-            async: false,
-            url: '{{route("package.fetchData", $general_setting->package_id)}}',
-            success: function(data) {
-                if(data['number_of_user_account'] > 0 && data['number_of_user_account'] <= numberOfUserAccount) {
-                    localStorage.setItem("message", "You don't have permission to create another user account as you already exceed the limit! Subscribe to another package if you wants more!");
-                    location.href = "{{route('user.index')}}";
-                }
-            }
-        });
-    @endif
-
-    $('#genbutton').on("click", function(){
-      $.get('genpass', function(data){
-        $("input[name='password']").val(data);
-      });
-    });
-
     $('select[name="role_id"]').on('change', function() {
-        if($(this).val() == 5) {
-            $('#biller-id').hide(300);
+        if($(this).val() == 5 || $(this).val() == 6) {
             $('#warehouseId').hide(300);
             $('.customer-section').show(300);
             $('.customer-input').prop('required',true);
             $('select[name="warehouse_id"]').prop('required',false);
-            $('select[name="biller_id"]').prop('required',false);
-        }
-        else if($(this).val() > 2 && $(this).val() != 5) {
+        } else if($(this).val() > 2 && $(this).val() != 5 && $(this).val() != 6) {
             $('select[name="warehouse_id"]').prop('required',true);
-            $('select[name="biller_id"]').prop('required',true);
-            $('#biller-id').show(300);
             $('#warehouseId').show(300);
             $('.customer-section').hide(300);
             $('.customer-input').prop('required',false);
-        }
-        else {
+        } else {
             $('select[name="warehouse_id"]').prop('required',false);
-            $('select[name="biller_id"]').prop('required',false);
-            $('#biller-id').hide(300);
             $('#warehouseId').hide(300);
             $('.customer-section').hide(300);
             $('.customer-input').prop('required',false);

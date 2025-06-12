@@ -1,39 +1,96 @@
 @extends('backend.layout.main')
 @section('content')
 
-<section>
+<section class="forms">
     <div class="container-fluid">
-        @include('includes.alerts')
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="text-center">Laporan Pengeluaran Outlet</h3>
+                        <h4 class="text-center mt-3">Tanggal: {{ \Carbon\Carbon::parse($start_date)->translatedFormat('j M Y') }} s/d {{ \Carbon\Carbon::parse($end_date)->translatedFormat('j M Y') }}</h4>
+                    </div>
+                    <div class="card-body">
+                        <form action="" method="GET">
+                            <div class="form-group">
+                                <label for=""><strong>Pilih Tanggal</strong></label>
+                                <div class="input-group">
+                                    <input type="text" name="start_date" id="start_date" class="form-control date" required value="{{ $start_date }}">
+                                    <span class="input-group-text">s/d</span>
+                                    <input type="text" name="end_date" id="end_date" class="form-control date" required value="{{ $end_date }}">
+                                </div>
+                                <div id="dateError" class="text-danger mt-2" style="display: none;">
+                                    Rentang tanggal tidak boleh lebih dari 30 hari!
+                                </div>
+                            </div>
 
-        <div class="card">
-            <div class="card-header d-flex justify-content-between">
-                <span>Pengeluaran</span>
-                @if(auth()->user()->hasRole('Kasir'))
-                    <a href="#" data-toggle="modal" data-target="#createModal" class="btn btn-info"><i class="dripicons-plus"></i> Tambah Pengeluaran</a>
-                @endif
-            </div>
+                            @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
+                                <div class="form-group">
+                                    <label><strong>Pilih Outlet</strong></label>
+                                    <select id="warehouse-select" name="warehouse_id" class="form-control selectpicker" data-live-search="true" data-live-search-style="begins"
+                                    title="Pilih outlet">
+                                        @foreach($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}" {{ $warehouse->id == $warehouseId ? 'selected' : '' }}>{{ $warehouse->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @endif
 
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="ingredient-table" class="table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Pengeluaran</th>
-                                <th>Keterangan</th>
-                                <th>Kuantitas</th>
-                                <th>Total</th>
-                                <th>Outlet</th>
-                                <th>Dibuat | Waktu</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Data akan diisi oleh DataTables secara otomatis -->
-                        </tbody>
-                    </table>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Filter</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
+
+        @if($warehouseId)
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Pengeluaran Outlet</span>
+                        <a href="{{ route('expense.export', $warehouseId) }}?start_date={{ $start_date }}&end_date={{ $end_date }}" class="btn btn-sm btn-success">Export Excel</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="ingredient-table" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Pengeluaran</th>
+                                        <th>Keterangan</th>
+                                        <th>Kuantitas</th>
+                                        <th>Total</th>
+                                        <th>Outlet</th>
+                                        <th>Dibuat | Waktu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($expenses as $expense)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td>{{ $expense->expenseCategory->name }}</td>
+                                            <td>{{ $expense->note }}</td>
+                                            <td>{{ $expense->qty }}</td>
+                                            <td>@currency($expense->amount)</td>
+                                            <td>{{ $expense->warehouse->name }}</td>
+                                            <td>{{ $expense->created_at }}</td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center">Data Tidak Ditemukan</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
     </div>
 </section>
 
@@ -41,74 +98,104 @@
 
 @push('scripts')
 <script type="text/javascript">
+$('.selectpicker').selectpicker();
+$("ul#expense").siblings('a').attr('aria-expanded','true');
+$("ul#expense").addClass("show");
+$("ul#expense #exp-cat-menu").addClass("active");
+
+$('.selectpicker').selectpicker('refresh');
+
+$('#ingredient-table').DataTable( {
+    "order": [],
+    'language': {
+        'lengthMenu': '_MENU_ {{trans("file.records per page")}}',
+        "info": '<small>{{trans("file.Showing")}} _START_ - _END_ (_TOTAL_)</small>',
+        "search": 'Cari',
+        'paginate': {
+                'previous': '<i class="dripicons-chevron-left"></i>',
+                'next': '<i class="dripicons-chevron-right"></i>'
+        }
+    },
+    'select': {
+        style: 'multi',
+        selector: 'td:first-child'
+    },
+    'lengthMenu': [[10, 25, 50, -1], [10, 25, 50, "All"]],
+});
+</script>
+
+<script>
     $(document).ready(function() {
-        $('#ingredient-table').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{{ route('expenses.data') }}",
-            columns: [
-                { data: null, name: 'DT_RowIndex', orderable: false, searchable: false, render: function(data, type, row, meta) {
-                    return meta.row + meta.settings._iDisplayStart + 1;
-                }},
-                { data: 'expense_category.name', name: 'expenseCategory.name' },
-                { data: 'note', name: 'note' },
-                { data: 'qty', name: 'qty' },
-                { data: 'amount', name: 'amount', render: function(data, type, row) {
-                    return 'Rp ' + Number(data).toLocaleString('id-ID');
-                }},
-                { data: 'warehouse.name', name: 'warehouse.name' },
-                { data: 'created_at', name: 'created_at' },
-            ],
-            language: {
-                search: 'Cari:',
-                lengthMenu: 'Tampilkan _MENU_ data per halaman',
-                info: 'Menampilkan _START_ hingga _END_ dari _TOTAL_ data',
-                paginate: {
-                    previous: '<i class="dripicons-chevron-left"></i>',
-                    next: '<i class="dripicons-chevron-right"></i>'
-                }
-            },
-            dom: '<"row"lfB>rtip',
-            buttons: [
-                {
-                    extend: 'pdf',
-                    text: '<i title="export to pdf" class="fa fa-file-pdf-o"></i>',
-                    exportOptions: {
-                        columns: ':visible:Not(.not-exported)',
-                        rows: ':visible'
-                    },
-                },
-                {
-                    extend: 'excel',
-                    text: '<i title="export to excel" class="dripicons-document-new"></i>',
-                    exportOptions: {
-                        columns: ':visible:Not(.not-exported)',
-                        rows: ':visible'
-                    },
-                },
-                {
-                    extend: 'csv',
-                    text: '<i title="export to csv" class="fa fa-file-text-o"></i>',
-                    exportOptions: {
-                        columns: ':visible:Not(.not-exported)',
-                        rows: ':visible'
-                    },
-                },
-                {
-                    extend: 'print',
-                    text: '<i title="print" class="fa fa-print"></i>',
-                    exportOptions: {
-                        columns: ':visible:Not(.not-exported)',
-                        rows: ':visible'
-                    },
-                },
-                {
-                    extend: 'colvis',
-                    text: '<i title="column visibility" class="fa fa-eye"></i>',
-                    columns: ':gt(0)'
-                },
-            ],
+        // Fungsi untuk memeriksa tanggal
+        function validateDates() {
+            var startDate = new Date($("input[name='start_date']").val());
+            var endDate = new Date($("input[name='end_date']").val());
+
+            // Jika tanggal mulai lebih besar dari tanggal selesai
+            if (startDate > endDate) {
+                alert("Tanggal Mulai tidak boleh lebih besar dari Tanggal Selesai.");
+                $("input[name='start_date']").val(''); // Mengosongkan input tanggal mulai
+                $("input[name='end_date']").val(''); // Mengosongkan input tanggal selesai
+            }
+        }
+
+        // Event listener untuk perubahan pada input tanggal
+        $("input[name='start_date'], input[name='end_date']").on("change", function() {
+            validateDates();
         });
     });
-</script>
+    </script>
+   <script>
+    $(function() {
+        // Inisialisasi datepicker
+        $("#start_date, #end_date").datepicker({
+            dateFormat: 'yy-mm-dd', // Format sesuai dengan backend
+            onSelect: function(selectedDate) {
+                var startDate = $("#start_date").datepicker("getDate");
+                var endDate = $("#end_date").datepicker("getDate");
+
+                // Jika start_date dipilih, set maxDate di end_date
+                if (this.id == "start_date") {
+                    $("#end_date").datepicker("option", "minDate", startDate);
+                    if (startDate) {
+                        var maxEndDate = new Date(startDate);
+                        maxEndDate.setDate(maxEndDate.getDate() + 30);
+                        $("#end_date").datepicker("option", "maxDate", maxEndDate);
+                    }
+                }
+
+                // Reset maxDate jika end_date diubah
+                if (this.id == "end_date" && !$("#start_date").val()) {
+                    $("#end_date").datepicker("option", "maxDate", null);
+                }
+            }
+        });
+
+        // Validasi form sebelum submit
+        $("form").on("submit", function(e) {
+            var startDate = $("#start_date").datepicker("getDate");
+            var endDate = $("#end_date").datepicker("getDate");
+            var errorDiv = $("#dateError");
+
+            errorDiv.hide(); // Reset error
+
+            if (!startDate || !endDate) {
+                alert("Silakan pilih tanggal mulai dan akhir.");
+                e.preventDefault();
+                return false;
+            }
+
+            var diffTime = Math.abs(endDate - startDate);
+            var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 30) {
+                errorDiv.show();
+                e.preventDefault(); // Cegah submit
+                return false;
+            }
+
+            return true;
+        });
+    });
+    </script>
 @endpush

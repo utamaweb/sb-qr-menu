@@ -26,6 +26,7 @@ use App\Models\Transaction;
 use App\Models\Product_Sale;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
+use App\Models\Ojol;
 use App\Models\ProductReturn;
 use App\Models\ProductVariant;
 use App\Models\ReturnPurchase;
@@ -36,10 +37,28 @@ use App\Models\Product_Warehouse;
 use App\Models\TransactionDetail;
 use Spatie\Permission\Models\Role;
 use App\Models\PurchaseProductReturn;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB as FacadesDB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use Spatie\Permission\Models\Permission;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use App\Services\DateService;
+use App\Models\Regional;
 
 class ReportController extends Controller
 {
+    protected $dateService;
+
+    public function __construct()
+    {
+        $this->dateService = new DateService();
+    }
+
     public function productQuantityAlert()
     {
         $role = Role::find(Auth::user()->role_id);
@@ -195,36 +214,80 @@ class ReportController extends Controller
 
     public function dailySale($year, $month)
     {
-        $role = Role::find(Auth::user()->role_id);
-        $start = 1;
-        $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
-        $warehouse_id = auth()->user()->warehouse_id;
-        while($start <= $number_of_day)
-        {
-            if($start < 10)
-                $date = $year.'-'.$month.'-0'.$start;
-            else
-                $date = $year.'-'.$month.'-'.$start;
-            $query1 = array(
-                'SUM(total_qty) AS total_qty',
-                'SUM(paid_amount) AS total_paid_amount',
-                'SUM(total_amount) AS total_amount'
-            );
-            // $sale_data = Sale::whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $sale_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->where('date', $date)->selectRaw(implode(',', $query1))->get();
-            $total_paid_amount[$start] = $sale_data[0]->total_paid_amount;
-            $total_qty[$start] = $sale_data[0]->total_qty;
-            $total_amount[$start] = $sale_data[0]->total_amount;
-            $start++;
+        // Get warehouse ID based on user role or request parameter
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
         }
-        $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
-        $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-        $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-        $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-        $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
+
+        // Calculate calendar parameters without using cal_days_in_month
+        $number_of_day = date('t', strtotime("$year-$month-01"));
+        $start_day = date('w', strtotime("$year-$month-01")) + 1;
+
+        // Generate prev & next month navigation dates
+        $prev_date = date('Y-m', strtotime("$year-$month-01 -1 month"));
+        list($prev_year, $prev_month) = explode('-', $prev_date);
+
+        $next_date = date('Y-m', strtotime("$year-$month-01 +1 month"));
+        list($next_year, $next_month) = explode('-', $next_date);
+
+        // Get warehouse list for dropdown
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $warehouse_id = 0;
-        return view('backend.report.daily_sale', compact('total_paid_amount','total_qty', 'total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+
+        // Get current warehouse if one is selected
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
+
+        // Initialize dailyData with zeros
+        $dailyData = array_fill(1, $number_of_day, [
+            'qty' => 0,
+            'paid' => 0,
+            'amount' => 0,
+            'transaction' => 0,
+        ]);
+
+        // Only query database if warehouse_id is set
+        if ($warehouse_id) {
+            // Format date string for the whole month
+            $start_date = "$year-" . sprintf('%02d', $month) . "-01";
+            $end_date = "$year-" . sprintf('%02d', $month) . "-$number_of_day";
+
+            // Use a single query to get all transactions for the month
+            $transactions = Transaction::where('status', 'Lunas')
+                ->where('warehouse_id', $warehouse_id)
+                ->whereDate('date', '>=', $start_date)
+                ->whereDate('date', '<=', $end_date)
+                ->selectRaw('DAY(date) as day, SUM(total_qty) AS total_qty, SUM(paid_amount) AS total_paid_amount,
+                             SUM(total_amount) AS total_amount, COUNT(*) AS total_transaction')
+                ->groupBy('day')
+                ->get();
+
+            // Fill the data array with actual values
+            foreach ($transactions as $transaction) {
+                $day = (int)$transaction->day;
+                $dailyData[$day] = [
+                    'qty' => $transaction->total_qty ?? 0,
+                    'paid' => $transaction->total_paid_amount ?? 0,
+                    'amount' => $transaction->total_amount ?? 0,
+                    'transaction' => $transaction->total_transaction ?? 0,
+                ];
+            }
+        }
+
+        return view('backend.report.daily_sale', compact(
+            'dailyData',
+            'start_day',
+            'year',
+            'month',
+            'number_of_day',
+            'prev_year',
+            'prev_month',
+            'next_year',
+            'next_month',
+            'lims_warehouse_list',
+            'warehouse_id',
+            'warehouse'
+        ));
     }
 
     public function dailySaleByWarehouse(Request $request,$year,$month)
@@ -243,7 +306,7 @@ class ReportController extends Controller
             $query1 = array(
                 'SUM(total_qty) AS total_qty',
                 'SUM(paid_amount) AS total_paid_amount',
-                'SUM(total_amount) AS total_amount'
+                'SUM(total_amount) AS total_amount',
             );
             // $sale_data = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
             $sale_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $data['warehouse_id'])->where('date', $date)->selectRaw(implode(',', $query1))->get();
@@ -265,163 +328,179 @@ class ReportController extends Controller
 
     public function dailyPurchase($year, $month)
     {
-        $role = Role::find(Auth::user()->role_id);
+        // Get warehouse ID based on user role or request parameter
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
+        }
+
         $start = 1;
         $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
-        $warehouse_id = auth()->user()->warehouse_id;
-        while($start <= $number_of_day)
-        {
-            if($start < 10)
-                $date = $year.'-'.$month.'-0'.$start;
-            else
-                $date = $year.'-'.$month.'-'.$start;
-            $query1 = array(
-                'SUM(qty) AS total_qty',
-                'SUM(amount) AS total_amount'
-            );
-            $purchase_data = Expense::where('warehouse_id', $warehouse_id)->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $total_qty[$start] = $purchase_data[0]->total_qty;
-            $total_amount[$start] = $purchase_data[0]->total_amount;
-            $start++;
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+
+        // Initialize arrays with zeros
+        $total_qty = array_fill(1, $number_of_day, 0);
+        $total_amount = array_fill(1, $number_of_day, 0);
+
+        // Only query database if warehouse_id is set
+        if ($warehouse_id) {
+            while($start <= $number_of_day)
+            {
+                if($start < 10)
+                    $date = $year.'-'.$month.'-0'.$start;
+                else
+                    $date = $year.'-'.$month.'-'.$start;
+
+                $query1 = array(
+                    'SUM(qty) AS total_qty',
+                    'SUM(amount) AS total_amount'
+                );
+
+                $purchase_data = Expense::where('warehouse_id', $warehouse_id)
+                                        ->whereDate('created_at', $date)
+                                        ->selectRaw(implode(',', $query1))
+                                        ->get();
+
+                $total_qty[$start] = $purchase_data[0]->total_qty ?? 0;
+                $total_amount[$start] = $purchase_data[0]->total_amount ?? 0;
+                $start++;
+            }
         }
+
         $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
         $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
         $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
         $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
         $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        // $warehouse_id = 0;
-        return view('backend.report.daily_purchase', compact('total_qty','total_amount', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
-    }
 
-    public function dailyPurchaseByWarehouse(Request $request, $year, $month)
-    {
-        $data = $request->all();
-        if($data['warehouse_id'] == 0)
-            return redirect()->back();
-        $start = 1;
-        $number_of_day = date('t', mktime(0, 0, 0, $month, 1, $year));
-        while($start <= $number_of_day)
-        {
-            if($start < 10)
-                $date = $year.'-'.$month.'-0'.$start;
-            else
-                $date = $year.'-'.$month.'-'.$start;
-            $query1 = array(
-                'SUM(total_discount) AS total_discount',
-                'SUM(order_discount) AS order_discount',
-                'SUM(total_tax) AS total_tax',
-                'SUM(order_tax) AS order_tax',
-                'SUM(shipping_cost) AS shipping_cost',
-                'SUM(grand_total) AS grand_total'
-            );
-            $purchase_data = Purchase::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', $date)->selectRaw(implode(',', $query1))->get();
-            $total_discount[$start] = $purchase_data[0]->total_discount;
-            $order_discount[$start] = $purchase_data[0]->order_discount;
-            $total_tax[$start] = $purchase_data[0]->total_tax;
-            $order_tax[$start] = $purchase_data[0]->order_tax;
-            $shipping_cost[$start] = $purchase_data[0]->shipping_cost;
-            $grand_total[$start] = $purchase_data[0]->grand_total;
-            $start++;
-        }
-        $start_day = date('w', strtotime($year.'-'.$month.'-01')) + 1;
-        $prev_year = date('Y', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-        $prev_month = date('m', strtotime('-1 month', strtotime($year.'-'.$month.'-01')));
-        $next_year = date('Y', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-        $next_month = date('m', strtotime('+1 month', strtotime($year.'-'.$month.'-01')));
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $warehouse_id = $data['warehouse_id'];
+        // Get current warehouse if one is selected
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
 
-        return view('backend.report.daily_purchase', compact('total_discount','order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'grand_total', 'start_day', 'year', 'month', 'number_of_day', 'prev_year', 'prev_month', 'next_year', 'next_month', 'lims_warehouse_list', 'warehouse_id'));
+        return view('backend.report.daily_purchase', compact(
+            'total_qty',
+            'total_amount',
+            'start_day',
+            'year',
+            'month',
+            'number_of_day',
+            'prev_year',
+            'prev_month',
+            'next_year',
+            'next_month',
+            'lims_warehouse_list',
+            'warehouse_id',
+            'warehouse'
+        ));
     }
 
     public function monthlySale($year)
     {
-        $role = Role::find(Auth::user()->role_id);
-        $start = strtotime($year .'-01-01');
-        $end = strtotime($year .'-12-31');
-        $warehouse_id = auth()->user()->warehouse_id;
-        while($start <= $end)
-        {
-            $start_date = $year . '-'. date('m', $start).'-'.'01';
-            $end_date = $year . '-'. date('m', $start).'-'.'31';
-
-            $temp_order_qty = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_qty');
-            $total_qty[] = number_format((float)$temp_order_qty, config('decimal'), '.', '');
-
-            $total_paid_amount = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('paid_amount');
-            $total_paid[] = number_format((float)$total_paid_amount, config('decimal'), '.', '');
-
-            $temp_total = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_amount');
-            $total_amount[] = number_format((float)$temp_total, config('decimal'), '.', '');
-            $start = strtotime("+1 month", $start);
+        // Get warehouse ID based on user role or request parameter
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
         }
-        $lims_warehouse_list = Warehouse::where('is_active',true)->get();
-        // $warehouse_id = 0;
-        return view('backend.report.monthly_sale', compact('year', 'total_qty', 'total_paid', 'total_amount','lims_warehouse_list', 'warehouse_id'));
-    }
 
-    public function monthlySaleByWarehouse(Request $request, $year)
-    {
-        $data = $request->all();
-        if($data['warehouse_id'] == 0)
-            return redirect()->back();
+        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
 
-        $start = strtotime($year .'-01-01');
-        $end = strtotime($year .'-12-31');
-        while($start <= $end)
-        {
-            $start_date = $year . '-'. date('m', $start).'-'.'01';
-            $end_date = $year . '-'. date('m', $start).'-'.'31';
+        // Initialize arrays with zeros
+        $total_qty = array_fill(0, 12, 0);
+        $total_transaction = array_fill(0, 12, 0);
+        $total_paid = array_fill(0, 12, 0);
+        $total_amount = array_fill(0, 12, 0);
 
-            $temp_total_discount = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_discount');
-            $total_discount[] = number_format((float)$temp_total_discount, config('decimal'), '.', '');
+        // Only query database if warehouse_id is set
+        if ($warehouse_id) {
+            // Build a single query for all months instead of looping through each month
+            $monthlyData = Transaction::where('status', 'Lunas')
+                ->where('warehouse_id', $warehouse_id)
+                ->whereYear('created_at', $year)
+                ->selectRaw('MONTH(created_at) as month,
+                             SUM(total_qty) as total_qty,
+                             COUNT(*) as transaction_count,
+                             SUM(paid_amount) as paid_amount,
+                             SUM(total_amount) as total_amount')
+                ->groupBy('month')
+                ->get()
+                ->keyBy('month');
 
-            $temp_order_discount = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('order_discount');
-            $order_discount[] = number_format((float)$temp_order_discount, config('decimal'), '.', '');
-
-            $temp_total_tax = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('total_tax');
-            $total_tax[] = number_format((float)$temp_total_tax, config('decimal'), '.', '');
-
-            $temp_order_tax = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('order_tax');
-            $order_tax[] = number_format((float)$temp_order_tax, config('decimal'), '.', '');
-
-            $temp_shipping_cost = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('shipping_cost');
-            $shipping_cost[] = number_format((float)$temp_shipping_cost, config('decimal'), '.', '');
-
-            $temp_total = Sale::where('warehouse_id', $data['warehouse_id'])->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->sum('grand_total');
-            $total[] = number_format((float)$temp_total, config('decimal'), '.', '');
-            $start = strtotime("+1 month", $start);
+            // Fill the arrays with actual data
+            for ($month = 1; $month <= 12; $month++) {
+                if (isset($monthlyData[$month])) {
+                    $data = $monthlyData[$month];
+                    $total_qty[$month-1] = number_format((float)$data->total_qty, config('decimal'), '.', '');
+                    $total_transaction[$month-1] = number_format((float)$data->transaction_count, config('decimal'), '.', '');
+                    $total_paid[$month-1] = number_format((float)$data->paid_amount, config('decimal'), '.', '');
+                    $total_amount[$month-1] = number_format((float)$data->total_amount, config('decimal'), '.', '');
+                }
+            }
         }
-        $lims_warehouse_list = Warehouse::where('is_active',true)->get();
-        $warehouse_id = $data['warehouse_id'];
-        return view('backend.report.monthly_sale', compact('year', 'total_discount', 'order_discount', 'total_tax', 'order_tax', 'shipping_cost', 'total', 'lims_warehouse_list', 'warehouse_id'));
+
+        // Get current warehouse if one is selected
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
+
+        return view('backend.report.monthly_sale', compact(
+            'year',
+            'total_qty',
+            'total_paid',
+            'total_amount',
+            'lims_warehouse_list',
+            'warehouse_id',
+            'total_transaction',
+            'warehouse'
+        ));
     }
 
     public function monthlyPurchase($year)
     {
-        $role = Role::find(Auth::user()->role_id);
-        $start = strtotime($year .'-01-01');
-        $end = strtotime($year .'-12-31');
-        $warehouse_id = auth()->user()->warehouse_id;
-        while($start <= $end)
-        {
-            $start_date = $year . '-'. date('m', $start).'-'.'01';
-            $end_date = $year . '-'. date('m', $start).'-'.'31';
-
-            $query1 = array(
-                'SUM(qty) AS total_qty',
-                'SUM(amount) AS total_amount'
-            );
-            $purchase_data = Expense::where('warehouse_id', $warehouse_id)->whereDate('created_at', '>=' , $start_date)->whereDate('created_at', '<=' , $end_date)->selectRaw(implode(',', $query1))->get();
-
-            $total_qty[$start] = $purchase_data[0]->total_qty;
-            $total_amount[$start] = $purchase_data[0]->total_amount;
-            $start = strtotime("+1 month", $start);
+        // Get warehouse ID based on user role or request parameter
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = request('warehouse_id');
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
         }
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
-        $warehouse_id = 0;
-        return view('backend.report.monthly_purchase', compact('year', 'total_qty', 'total_amount', 'lims_warehouse_list', 'warehouse_id'));
+
+        $warehouses = Warehouse::where('is_active', true)->get();
+
+        // Initialize arrays with zeros
+        $total_qty = array_fill(0, 12, 0);
+        $total_amount = array_fill(0, 12, 0);
+
+        // Only query database if warehouse_id is set
+        if ($warehouse_id) {
+            for ($month = 1; $month <= 12; $month++) {
+                $startDate = "$year-$month-01";
+                $endDate = date("Y-m-t", strtotime($startDate)); // last day of month
+
+                $query1 = array(
+                    'SUM(qty) AS total_qty',
+                    'SUM(amount) AS total_amount'
+                );
+
+                $purchase_data = Expense::where('warehouse_id', $warehouse_id)
+                    ->whereDate('created_at', '>=', $startDate)
+                    ->whereDate('created_at', '<=', $endDate)
+                    ->selectRaw(implode(',', $query1))
+                    ->get();
+
+                $total_qty[$month-1] = $purchase_data[0]->total_qty ?? 0;
+                $total_amount[$month-1] = $purchase_data[0]->total_amount ?? 0;
+            }
+        }
+
+        // Get current warehouse if one is selected
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
+
+        return view('backend.report.monthly_purchase', compact(
+            'year',
+            'total_qty',
+            'total_amount',
+            'warehouses',
+            'warehouse_id',
+            'warehouse'
+        ));
     }
 
     public function monthlyPurchaseByWarehouse(Request $request, $year)
@@ -793,7 +872,18 @@ class ReportController extends Controller
             $end_date = Carbon::now()->format('Y-m-d');
         }
 
-        $warehouseId = auth()->user()->warehouse_id;
+        // Get warehouse ID based on user role or request
+        if(auth()->user()->hasRole('Admin Outlet')){
+            $warehouseId = auth()->user()->warehouse_id;
+        } else {
+            $warehouseId = $request->input('warehouse_id') ?? auth()->user()->warehouse_id;
+        }
+
+        // Get warehouse list for filter
+        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+            ->where('is_active', true)
+            ->get();
+        $warehouse = Warehouse::find($warehouseId);
 
         // query optimized
         $products = Product::with('category')
@@ -813,29 +903,110 @@ class ReportController extends Controller
             ->selectRaw('COALESCE(transaction_summary.total_qty, 0) as qty, COALESCE(transaction_summary.total_subtotal, 0) as subtotal')
             ->get();
 
-        return view('backend.report.product_report', compact('start_date', 'end_date', 'products'));
+        return view('backend.report.product_report', compact('start_date', 'end_date', 'products', 'warehouses', 'warehouseId', 'warehouse'));
     }
 
 
-    public function listTransaction()
+    // public function listTransaction(Request $request)
+    // {
+    //     // Get date filter from request or use current date as default
+    //     if($request->input('start_date')) {
+    //         $start_date = $request->input('start_date');
+    //         $end_date = $request->input('end_date');
+    //     } else {
+    //         $start_date = Carbon::now()->format('Y-m-d');
+    //         $end_date = Carbon::now()->format('Y-m-d');
+    //     }
+
+    //     $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+    //     if(auth()->user()->hasRole('Admin Outlet')){
+    //         $warehouseId = auth()->user()->warehouse_id;
+    //     } else {
+    //         $warehouseId = $request->input('warehouse_id') ?? null;
+    //     }
+
+    //     $totalQtyPerProduct = [];
+    //     $totalSubtotalPerProduct = [];
+
+    //     $regionals = Regional::where('business_id', auth()->user()->business_id)->get();
+
+    //     $warehouse_request = $request->get('warehouse_id');
+    //     $regional_request = $request->get('regional_id');
+
+
+    //     if($regional_request){
+    //         $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+    //             ->where('regional_id', $regional_request)
+    //             ->get();
+    //     }
+
+    //     // Query transactions with date filter
+    //     $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')
+    //         ->whereDate('date', '>=', $start_date)
+    //         ->whereDate('date', '<=', $end_date)
+    //         ->orderBy('id', 'DESC')
+    //         ->get();
+
+    //     if($regional_request || $warehouse_request) {
+    //         if($regional_request) {
+    //             $transactions = $transactions->where('regional_id', $regional_request);
+    //         }
+    //         if($warehouse_request) {
+    //             $transactions = $transactions->where('warehouse_id', $warehouse_request);
+    //         }
+    //     }
+
+    //     return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct', 'warehouses', 'warehouseId', 'regionals', 'warehouse_request', 'regional_request'));
+    // }
+
+    public function listTransaction(Request $request)
     {
-        $start_date = Carbon::now()->format('Y-m-d');
-        $end_date = Carbon::now()->format('Y-m-d');
+        $warehouse_request = $request->get('warehouse_id', 'all');
+        $regional_request = $request->get('regional_id', 'all');
+        $start_date = $request->get('start_date', date('Y-m-d'));
+        $end_date = $request->get('end_date', date('Y-m-d'));
 
+        $query = Transaction::with(['warehouse', 'order_type', 'transaction_details.product'])
+                ->whereDate('created_at', '>=', $start_date)
+                ->whereDate('created_at', '<=', $end_date);
 
-        $totalQtyPerProduct = [];
-        $totalSubtotalPerProduct = [];
-        if(auth()->user()->hasRole('Superadmin')){
-            $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')->orderBy('id', 'DESC')->get();
-        } elseif(auth()->user()->hasRole('Admin Bisnis')){
-            $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-            // $warehouse_id = auth()->user()->warehouse->business->warehouses->pluck('id');
-            $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')->whereIn('warehouse_id', $warehouse_id)->orderBy('id', 'DESC')->get();
-        } else{
-            $transactions = Transaction::with('warehouse', 'order_type', 'transaction_details')->where('warehouse_id', auth()->user()->warehouse_id)->orderBy('id', 'DESC')->get();
+        if (auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $regionals = Regional::where('business_id', auth()->user()->business_id)->get();
+
+            if ($regional_request != 'all' && $regional_request != null) {
+                $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                    ->where('regional_id', $regional_request)
+                    ->get();
+
+                $query->whereHas('warehouse', function($q) use ($regional_request) {
+                    $q->where('regional_id', $regional_request);
+                });
+            } else {
+                $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+            }
+
+            if ($warehouse_request != 'all' && $warehouse_request != null) {
+                $query->where('warehouse_id', $warehouse_request);
+            }
+        } else {
+            $warehouse_id = auth()->user()->warehouse_id;
+            $query->where('warehouse_id', $warehouse_id);
+
+            $warehouses = collect();
+            $regionals = collect();
         }
-        return view('backend.report.list_transaction', compact('start_date', 'end_date', 'transactions', 'totalSubtotalPerProduct', 'totalQtyPerProduct'));
 
+        $transactions = $query->orderBy('created_at', 'desc')->get();
+
+        return view('backend.report.list_transaction', compact(
+            'start_date',
+            'end_date',
+            'transactions',
+            'warehouses',
+            'warehouse_request',
+            'regional_request',
+            'regionals'
+        ));
     }
 
     public function productReportData(Request $request)
@@ -1736,13 +1907,47 @@ class ReportController extends Controller
 
     public function paymentReportByDate(Request $request)
     {
-        $data = $request->all();
-        $start_date = $data['start_date'];
-        $end_date = $data['end_date'];
-        $warehouse_id = auth()->user()->warehouse_id;
+        // Set date parameters
+        $start_date = $request->input('start_date');
+        $end_date = $request->input('end_date');
 
-        $lims_payment_data = Transaction::where('status', 'Lunas')->where('warehouse_id', $warehouse_id)->where('date', '>=' , $start_date)->where('date', '<=' , $end_date)->get();
-        return view('backend.report.payment_report',compact('lims_payment_data', 'start_date', 'end_date'));
+        // Get warehouse ID based on user role
+        if (auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = $request->input('warehouse_id');
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                         ->where('is_active', true)
+                         ->get();
+        } else {
+            // For Admin Outlet, restrict to their assigned warehouse
+            $warehouse_id = auth()->user()->warehouse_id;
+            $warehouses = collect([Warehouse::find($warehouse_id)]);
+        }
+
+        // Initialize payment data as null
+        $lims_payment_data = null;
+
+        // Only query data if warehouse is selected
+        if ($warehouse_id) {
+            // Query for payment data
+            $query = Transaction::where('status', 'Lunas')
+                    ->whereDate('date', '>=', $start_date)
+                    ->whereDate('date', '<=', $end_date)
+                    ->where('warehouse_id', $warehouse_id);
+
+            $lims_payment_data = $query->get();
+        }
+
+        // Get the current warehouse for display
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
+
+        return view('backend.report.payment_report', compact(
+            'lims_payment_data',
+            'start_date',
+            'end_date',
+            'warehouses',
+            'warehouse_id',
+            'warehouse'
+        ));
     }
 
     public function warehouseReport(Request $request)
@@ -4539,84 +4744,101 @@ class ReportController extends Controller
         return view('backend.report.supplier_due_report', compact('lims_purchase_data', 'start_date', 'end_date'));
     }
 
+    /**
+     * Get warehouses by regional ID
+     */
+    public function getWarehousesByRegional($regional_id)
+    {
+        if ($regional_id == 'all') {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+        } else {
+            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                ->where('regional_id', $regional_id)
+                ->get();
+        }
+
+        return response()->json($warehouses);
+    }
+
     public function differenceStockReport(Request $request)
     {
-        // Kondisi untuk filter tanggal
-        if ($request->input('start_date')) {
-            $start_date = $request->input('start_date');
-            $end_date = $request->input('end_date');
-        } else {
-            $start_date = date("Y-m-d");
-            $end_date = date("Y-m-d");
-        }
+        // Set default dates and filters
+        $start_date = $request->input('start_date', date("Y-m-d"));
+        $end_date = $request->input('end_date', date("Y-m-d"));
+        $shift = $request->shift != "all" ? [(int)$request->shift] : [1, 2, 3];
 
-        // Kondisi untuk shift
-        if($request->shift != "all"){
-            $shift = [(int) $request->shift];
-        } else {
-            $shift = [1,2,3];
-        }
+        // Get regionals for the current business
+        $regionals = Regional::where('business_id', auth()->user()->business_id)->get();
+        $regionalId = $request->input('regional_id', 'all');
 
-        // Kondisi untuk role admin outlet
+        // Determine warehouse ID based on user role
         if (auth()->user()->hasRole('Admin Outlet')) {
-            $warehouse_id = auth()->user()->warehouse_id;
-
-            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
-            $stocks = Stock::where('stocks.difference_stock', '!=', 0)
-                ->where('stocks.warehouse_id', $warehouse_id)
-                ->whereIn('shifts.shift_number', $shift)
-                ->whereDate('stocks.created_at', '>=', $start_date)
-                ->whereDate('stocks.created_at', '<=', $end_date)
-                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
-                ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
-                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
-                ->select(
-                    'warehouses.name as warehouse_name',
-                    'ingredients.name as ingredient_name',
-                    'shifts.shift_number',
-                    DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
-                )
-                ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
-                ->orderBy('warehouses.name')
-                ->orderBy('ingredients.name')
-                ->orderBy('shifts.shift_number')
-                ->get();
-
-            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift'));
+            $warehouse_id = [auth()->user()->warehouse_id];
+            $warehouse_request = auth()->user()->warehouse_id;
+            $warehouses = Warehouse::where('id', auth()->user()->warehouse_id)->get();
         } else {
-            $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
-            $warehouse_ids = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-            if($request->warehouse_id != 'all'){
-                $warehouse_id = [(int) $request->warehouse_id];
-            } else {
-                $warehouse_id = $warehouse_ids;
-            }
-            $warehouse_request = $request->get('warehouse_id');
-            // Mengambil data stocks, join ke tabel warehouse, shift, dan ingredient
-            $stocks = Stock::where('stocks.difference_stock', '!=', 0)
-                ->wherein('stocks.warehouse_id', $warehouse_id)
-                ->whereIn('shifts.shift_number', $shift)
-                ->whereDate('stocks.created_at', '>=', $start_date)
-                ->whereDate('stocks.created_at', '<=', $end_date)
-                ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
-                ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
-                ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
-                ->select(
-                    'warehouses.name as warehouse_name',
-                    'ingredients.name as ingredient_name',
-                    'shifts.shift_number',
-                    DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
-                )
-                ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
-                ->orderBy('warehouses.name')
-                ->orderBy('ingredients.name')
-                ->orderBy('shifts.shift_number')
-                ->get();
+            // Get warehouses based on regional filter
+            if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+                if($regionalId != 'all' && $regionalId != null) {
+                    $warehouses = Warehouse::where('business_id', auth()->user()->business_id)
+                        ->where('regional_id', $regionalId)
+                        ->get();
+                } else {
+                    $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->get();
+                }
 
-            return view('backend.report.difference_stock_report', compact('start_date', 'end_date', 'stocks', 'shift', 'warehouse_id', 'warehouses', 'warehouse_request'));
+                $warehouse_ids = $warehouses->pluck('id');
+                $warehouse_id = $request->warehouse_id != 'all' ? [(int)$request->warehouse_id] : $warehouse_ids->toArray();
+                $warehouse_request = $request->get('warehouse_id');
+            } else {
+                $warehouse_id = [auth()->user()->warehouse_id];
+                $warehouse_request = auth()->user()->warehouse_id;
+                $warehouses = Warehouse::where('id', auth()->user()->warehouse_id)->get();
+            }
         }
 
-        return view('backend.report.difference_stock_report', compact('start_date', 'end_date'));
+        // Build stock query with common conditions
+        $query = Stock::where('stocks.difference_stock', '!=', 0)
+            ->whereDate('stocks.created_at', '>=', $start_date)
+            ->whereDate('stocks.created_at', '<=', $end_date)
+            ->whereIn('shifts.shift_number', $shift)
+            ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
+            ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
+            ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id');
+
+        // Apply warehouse filter
+        if ($request->warehouse_id != 'all') {
+            $query->whereIn('stocks.warehouse_id', $warehouse_id);
+        }
+        // Apply regional filter if no specific warehouse is selected
+        else if ($regionalId != 'all' && $regionalId != null) {
+            $query->where('warehouses.regional_id', $regionalId);
+        }
+        // Otherwise apply business filter
+        else {
+            $query->whereIn('stocks.warehouse_id', $warehouse_id);
+        }
+
+        $stocks = $query->select(
+                'warehouses.name as warehouse_name',
+                'ingredients.name as ingredient_name',
+                'shifts.shift_number',
+                DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
+            )
+            ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
+            ->orderBy('warehouses.name')
+            ->orderBy('ingredients.name')
+            ->orderBy('shifts.shift_number')
+            ->get();
+
+        // Prepare view data
+        $viewData = compact('start_date', 'end_date', 'stocks', 'shift');
+
+        if (!auth()->user()->hasRole('Admin Outlet')) {
+            $viewData = array_merge($viewData, compact('warehouse_id', 'warehouses', 'warehouse_request', 'regionals', 'regionalId'));
+        }
+
+        return view('backend.report.difference_stock_report', $viewData);
     }
 
     public function remainingStockReport(Request $request)
@@ -4769,6 +4991,4 @@ class ReportController extends Controller
         return $pdf->download('laporan-sisa-stok-'.$month . '-'. $year .'.pdf');
         // return view('backend.report.remaining_stock_report_pdf', compact('month', 'year', 'stocks', 'warehouse_ids', 'warehouses','formattedStocks'));
     }
-
-
 }

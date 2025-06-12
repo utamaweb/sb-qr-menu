@@ -1,38 +1,41 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\ExpenseCategoryController;
-use App\Http\Controllers\ExpenseController;
-use App\Http\Controllers\ProductWarehouseController;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\IngredientController;
-use App\Http\Controllers\StockOpnameController;
-use App\Http\Controllers\StockPurchaseController;
-use App\Http\Controllers\StockController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\RoleController;
-use App\Http\Controllers\SettingController;
-use App\Http\Controllers\ShiftController;
-use App\Http\Controllers\UnitController;
-use App\Http\Controllers\BusinessController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\WarehouseController;
-use App\Http\Controllers\OrderTypeController;
-use App\Http\Controllers\CloseCashierController;
-use App\Http\Controllers\OjolController;
-use App\Http\Controllers\OjolWarehouseController;
-use App\Http\Controllers\BusinessStockController;
-use App\Http\Controllers\CustomCategoryController;
-use App\Http\Controllers\WhatsappController;
-use App\Http\Controllers\CustomMessageController;
-
 use App\Models\Warehouse;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\OjolController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UnitController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ShiftController;
+use App\Http\Controllers\StockController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\SettingController;
+use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\RegionalController;
+use App\Http\Controllers\WhatsappController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\OrderTypeController;
+use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\IngredientController;
+use App\Http\Controllers\StockOpnameController;
+use App\Http\Controllers\CloseCashierController;
+use App\Http\Controllers\BusinessStockController;
+use App\Http\Controllers\CustomMessageController;
+
+use App\Http\Controllers\OjolWarehouseController;
+use App\Http\Controllers\StockPurchaseController;
+use App\Http\Controllers\CustomCategoryController;
+use App\Http\Controllers\ExpenseCategoryController;
+use App\Http\Controllers\ProductWarehouseController;
+use App\Http\Controllers\Report\ProductOmzetController;
+use App\Http\Controllers\Report\FinanceReportController;
 
 Route::fallback(function () {
     return redirect()->route('admin.auth.index');
@@ -132,6 +135,8 @@ Route::group(['prefix' => 'admin'], function () {
         // });
         Route::resource('kategori', CategoryController::class);
 
+        Route::resource('regional', RegionalController::class);
+
         Route::controller(WarehouseController::class)->group(function () {
             Route::post('importwarehouse', 'importWarehouse')->name('outlet.import');
             Route::post('warehouse/deletebyselection', 'deleteBySelection');
@@ -187,13 +192,14 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::post('monthly_sale/{year}', 'monthlySaleByWarehouse')->name('report.monthlySaleByWarehouse');
                 Route::get('daily_purchase/{year}/{month}', 'dailyPurchase');
                 Route::post('daily_purchase/{year}/{month}', 'dailyPurchaseByWarehouse')->name('report.dailyPurchaseByWarehouse');
-                Route::get('monthly_purchase/{year}', 'monthlyPurchase');
+                Route::get('monthly_purchase/{year}', 'monthlyPurchase')->name('report.monthlyPurchase');
                 Route::post('monthly_purchase/{year}', 'monthlyPurchaseByWarehouse')->name('report.monthlyPurchaseByWarehouse');
                 Route::get('best_seller', 'bestSeller');
                 Route::post('best_seller', 'bestSellerByWarehouse')->name('report.bestSellerByWarehouse');
                 Route::post('profit_loss', 'profitLoss')->name('report.profitLoss');
                 Route::get('product_report', 'productReport')->name('report.product');
                 Route::get('difference_stock_report', 'differenceStockReport')->name('report.differenceStockReport');
+                Route::get('get-warehouses-by-regional/{regional_id}', 'getWarehousesByRegional')->name('report.get_warehouses_by_regional');
                 Route::get('remaining_stock_report', 'remainingStockReport')->name('report.remainingStockReport');
                 Route::get('remaining_stock_report/print', 'remainingStockReportPrint')->name('report.remainingStockReportPrint');
                 Route::get('list-transaksi', 'listTransaction')->name('report.listTransaction');
@@ -289,6 +295,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('expenses/expense-data', 'expenseData')->name('expenses.data');
             Route::post('expenses/deletebyselection', 'deleteBySelection');
         });
+        Route::get('/expense/export/{warehouse_id}', [ExpenseController::class, 'export'])->name('expense.export');
         Route::resource('pengeluaran', ExpenseController::class);
         Route::get('/expenses/data', [ExpenseController::class, 'getExpenses'])->name('expenses.data');
 
@@ -328,7 +335,16 @@ Route::group(['prefix' => 'admin'], function () {
 
         // Route for warehouse max shifts count
         Route::get('/max_shifts', [WarehouseController::class, 'maxShiftPage'])->name('maxShiftPage');
-        Route::put('/max_shifts', [WarehouseController::class, 'maxShiftUpdate'])->name('maxShiftUpdate');
+        Route::put('/max_shifts', [WarehouseController::class, 'maxShiftUpdate'])->name('maxShiftUpdate');        // Route for finance report
+        Route::get('/finance-report', [FinanceReportController::class, 'financeReport'])->name('financeReport');
+        Route::get('/get-warehouses-by-regional/{regional_id}', [App\Http\Controllers\Report\FinanceReportController::class, 'getWarehousesByRegional'])->name('getWarehousesByRegional');
+
+        // Route for close cashier report regional filtering
+        Route::get('close-cashier/get-warehouses-by-regional/{regional_id}', [CloseCashierController::class, 'getWarehousesByRegional'])->name('close_cashier.get_warehouses_by_regional');
+
+        // Route for product omzet report
+        Route::get('products-omzet-by-month', [ProductOmzetController::class, 'index'])->name('report.productsOmzetByMonth');
+        Route::get('products-omzet-by-month-excel', [ProductOmzetController::class, 'productsOmzetByMonthExcel'])->name('report.productsOmzetByMonthExcel');
 
     });
 });

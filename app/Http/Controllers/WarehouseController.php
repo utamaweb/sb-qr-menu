@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Warehouse;
-use App\Models\Business;
-use App\Models\User;
-use Illuminate\Validation\Rule;
-use Illuminate\Support\Str;
-use Keygen;
-use Auth;
 use DB;
+use Auth;
+use Keygen;
+use App\Models\User;
+use App\Models\Business;
+use App\Models\Regional;
+use App\Models\Warehouse;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use App\Services\WhatsappService;
 
 class WarehouseController extends Controller
@@ -27,24 +28,29 @@ class WarehouseController extends Controller
         if(auth()->user()->hasRole('Superadmin')){
             $lims_warehouse_all = Warehouse::with('business')->where('is_active', true)->get();
             $business = Business::get();
+            $regionals = Regional::get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
             $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->business_id)->firstOrFail();
+            $regionals = Regional::where('business_id', $business->id)->get();
             $lims_warehouse_all = $business->warehouse;
         } else{
             $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->warehouse->business_id)->first();
+            $regionals = Regional::where('id', auth()->user()->warehouse->regional_id)->first();
             $lims_warehouse_all = $business->warehouse;
         }
         $numberOfWarehouse = $lims_warehouse_all->count();
-        return view('backend.warehouse.index', compact('lims_warehouse_all', 'numberOfWarehouse','business'));
+        return view('backend.warehouse.index', compact('lims_warehouse_all', 'numberOfWarehouse','business', 'regionals'));
     }
 
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name'        => 'required|max:255',
-            'business_id' => 'required',
-            'address'     => 'required',
-            'service'     => 'required'
+            'name'           => 'required|max:255',
+            'business_id'    => 'required',
+            'address'        => 'required',
+            'service'        => 'required',
+            'can_edit_order' => 'required',
+            'regional_id'    => 'required'
         ]);
         $input['is_active'] = true;
         if(auth()->user()->hasRole('Superadmin')){
@@ -69,10 +75,12 @@ class WarehouseController extends Controller
             'address'            => $request->address,
             'business_id'        => $request->business_id,
             'is_self_service'    => $request->service,
+            'can_edit_order'     => $request->can_edit_order,
             'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
             'expired_at'         => $request->expired_at,
             'whatsapp'           => $request->whatsapp,
-            'is_whatsapp_active' => $is_wa_active
+            'is_whatsapp_active' => $is_wa_active,
+            'regional_id'        => $request->regional_id,
         ]);
 
         if($warehouse) {
@@ -92,10 +100,12 @@ class WarehouseController extends Controller
     public function update(Request $request, $id)
     {
         $this->validate($request, [
-            'name'        => 'max:255',
-            'business_id' => 'required',
-            'address'     => 'required',
-            'service'     => 'required'
+            'name'           => 'max:255',
+            'business_id'    => 'required',
+            'address'        => 'required',
+            'service'        => 'required',
+            'can_edit_order' => 'required',
+            'regional_id'    => 'required',
         ]);
         $input = $request->all();
         $lims_warehouse_data = Warehouse::find($id);
@@ -123,10 +133,12 @@ class WarehouseController extends Controller
             'address'            => $request->address,
             'business_id'        => $request->business_id,
             'is_self_service'    => $request->service,
+            'can_edit_order'     => $request->can_edit_order,
             'tagihan'            => intVal(str_replace(',', '', $request->tagihan)),
             'expired_at'         => $request->expired_at,
             'whatsapp'           => $request->whatsapp,
-            'is_whatsapp_active' => $is_wa_active
+            'is_whatsapp_active' => $is_wa_active,
+            'regional_id'        => $request->regional_id,
         ]);
         return redirect()->back()->with('message', 'Data Berhasil Diubah');
     }
@@ -198,7 +210,7 @@ class WarehouseController extends Controller
      * Get outlet by id
      */
     public function getOutletById($id) {
-        $outlet = Warehouse::with('business')->find($id);
+        $outlet = Warehouse::with('business', 'regional')->find($id);
 
         return response()->json($outlet);
     }

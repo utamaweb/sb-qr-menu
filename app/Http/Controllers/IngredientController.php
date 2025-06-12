@@ -35,12 +35,10 @@ class IngredientController extends Controller
             'name' => 'max:255',
         ]);
         Ingredient::create([
-            'name' => $request->name,
-            // 'max_stock' => $request->max_stock,
-            // 'first_stock' => $request->first_stock,
-            // 'stock_in' => $request->first_stock,
-            'unit_id' => $request->unit_id,
-            'business_id' => auth()->user()->business_id,
+            'name'          => $request->name,
+            'minimum_stock' => $request->minimum_stock,
+            'unit_id'       => $request->unit_id,
+            'business_id'   => auth()->user()->business_id,
         ]);
         return redirect()->back()->with('message', 'Data berhasil ditambahkan');
     }
@@ -58,11 +56,9 @@ class IngredientController extends Controller
         ]);
         $ingredient = Ingredient::find($id);
         $ingredient->update([
-            'name' => $request->name,
-            // 'first_stock' => $request->first_stock,
-            // 'stock_in' => $request->first_stock,
-            // 'max_stock' => $request->max_stock,
-            'unit_id' => $request->unit_id,
+            'name'          => $request->name,
+            'minimum_stock' => $request->minimum_stock,
+            'unit_id'       => $request->unit_id,
         ]);
         return redirect()->back()->with('message', 'Data berhasil diedit');
     }

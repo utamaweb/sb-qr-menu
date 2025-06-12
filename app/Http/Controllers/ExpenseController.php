@@ -2,49 +2,58 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Expense;
-use App\Models\Account;
-use App\Models\Warehouse;
-use App\Models\CashRegister;
+use DB;
+use Auth;
+use Carbon\Carbon;
 use App\Models\Shift;
+use App\Models\Account;
+use App\Models\Expense;
+use App\Models\Warehouse;
+use Illuminate\Support\Str;
+use App\Models\CashRegister;
+use Illuminate\Http\Request;
 use App\Models\ExpenseCategory;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Auth;
-use DB;
-use Carbon\Carbon;
-use Yajra\DataTables\Facades\DataTables; // Pastikan package yajra/laravel-datatables sudah diinstal
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use Yajra\DataTables\Facades\DataTables;
 
 
 class ExpenseController extends Controller
 {
-    // public function index(Request $request)
-    // {
-    //     if(auth()->user()->hasRole('Superadmin')){
-    //         $lims_expense_category_list = ExpenseCategory::get();
-    //         $expenses = Expense::get();
-    //     } elseif(auth()->user()->hasRole('Admin Bisnis')){
-    //         $lims_expense_category_list = ExpenseCategory::where('business_id', auth()->user()->business_id)->get();
-    //         $warehouse_id = Warehouse::where('business_id', auth()->user()->business_id)->pluck('id');
-    //         $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->whereIn('warehouse_id', $warehouse_id)->get();
-    //     } else{
-    //         $warehouse = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-    //         $business_id = $warehouse->business_id;
-    //         $lims_expense_category_list = ExpenseCategory::where('business_id', $business_id)->get();
-    //         $expenses = Expense::with('expenseCategory', 'warehouse', 'user')->where('warehouse_id', auth()->user()->warehouse_id)->get();
-    //     }
-    //     $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
-    //     return view('backend.expense.index', compact('expenses','lims_expense_category_list', 'lims_warehouse_list'));
-
-    // }
-
     public function index(Request $request)
     {
-        $lims_expense_category_list = ExpenseCategory::get();
-        $lims_warehouse_list = Warehouse::select('name', 'id')->where('is_active', true)->get();
+        // Kondisi untuk filter tanggal
+        if ($request->input('start_date')) {
+            $start_date = $request->input('start_date');
+            $end_date = $request->input('end_date');
+        } else {
+            $start_date = date("Y-m-d");
+            $end_date = date("Y-m-d");
+        }
 
-        return view('backend.expense.index', compact('lims_expense_category_list', 'lims_warehouse_list'));
+        // get warehouse data and expense data
+        $warehouses = Warehouse::where('business_id', auth()->user()->business_id)->where('is_active', true)->get();
+
+        // condition for user access
+        if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouseId = $request->get('warehouse_id') ?? null;
+        } else {
+            $warehouseId = auth()->user()->warehouse_id;
+        }
+
+        $warehouse = Warehouse::where('id', $warehouseId)->first();
+        $expenses = Expense::with('expenseCategory', 'warehouse', 'user')
+            ->where('warehouse_id', $warehouseId)
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return view('backend.expense.index', compact('start_date', 'end_date', 'expenses', 'warehouseId', 'warehouse', 'warehouses'));
     }
 
     public function getExpenses(Request $request)
@@ -135,5 +144,71 @@ class ExpenseController extends Controller
         $lims_expense_data = Expense::find($id);
         $lims_expense_data->delete();
         return redirect()->back()->with('not_permitted', 'Data deleted successfully');
+    }
+
+    public function export($warehouseId){
+        $start_date = request()->start_date;
+        $end_date = request()->end_date;
+        $query = Expense::with('expenseCategory', 'warehouse', 'user')
+            ->where('warehouse_id', $warehouseId)
+            ->whereDate('created_at', '>=', $start_date)
+            ->whereDate('created_at', '<=', $end_date)
+            ->orderBy('id', 'desc');
+
+        $totalCost = $query->sum('amount');
+        $warehouse = Warehouse::findOrFail($warehouseId);
+
+        $data      = $query->distinct()->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet       = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'Laporan Pengeluaran Outlet ' . $warehouse->name . ': ' . $start_date . ' s/d ' . $end_date);
+        $sheet->mergeCells('A1:G1');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(16);
+        $sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $headers = ['No.', 'Pengeluaran', 'Keterangan', 'Kuantitas', 'Total', 'Outlet', 'Dibuat | Waktu'];
+        $sheet->fromArray($headers, NULL, 'A3');
+
+        $headerRange = 'A3:G3';
+        $sheet->getStyle($headerRange)->getFont()->setBold(true);
+        $sheet->getStyle($headerRange)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+        $sheet->getStyle($headerRange)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        foreach ($data as $index => $item) {
+            $row = [
+                $index + 1,
+                $item->expenseCategory->name,
+                $item->note,
+                $item->qty,
+                'Rp. ' . number_format($item->amount, 0, ',', '.'),
+                $item->warehouse->name,
+                $item->created_at,
+            ];
+            $sheet->fromArray($row, NULL, 'A' . ($index + 4));
+        }
+
+        $sheet->setCellValue('D' . (count($data) + 5), 'Total Keseluruhan:');
+        $sheet->setCellValue('E' . (count($data) + 5), 'Rp. ' . number_format($totalCost, 0, ',', '.'));
+
+        $lastRow = count($data) + 6;
+        $sheet->getStyle('A3:G' . $lastRow)->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
+
+        $sheet->setAutoFilter('A3:G' . (count($data) + 3));
+
+        foreach (range('A', 'G') as $columnID) {
+            $sheet->getColumnDimension($columnID)->setAutoSize(true);
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'laporan_pengeluaran_' . Str::slug($warehouse->name) . '_' . $start_date . '_' . $end_date . '.xlsx';
+
+        return response()->stream(function () use ($writer) {
+            $writer->save('php://output');
+        }, 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
     }
 }

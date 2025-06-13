@@ -53,7 +53,7 @@
                 <div class="mb-4">
                     <div class="card bg-info text-white">
                         <div class="card-body text-center">
-                            <h5 class="mb-2">Total Sales Bulan {{ date("F Y", strtotime("$year-$month-01")) }}:</h5>
+                            <h5 class="mb-2">Total Bulan {{ date("F Y", strtotime("$year-$month-01")) }}:</h5>
                             <h4>Rp. {{ number_format($totalMonthlyAmount, 0, '', '.') }}</h4>
                         </div>
                     </div>
@@ -100,19 +100,19 @@
                                         <td class="{{ ($year.'-'.$month.'-'.$currentDay == date('Y-m-d')) ? 'bg-success text-white' : '' }}">
                                             <p><strong>{{ $currentDay }}</strong></p>
 
-                                            @if ($dailyData[$currentDay]['qty'] > 0)
+                                            {{-- @if ($dailyData[$currentDay]['qty'] > 0)
                                                 <strong>Total Produk Terjual</strong><br>
                                                 <span>{{ number_format($dailyData[$currentDay]['qty'], 0, '', '.') }}</span><br><br>
-                                            @endif
+                                            @endif --}}
 
-                                            @if ($dailyData[$currentDay]['transaction'] > 0)
+                                            {{-- @if ($dailyData[$currentDay]['transaction'] > 0)
                                                 <strong>Jumlah Transaksi Lunas</strong><br>
                                                 <span>{{ number_format($dailyData[$currentDay]['transaction'], 0, '', '.') }}</span><br><br>
-                                            @endif
+                                            @endif --}}
 
                                             @if ($dailyData[$currentDay]['amount'] > 0)
-                                                <strong>Total Sales</strong><br>
-                                                <span>Rp. {{ number_format($dailyData[$currentDay]['amount'], 0, '', '.') }}</span><br>
+                                                {{-- <strong>Total Sales</strong><br> --}}
+                                                <strong>Rp. {{ number_format($dailyData[$currentDay]['amount'], 0, '', '.') }}</strong><br>
                                             @endif
 
                                         </td>

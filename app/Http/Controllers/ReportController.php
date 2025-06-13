@@ -379,7 +379,9 @@ class ReportController extends Controller
                 ->selectRaw('DAY(date) as day, SUM(total_qty) AS total_qty, SUM(paid_amount) AS total_paid_amount,
                              SUM(total_amount) AS total_amount, COUNT(*) AS total_transaction')
                 ->groupBy('day')
-                ->get();            foreach ($transactions as $transaction) {
+                ->get();
+
+            foreach ($transactions as $transaction) {
                 $day = (int)$transaction->day;
                 $amount = $transaction->total_amount ?? 0;
 
@@ -387,9 +389,9 @@ class ReportController extends Controller
                 $fictionalAmount = $this->calculateFictionalAmount($amount);
 
                 $dailyData[$day] = [
-                    'qty' => $transaction->total_qty ?? 0,
-                    'paid' => $transaction->total_paid_amount ?? 0,
-                    'amount' => $fictionalAmount,
+                    'qty'         => $transaction->total_qty ?? 0,
+                    'paid'        => $transaction->total_paid_amount ?? 0,
+                    'amount'      => $fictionalAmount,
                     'transaction' => $transaction->total_transaction ?? 0,
                     'real_amount' => $amount,
                 ];

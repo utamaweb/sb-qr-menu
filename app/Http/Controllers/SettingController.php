@@ -67,6 +67,7 @@ class SettingController extends Controller
         $general_setting->id = 1;
         $general_setting->site_title = $data['site_title'];
         $general_setting->developed_by = $data['developed_by'];
+        $general_setting->omzet_percentage = $data['omzet_percentage'];
         $logo = $request->site_logo;
         if ($logo) {
             Storage::delete('storage/images/logo', $general_setting->site_logo);

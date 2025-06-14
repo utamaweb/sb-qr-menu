@@ -53,7 +53,7 @@
                                         <input type="text" name="company_name" class="form-control" value="@if($lims_general_setting_data){{$lims_general_setting_data->company_name}}@endif" />
                                     </div>
                                 </div> --}}
-                           
+
                                 {{-- <div class="col-md-4 d-none">
                                     <div class="form-group">
                                         <label>{{trans('file.Currency')}} *</label>
@@ -184,6 +184,12 @@
                                     <div class="form-group">
                                         <label>Dikembangkan Oleh *</label>
                                         <input type="text" name="developed_by" class="form-control" value="{{$lims_general_setting_data->developed_by}}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label>Omzet Percentage</label>
+                                        <input type="text" name="omzet_percentage" class="form-control" value="{{$lims_general_setting_data->omzet_percentage}}">
                                     </div>
                                 </div>
                                 {{-- @if(config('database.connections.saleprosaas_landlord'))

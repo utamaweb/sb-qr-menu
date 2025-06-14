@@ -6,6 +6,7 @@ use DB;
 use PDF;
 use Auth;
 use Carbon\Carbon;
+use App\Models\Ojol;
 use App\Models\Sale;
 use App\Models\Unit;
 use App\Models\User;
@@ -18,6 +19,7 @@ use App\Models\Returns;
 use App\Models\Variant;
 use App\Models\Customer;
 use App\Models\Purchase;
+use App\Models\Regional;
 use App\Models\Supplier;
 use App\Models\Transfer;
 use App\Models\Quotation;
@@ -26,8 +28,9 @@ use App\Models\Transaction;
 use App\Models\Product_Sale;
 use Illuminate\Http\Request;
 use App\Models\CustomerGroup;
-use App\Models\Ojol;
 use App\Models\ProductReturn;
+use App\Services\DateService;
+use App\Models\GeneralSetting;
 use App\Models\ProductVariant;
 use App\Models\ReturnPurchase;
 use App\Models\ProductPurchase;
@@ -35,20 +38,18 @@ use App\Models\ProductTransfer;
 use App\Models\ProductQuotation;
 use App\Models\Product_Warehouse;
 use App\Models\TransactionDetail;
+use Illuminate\Support\Collection;
 use Spatie\Permission\Models\Role;
 use App\Models\PurchaseProductReturn;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB as FacadesDB;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use Spatie\Permission\Models\Permission;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Alignment;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Facades\Response;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use Spatie\Permission\Models\Permission;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Color;
-use App\Services\DateService;
-use App\Models\Regional;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use Illuminate\Support\Facades\DB as FacadesDB;
 
 class ReportController extends Controller
 {
@@ -59,38 +60,31 @@ class ReportController extends Controller
         $this->dateService = new DateService();
     }
 
-    /**
-     * Calculate fictional amount based on specified rules
-     *
-     * - If total sales 0-10jt, multiply by 50%
-     * - If total sales 10.000.001 - 20jt, multiply by 30%
-     * - If total sales 20.000.001 - 40jt, multiply by 20%
-     * - If total sales 40jt and above, multiply by 10%
-     *
-     * @param float $amount Original amount
-     * @return float Fictional amount rounded up to nearest 1000
-     */
-    private function calculateFictionalAmount($amount)
+    private function calculateOmzet($amount)
     {
-        $multiplier = 0;
+        // $multiplier = 0;
+        // $multiplier = 0.8;
+        // get setting of omzet percentage on general_settings table
+        $generalSetting = GeneralSetting::first();
+        $multiplier = $generalSetting->omzet_percentage ?? 0.08;
 
-        if ($amount <= 10000000) {
-            // 0-10jt: multiply by 50%
-            $multiplier = 0.5;
-        } elseif ($amount <= 20000000) {
-            // 10.000.001 - 20jt: multiply by 30%
-            $multiplier = 0.3;
-        } elseif ($amount <= 40000000) {
-            // 20.000.001 - 40jt: multiply by 20%
-            $multiplier = 0.2;
-        } else {
-            // 40jt and above: multiply by 10%
-            $multiplier = 0.1;
-        }
+        // if ($amount <= 10000000) {
+        //     // 0-10jt: multiply by 50%
+        //     $multiplier = 0.5;
+        // } elseif ($amount <= 20000000) {
+        //     // 10.000.001 - 20jt: multiply by 30%
+        //     $multiplier = 0.3;
+        // } elseif ($amount <= 40000000) {
+        //     // 20.000.001 - 40jt: multiply by 20%
+        //     $multiplier = 0.2;
+        // } else {
+        //     // 40jt and above: multiply by 10%
+        //     $multiplier = 0.1;
+        // }
 
-        // Calculate fictional amount and round up to nearest 1000
-        $fictionalAmount = $amount * $multiplier;
-        return ceil($fictionalAmount / 1000) * 1000;
+        // Calculate omzet amount and round up to nearest 1000
+        $omzetAmount = $amount * $multiplier;
+        return ceil($omzetAmount / 1000) * 1000;
     }
 
     public function productQuantityAlert()
@@ -386,12 +380,12 @@ class ReportController extends Controller
                 $amount = $transaction->total_amount ?? 0;
 
                 // Apply multiplier based on total sales amount
-                $fictionalAmount = $this->calculateFictionalAmount($amount);
+                $omzetAmount = $this->calculateOmzet($amount);
 
                 $dailyData[$day] = [
                     'qty'         => $transaction->total_qty ?? 0,
                     'paid'        => $transaction->total_paid_amount ?? 0,
-                    'amount'      => $fictionalAmount,
+                    'amount'      => $omzetAmount,
                     'transaction' => $transaction->total_transaction ?? 0,
                     'real_amount' => $amount,
                 ];

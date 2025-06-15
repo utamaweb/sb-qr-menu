@@ -270,6 +270,13 @@ class StockController extends Controller
                 foreach($detailStockPurchase as $detail){
                     // get stok data
                     $stock = Stock::where('shift_id', $shift->id)->where('ingredient_id', $detail->ingredient_id)->where('warehouse_id', $stockPurchase->warehouse_id)->first();
+
+                    // Validasi untuk mencegah stok menjadi negatif
+                    if ($stock->last_stock < $detail->qty) {
+                        DB::rollback();
+                        return response()->json(['message' => "Pengurangan stok akan menyebabkan stok negatif untuk bahan " . Ingredient::find($detail->ingredient_id)->name], 500);
+                    }
+
                     // update stok dengan mengurangi jumlah qty yang ada pada detail
                     Stock::where('shift_id', $shift->id)->where('ingredient_id', $detail->ingredient_id)->where('warehouse_id', $stockPurchase->warehouse_id)->update([
                         'stock_in' => $stock->stock_in - $detail->qty,

@@ -48,6 +48,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label>NPWPD</label>
+                    <input type="text" name="npwpd" class="form-control">
+                </div>
+
+                <div class="form-group">
                     <label for="service">Jenis Service <span class="text-danger">*</span></label>
                     <select name="service" id="service" class="form-control">
                         <option value="1" {{ ($warehouse->is_self_service == 1) ? 'selected' : '' }}>Self Service</option>

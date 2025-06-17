@@ -22,7 +22,14 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary px-4">Filter</button>
+                            <div class="d-flex justify-content-center">
+                                <button type="submit" class="btn btn-primary px-4 me-2">Filter</button>
+                                @if(isset($warehouse) && $warehouse)
+                                    <a href="{{ url('admin/report/daily_sale_outlet_pdf/' . encrypt(json_encode(['year' => $year, 'month' => $month]))) }}?warehouse_id={{ $warehouse_id }}" class="btn btn-danger px-4">
+                                        <i class="fa fa-file-pdf"></i> Export PDF
+                                    </a>
+                                @endif
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -30,11 +37,26 @@
 
                 <!-- Show current warehouse information -->
                 @if(isset($warehouse) && $warehouse)
-                    <h5 class="text-center mb-3">Outlet: {{ $warehouse->name }}</h5>
+                    <h5 class="text-center mb-3">Outlet: {{ $warehouse->name }}
+                        @if(!auth()->user()->hasRole(['Sales', 'Admin Bisnis', 'Report']))
+                            <div class="mt-2">
+                                <a href="{{ url('admin/report/daily_sale_outlet_pdf/' . encrypt(json_encode(['year' => $year, 'month' => $month]))) }}?warehouse_id={{ auth()->user()->warehouse_id }}" class="btn btn-sm btn-danger px-4">
+                                    <i class="fa fa-file-pdf"></i> Export PDF
+                                </a>
+                            </div>
+                        @endif
+                    </h5>
                 @elseif($warehouse_id == '' && auth()->user()->hasRole(['Admin Bisnis', 'Report']))
                     <h5 class="text-center mb-3">Outlet Belum Dipilih</h5>
                 @elseif(!auth()->user()->hasRole(['Admin Bisnis', 'Report']))
-                    <h5 class="text-center mb-3">Outlet: {{ auth()->user()->warehouse->name ?? 'Tidak Ditemukan' }}</h5>
+                    <h5 class="text-center mb-3">
+                        Outlet: {{ auth()->user()->warehouse->name ?? 'Tidak Ditemukan' }}
+                        <div class="mt-2">
+                            <a href="{{ url('admin/report/daily_sale_outlet_pdf/' . encrypt(json_encode(['year' => $year, 'month' => $month]))) }}?warehouse_id={{ auth()->user()->warehouse_id }}" class="btn btn-sm btn-danger px-4">
+                                <i class="fa fa-file-pdf"></i> Export PDF
+                            </a>
+                        </div>
+                    </h5>
                 @endif
 
                 @php
@@ -138,6 +160,24 @@
     // Initialize selectpicker if you're using Bootstrap Select
     $('.selectpicker').selectpicker({
         style: 'btn-link',
+    });
+
+    // Hide export PDF button when warehouse selection changes
+    $(document).ready(function() {
+        // Store the initial value of the warehouse dropdown
+        let initialWarehouseId = $('#warehouse_id').val();
+
+        $('#warehouse_id').on('change', function() {
+            // Get the export button element
+            const exportBtn = $(this).closest('form').find('.btn-danger');
+
+            // If the selected value is different from the initial value, hide the export button
+            if ($(this).val() !== initialWarehouseId) {
+                exportBtn.hide();
+            } else {
+                exportBtn.show();
+            }
+        });
     });
 </script>
 @endpush

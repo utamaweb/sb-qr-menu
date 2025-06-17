@@ -73,6 +73,7 @@ class WarehouseController extends Controller
             'name'               => $request->name,
             'is_active'          => 1,
             'address'            => $request->address,
+            'npwpd'              => $request->npwpd,
             'business_id'        => $request->business_id,
             'is_self_service'    => $request->service,
             'can_edit_order'     => $request->can_edit_order,
@@ -131,6 +132,7 @@ class WarehouseController extends Controller
         $lims_warehouse_data->update([
             'name'               => $request->name,
             'address'            => $request->address,
+            'npwpd'              => $request->npwpd,
             'business_id'        => $request->business_id,
             'is_self_service'    => $request->service,
             'can_edit_order'     => $request->can_edit_order,

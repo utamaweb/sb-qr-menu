@@ -58,6 +58,13 @@
                     </div>
                     {{-- End of address input --}}
 
+                    {{-- Npwpd input --}}
+                    <div class="form-group">
+                        <label>NPWPD</label>
+                        <input type="text" name="npwpd" id="editNpwpd" class="form-control">
+                    </div>
+                    {{-- End of npwpd input --}}
+
                     {{-- Service input --}}
                     <div class="form-group">
                         <label for="editService">Jenis Service <span class="text-danger">*</span></label>
@@ -186,6 +193,7 @@
 
                     $('#editName').val(data.name);
                     $('#editAddress').val(data.address);
+                    $('#editNpwpd').val(data.npwpd);
                     $('#editService').selectpicker('val', data.is_self_service);
                     $('#editOrder').selectpicker('val', data.can_edit_order);
                     $('#editBusiness').selectpicker('val', data.business_id);

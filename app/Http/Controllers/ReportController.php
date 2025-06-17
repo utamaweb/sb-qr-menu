@@ -408,6 +408,89 @@ class ReportController extends Controller
         ));
     }
 
+    /**
+     * Generate PDF report for daily sales with tax information
+     */
+    public function dailySaleOutletPdf($year = null, $month = null)
+    {
+        if ($year !== null && strpos($year, 'eyJ') === 0 && $month === null) {
+            try {
+                $decrypted = decrypt($year);
+                $params = json_decode($decrypted, true);
+
+                if (!isset($params['year']) || !isset($params['month'])) {
+                    return redirect()->route('admin.dashboard')->with('error', 'Invalid URL format');
+                }
+
+                $year = $params['year'];
+                $month = $params['month'];
+            } catch (\Exception $e) {
+                return redirect()->route('admin.dashboard')->with('error', 'Invalid URL');
+            }
+        }
+
+        $warehouse_id = request('warehouse_id');
+        if (!auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+            $warehouse_id = auth()->user()->warehouse_id;
+        }
+
+        $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;
+        $number_of_day = date('t', strtotime("$year-$month-01"));
+
+        // Prepare data for PDF
+        $dailyData = [];
+        if ($warehouse_id) {
+            $start_date = "$year-" . sprintf('%02d', $month) . "-01";
+            $end_date = "$year-" . sprintf('%02d', $month) . "-$number_of_day";
+
+            $transactions = Transaction::where('status', 'Lunas')
+                ->where('warehouse_id', $warehouse_id)
+                ->whereDate('date', '>=', $start_date)
+                ->whereDate('date', '<=', $end_date)
+                ->selectRaw('DAY(date) as day, SUM(total_amount) AS total_amount, DATE(date) as full_date')
+                ->groupBy('day', 'full_date')
+                ->orderBy('day', 'asc')
+                ->get();
+
+            foreach ($transactions as $transaction) {
+                $day = (int)$transaction->day;
+                $amount = $transaction->total_amount ?? 0;
+                $amount = $this->calculateOmzet($amount);
+                $fullDate = $transaction->full_date;
+
+                // Calculate tax amount (10%)
+                $taxAmount = $amount * 0.1;
+
+                $dailyData[] = [
+                    'day' => $day,
+                    'date' => $fullDate,
+                    'amount' => $amount,
+                    'tax' => $taxAmount,
+                ];
+            }
+        }
+
+        // Calculate totals
+        $totalAmount = array_sum(array_column($dailyData, 'amount'));
+        $totalTax = array_sum(array_column($dailyData, 'tax'));
+
+        // Get outlet name
+        $outletName = $warehouse ? $warehouse->name : 'Semua Outlet';
+
+        $data = [
+            'dailyData'   => $dailyData,
+            'totalAmount' => $totalAmount,
+            'totalTax'    => $totalTax,
+            'year'        => $year,
+            'month'       => $month,
+            'outletName'  => $outletName,
+            'warehouse'   => $warehouse
+        ];
+
+        $pdf = PDF::loadView('backend.report.daily_sale_outlet_pdf', $data);
+        return $pdf->download('laporan_pajak_' . $year . '_' . $month . '.pdf');
+    }
+
     public function dailySaleByWarehouse(Request $request,$year,$month)
     {
         $data = $request->all();

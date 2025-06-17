@@ -26,6 +26,7 @@
                                     <th>Bisnis</th>
                                     <th>Regional</th>
                                     <th>Alamat</th>
+                                    <th>NPWPD</th>
                                     <th>Tanggal Dibuat</th>
                                     <th>Tagihan</th>
                                     <th>Tanggal Expired</th>
@@ -42,6 +43,7 @@
                                     <td>{{ $warehouse->business->name }}</td>
                                     <td>{{ $warehouse->regional->name ?? '-' }}</td>
                                     <td>{{ $warehouse->address }}</td>
+                                    <td>{{ $warehouse->npwpd }}</td>
                                     <td>{{ date('d M Y', strtotime($warehouse->created_at)) }}</td>
                                     <td>Rp. {{ number_format($warehouse->tagihan, 0, ',', '.') }}</td>
                                     <td>

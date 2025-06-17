@@ -746,7 +746,7 @@ class TransactionController extends Controller
                                 // Update stock
                                 $stock->update([
                                     'stock_used' => $stock->stock_used += ($ingredient['qty'] * $detail['qty']),
-                                    'last_used' => $stock->last_used + ($ingredient['qty'] * $detail['qty'])
+                                    'last_stock' => $stock->last_stock + ($ingredient['qty'] * $detail['qty'])
                                 ]);
 
                                 // Create transaction in out

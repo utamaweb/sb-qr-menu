@@ -467,6 +467,7 @@ class TransactionController extends Controller
                 }
 
                 $transaction['details'] = $transaction->transaction_details;
+                $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
                 return response()->json($transaction, 200);
 
             }

@@ -189,6 +189,7 @@ Route::group(['prefix' => 'admin'], function () {
                 Route::get('daily_sale/{year}/{month}', 'dailySale');
                 // Route::get('daily_sale_outlet/{year}/{month}', 'dailySaleOutlet')->name('report.dailySaleOutlet');
                 Route::get('daily_sale_outlet/{hash}', 'dailySaleOutlet')->name('report.dailySaleOutlet');
+                Route::get('daily_sale_outlet_pdf/{hash}', 'dailySaleOutletPdf')->name('report.dailySaleOutletPdf');
                 Route::post('daily_sale/{year}/{month}', 'dailySaleByWarehouse')->name('report.dailySaleByWarehouse');
                 Route::get('monthly_sale/{year}', 'monthlySale');
                 Route::post('monthly_sale/{year}', 'monthlySaleByWarehouse')->name('report.monthlySaleByWarehouse');

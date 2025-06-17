@@ -35,6 +35,13 @@
                     </div>
                     {{-- End of address input --}}
 
+                    {{-- NPWPD input --}}
+                    <div class="form-group">
+                        <label>NPWPD</label>
+                        <input type="text" name="npwpd" id="renewalNpwpd" required class="form-control" disabled>
+                    </div>
+                    {{-- End of npwpd input --}}
+
                     {{-- Service input --}}
                     <div class="form-group">
                         <label for="renewalService">Jenis Service</label>
@@ -93,6 +100,7 @@
 
                 $('#renewalName').val(data.name);
                 $('#renewalAddress').val(data.address);
+                $('#renewalNpwpd').val(data.npwpd);
                 $('#renewalService').val(data.is_self_service ? 'Self Service' : 'Hanya Kasir');
                 $('#renewalEditOrder').val(data.can_edit_order ? 'Bisa Edit' : 'Tidak Bisa');
                 $('#renewalBusiness').val(data.business.name);

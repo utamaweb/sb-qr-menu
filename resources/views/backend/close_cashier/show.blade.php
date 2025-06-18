@@ -245,6 +245,11 @@
                                                         {{ $stock->stock_close_input }}</td>
                                                 </tr>
                                                 <tr>
+                                                    <td style="width: 50%;">Stok Rusak</td>
+                                                    <td style="width: 50%; text-align: right;">
+                                                        {{ $stock->broken_stock }}</td>
+                                                </tr>
+                                                <tr>
                                                     <td style="width: 50%;">Selisih</td>
                                                     <td style="width: 50%; text-align: right;">
                                                         {{ $stock->difference_stock }}</td>

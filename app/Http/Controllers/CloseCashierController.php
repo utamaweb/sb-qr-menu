@@ -149,6 +149,7 @@ class CloseCashierController extends Controller
                 'used_stock' => $ingredientStock->stock_used,
                 'last_system_stock' => $ingredientStock->last_stock,
                 'stock_close_input' => $ingredientStock->stock_close_input,
+                'broken_stock' => $ingredientStock->broken_stock,
                 'difference_stock' => $ingredientStock->difference_stock,
             ];
 

@@ -26,11 +26,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('purchase:auto')->everyFiveMinutes();
-        // $schedule->command('dsoalert:find')->dailyAt('00:00');
-        // $schedule->command('reset:db')->everyMinute();
-        // Testing Purpose
-        // $schedule->command('quote:daily')->everyMinute();
+        $schedule->command('transaction:check-activity')->hourly();
+        // * * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
+        // php artisan transaction:check-activity
     }
 
     /**

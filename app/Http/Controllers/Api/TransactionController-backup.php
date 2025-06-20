@@ -195,11 +195,6 @@ class TransactionController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */    /**
-     * Store a new transaction or process payment for an existing transaction
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -208,391 +203,280 @@ class TransactionController extends Controller
         try {
             // Step 1. Create Transaction
             if ($request->category_order) {
-                return $this->createNewTransaction($request);
-            } else {
-                // Step 2. Payment Transaction
-                return $this->processPayment($request);
+                $data = $request->all();
+                $validator = Validator::make($data, [
+                    'transaction_details' => 'required',
+                    'order_type_id' => 'required',
+                ]);
+
+                if ($validator->fails()) {
+                    return response()->json(['message' => 'Pilihan Menu & Jenis Pesanan Tidak Boleh Kosong'], 500);
+                }
+                $total_amount = 0;
+                foreach ($request->transaction_details as $detail) {
+                    $total_amount += $detail['subtotal'];
+                }
+                $total_qty = 0;
+                foreach ($request->transaction_details as $detail) {
+                    $total_qty += $detail['qty'];
+                }
+                // $change_money = $request->paid_amount - $total_amount;
+                $dateNow = Carbon::now()->format('Y-m-d');
+                $dateTimeNow = Carbon::now();
+                // $transactionCheck = Transaction::where('date', $dateNow)->orderBy('id', "DESC")->count();
+                $checkShiftOpen = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                    // ->where('date', $dateNow)
+                    // ->where('user_id', auth()->user()->id)
+                    ->where('is_closed', 0)
+                    ->first();
+                if ($checkShiftOpen == NULL) {
+                    return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
+                }
+                $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
+                    ->where('is_closed', 0)
+                    // ->orderBy('id', 'desc')
+                    ->first();
+
+                $countTransactionInShift = Transaction::where('shift_id', $shift->id)->orderBy('id', 'DESC')->count();
+                $lastTransaction = Transaction::where('shift_id', $shift->id)->orderBy('id', 'DESC')->first();
+                if ($countTransactionInShift > 0) {
+                    $sequence_number = $lastTransaction->sequence_number + 1;
+                } else {
+                    $sequence_number = 1;
+                }
+                // return $sequence_number;
+
+                // Insert ke table transaction (step 1 : buat transaksi)
+                $transaction = Transaction::create([
+                    'warehouse_id' => auth()->user()->warehouse_id,
+                    'shift_id' => $checkShiftOpen->id,
+                    'sequence_number' => $sequence_number,
+                    'order_type_id' => $request->order_type_id,
+                    'category_order' => $request->category_order,
+                    'user_id' => auth()->user()->id,
+                    // 'payment_method' => $request->payment_method,
+                    'date' => $dateNow,
+                    'notes' => $request->notes,
+                    'total_amount' => $total_amount,
+                    'total_qty' => $total_qty,
+                    'status' => 'Pending',
+                    // 'paid_amount' => $request->paid_amount,
+                    // 'change_money' => $change_money,
+                ]);
+
+                // Simpan detail transaksi
+                $transaction_details = $request->input('transaction_details');
+                $transactionDetailsWithProducts = [];
+                foreach ($transaction_details as $detail) {
+                    $productDetail = [
+                        'transaction_id' => $transaction->id,
+                        'product_id' => $detail['product_id'],
+                        'qty' => $detail['qty'],
+                        'subtotal' => $detail['subtotal'],
+                        // 'product_name' => \App\Models\Product::find($detail['product_id'])->name,
+                        'product_name' => $detail['product_name'],
+                        'product_price' => $detail['product_price'],
+                    ];
+
+                    // Menambahkan data detail produk ke array
+                    $transactionDetailsWithProducts[] = $productDetail;
+
+                    $transaction->transaction_details()->create($detail);
+                }
+                $transaction['details'] = $transactionDetailsWithProducts;
+                $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
+                $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
+                // $transaction['paid_at'] = $dateTimeNow->isoFormat('D MMM Y H:m');
+                $transaction['product_count'] = count($request->transaction_details);
+
+                $transaction['order_type'] = $transaction->order_type;
+                $transaction['order_type_name'] = $transaction['order_type']['name'];
+                DB::commit();
+                // event(new TransactionNotPaid([
+                //     'id' => $transaction->id,
+                //     'sequence_number' => $transaction->sequence_number,
+                //     'order_type' => $transaction->order_type->name,
+                //     'payment_method' => $transaction->payment_method,
+                //     'total_amount' => $transaction->total_amount,
+                //     'paid_time' => $transaction->created_at->format('Y-m-d H:i:s'),
+                //     'status' => $transaction->status,
+                //     'items' => $transaction->transaction_details->map(function($detail) {
+                //         return [
+                //             'transaction_id' => $detail->transaction_id,
+                //             'product_id' => $detail->product_id,
+                //             'product_name' => $detail->product->name,
+                //             'price' => $detail->product_price,
+                //             'qty' => $detail->qty,
+                //             'subtotal' => $detail->subtotal,
+                //         ];
+                //     })->toArray(),
+                // ]));
+
+                return response()->json($transaction, 200);
+
+            } else { // Step 2. Payment Transaction
+                // Get data from request
+                $data = $request->all();
+
+                // Validation
+                $validator = Validator::make($data, [
+                    'payment_details' => 'required|array',
+                ]);
+
+                if ($validator->fails()) {
+                    return response()->json(['message' => 'Pilihan Menu Tidak Boleh Kosong'], 500);
+                }
+
+                // Get shift
+                $shift = DB::select("SELECT * FROM shifts
+                    WHERE warehouse_id = " . auth()->user()->warehouse_id .
+                    " AND is_closed = 0
+                    ORDER BY id DESC
+                    LIMIT 1");
+
+                // Shift check
+                if (collect($shift)->count() > 0) {
+                    $shift = collect($shift)->first();
+                } else {
+                    return response()->json(['message' => 'Kasir belum buka'], 500);
+                }
+
+                // Get stocks
+                $stocks = Stock::where('shift_id', $shift->id)->get();
+
+                // Get transaction
+                $transaction = Transaction::with('transaction_details', 'transaction_details.product', 'transaction_details.product.ingredient')
+                    ->findOrFail($request->transaction_id);
+
+                // Payment details from request
+                $payment_details = collect($request->payment_details);
+
+                // Sync transaction details with payment details
+                foreach ($transaction->transaction_details as $detail) {
+                    $product_id = $detail->product_id;
+                    $updated_detail = $payment_details->firstWhere('product_id', $product_id);
+
+                    if (!$updated_detail) {
+                        // If the product is removed from the order, delete it from transaction_details
+                        $detail->delete();
+                    } else {
+                        // Update qty and subtotal if the product exists in the updated order
+                        $detail->update([
+                            'qty' => $updated_detail['qty'],
+                            'subtotal' => $updated_detail['subtotal'],
+                        ]);
+                    }
+                }
+
+                // Add new items to transaction_details if they don't exist yet
+                foreach ($payment_details as $payment_detail) {
+                    $product_id = $payment_detail['product_id'];
+                    $existing_detail = $transaction->transaction_details->firstWhere('product_id', $product_id);
+
+                    if (!$existing_detail) {
+                        // Add new item to transaction_details
+                        $transaction->transaction_details()->create([
+                            'product_id' => $product_id,
+                            'qty' => $payment_detail['qty'],
+                            'subtotal' => $payment_detail['subtotal'],
+                        ]);
+                    }
+                }
+
+                // Refresh transaction_details after synchronization
+                $transaction->refresh();
+                $transaction->load('transaction_details', 'transaction_details.product', 'transaction_details.product.ingredient');
+
+                // Recalculate stock based on updated transaction_details
+                $outOfStockIngredients = [];
+                foreach ($transaction->transaction_details as $detail) {
+                    $product = $detail->product;
+                    $ingredients = $product->ingredient;
+
+                    foreach ($ingredients as $ingredient) {
+                        $stock = $stocks->where('ingredient_id', $ingredient->id)->first();
+                        $productIngredientQty = IngredientProducts::where('product_id', $product->id)
+                            ->where('ingredient_id', $ingredient->id)
+                            ->value('qty');
+
+                        if (!$stock) {
+                            // Handle if stock doesn't exist yet
+                            $getLastStock = Stock::where('warehouse_id', auth()->user()->warehouse_id)
+                                ->where('ingredient_id', $ingredient->id)
+                                ->orderBy('id', 'DESC')
+                                ->first();
+
+                            $stock = Stock::create([
+                                'warehouse_id'  => auth()->user()->warehouse_id,
+                                'ingredient_id' => $ingredient->id,
+                                'shift_id'      => $shift->id,
+                                'first_stock'   => $getLastStock ? $getLastStock->last_stock : 0,
+                                'last_stock'    => $getLastStock ? $getLastStock->last_stock : 0,
+                            ]);
+                        }
+
+                        if ($stock->last_stock < ($productIngredientQty * $detail->qty)) {
+                            // If stock is insufficient, add to out-of-stock list
+                            if (!in_array($ingredient->name, $outOfStockIngredients)) {
+                                $outOfStockIngredients[] = $ingredient->name;
+                            }
+                        } else {
+                            // Deduct stock
+                            $stock->last_stock -= ($productIngredientQty * $detail->qty);
+                            $stock->stock_used += ($productIngredientQty * $detail->qty);
+                            $stock->save();
+
+                            // Record transaction in/out
+                            TransactionInOut::create([
+                                'warehouse_id'     => auth()->user()->warehouse_id,
+                                'ingredient_id'    => $ingredient->id,
+                                'transaction_id'   => $transaction->id,
+                                'qty'              => $detail->qty,
+                                'date'             => Carbon::now()->format('Y-m-d'),
+                                'transaction_type' => 'out',
+                                'user_id'          => auth()->user()->id,
+                            ]);
+                        }
+                    }
+                }
+
+                if (!empty($outOfStockIngredients)) {
+                    $ingredientsList = implode(', ', $outOfStockIngredients);
+                    return response()->json([
+                        'status' => false,
+                        'message' => 'Stok bahan baku ' . $ingredientsList . ' berikut tidak mencukupi.'
+                    ], 500);
+                }
+
+                // Update transaction status and totals
+                $total_amount = $payment_details->sum('subtotal');
+                $total_qty = $payment_details->sum('qty');
+
+                if ($transaction->status == 'Pending') {
+                    $transaction->update([
+                        'payment_method' => $request->payment_method,
+                        'paid_amount' => $request->paid_amount,
+                        'change_money' => $request->change_money,
+                        'status' => 'Lunas',
+                        'total_amount' => $total_amount,
+                        'total_qty' => $total_qty,
+                    ]);
+                    DB::commit();
+                } else {
+                    return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 500);
+                }
+
+                $transaction['details'] = $transaction->transaction_details;
+                $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
+                return response()->json($transaction, 200);
+
             }
         } catch (\Throwable $th) {
             DB::rollback();
             \Log::emergency("File:" . $th->getFile() . " Line:" . $th->getLine() . " Message:" . $th->getMessage());
             return response()->json(['message' => "Pembayaran pesanan gagal!"], 500);
+            // return response()->json(['message' => $th->getMessage(), 'line' => $th->getLine()], 500);
         }
-    }
-
-    /**
-     * Create a new transaction
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function createNewTransaction(Request $request)
-    {
-        // Validate request data
-        $validator = Validator::make($request->all(), [
-            'transaction_details' => 'required',
-            'order_type_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Pilihan Menu & Jenis Pesanan Tidak Boleh Kosong'], 500);
-        }
-
-        // Calculate total amount and quantity
-        $total_amount = collect($request->transaction_details)->sum('subtotal');
-        $total_qty = collect($request->transaction_details)->sum('qty');
-
-        // Get current date and time
-        $dateNow = Carbon::now()->format('Y-m-d');
-
-        // Check if shift is open
-        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-            ->where('is_closed', 0)
-            ->first();
-
-        if (!$shift) {
-            return response()->json(['message' => 'Belum Ada Kasir Buka'], 500);
-        }
-
-        // Check stock availability before creating transaction
-        $outOfStockIngredients = $this->checkStockAvailability($request->transaction_details, $shift->id);
-
-        if (!empty($outOfStockIngredients)) {
-            $ingredientsList = implode(', ', $outOfStockIngredients);
-            return response()->json([
-                'status' => false,
-                'message' => 'Stok bahan baku ' . $ingredientsList . ' berikut tidak mencukupi.'
-            ], 500);
-        }
-
-        // Get sequence number
-        $sequence_number = $this->getNextSequenceNumber($shift->id);
-
-        // Create transaction
-        $transaction = Transaction::create([
-            'warehouse_id' => auth()->user()->warehouse_id,
-            'shift_id' => $shift->id,
-            'sequence_number' => $sequence_number,
-            'order_type_id' => $request->order_type_id,
-            'category_order' => $request->category_order,
-            'user_id' => auth()->user()->id,
-            'date' => $dateNow,
-            'notes' => $request->notes,
-            'total_amount' => $total_amount,
-            'total_qty' => $total_qty,
-            'status' => 'Pending',
-        ]);
-
-        // Save transaction details
-        $transactionDetailsWithProducts = [];
-        foreach ($request->input('transaction_details') as $detail) {
-            $productDetail = [
-                'transaction_id' => $transaction->id,
-                'product_id' => $detail['product_id'],
-                'qty' => $detail['qty'],
-                'subtotal' => $detail['subtotal'],
-                'product_name' => $detail['product_name'],
-                'product_price' => $detail['product_price'],
-            ];
-
-            $transactionDetailsWithProducts[] = $productDetail;
-            $transaction->transaction_details()->create($detail);
-        }
-
-        // Add additional data for response
-        $transaction['details'] = $transactionDetailsWithProducts;
-        $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-        $transaction['datetime'] = $transaction->created_at->isoFormat('D MMM Y H:m');
-        $transaction['product_count'] = count($request->transaction_details);
-        $transaction['order_type'] = $transaction->order_type;
-        $transaction['order_type_name'] = $transaction['order_type']['name'];
-
-        DB::commit();
-
-        // Optionally trigger event if needed
-        // event(new TransactionNotPaid($transaction));
-
-        return response()->json($transaction, 200);
-    }
-
-    /**
-     * Process payment for an existing transaction
-     *
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    private function processPayment(Request $request)
-    {
-        // Validate request
-        $validator = Validator::make($request->all(), [
-            'payment_details' => 'required|array',
-            'transaction_id' => 'required|exists:transactions,id',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json(['message' => 'Pilihan Menu Tidak Boleh Kosong'], 500);
-        }
-
-        // Get current shift
-        $shift = Shift::where('warehouse_id', auth()->user()->warehouse_id)
-            ->where('is_closed', 0)
-            ->first();
-
-        if (!$shift) {
-            return response()->json(['message' => 'Kasir belum buka'], 500);
-        }
-
-        // Get stocks for the current shift
-        $stocks = Stock::where('shift_id', $shift->id)->get();
-
-        // Get transaction with details
-        $transaction = Transaction::with('transaction_details', 'transaction_details.product', 'transaction_details.product.ingredient')
-            ->findOrFail($request->transaction_id);
-
-        // Get payment details from request
-        $payment_details = collect($request->payment_details);
-
-        // Sync transaction details with payment details
-        $this->syncTransactionDetails($transaction, $payment_details);
-
-        // Refresh transaction details after sync
-        $transaction->refresh();
-        $transaction->load('transaction_details', 'transaction_details.product', 'transaction_details.product.ingredient');
-
-        // Process stock for updated transaction details
-        $outOfStockIngredients = $this->processStockForPayment($transaction, $stocks);
-
-        if (!empty($outOfStockIngredients)) {
-            $ingredientsList = implode(', ', $outOfStockIngredients);
-            return response()->json([
-                'status' => false,
-                'message' => 'Stok bahan baku ' . $ingredientsList . ' berikut tidak mencukupi.'
-            ], 500);
-        }
-
-        // Update transaction status and totals
-        $total_amount = $payment_details->sum('subtotal');
-        $total_qty = $payment_details->sum('qty');
-
-        if ($transaction->status == 'Pending') {
-            $transaction->update([
-                'payment_method' => $request->payment_method,
-                'paid_amount' => $request->paid_amount,
-                'change_money' => $request->change_money,
-                'status' => 'Lunas',
-                'total_amount' => $total_amount,
-                'total_qty' => $total_qty,
-            ]);
-
-            DB::commit();
-
-            // Optionally trigger event if needed
-            // event(new TransactionPaid($transaction));
-        } else {
-            return response()->json(['message' => 'Transaksi ini telah dibayar lunas'], 500);
-        }
-
-        // Add additional data for response
-        $transaction['details'] = $transaction->transaction_details;
-        $transaction['warehouse'] = Warehouse::where('id', auth()->user()->warehouse_id)->first();
-
-        return response()->json($transaction, 200);
-    }
-
-    /**
-     * Check stock availability for transaction details
-     *
-     * @param array $transactionDetails
-     * @param int $shiftId
-     * @return array List of out-of-stock ingredients
-     */
-    private function checkStockAvailability($transactionDetails, $shiftId)
-    {
-        $outOfStockIngredients = [];
-        $productIds = collect($transactionDetails)->pluck('product_id')->toArray();
-
-        // Get products with their ingredients
-        $products = Product::with('ingredient')->whereIn('id', $productIds)->get();
-
-        // Get current stocks
-        $stocks = Stock::where('shift_id', $shiftId)
-            ->where('warehouse_id', auth()->user()->warehouse_id)
-            ->get();
-
-        foreach ($transactionDetails as $detail) {
-            $product = $products->firstWhere('id', $detail['product_id']);
-
-            if (!$product) continue;
-
-            $ingredients = $product->ingredient;
-
-            foreach ($ingredients as $ingredient) {
-                $stock = $stocks->firstWhere('ingredient_id', $ingredient->id);
-
-                if (!$stock) {
-                    // Try to get last stock if none exists for current shift
-                    $lastStock = Stock::where('warehouse_id', auth()->user()->warehouse_id)
-                        ->where('ingredient_id', $ingredient->id)
-                        ->orderBy('id', 'DESC')
-                        ->first();
-
-                    if ($lastStock) {
-                        // Create new stock entry for current shift
-                        $stock = Stock::create([
-                            'warehouse_id' => auth()->user()->warehouse_id,
-                            'ingredient_id' => $ingredient->id,
-                            'shift_id' => $shiftId,
-                            'first_stock' => $lastStock->last_stock,
-                            'last_stock' => $lastStock->last_stock,
-                        ]);
-
-                        $stocks->push($stock);
-                    } else {
-                        // No previous stock exists
-                        if (!in_array($ingredient->name, $outOfStockIngredients)) {
-                            $outOfStockIngredients[] = $ingredient->name;
-                        }
-                        continue;
-                    }
-                }
-
-                $productIngredientQty = IngredientProducts::where('product_id', $product->id)
-                    ->where('ingredient_id', $ingredient->id)
-                    ->value('qty');
-
-                if ($stock->last_stock < ($productIngredientQty * $detail['qty'])) {
-                    if (!in_array($ingredient->name, $outOfStockIngredients)) {
-                        $outOfStockIngredients[] = $ingredient->name;
-                    }
-                }
-            }
-        }
-
-        return $outOfStockIngredients;
-    }
-
-    /**
-     * Get the next sequence number for a shift
-     *
-     * @param int $shiftId
-     * @return int
-     */
-    private function getNextSequenceNumber($shiftId)
-    {
-        $lastTransaction = Transaction::where('shift_id', $shiftId)
-            ->orderBy('id', 'DESC')
-            ->first();
-
-        return $lastTransaction ? $lastTransaction->sequence_number + 1 : 1;
-    }
-
-    /**
-     * Sync transaction details with payment details
-     *
-     * @param Transaction $transaction
-     * @param Collection $paymentDetails
-     */
-    private function syncTransactionDetails($transaction, $paymentDetails)
-    {
-        // Remove products that are no longer in payment details
-        foreach ($transaction->transaction_details as $detail) {
-            $updatedDetail = $paymentDetails->firstWhere('product_id', $detail->product_id);
-
-            if (!$updatedDetail) {
-                $detail->delete();
-            } else {
-                $detail->update([
-                    'qty' => $updatedDetail['qty'],
-                    'subtotal' => $updatedDetail['subtotal'],
-                ]);
-            }
-        }
-
-        // Add new products from payment details
-        foreach ($paymentDetails as $paymentDetail) {
-            $existingDetail = $transaction->transaction_details->firstWhere('product_id', $paymentDetail['product_id']);
-
-            if (!$existingDetail) {
-                $transaction->transaction_details()->create([
-                    'product_id' => $paymentDetail['product_id'],
-                    'qty' => $paymentDetail['qty'],
-                    'subtotal' => $paymentDetail['subtotal'],
-                    'product_name' => $paymentDetail['product_name'] ?? Product::find($paymentDetail['product_id'])->name,
-                    'product_price' => $paymentDetail['product_price'] ?? 0,
-                ]);
-            }
-        }
-    }
-
-    /**
-     * Process stock for payment transaction
-     *
-     * @param Transaction $transaction
-     * @param Collection $stocks
-     * @return array List of out-of-stock ingredients
-     */
-    private function processStockForPayment($transaction, $stocks)
-    {
-        $outOfStockIngredients = [];
-        $warehouseId = auth()->user()->warehouse_id;
-        $dateNow = Carbon::now()->format('Y-m-d');
-
-        foreach ($transaction->transaction_details as $detail) {
-            $product = $detail->product;
-            $ingredients = $product->ingredient;
-
-            foreach ($ingredients as $ingredient) {
-                $stock = $stocks->firstWhere('ingredient_id', $ingredient->id);
-                $productIngredientQty = IngredientProducts::where('product_id', $product->id)
-                    ->where('ingredient_id', $ingredient->id)
-                    ->value('qty');
-
-                if (!$stock) {
-                    // Create stock if it doesn't exist
-                    $lastStock = Stock::where('warehouse_id', $warehouseId)
-                        ->where('ingredient_id', $ingredient->id)
-                        ->orderBy('id', 'DESC')
-                        ->first();
-
-                    $lastStockValue = $lastStock ? $lastStock->last_stock : 0;
-
-                    $stock = Stock::create([
-                        'warehouse_id' => $warehouseId,
-                        'ingredient_id' => $ingredient->id,
-                        'shift_id' => $transaction->shift_id,
-                        'first_stock' => $lastStockValue,
-                        'last_stock' => $lastStockValue,
-                    ]);
-
-                    $stocks->push($stock);
-                }
-
-                // Check if stock is sufficient
-                if ($stock->last_stock < ($productIngredientQty * $detail->qty)) {
-                    if (!in_array($ingredient->name, $outOfStockIngredients)) {
-                        $outOfStockIngredients[] = $ingredient->name;
-                    }
-                } else {
-                    // Deduct stock
-                    $stock->last_stock -= ($productIngredientQty * $detail->qty);
-                    $stock->stock_used = ($stock->stock_used ?? 0) + ($productIngredientQty * $detail->qty);
-                    $stock->save();
-
-                    // Record transaction in/out
-                    TransactionInOut::create([
-                        'warehouse_id' => $warehouseId,
-                        'ingredient_id' => $ingredient->id,
-                        'transaction_id' => $transaction->id,
-                        'qty' => $detail->qty,
-                        'date' => $dateNow,
-                        'transaction_type' => 'out',
-                        'user_id' => auth()->user()->id,
-                    ]);
-                }
-            }
-        }
-
-        return $outOfStockIngredients;
     }
 
 

@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         // Commands\AutoPurchase::class,
         // Commands\DsoAlert::class,
         // Commands\ResetDB::class,
+        Commands\StockWhatsappNotification::class,
     ];
 
     /**
@@ -29,6 +30,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('transaction:check-activity')->hourly();
         // * * * * * cd /path/to/project && php artisan schedule:run >> /dev/null 2>&1
         // php artisan transaction:check-activity
+        // * * * * * cd /path/to/sbpos && php artisan schedule:run >> /dev/null 2>&1
+
+        $schedule->command('stock:whatsapp-notification')->dailyAt('00:00');
     }
 
     /**

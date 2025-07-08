@@ -7,11 +7,34 @@
 
                 <h4 class="text-center mb-4">Laporan Sales</h4>
 
-                <!-- Add warehouse filter only for Admin Bisnis or Report roles -->
+                <!-- Date and Warehouse filters - Only for Admin Bisnis and Report roles -->
                 @if(auth()->user()->hasRole(['Admin Bisnis', 'Report']))
                 <div class="row mb-4">
                     <div class="col-md-6 offset-md-3 text-center">
-                        <form action="{{ url('admin/report/daily_sale_outlet/' . encrypt(json_encode(['year' => $year, 'month' => $month]))) }}" method="GET">
+                        <form action="{{ route('admin.report.daily_sale_outlet') }}" method="GET">
+                            <!-- Month and Year filters -->
+                            <div class="form-row mb-3">
+                                <div class="col-md-6 mb-2">
+                                    <select name="month" id="month" class="form-control selectpicker">
+                                        @foreach(range(1, 12) as $m)
+                                            <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
+                                                {{ date("F", mktime(0, 0, 0, $m, 1)) }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-2">
+                                    <select name="year" id="year" class="form-control selectpicker">
+                                        @foreach(range(date('Y')-5, date('Y')+1) as $y)
+                                            <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>
+                                                {{ $y }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Warehouse filter -->
                             <div class="form-group mb-3">
                                 <select name="warehouse_id" id="warehouse_id" class="form-control selectpicker" data-live-search="true">
                                     <option value="">Pilih Outlet</option>
@@ -22,10 +45,19 @@
                                     @endforeach
                                 </select>
                             </div>
+
                             <div class="d-flex justify-content-center">
                                 <button type="submit" class="btn btn-primary px-4 me-2">Filter</button>
                                 @if(isset($warehouse) && $warehouse)
-                                    <a href="{{ url('admin/report/daily_sale_outlet_pdf/' . encrypt(json_encode(['year' => $year, 'month' => $month]))) }}?warehouse_id={{ $warehouse_id }}" class="btn btn-danger px-4">
+                                    @php
+                                        $params = [
+                                            'year' => $year,
+                                            'month' => $month,
+                                            'warehouse_id' => $warehouse_id
+                                        ];
+                                        $hashParams = encrypt(json_encode($params));
+                                    @endphp
+                                    <a href="{{ url('admin/report/daily_sale_outlet_pdf') }}?hash={{ $hashParams }}" class="btn btn-danger px-4">
                                         <i class="fa fa-file-pdf"></i> Export PDF
                                     </a>
                                 @endif
@@ -40,7 +72,15 @@
                     <h5 class="text-center mb-3">Outlet: {{ $warehouse->name }}
                         @if(!auth()->user()->hasRole(['Sales', 'Admin Bisnis', 'Report']))
                             <div class="mt-2">
-                                <a href="{{ url('admin/report/daily_sale_outlet_pdf/' . encrypt(json_encode(['year' => $year, 'month' => $month]))) }}?warehouse_id={{ auth()->user()->warehouse_id }}" class="btn btn-sm btn-danger px-4">
+                                @php
+                                    $params = [
+                                        'year' => date('Y'),
+                                        'month' => date('m'),
+                                        'warehouse_id' => auth()->user()->warehouse_id
+                                    ];
+                                    $hashParams = encrypt(json_encode($params));
+                                @endphp
+                                <a href="{{ url('admin/report/daily_sale_outlet_pdf') }}?hash={{ $hashParams }}" class="btn btn-sm btn-danger px-4">
                                     <i class="fa fa-file-pdf"></i> Export PDF
                                 </a>
                             </div>
@@ -52,7 +92,15 @@
                     <h5 class="text-center mb-3">
                         Outlet: {{ auth()->user()->warehouse->name ?? 'Tidak Ditemukan' }}
                         <div class="mt-2">
-                            <a href="{{ url('admin/report/daily_sale_outlet_pdf/' . encrypt(json_encode(['year' => $year, 'month' => $month]))) }}?warehouse_id={{ auth()->user()->warehouse_id }}" class="btn btn-sm btn-danger px-4">
+                            @php
+                                $params = [
+                                    'year' => date('Y'),
+                                    'month' => date('m'),
+                                    'warehouse_id' => auth()->user()->warehouse_id
+                                ];
+                                $hashParams = encrypt(json_encode($params));
+                            @endphp
+                            <a href="{{ url('admin/report/daily_sale_outlet_pdf') }}?hash={{ $hashParams }}" class="btn btn-sm btn-danger px-4">
                                 <i class="fa fa-file-pdf"></i> Export PDF
                             </a>
                         </div>
@@ -162,20 +210,26 @@
         style: 'btn-link',
     });
 
-    // Hide export PDF button when warehouse selection changes
+    // Hide export PDF button when any filter changes (warehouse, month, year)
     $(document).ready(function() {
-        // Store the initial value of the warehouse dropdown
+        // Store the initial values
         let initialWarehouseId = $('#warehouse_id').val();
+        let initialMonth = $('#month').val();
+        let initialYear = $('#year').val();
+        let exportBtn = $('.btn-danger');
 
-        $('#warehouse_id').on('change', function() {
-            // Get the export button element
-            const exportBtn = $(this).closest('form').find('.btn-danger');
+        // Function to check if any filter has changed
+        function hasFilterChanged() {
+            return $('#warehouse_id').val() !== initialWarehouseId ||
+                   $('#month').val() !== initialMonth ||
+                   $('#year').val() !== initialYear;
+        }
 
-            // If the selected value is different from the initial value, hide the export button
-            if ($(this).val() !== initialWarehouseId) {
+        // Add event listeners to all filter elements
+        $('#warehouse_id, #month, #year').on('change', function() {
+            // Hide the export button if any filter has changed
+            if (hasFilterChanged()) {
                 exportBtn.hide();
-            } else {
-                exportBtn.show();
             }
         });
     });

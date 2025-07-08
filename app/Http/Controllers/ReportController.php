@@ -318,30 +318,48 @@ class ReportController extends Controller
         ));
     }
 
-    public function dailySaleOutlet($year = null, $month = null)
+    public function dailySaleOutlet(Request $request)
     {
-        if ($year !== null && strpos($year, 'eyJ') === 0 && $month === null) {
+        // Check if we have a hash parameter and decrypt it
+        if ($request->has('hash')) {
             try {
-                $decrypted = decrypt($year);
+                $decrypted = decrypt($request->input('hash'));
                 $params = json_decode($decrypted, true);
-
-                if (!isset($params['year']) || !isset($params['month'])) {
-                    return redirect()->route('admin.dashboard')->with('error', 'Invalid URL format');
-                }
-
-                $year = $params['year'];
-                $month = $params['month'];
+                
+                // Extract year and month from decrypted hash
+                $year = $params['year'] ?? date('Y');
+                $month = $params['month'] ?? date('m');
+                $warehouse_id = $params['warehouse_id'] ?? null;
             } catch (\Exception $e) {
-                return redirect()->route('admin.dashboard')->with('error', 'Invalid URL');
+                // If decryption fails, use defaults
+                $year = date('Y');
+                $month = date('m');
+                $warehouse_id = null;
+            }
+        } else {
+            // Only Admin Bisnis and Report roles can filter by date and outlet
+            if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+                // Get year and month from request or use current date
+                $year = $request->input('year', date('Y'));
+                $month = $request->input('month', date('m'));
+                
+                // Get warehouse_id from request
+                $warehouse_id = $request->input('warehouse_id');
+            } else {
+                // For other roles, always use current month/year and their assigned outlet
+                $year = date('Y');
+                $month = date('m');
+                $warehouse_id = auth()->user()->warehouse_id;
             }
         }
-
-        $lims_warehouse_list = Warehouse::where('is_active', true)->get();
+        
+        // Get warehouses for the business based on user role
         if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
-            $lims_warehouse_list = Warehouse::where('is_active', true)->where('business_id', auth()->user()->business_id)->get();
-            $warehouse_id = request('warehouse_id');
+            $lims_warehouse_list = Warehouse::where('is_active', true)
+                ->where('business_id', auth()->user()->business_id)
+                ->get();
         } else {
-            $warehouse_id = auth()->user()->warehouse_id;
+            $lims_warehouse_list = collect(); // Empty collection, not needed for other roles
         }
 
         $number_of_day = date('t', strtotime("$year-$month-01"));
@@ -411,27 +429,38 @@ class ReportController extends Controller
     /**
      * Generate PDF report for daily sales with tax information
      */
-    public function dailySaleOutletPdf($year = null, $month = null)
+    public function dailySaleOutletPdf(Request $request)
     {
-        if ($year !== null && strpos($year, 'eyJ') === 0 && $month === null) {
+        // Check if we have a hash parameter and decrypt it
+        if ($request->has('hash')) {
             try {
-                $decrypted = decrypt($year);
+                $decrypted = decrypt($request->input('hash'));
                 $params = json_decode($decrypted, true);
-
-                if (!isset($params['year']) || !isset($params['month'])) {
-                    return redirect()->route('admin.dashboard')->with('error', 'Invalid URL format');
-                }
-
-                $year = $params['year'];
-                $month = $params['month'];
+                
+                // Extract year, month and warehouse_id from decrypted hash
+                $year = $params['year'] ?? date('Y');
+                $month = $params['month'] ?? date('m');
+                $warehouse_id = $params['warehouse_id'] ?? null;
             } catch (\Exception $e) {
-                return redirect()->route('admin.dashboard')->with('error', 'Invalid URL');
+                // If decryption fails, use defaults
+                $year = date('Y');
+                $month = date('m');
+                $warehouse_id = null;
             }
-        }
-
-        $warehouse_id = request('warehouse_id');
-        if (!auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
-            $warehouse_id = auth()->user()->warehouse_id;
+        } else {
+            // Only Admin Bisnis and Report roles can filter by date and outlet
+            if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
+                // Get year and month from request or use current date
+                $year = $request->input('year', date('Y'));
+                $month = $request->input('month', date('m'));
+                // Get warehouse_id from request
+                $warehouse_id = $request->input('warehouse_id');
+            } else {
+                // For other roles, always use current month/year and their assigned outlet
+                $year = date('Y');
+                $month = date('m');
+                $warehouse_id = auth()->user()->warehouse_id;
+            }
         }
 
         $warehouse = $warehouse_id ? Warehouse::find($warehouse_id) : null;

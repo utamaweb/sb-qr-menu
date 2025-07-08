@@ -156,7 +156,7 @@
                     <a href="{{ route('report.productsOmzetByMonth') }}">Laporan Omset Produk</a>
                 </li>
                 <li id="daily-sale-outlet">
-                    <a href="{{ url('admin/report/daily_sale_outlet/' . encrypt(json_encode(['year' => date('Y'), 'month' => date('m')]))) }}">Laporan Sales</a>
+                    <a href="{{ route('admin.report.daily_sale_outlet', ['year' => date('Y'), 'month' => date('m')]) }}">Laporan Sales</a>
                 </li>
                 <li id="finance-report">
                     <a href="{{ route('financeReport') }}?warehouse_id=all&regional_id=all">Laporan Finance</a>
@@ -326,7 +326,7 @@
                     <a href="{{ url('admin/report/best_seller') }}">{{ trans('file.Best Seller') }}</a>
                 </li> --}}
                 <li id="daily-sale-outlet">
-                    <a href="{{ url('admin/report/daily_sale_outlet/' . encrypt(json_encode(['year' => date('Y'), 'month' => date('m')]))) }}">Laporan Sales</a>
+                    <a href="{{ route('admin.report.daily_sale_outlet', ['year' => date('Y'), 'month' => date('m')]) }}">Laporan Sales</a>
                 </li>
                 <li id="daily-sale-report-menu">
                     <a href="{{ url('admin/report/daily_sale/' . date('Y') . '/' . date('m')) }}">Transaksi Harian</a>
@@ -364,7 +364,15 @@
         </li>
     @elseif(auth()->user()->hasRole('Sales'))
         <li id="daily-sale-outlet">
-            <a href="{{ url('admin/report/daily_sale_outlet/' . encrypt(json_encode(['year' => date('Y'), 'month' => date('m')]))) }}">
+            @php
+                $params = [
+                    'year' => date('Y'),
+                    'month' => date('m'),
+                    'warehouse_id' => auth()->user()->warehouse_id
+                ];
+                $hashParams = encrypt(json_encode($params));
+            @endphp
+            <a href="{{ route('admin.report.daily_sale_outlet') }}?hash={{ $hashParams }}">
                 <i class="dripicons-document-remove"></i>
                 <span>Laporan Sales</span>
             </a>

@@ -70,15 +70,18 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Waktu Buka / Tutup Kasir</th>
-                                    <th>Kasir</th>
                                     <th>Outlet</th>
                                     <th>Shift</th>
                                     <th>Modal Awal</th>
                                     <th>Total Tunai</th>
-                                    <th>Total Non Tunai</th>
                                     <th>Uang Laci</th>
                                     <th>Selisih</th>
                                     <th>Total Pengeluaran</th>
+                                    <th>Total Non Tunai</th>
+                                    <th>QRIS / TF</th>
+                                    <th>GoFood</th>
+                                    <th>GrabFood</th>
+                                    <th>ShopeeFood</th>
                                     <th class="not-exported">Aksi</th>
                                 </tr>
                             </thead>
@@ -89,23 +92,18 @@
                                         <td><b>Buka:</b> {{ $closeCashier->open_time }} <br>
                                             <b>Tutup:</b> {{ $closeCashier->close_time }}
                                         </td>
-                                        <td>{{ $closeCashier->shift->user->name }}</td>
                                         <td>{{ $closeCashier->shift->warehouse->name }}</td>
                                         <td>{{ $closeCashier->shift->shift_number }}</td>
                                         <td>@currency($closeCashier->initial_balance)</td>
                                         <td>@currency($closeCashier->total_cash)</td>
-                                        <td>
-                                            <div><strong>Total:</strong> @currency($closeCashier->total_non_cash)</div>
-                                            <ul class="mb-0 pl-3" style="list-style-type: disc;">
-                                                <li>GoFood: @currency($closeCashier->gofood_omzet ?? 0)</li>
-                                                <li>GrabFood: @currency($closeCashier->grabfood_omzet ?? 0)</li>
-                                                <li>ShopeeFood: @currency($closeCashier->shopeefood_omzet ?? 0)</li>
-                                                <li>QRIS / TF: @currency($closeCashier->qris_omzet + $closeCashier->transfer_omzet ?? 0)</li>
-                                            </ul>
-                                        </td>
                                         <td>@currency($closeCashier->cash_in_drawer)</td>
                                         <td>@currency($closeCashier->difference)</td>
                                         <td>@currency($closeCashier->total_expense)</td>
+                                        <td>@currency($closeCashier->total_non_cash)</td>
+                                        <td>@currency($closeCashier->qris_omzet + $closeCashier->transfer_omzet)</td>
+                                        <td>@currency($closeCashier->gofood_omzet)</td>
+                                        <td>@currency($closeCashier->grabfood_omzet)</td>
+                                        <td>@currency($closeCashier->shopeefood_omzet)</td>
                                         <td>
                                             <div class="row">
                                                 <a href="{{ route('close-cashier.show', $closeCashier->id) }}" class="btn btn-link"><i class="dripicons-italic"></i> Detail</a>

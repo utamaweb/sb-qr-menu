@@ -74,6 +74,7 @@
                                         <th>Outlet</th>
                                         <th>Bahan Baku</th>
                                         <th>Selisih</th>
+                                        <th>Stok Rusak</th>
                                         <th>Shift</th>
                                     </tr>
                                 </thead>
@@ -83,6 +84,7 @@
                                             <td>{{ $stock->warehouse_name }}</td>
                                             <td>{{ $stock->ingredient_name }}</td>
                                             <td>{{ $stock->total_difference_stock }}</td>
+                                            <td>{{ $stock->total_broken_stock }}</td>
                                             <td>{{ $stock->shift_number }}</td>
                                         </tr>
                                     @endforeach
@@ -217,54 +219,30 @@ $('head').append(`
     </style>
 `);
 
-// Add loading indicator element after warehouse select
 $('#warehouse-select').after('<div class="loader-container"><div class="loader"></div><small class="ml-2">Loading outlets...</small></div>');
 
-// Handle Regional-Warehouse dependency
 $(document).ready(function() {
-    // On regional select change
     $('#regional-select').change(function() {
         var regionalId = $(this).val();
-
-        // Show loading indicator
         $('.loader-container').show();
-
-        // Disable warehouse select while loading
         $('#warehouse-select').prop('disabled', true).selectpicker('refresh');
-
-        // Make AJAX request
         $.ajax({
             url: '{{ route("getWarehousesByRegional", "") }}/' + regionalId,
             type: 'GET',
             dataType: 'json',
             success: function(data) {
-                // Clear current options
                 $('#warehouse-select').empty();
-
-                // Add "All Outlets" option
                 $('#warehouse-select').append('<option value="all">Semua Outlet</option>');
-
-                // Add warehouses from response
                 $.each(data, function(index, warehouse) {
                     $('#warehouse-select').append('<option value="' + warehouse.id + '">' + warehouse.name + '</option>');
                 });
-
-                // Enable warehouse select and refresh
                 $('#warehouse-select').prop('disabled', false).selectpicker('refresh');
-
-                // Hide loading indicator
                 $('.loader-container').hide();
             },
             error: function(xhr, status, error) {
                 console.error("Error fetching warehouses: " + error);
-
-                // Hide loading indicator even on error
                 $('.loader-container').hide();
-
-                // Re-enable warehouse select
                 $('#warehouse-select').prop('disabled', false).selectpicker('refresh');
-
-                // Show error message
                 alert("Error loading outlets. Please try again.");
             }
         });

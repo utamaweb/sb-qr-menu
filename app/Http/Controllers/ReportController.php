@@ -325,7 +325,7 @@ class ReportController extends Controller
             try {
                 $decrypted = decrypt($request->input('hash'));
                 $params = json_decode($decrypted, true);
-                
+
                 // Extract year and month from decrypted hash
                 $year = $params['year'] ?? date('Y');
                 $month = $params['month'] ?? date('m');
@@ -342,7 +342,7 @@ class ReportController extends Controller
                 // Get year and month from request or use current date
                 $year = $request->input('year', date('Y'));
                 $month = $request->input('month', date('m'));
-                
+
                 // Get warehouse_id from request
                 $warehouse_id = $request->input('warehouse_id');
             } else {
@@ -352,7 +352,7 @@ class ReportController extends Controller
                 $warehouse_id = auth()->user()->warehouse_id;
             }
         }
-        
+
         // Get warehouses for the business based on user role
         if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
             $lims_warehouse_list = Warehouse::where('is_active', true)
@@ -436,7 +436,7 @@ class ReportController extends Controller
             try {
                 $decrypted = decrypt($request->input('hash'));
                 $params = json_decode($decrypted, true);
-                
+
                 // Extract year, month and warehouse_id from decrypted hash
                 $year = $params['year'] ?? date('Y');
                 $month = $params['month'] ?? date('m');
@@ -5028,13 +5028,16 @@ class ReportController extends Controller
         }
 
         // Build stock query with common conditions
-        $query = Stock::where('stocks.difference_stock', '!=', 0)
-            ->whereDate('stocks.created_at', '>=', $start_date)
+        $query = Stock::whereDate('stocks.created_at', '>=', $start_date)
             ->whereDate('stocks.created_at', '<=', $end_date)
             ->whereIn('shifts.shift_number', $shift)
             ->join('warehouses', 'stocks.warehouse_id', '=', 'warehouses.id')
             ->join('shifts', 'stocks.shift_id', '=', 'shifts.id')
-            ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id');
+            ->join('ingredients', 'stocks.ingredient_id', '=', 'ingredients.id')
+            ->where(function($q) {
+            $q->where('stocks.difference_stock', '!=', 0)
+              ->orWhere('stocks.broken_stock', '!=', 0);
+            });
 
         // Apply warehouse filter
         if ($request->warehouse_id != 'all') {
@@ -5053,7 +5056,8 @@ class ReportController extends Controller
                 'warehouses.name as warehouse_name',
                 'ingredients.name as ingredient_name',
                 'shifts.shift_number',
-                DB::raw('SUM(stocks.difference_stock) as total_difference_stock')
+                DB::raw('SUM(stocks.difference_stock) as total_difference_stock'),
+                DB::raw('SUM(stocks.broken_stock) as total_broken_stock'),
             )
             ->groupBy('warehouses.name', 'ingredients.name', 'shifts.shift_number')
             ->orderBy('warehouses.name')

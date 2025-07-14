@@ -94,7 +94,15 @@
                                         <td>{{ $closeCashier->shift->shift_number }}</td>
                                         <td>@currency($closeCashier->initial_balance)</td>
                                         <td>@currency($closeCashier->total_cash)</td>
-                                        <td>@currency($closeCashier->total_non_cash)</td>
+                                        <td>
+                                            <div><strong>Total:</strong> @currency($closeCashier->total_non_cash)</div>
+                                            <ul class="mb-0 pl-3" style="list-style-type: disc;">
+                                                <li>GoFood: @currency($closeCashier->gofood_omzet ?? 0)</li>
+                                                <li>GrabFood: @currency($closeCashier->grabfood_omzet ?? 0)</li>
+                                                <li>ShopeeFood: @currency($closeCashier->shopeefood_omzet ?? 0)</li>
+                                                <li>QRIS / TF: @currency($closeCashier->qris_omzet + $closeCashier->transfer_omzet ?? 0)</li>
+                                            </ul>
+                                        </td>
                                         <td>@currency($closeCashier->cash_in_drawer)</td>
                                         <td>@currency($closeCashier->difference)</td>
                                         <td>@currency($closeCashier->total_expense)</td>

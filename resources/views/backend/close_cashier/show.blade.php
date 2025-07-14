@@ -94,7 +94,7 @@
                                             </tr>
                                             <tr>
                                                 <td style="width: 50%;">Omset QRIS / TRANSFER</td>
-                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->transfer_omzet)</td>
+                                                <td style="width: 50%; text-align: right;">@currency($closeCashier->transfer_omzet + $closeCashier->qris_omzet)</td>
                                             </tr>
                                             <tr>
                                                 <td style="width: 50%;">Total Non Tunai</td>

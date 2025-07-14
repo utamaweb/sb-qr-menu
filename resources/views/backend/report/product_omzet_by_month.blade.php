@@ -9,17 +9,28 @@
         {{-- Filter --}}
         <div class="card">
             <div class="card-header">
-                <h3 class="text-center">Laporan Omset Produk Per Bulan</h3>
+                <h3 class="text-center">Laporan Omset Produk</h3>
             </div>
 
             <div class="card-body">
                 <form action="" method="GET">
-                    {{-- Month input --}}
-                    <div class="form-group">
-                        <label for="month-input" class="form-label">Bulan <span class="text-danger">*</span></label>
-                        <input type="month" name="month" id="month-input" class="form-control" value="{{ request()->month ?? date('Y-m') }}" required>
+                    {{-- Date Range input --}}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="start-date-input" class="form-label">Dari Tanggal <span class="text-danger">*</span></label>
+                                <input type="text" id="start-date-input" name="start_date" required class="form-control date" value="{{ $start_date }}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="end-date-input" class="form-label">Sampai Tanggal <span class="text-danger">*</span></label>
+                                <input type="text" name="end_date" class="form-control date" id="end-date-input" required value="{{ $end_date }}">
+                            </div>
+                        </div>
                     </div>
-                    {{-- End of month input --}}
+                    {{-- End of date range input --}}
 
                     {{-- Outlet input --}}
                     @if (auth()->user()->hasRole(['Admin Bisnis', 'Report']))
@@ -86,6 +97,7 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <script>
         $("ul#report").siblings('a').attr('aria-expanded','true');
         $("ul#report").addClass("show");
@@ -109,13 +121,13 @@
             if(productIDs.length == 0) {
                 alert('Tidak ada produk yang dipilih');
             } else {
-                // Separate month and year
-                var month = $('#month-input').val().split('-')[1];
-                var year = $('#month-input').val().split('-')[0];
+                // Get date range
+                var startDate = $('#start-date-input').val();
+                var endDate = $('#end-date-input').val();
 
                 let url = "{{  route('report.productsOmzetByMonthExcel') }}";
-                url += '?month=' + month;
-                url += '&year=' + year;
+                url += '?start_date=' + startDate;
+                url += '&end_date=' + endDate;
                 url += '&outlet=' + $('#outlet-input').val();
                 url += '&productIDs=' + productIDs.join(',');
 

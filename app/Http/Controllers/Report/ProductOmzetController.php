@@ -36,6 +36,14 @@ class ProductOmzetController extends Controller
         $data = null;
         $outlets = null;
 
+        if (request()->input('start_date')) {
+            $start_date = request()->input('start_date');
+            $end_date = request()->input('end_date');
+        } else {
+            $start_date = date("Y-m-d");
+            $end_date = date("Y-m-d");
+        }
+
         if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
             $outlet = request()->outlet;
         } else {
@@ -45,11 +53,7 @@ class ProductOmzetController extends Controller
         // Get data by user role
         if(auth()->user()->hasRole(['Admin Bisnis', 'Report'])) {
             // Check request
-            if(request()->has('month')) {
-                $date = explode('-', request()->month);
-                $month = $date[1];
-                $year = $date[0];
-
+            if(request()->has('start_date') && request()->has('end_date')) {
                 // Get outlet products
                 $data = collect(DB::select("SELECT pw.product_id, p.name
                     FROM product_warehouse AS pw
@@ -71,7 +75,7 @@ class ProductOmzetController extends Controller
                     AND pw.deleted_at IS NULL"));
         }
 
-        return view('backend.report.product_omzet_by_month', compact('data', 'outlets'));
+        return view('backend.report.product_omzet_by_month', compact('data', 'outlets', 'start_date', 'end_date'));
     }
 
     /**
@@ -84,6 +88,10 @@ class ProductOmzetController extends Controller
         // Get product IDs
         $productIDs = explode(',', request()->productIDs);
 
+        // Get date range
+        $startDate = Carbon::parse(request()->start_date);
+        $endDate = Carbon::parse(request()->end_date);
+
         // Get outlet name
         $outlet = Warehouse::find(request()->outlet);
 
@@ -95,15 +103,13 @@ class ProductOmzetController extends Controller
         $numberOfColumn = ($outlet->max_shift_count * ($ojolCount + 2)) - 1;
         $endColumn = $this->addExcelColumn('D', $numberOfColumn);
 
-        // dd([$ojolCount, $numberOfColumn, $endColumn]);
-
         // Product loop
         foreach ($productIDs as $index => $productID) {
             // Get product
             $product = Product::find($productID);
 
-            // Get data for Laporan Omset Produk Per Bulan
-            $data = $this->getProductsByMonth(request()->month, request()->year, request()->outlet, $productID, $product->name);
+            // Get data for Laporan Omset Produk
+            $data = $this->getProductsByDateRange($startDate->format('Y-m-d'), $endDate->format('Y-m-d'), request()->outlet, $productID, $product->name);
 
             // Create new sheet
             $newSheet = $spreadsheet->createSheet();
@@ -113,12 +119,11 @@ class ProductOmzetController extends Controller
             $sheet = $spreadsheet->getActiveSheet();
 
             // Titles
-            $createDate = Carbon::create(request()->year, request()->month, 1);
-            $monthTitle = $this->dateService->changeMonth($createDate->month) . " " . $createDate->year;
+            $dateRangeTitle = "Periode: " . $startDate->format('d-m-Y') . " s/d " . $endDate->format('d-m-Y');
             $productTitle = $product->name;
 
             // Title rows
-            $sheet->setCellValue('A1', $monthTitle);
+            $sheet->setCellValue('A1', $dateRangeTitle);
             $sheet->mergeCells('A1:C1');
             $sheet->getStyle('A1:C1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle('A1:C1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
@@ -443,6 +448,94 @@ class ProductOmzetController extends Controller
         }
 
         $row;
+
+        return $row;
+    }
+
+    /**
+     * Get data for Laporan Omset Produk
+     */
+    private function getProductsByDateRange($startDate, $endDate, $outlet, $productId, $productName) {
+        // Get outlet
+        $outlet = Warehouse::find($outlet);
+
+        // Get outlet max shifts count
+        $maxShiftsCount = $outlet->max_shift_count;
+
+        // Get ojols by outlet business_id
+        $ojols = Ojol::where('business_id', $outlet->business_id)->get();
+
+        // Get outlet transactions
+        $transactions = collect(DB::select("SELECT t.id, s.shift_number, t.payment_method, t.total_amount, t.date
+            FROM transactions AS t
+                LEFT JOIN shifts AS s ON t.shift_id = s.id
+            WHERE t.warehouse_id = $outlet->id
+                AND t.date BETWEEN '$startDate' AND '$endDate'
+                AND t.deleted_at IS NULL"));
+
+        // Get transactions details
+        $transactionDetails = TransactionDetail::whereIn('transaction_id', $transactions->pluck('id'))->where('product_id', $productId)->get();
+
+        // Get date range
+        $startDateCarbon = Carbon::parse($startDate);
+        $endDateCarbon = Carbon::parse($endDate);
+
+        $row = [];
+        $row['product_id'] = $productId;
+        $row['product_name'] = $productName;
+        $row['transactions'] = [];
+
+        // Date loop - for each day in the date range
+        for ($currentDate = $startDateCarbon->copy(); $currentDate->lte($endDateCarbon); $currentDate->addDay()) {
+            $date_row = [];
+            $date_row['date'] = $currentDate->format('d');
+            $date_row['day'] = $this->dateService->changeDay($currentDate->dayOfWeek);
+            $date_row['omzet'] = $transactionDetails
+                ->whereIn('transaction_id', $transactions
+                    ->where('date', $currentDate->format('Y-m-d'))
+                    ->pluck('id'))
+                ->sum('subtotal');
+            $date_row['shifts'] = [];
+
+            // Shifts loop
+            for ($j = 1; $j <= $maxShiftsCount; $j++) {
+                $shift_row = [];
+                $shift_row['shift_number'] = $j;
+
+                // Dine In
+                $shift_row['dine_in'] = $transactionDetails
+                    ->whereIn('transaction_id', $transactions
+                        ->where('date', $currentDate->format('Y-m-d'))
+                        ->where('shift_number', $j)
+                        ->whereIn('payment_method', ['Tunai', 'Transfer'])
+                        ->pluck('id'))
+                    ->sum('qty');
+
+
+                // Ojol loop
+                foreach ($ojols as $ojol) {
+                    $shift_row[$ojol->name] = $transactionDetails
+                        ->whereIn('transaction_id', $transactions
+                            ->where('date', $currentDate->format('Y-m-d'))
+                            ->where('shift_number', $j)
+                            ->where('payment_method', $ojol->name)
+                            ->pluck('id'))
+                        ->sum('qty');
+                }
+
+                // Total
+                $shift_row['total'] = $transactionDetails
+                    ->whereIn('transaction_id', $transactions
+                        ->where('date', $currentDate->format('Y-m-d'))
+                        ->where('shift_number', $j)
+                        ->pluck('id'))
+                    ->sum('qty');
+
+                $date_row['shifts'][] = $shift_row;
+            }
+
+            $row['transactions'][] = $date_row;
+        }
 
         return $row;
     }

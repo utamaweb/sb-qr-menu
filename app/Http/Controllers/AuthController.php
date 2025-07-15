@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Auth;
 use Cache;
 use DB;
@@ -24,11 +25,41 @@ class AuthController extends Controller
             });
         }
         $numberOfUserAccount = \App\Models\User::where('is_active', true)->count();
-        return view('backend.auth.login', compact('general_setting', 'numberOfUserAccount'));
+
+        $siteKey = env('CLOUDFLARE_TURNSTILE_SITE_KEY'); // Your Cloudflare site key
+        $appEnv = env('APP_ENV', 'production');
+
+        return view('backend.auth.login', compact('general_setting', 'numberOfUserAccount', 'siteKey', 'appEnv'));
     }
 
     public function login(Request $request)
     {
+        // Only validate CAPTCHA in production environment
+        $appEnv = env('APP_ENV', 'production');
+
+        if ($appEnv === 'production') {
+            // Validate Cloudflare Turnstile CAPTCHA
+            $cfResponse = $request->input('cf-turnstile-response');
+            if (!$cfResponse) {
+                return redirect()->back()->with('captcha_error', 'Please complete the CAPTCHA challenge.');
+            }
+
+            // Verify CAPTCHA with Cloudflare
+            $secretKey = env('CLOUDFLARE_TURNSTILE_SECRET_KEY');
+            $ip = $request->ip();
+            $response = \Illuminate\Support\Facades\Http::asForm()->post('https://challenges.cloudflare.com/turnstile/v0/siteverify', [
+                'secret' => $secretKey,
+                'response' => $cfResponse,
+                'remoteip' => $ip,
+            ]);
+
+            $result = $response->json();
+            if (!$result['success']) {
+                return redirect()->back()->with('captcha_error', 'CAPTCHA validation failed. Please try again.');
+            }
+        }
+        // In local/development environment, bypass CAPTCHA validation
+
         $credential = $request->only('username', 'password');
 
         if (Auth::guard('web')->attempt($credential)) {

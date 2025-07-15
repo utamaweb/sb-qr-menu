@@ -127,7 +127,6 @@
 
         if (passwordToggleBtn && passwordField) {
             passwordToggleBtn.addEventListener('click', function() {
-                // Toggle password visibility
                 if (passwordField.type === 'password') {
                     passwordField.type = 'text';
                     passwordToggleBtn.querySelector('i').classList.remove('fa-eye-slash');
@@ -137,6 +136,17 @@
                     passwordToggleBtn.querySelector('i').classList.remove('fa-eye');
                     passwordToggleBtn.querySelector('i').classList.add('fa-eye-slash');
                 }
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('login-form');
+        const submitBtn = loginForm ? loginForm.querySelector('button[type="submit"]') : null;
+        if (loginForm && submitBtn) {
+            loginForm.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm mr-2"></span>Loading...';
             });
         }
     });

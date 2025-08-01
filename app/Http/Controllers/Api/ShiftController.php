@@ -105,6 +105,18 @@ class ShiftController extends Controller
     // closeUpdate()
     public function close(Request $request)
     {
+        // $validator = Validator::make($request->all(), [
+        //     'cash_in_drawer'         => 'required|numeric',
+        //     'stocks'                 => 'required|array|min:1',
+        //     'stocks.*.ingredient_id' => 'required',
+        //     'stocks.*.stock'         => 'required|numeric',
+        //     'stocks.*.broken_stock'  => 'required|numeric',
+        // ]);
+
+        // if ($validator->fails()) {
+        //     return response()->json(['errors' => $validator->messages()], 400);
+        // }
+
         DB::beginTransaction();
 
         try {

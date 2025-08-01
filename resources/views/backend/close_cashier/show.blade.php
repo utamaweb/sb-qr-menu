@@ -275,6 +275,31 @@
                 </div>
             </div>
         </div>
+
+        <!-- Summary transaksi lunas dan cancel -->
+        <div class="container-fluid mb-3">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-body">
+                            @php
+                                $countLunas = $transactionals->where('status', 'Lunas')->count();
+                                $countCancel = $transactionals->where('status', 'Batal')->count();
+                            @endphp
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h5 class="mb-0">Jumlah Transaksi Lunas: <span class="badge badge-success">{{ $countLunas }}</span></h5>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="mb-0">Jumlah Transaksi Cancel: <span class="badge badge-danger">{{ $countCancel }}</span></h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="table-responsive">
             <table id="ingredient-table" class="table table-hover" style="width: 100%">
                 <thead>

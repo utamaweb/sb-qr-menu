@@ -128,9 +128,7 @@ class CloseCashierController extends Controller
         $sumExpense = $expenses->sum('amount');
         $stockPurchases = StockPurchase::where('shift_id', $closeCashier->shift_id)->get();
         $sumStockPurchase = $stockPurchases->sum('total_price');
-        $transactionals = Transaction::where('status', 'Lunas')
-            ->where('shift_id', $closeCashier->shift_id)
-            ->get();
+        $transactionals = Transaction::where('shift_id', $closeCashier->shift_id)->get();
 
         $stocks = Stock::where('shift_id', $closeCashier->shift_id)->get();
         $ingredientIds = $stocks->pluck('ingredient_id');

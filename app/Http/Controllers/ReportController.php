@@ -60,30 +60,19 @@ class ReportController extends Controller
         $this->dateService = new DateService();
     }
 
-    private function calculateOmzet($amount)
+    private function calculateOmzet($amount, $transactionDate)
     {
-        // $multiplier = 0;
-        // $multiplier = 0.8;
         // get setting of omzet percentage on general_settings table
         $generalSetting = GeneralSetting::first();
         $multiplier = $generalSetting->omzet_percentage ?? 0.08;
 
-        // if ($amount <= 10000000) {
-        //     // 0-10jt: multiply by 50%
-        //     $multiplier = 0.5;
-        // } elseif ($amount <= 20000000) {
-        //     // 10.000.001 - 20jt: multiply by 30%
-        //     $multiplier = 0.3;
-        // } elseif ($amount <= 40000000) {
-        //     // 20.000.001 - 40jt: multiply by 20%
-        //     $multiplier = 0.2;
-        // } else {
-        //     // 40jt and above: multiply by 10%
-        //     $multiplier = 0.1;
-        // }
-
         // Calculate omzet amount and round up to nearest 1000
-        $omzetAmount = $amount * $multiplier;
+        // $omzetAmount = $amount * $multiplier * 0.10;
+
+        $omzetAmount = $amount * 0.08;
+        if($transactionDate >= '2025-08-05'){
+            $omzetAmount = $amount * $multiplier * 0.10;
+        }
         return ceil($omzetAmount / 1000) * 1000;
     }
 
@@ -389,16 +378,17 @@ class ReportController extends Controller
                 ->whereDate('date', '>=', $start_date)
                 ->whereDate('date', '<=', $end_date)
                 ->selectRaw('DAY(date) as day, SUM(total_qty) AS total_qty, SUM(paid_amount) AS total_paid_amount,
-                             SUM(total_amount) AS total_amount, COUNT(*) AS total_transaction')
+                        SUM(total_amount) AS total_amount, COUNT(*) AS total_transaction, MAX(date) as transaction_date')
                 ->groupBy('day')
                 ->get();
 
             foreach ($transactions as $transaction) {
                 $day = (int)$transaction->day;
                 $amount = $transaction->total_amount ?? 0;
+                $transactionDate = $transaction->transaction_date ?? $start_date;
 
-                // Apply multiplier based on total sales amount
-                $omzetAmount = $this->calculateOmzet($amount);
+                // Pass the transaction date to calculateOmzet for correct formula
+                $omzetAmount = $this->calculateOmzet($amount, $transactionDate);
 
                 $dailyData[$day] = [
                     'qty'         => $transaction->total_qty ?? 0,
@@ -476,7 +466,7 @@ class ReportController extends Controller
                 ->where('warehouse_id', $warehouse_id)
                 ->whereDate('date', '>=', $start_date)
                 ->whereDate('date', '<=', $end_date)
-                ->selectRaw('DAY(date) as day, SUM(total_amount) AS total_amount, DATE(date) as full_date')
+                ->selectRaw('DAY(date) as day, SUM(total_amount) AS total_amount, MAX(date) as transaction_date, DATE(date) as full_date')
                 ->groupBy('day', 'full_date')
                 ->orderBy('day', 'asc')
                 ->get();
@@ -484,17 +474,20 @@ class ReportController extends Controller
             foreach ($transactions as $transaction) {
                 $day = (int)$transaction->day;
                 $amount = $transaction->total_amount ?? 0;
-                $amount = $this->calculateOmzet($amount);
+                $transactionDate = $transaction->transaction_date ?? $transaction->full_date;
+                $omzetAmount = $this->calculateOmzet($amount, $transactionDate);
                 $fullDate = $transaction->full_date;
 
-                // Calculate tax amount (10%)
-                $taxAmount = $amount * 0.1;
+                // Calculate tax amount (10%) based on omzet formula
+                $taxAmount = $omzetAmount * 0.1;
 
                 $dailyData[] = [
                     'day' => $day,
                     'date' => $fullDate,
-                    'amount' => $amount,
+                    'amount' => $omzetAmount,
                     'tax' => $taxAmount,
+                    'real_amount' => $amount,
+                    'transaction_date' => $transactionDate,
                 ];
             }
         }

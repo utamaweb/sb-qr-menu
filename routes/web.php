@@ -28,7 +28,6 @@ use App\Http\Controllers\StockOpnameController;
 use App\Http\Controllers\CloseCashierController;
 use App\Http\Controllers\BusinessStockController;
 use App\Http\Controllers\CustomMessageController;
-
 use App\Http\Controllers\OjolWarehouseController;
 use App\Http\Controllers\StockPurchaseController;
 use App\Http\Controllers\CustomCategoryController;
@@ -37,10 +36,12 @@ use App\Http\Controllers\ProductWarehouseController;
 use App\Http\Controllers\Report\ProductOmzetController;
 use App\Http\Controllers\Report\FinanceReportController;
 
+// Fallback: redirect any unknown route to the admin login page
 Route::fallback(function () {
     return redirect()->route('admin.auth.index');
 });
 
+// Maintenance helpers (consider securing/limiting in production)
 Route::get('/get-storage', function () {
     Artisan::call('storage:link');
 });
@@ -51,17 +52,15 @@ Route::get('/optimize-clear', function () {
     Artisan::call('optimize:clear');
 });
 
-// Route::get('/apk', function () {
-//     return redirect('https://drive.google.com/drive/folders/1E_jhYwX5jSP0VN3rvH8gE-yUSE7LJ4lw?usp=sharing');
-// });
 Route::group(['prefix' => 'admin'], function () {
+    // Admin authentication (login/logout)
     Route::middleware(['web'])->group(function () {
         Route::get('login', [AuthController::class, 'index'])->name('admin.auth.index');
         Route::post('login', [AuthController::class, 'login'])->name('admin.auth.login');
         Route::post('logout', [AuthController::class, 'logout'])->name('admin.auth.logout');
     });
 
-
+    // Authenticated: basic home/upload
     Route::group(['middleware' => 'auth:web'], function () {
         Route::post('upload-apk', [HomeController::class, 'uploadApk'])->name('uploadApk');
         Route::controller(HomeController::class)->group(function () {
@@ -69,16 +68,18 @@ Route::group(['prefix' => 'admin'], function () {
         });
     });
 
+    // Main admin area
     Route::group(['middleware' => ['common', 'auth:web', 'active']], function () {
 
+        // Dashboard & home
         Route::controller(HomeController::class)->group(function () {
             Route::get('/', 'index');
             Route::get('/dashboard', 'dashboard')->name('admin.dashboard');
             Route::get('my-transactions/{year}/{month}', 'myTransaction');
         });
 
-        // Route for whatsapp
-        Route::controller(WhatsappController::class)->name('whatsapp.')->group(function() {
+        // WhatsApp
+        Route::controller(WhatsappController::class)->name('whatsapp.')->group(function () {
             Route::get('/whatsapp', 'index')->name('index');
             Route::post('/whatsapp/store', 'store')->name('store');
             Route::get('/whatsapp/sessions', 'sessions')->name('sessions');
@@ -90,13 +91,12 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('/whatsapp/send-message/{number}/{message}', 'sendMessage')->name('sendMessage');
         });
 
-        // Route for custom message
-        Route::controller(CustomMessageController::class)->group(function() {
+        // Custom messages
+        Route::controller(CustomMessageController::class)->group(function () {
             Route::resource('custom-message', CustomMessageController::class);
         });
 
-
-        // Need to check again
+        // Products & outlets
         Route::get('produk-outlet/sort/{category}', [ProductWarehouseController::class, 'sort'])->name('produk-outlet.sort');
         Route::put('produk-outlet/sort', [ProductWarehouseController::class, 'storeSort'])->name('produk-outlet.storeSort');
         Route::resource('produk-outlet', ProductWarehouseController::class);
@@ -112,13 +112,14 @@ Route::group(['prefix' => 'admin'], function () {
             Route::post('exportproduct', 'exportProduct')->name('product.export');
         });
 
+        // Roles & permissions
         Route::resource('role', RoleController::class);
         Route::controller(RoleController::class)->group(function () {
             Route::get('role/permission/{id}', 'permission')->name('role.permission');
             Route::post('role/set_permission', 'setPermission')->name('role.setPermission');
         });
 
-
+        // Business & units
         Route::resource('business', BusinessController::class);
         Route::resource('unit', UnitController::class);
         Route::controller(UnitController::class)->group(function () {
@@ -127,16 +128,13 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('unit/lims_unit_search', 'limsUnitSearch')->name('unit.search');
         });
 
-
-        // Route::controller(CategoryController::class)->group(function () {
-        //     Route::post('category/import', 'import')->name('category.import');
-        //     Route::post('category/deletebyselection', 'deleteBySelection');
-        //     Route::post('category/category-data', 'categoryData');
-        // });
+        // Categories
         Route::resource('kategori', CategoryController::class);
 
+        // Regional
         Route::resource('regional', RegionalController::class);
 
+        // Warehouses (Outlets)
         Route::controller(WarehouseController::class)->group(function () {
             Route::post('importwarehouse', 'importWarehouse')->name('outlet.import');
             Route::post('warehouse/deletebyselection', 'deleteBySelection');
@@ -147,15 +145,10 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::resource('outlet', WarehouseController::class)->except('show');
 
-
-        // Route::controller(CategoryController::class)->group(function () {
-        //     Route::post('category/import', 'import')->name('category.import');
-        //     Route::post('category/deletebyselection', 'deleteBySelection');
-        //     Route::post('category/category-data', 'categoryData');
-        // });
-
+        // Order types
         Route::resource('tipe-pesanan', OrderTypeController::class);
 
+        // Ingredients & stock
         Route::controller(IngredientController::class)->group(function () {
             Route::post('ingredient/import', 'import')->name('ingredient.import');
             Route::post('ingredient/deletebyselection', 'deleteBySelection');
@@ -163,14 +156,17 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::resource('bahan-baku', IngredientController::class);
         Route::resource('stok', StockController::class);
+
+        // Stock opname & cashier
         Route::resource('stock-opname', StockOpnameController::class);
         Route::resource('close-cashier', CloseCashierController::class);
         Route::put('stock-opname-detail/{id}', [StockOpnameController::class, 'updateDetail'])->name('updateDetailStockOpname');
         Route::resource('kategori_bahan_baku', KategoriBahanBakuController::class);
 
+        // Stock purchases
         Route::resource('pembelian-stok', StockPurchaseController::class);
 
-
+        // Shifts
         Route::controller(ShiftController::class)->group(function () {
             Route::post('shift/import', 'import')->name('shift.import');
             Route::post('shift/deletebyselection', 'deleteBySelection');
@@ -178,7 +174,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::resource('shift', ShiftController::class);
 
-
+        // Reports
         Route::controller(ReportController::class)->group(function () {
             Route::prefix('report')->group(function () {
                 Route::get('product_quantity_alert', 'productQuantityAlert')->name('report.qtyAlert');
@@ -247,7 +243,7 @@ Route::group(['prefix' => 'admin'], function () {
             });
         });
 
-
+        // Users
         Route::controller(UserController::class)->group(function () {
             Route::get('user/profile/{id}', 'profile')->name('user.profile');
             Route::put('user/update_profile/{id}', 'profileUpdate')->name('user.profileUpdate');
@@ -259,7 +255,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::resource('user', UserController::class);
 
-
+        // Settings
         Route::controller(SettingController::class)->group(function () {
             Route::prefix('setting')->group(function () {
                 Route::get('general_setting', 'generalSetting')->name('setting.general');
@@ -284,7 +280,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::get('backup', 'backup')->name('setting.backup');
         });
 
-
+        // Expense categories
         Route::controller(ExpenseCategoryController::class)->group(function () {
             Route::get('expense_categories/gencode', 'generateCode');
             Route::post('expense_categories/import', 'import')->name('expense_category.import');
@@ -293,7 +289,7 @@ Route::group(['prefix' => 'admin'], function () {
         });
         Route::resource('nama-pengeluaran', ExpenseCategoryController::class);
 
-
+        // Expenses
         Route::controller(ExpenseController::class)->group(function () {
             Route::post('expenses/expense-data', 'expenseData')->name('expenses.data');
             Route::post('expenses/deletebyselection', 'deleteBySelection');
@@ -302,8 +298,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::resource('pengeluaran', ExpenseController::class);
         Route::get('/expenses/data', [ExpenseController::class, 'getExpenses'])->name('expenses.data');
 
-
-        // Route for Ojol
+        // Ojol
         Route::controller(OjolController::class)->name('ojol.')->group(function () {
             Route::get('ojol', 'index')->name('index');
             Route::get('ojol/create', 'create')->name('create');
@@ -312,7 +307,7 @@ Route::group(['prefix' => 'admin'], function () {
             Route::put('ojol/edit/{ojol}', 'update')->name('update');
             Route::delete('ojol/destroy/{ojol}', 'destroy')->name('destroy');
         });
-        // Route for Ojol Warehouse
+        // Ojol Warehouse
         Route::controller(OjolWarehouseController::class)->name('ojol-warehouse.')->group(function () {
             Route::get('ojol_outlet', 'index')->name('index');
             Route::get('ojol_outlet/form/{ojol}', 'form')->name('form');
@@ -320,34 +315,35 @@ Route::group(['prefix' => 'admin'], function () {
             Route::delete('ojol_outlet/destroy/{ojol}', 'destroy')->name('destroy');
         });
 
-        // Route for CloseCashier transaction details
+        // CloseCashier transaction details
         Route::get('close-cashier/transaction/{transaction}', [CloseCashierController::class, 'transactionDetails'])->name('close_cashier_transaction');
 
-        // Route for business outler stocks
-        Route::controller(BusinessStockController::class)->name('business-stock.')->group(function() {
+        // Business outlet stocks
+        Route::controller(BusinessStockController::class)->name('business-stock.')->group(function () {
             Route::get('/business_stocks', 'index')->name('index');
         });
 
-        // Route for custom category parent
-        Route::controller(CustomCategoryController::class)->name('custom-category.')->group(function() {
+        // Custom category parent
+        Route::controller(CustomCategoryController::class)->name('custom-category.')->group(function () {
             Route::get('/custom_categories', 'index')->name('index');
             Route::get('/custom_category/{category}', 'form')->name('form');
             Route::post('/custom_category/{category}', 'store')->name('store');
             Route::delete('/custom_category/{category}', 'destroy')->name('destroy');
         });
 
-        // Route for warehouse max shifts count
+        // Warehouse max shifts count
         Route::get('/max_shifts', [WarehouseController::class, 'maxShiftPage'])->name('maxShiftPage');
-        Route::put('/max_shifts', [WarehouseController::class, 'maxShiftUpdate'])->name('maxShiftUpdate');        // Route for finance report
+        Route::put('/max_shifts', [WarehouseController::class, 'maxShiftUpdate'])->name('maxShiftUpdate');
+
+        // Finance report
         Route::get('/finance-report', [FinanceReportController::class, 'financeReport'])->name('financeReport');
         Route::get('/get-warehouses-by-regional/{regional_id}', [App\Http\Controllers\Report\FinanceReportController::class, 'getWarehousesByRegional'])->name('getWarehousesByRegional');
 
-        // Route for close cashier report regional filtering
+        // Close cashier report regional filtering
         Route::get('close-cashier/get-warehouses-by-regional/{regional_id}', [CloseCashierController::class, 'getWarehousesByRegional'])->name('close_cashier.get_warehouses_by_regional');
 
-        // Route for product omzet report
+        // Product omzet report
         Route::get('products-omzet-by-month', [ProductOmzetController::class, 'index'])->name('report.productsOmzetByMonth');
         Route::get('products-omzet-by-month-excel', [ProductOmzetController::class, 'productsOmzetByMonthExcel'])->name('report.productsOmzetByMonthExcel');
-
     });
 });

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique()->comment("System generated code");
             $table->enum('status', ['pending', 'ordered'])->default('pending');
-            $table->foreignId('table_id')->constrained('tables')->onDelete('set null');
-            $table->foreignId('transaction_id')->nullable()->constrained('transactions', 'id')->onDelete('set null');
+            $table->foreignId('table_id')->constrained('tables')->onDelete('restrict');
+            $table->foreignId('transaction_id')->nullable()->constrained('transactions')->onDelete('cascade');
 
             // Define index
             $table->index('code');

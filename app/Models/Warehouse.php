@@ -32,4 +32,12 @@ class Warehouse extends Model
     {
         return $this->belongsTo('App\Models\Regional');
     }
+
+    /**
+     * Relationships with tables
+     */
+    public function tables()
+    {
+        return $this->hasMany(Table::class, 'outlet_id', 'id');
+    }
 }

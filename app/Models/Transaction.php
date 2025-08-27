@@ -43,4 +43,11 @@ class Transaction extends Model
     {
         return $this->hasMany('App\Models\MultiPayment');
     }
+
+    /**
+     * Relationship with table transactions
+     */
+    public function tableTransactions() {
+        return $this->hasMany(TableTransaction::class, 'transaction_id', 'id');
+    }
 }

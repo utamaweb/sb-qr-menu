@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('table_transactions', function (Blueprint $table) {
+            $table->id();
+            $table->string('code')->unique()->comment("System generated code");
+            $table->enum('status', ['pending', 'ordered'])->default('pending');
+            $table->foreignId('table_id')->constrained('tables')->onDelete('set null');
+            $table->foreignId('transaction_id')->nullable()->constrained('transactions', 'id')->onDelete('set null');
+
+            // Define index
+            $table->index('code');
+            $table->index('table_id');
+            $table->index('transaction_id');
+
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('table_transactions');
+    }
+};

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TableController;
 use App\Models\Warehouse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -345,5 +346,8 @@ Route::group(['prefix' => 'admin'], function () {
         // Product omzet report
         Route::get('products-omzet-by-month', [ProductOmzetController::class, 'index'])->name('report.productsOmzetByMonth');
         Route::get('products-omzet-by-month-excel', [ProductOmzetController::class, 'productsOmzetByMonthExcel'])->name('report.productsOmzetByMonthExcel');
+
+        // Outlet table management
+        Route::resource('tables', TableController::class);
     });
 });

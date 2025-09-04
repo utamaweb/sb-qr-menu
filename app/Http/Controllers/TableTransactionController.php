@@ -25,6 +25,19 @@ class TableTransactionController extends Controller
     }
 
     /**
+     * Demo Mobile -> demoMobile (Public method)
+     *
+     * method used for template test in mobile view.
+     */
+    public function demoMobile(Warehouse $warehouse)
+    {
+        // Get mapped products
+        $mappedData = $this->getMappedProducts($warehouse);
+
+        return view('backend.layout.menu-mobile', compact('mappedData'));
+    }
+
+    /**
      * Get mapped outlet products -> getMappedProducts (Private method)
      *
      * method used to get mapped outlet products.

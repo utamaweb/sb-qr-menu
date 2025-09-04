@@ -358,3 +358,4 @@ Route::get('/menu', function() {
 });
 
 Route::get('/menu/demo/{warehouse}', [TableTransactionController::class, 'demo']);
+Route::get('/menu/demo-mobile/{warehouse}', [TableTransactionController::class, 'demoMobile']);

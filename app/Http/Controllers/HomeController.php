@@ -42,11 +42,13 @@ class HomeController extends Controller
     public function dashboard()
     {
         $user = auth()->user();
+
+        // Use non-mutating Carbon instances and include full day range for timestamp columns
         $now = Carbon::now();
-        $startOfMonth = $now->startOfMonth()->toDateString();
-        $endOfMonth = $now->endOfMonth()->toDateString();
-        $startOfLastMonth = $now->copy()->subMonthNoOverflow()->startOfMonth()->toDateString();
-        $endOfLastMonth = $now->copy()->subMonthNoOverflow()->endOfMonth()->toDateString();
+        $startOfMonth = $now->copy()->startOfMonth();
+        $endOfMonth = $now->copy()->endOfMonth();
+        $startOfLastMonth = $now->copy()->subMonthNoOverflow()->startOfMonth();
+        $endOfLastMonth = $now->copy()->subMonthNoOverflow()->endOfMonth();
 
         // Elemen Paling Atas di dashboard
         $countBusiness = Business::count();
@@ -75,10 +77,31 @@ class HomeController extends Controller
             $countProduct = Product::where('business_id', $business_id)->count();
             $countIngredient = Ingredient::where('business_id', $business_id)->count();
 
-            $totalIncomeThisMonth = $this->getTransactionSum($warehouses, $startOfMonth, $endOfMonth);
-            $totalIncomePreviousMonth = $this->getTransactionSum($warehouses, $startOfLastMonth, $endOfLastMonth);
-            $countTransactionThisMonth = $this->getTransactionCount($warehouses, $startOfMonth, $endOfMonth);
-            $countTransactionPreviousMonth = $this->getTransactionCount($warehouses, $startOfLastMonth, $endOfLastMonth);
+            // Fetch income and counts for this and last month in a single query
+            $aggregates = Transaction::whereIn('warehouse_id', $warehouses)
+                ->where('status', 'Lunas')
+                ->selectRaw(
+                    'SUM(CASE WHEN `date` BETWEEN ? AND ? THEN total_amount ELSE 0 END) AS income_this_month, '
+                        . 'SUM(CASE WHEN `date` BETWEEN ? AND ? THEN total_amount ELSE 0 END) AS income_previous_month, '
+                        . 'SUM(CASE WHEN `date` BETWEEN ? AND ? THEN 1 ELSE 0 END) AS count_this_month, '
+                        . 'SUM(CASE WHEN `date` BETWEEN ? AND ? THEN 1 ELSE 0 END) AS count_previous_month',
+                    [
+                        $startOfMonth,
+                        $endOfMonth,
+                        $startOfLastMonth,
+                        $endOfLastMonth,
+                        $startOfMonth,
+                        $endOfMonth,
+                        $startOfLastMonth,
+                        $endOfLastMonth,
+                    ]
+                )
+                ->first();
+
+            $totalIncomeThisMonth = (float) ($aggregates->income_this_month ?? 0);
+            $totalIncomePreviousMonth = (float) ($aggregates->income_previous_month ?? 0);
+            $countTransactionThisMonth = (int) ($aggregates->count_this_month ?? 0);
+            $countTransactionPreviousMonth = (int) ($aggregates->count_previous_month ?? 0);
 
             $data = compact('countBusiness', 'countWarehouse', 'countAdminBisnis', 'countAdminOutlet', 'totalIncomeThisMonth', 'totalIncomePreviousMonth', 'countTransactionThisMonth', 'countTransactionPreviousMonth', 'countProduct', 'countIngredient');
         } else {
@@ -90,8 +113,20 @@ class HomeController extends Controller
             $profit = $revenue - $expense;
 
             $data = compact(
-                'purchase_return', 'revenue', 'expense', 'profit', 'countBusiness', 'countWarehouse', 'countAdminBisnis', 'countAdminOutlet',
-                'countProduct', 'countIngredient', 'totalIncomePreviousMonth', 'totalIncomeThisMonth', 'countTransactionPreviousMonth', 'countTransactionThisMonth'
+                'purchase_return',
+                'revenue',
+                'expense',
+                'profit',
+                'countBusiness',
+                'countWarehouse',
+                'countAdminBisnis',
+                'countAdminOutlet',
+                'countProduct',
+                'countIngredient',
+                'totalIncomePreviousMonth',
+                'totalIncomeThisMonth',
+                'countTransactionPreviousMonth',
+                'countTransactionThisMonth'
             );
         }
 
@@ -149,5 +184,4 @@ class HomeController extends Controller
         }
         return redirect()->back()->with('message', 'APK Berhasil Diupload');
     }
-
 }

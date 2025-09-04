@@ -26,15 +26,15 @@ class WarehouseController extends Controller
     public function index()
     {
         if(auth()->user()->hasRole('Superadmin')){
-            $lims_warehouse_all = Warehouse::with('business')->where('is_active', true)->get();
+            $lims_warehouse_all = Warehouse::with('business', 'regional')->where('is_active', true)->get();
             $business = Business::get();
             $regionals = Regional::get();
         } elseif(auth()->user()->hasRole('Admin Bisnis')){
-            $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->business_id)->firstOrFail();
+            $business = Business::with('warehouse', 'warehouse.business', 'warehouse.regional')->where('id', auth()->user()->business_id)->firstOrFail();
             $regionals = Regional::where('business_id', $business->id)->get();
             $lims_warehouse_all = $business->warehouse;
         } else{
-            $business = Business::with('warehouse', 'warehouse.business')->where('id', auth()->user()->warehouse->business_id)->first();
+            $business = Business::with('warehouse', 'warehouse.business', 'warehouse.regional')->where('id', auth()->user()->warehouse->business_id)->first();
             $regionals = Regional::where('id', auth()->user()->warehouse->regional_id)->first();
             $lims_warehouse_all = $business->warehouse;
         }

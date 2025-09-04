@@ -36,6 +36,7 @@ use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ProductWarehouseController;
 use App\Http\Controllers\Report\ProductOmzetController;
 use App\Http\Controllers\Report\FinanceReportController;
+use App\Http\Controllers\TableTransactionController;
 
 // Fallback: redirect any unknown route to the admin login page
 Route::fallback(function () {
@@ -351,3 +352,9 @@ Route::group(['prefix' => 'admin'], function () {
         Route::resource('tables', TableController::class);
     });
 });
+
+Route::get('/menu', function() {
+    return view('backend.layout.menu');
+});
+
+Route::get('/menu/demo/{warehouse}', [TableTransactionController::class, 'demo']);

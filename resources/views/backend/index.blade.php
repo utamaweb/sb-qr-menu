@@ -6,7 +6,7 @@
         <div class="container-fluid">
         <div class="col-md-12">
             <div class="brand-text float-left mt-4">
-                <h3>{{trans('file.welcome')}} <span>{{Auth::user()->name}}</span></h3>
+                <h3>Welcome <span>{{Auth::user()->name}}</span></h3>
             </div>
             <div class="filter-toggle btn-group">
                 <button style="cursor: auto;" class="btn btn-secondary date-btn" disabled data-start_date="{{date('Y').'-'.date('m').'-'.'01'}}" data-end_date="{{date('Y-m-d')}}">{{date('F')}} {{date('Y')}}</button>

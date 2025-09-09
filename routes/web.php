@@ -353,9 +353,11 @@ Route::group(['prefix' => 'admin'], function () {
     });
 });
 
-Route::get('/menu', function() {
-    return view('backend.layout.menu');
-});
-
 Route::get('/menu/demo/{warehouse}', [TableTransactionController::class, 'demo']);
 Route::get('/menu/demo-mobile/{warehouse}', [TableTransactionController::class, 'demoMobile']);
+Route::get('/menu/info', function() {
+    return view('backend.layout.menu-info');
+});
+
+Route::get('/table/{tableCode}', [TableTransactionController::class, 'qrMenuAccess']);
+Route::get('/menu/{tableTransactionCode}', [TableTransactionController::class, 'getTableMenuPage'])->name('getTableMenuPage');

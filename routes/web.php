@@ -359,6 +359,6 @@ Route::get('/menu/info', function() {
     return view('backend.layout.menu-info');
 });
 
-Route::get('/table/{tableCode}', [TableTransactionController::class, 'qrMenuAccess']);
+Route::get('/table/{tableCode}', [TableTransactionController::class, 'qrMenuAccess'])->name('qrMenuAccess');
 Route::get('/menu/{tableTransactionCode}', [TableTransactionController::class, 'getTableMenuPage'])->name('getTableMenuPage');
 Route::post('/menu/{tableTransactionCode}', [TableTransactionController::class, 'createOrder'])->name('createOrder');

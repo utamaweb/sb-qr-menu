@@ -4,6 +4,12 @@
         <span>Kategori Custom</span>
     </a>
 </li>
+<li id="table">
+    <a href="{{ route('tables.index') }}">
+        <i class="dripicons-document"></i>
+        <span>Meja</span>
+    </a>
+</li>
 <li id="max_shift_link">
     <a href="{{ route('maxShiftPage') }}">
         <i class="dripicons-clock"></i>

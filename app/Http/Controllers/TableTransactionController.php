@@ -7,12 +7,14 @@ use App\Models\TableTransaction;
 use App\Models\Transaction;
 use App\Models\Warehouse;
 use App\Services\TableTransactionService;
+use App\Services\OutletService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 
 class TableTransactionController extends Controller
 {
     private $tableTransactionService;
+    private $outletService;
 
     /**
      * Constructor -> __construct (Public method)
@@ -22,6 +24,7 @@ class TableTransactionController extends Controller
     public function __construct()
     {
         $this->tableTransactionService = new TableTransactionService();
+        $this->outletService = new OutletService();
     }
 
     /**
@@ -37,6 +40,16 @@ class TableTransactionController extends Controller
             return view('backend.layout.menu-info', [
                 'infoTitle' => 'Meja Tidak Ditemukan',
                 'infoSubtitle' => 'Kode meja tidak ditemukan. Silakan hubungi pelayan untuk mendapatkan bantuan.',
+            ]);
+        }
+
+        // Check latest shift
+        $latestShift = $this->outletService->checkLatestShift($table->outlet_id);
+
+        if (!$latestShift) {
+            return view('backend.layout.menu-info', [
+                'infoTitle' => 'Outlet Tutup',
+                'infoSubtitle' => 'Outlet sedang tutup. Silakan hubungi pelayan untuk mendapatkan bantuan.',
             ]);
         }
 
@@ -107,6 +120,47 @@ class TableTransactionController extends Controller
         $mappedData = $this->tableTransactionService->getMappedProducts($tableTransaction->table->outlet);
 
         return view('backend.layout.menu-mobile', compact('mappedData'));
+    }
+
+    /**
+     * Create Order -> createOrder (Public method)
+     *
+     * method used to create order from table transaction.
+     */
+    public function createOrder(Request $request, $tableTransactionCode)
+    {
+        // Get Table Transaction
+        $tableTransaction = TableTransaction::where('code', $tableTransactionCode)->with('table.outlet')->first();
+
+        // Check latest shift
+        $latestShift = $this->outletService->checkLatestShift($tableTransaction->table->outlet_id);
+
+        if (!$latestShift) {
+            return view('backend.layout.menu-info', [
+                'infoTitle' => 'Outlet Tutup',
+                'infoSubtitle' => 'Outlet sedang tutup. Silakan hubungi pelayan untuk mendapatkan bantuan.',
+            ]);
+        }
+
+        // Create order
+        // Map data from request to array
+        $data = [];
+        $data['total'] = $request->input('total');
+        $data['items'] = json_decode($request->input('cart'), true);
+
+        try {
+            $this->tableTransactionService->createNewTransaction($tableTransactionCode, $data, $latestShift);
+
+            return view('backend.layout.menu-info', [
+                'infoTitle' => 'Pemesanan Berhasil',
+                'infoSubtitle' => 'Pemesanan Anda telah berhasil. Silakan tunggu pesanan Anda disiapkan.',
+            ]);
+        } catch (\Exception $e) {
+            return view('backend.layout.menu-info', [
+                'infoTitle' => 'Pemesanan Gagal',
+                'infoSubtitle' => 'Terjadi kesalahan saat memproses pesanan Anda. Silakan coba lagi atau hubungi pelayan untuk mendapatkan bantuan. Error: ' . $e->getMessage(),
+            ]);
+        }
     }
 
     /**

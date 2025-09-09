@@ -361,3 +361,4 @@ Route::get('/menu/info', function() {
 
 Route::get('/table/{tableCode}', [TableTransactionController::class, 'qrMenuAccess']);
 Route::get('/menu/{tableTransactionCode}', [TableTransactionController::class, 'getTableMenuPage'])->name('getTableMenuPage');
+Route::post('/menu/{tableTransactionCode}', [TableTransactionController::class, 'createOrder'])->name('createOrder');

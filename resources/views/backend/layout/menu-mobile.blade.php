@@ -310,7 +310,7 @@
     </div>
 
     <!-- Hidden order form (change action to your submit route) -->
-    <form id="orderForm" method="POST" action="{{ url()->current() }}" class="d-none">
+    <form id="orderForm" method="POST" action="{{ route('createOrder', request('tableTransactionCode')) }}" class="d-none">
         @csrf
         <input type="hidden" name="cart" id="orderCart" />
         <input type="hidden" name="total" id="orderTotal" />

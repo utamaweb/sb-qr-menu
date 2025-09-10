@@ -75,8 +75,17 @@ class TableTransactionController extends Controller
             } else {
                 // Check transaction status
                 $transaction = Transaction::where('id', $latestSession->transaction_id)->first();
-                if ($transaction->status != 'lunas') {
+                if ($transaction->status != 'Lunas') {
                     return redirect()->route('getTableMenuPage', ['tableTransactionCode' => $latestSession->code]);
+                } else {
+                    // Create new session
+                    $newSessionCode = $table->code . '-' . strtolower(Str::random(5));
+                    $newSession = $table->tableTransactions()->create([
+                        'code' => $newSessionCode,
+                        'status' => 'pending',
+                    ]);
+
+                    return redirect()->route('getTableMenuPage', ['tableTransactionCode' => $newSession->code]);
                 }
             }
         } else {
